@@ -245,7 +245,17 @@ body {
   width: min(100dvw, calc(100dvh - 11.5rem));
   height: min(100dvw, calc(100dvh - 11.5rem));
   max-width: 100%;
-  background: #161512;
+  background-color: #f0d9b5;
+  background-image: linear-gradient(45deg, #b58863 25%, transparent 25%),
+    linear-gradient(-45deg, #b58863 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #b58863 75%),
+    linear-gradient(-45deg, transparent 75%, #b58863 75%);
+  background-size: 25% 25%;
+  background-position:
+    0 0,
+    0 12.5%,
+    12.5% -12.5%,
+    -12.5% 0;
   box-shadow: 0 0 0 1px #000;
 }
 

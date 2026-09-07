@@ -1,13 +1,10 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { Chessground } from "@lichess-org/chessground";
 import type { Api } from "@lichess-org/chessground/api";
 import type { Key } from "@lichess-org/chessground/types";
 import type { DrawBrushes, DrawShape } from "@lichess-org/chessground/draw";
-
-import "@lichess-org/chessground/assets/chessground.base.css";
-import "@lichess-org/chessground/assets/chessground.brown.css";
-import "@lichess-org/chessground/assets/chessground.cburnett.css";
 
 export interface BoardArrow {
   orig: Key;
@@ -49,7 +46,7 @@ export function ChessBoard({
   check = false,
   onMove,
 }: ChessBoardProps) {
-  const wrapRef = useRef<HTMLDivElement>(null);
+  const hostRef = useRef<HTMLDivElement>(null);
   const apiRef = useRef<Api | null>(null);
   const onMoveRef = useRef(onMove);
   const latestRef = useRef({
@@ -63,6 +60,7 @@ export function ChessBoard({
     movableColor,
     check,
   });
+  const [side, setSide] = useState(0);
 
   useEffect(() => {
     onMoveRef.current = onMove;
@@ -80,63 +78,84 @@ export function ChessBoard({
   });
 
   useEffect(() => {
-    const el = wrapRef.current;
-    if (!el) return;
-    let alive = true;
-    let api: Api | undefined;
+    const host = hostRef.current;
+    const parent = host?.parentElement;
+    if (!host || !parent) return;
 
-    void import("@lichess-org/chessground").then(({ Chessground }) => {
-      if (!alive || !wrapRef.current) return;
-      const latest = latestRef.current;
-      api = Chessground(wrapRef.current, {
-        fen: latest.fen,
-        orientation: latest.orientation,
-        turnColor: latest.turnColor,
-        check: latest.check,
-        lastMove: latest.lastMove ?? undefined,
-        coordinates: true,
-        disableContextMenu: true,
-        blockTouchScroll: true,
-        trustAllEvents: true,
-        addPieceZIndex: true,
-        animation: { enabled: true, duration: 200 },
-        draggable: {
-          enabled: true,
-          showGhost: true,
-          autoDistance: true,
-          distance: 0,
+    const measure = () => {
+      const next = Math.max(
+        0,
+        Math.floor(Math.min(parent.clientWidth, parent.clientHeight)),
+      );
+      setSide(next);
+    };
+
+    const ro = new ResizeObserver(measure);
+    ro.observe(parent);
+    measure();
+    return () => ro.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const host = hostRef.current;
+    if (!host || side < 32) return;
+
+    const el = document.createElement("div");
+    el.className = "cg-wrap board-cg";
+    el.style.width = `${side}px`;
+    el.style.height = `${side}px`;
+    host.replaceChildren(el);
+
+    const latest = latestRef.current;
+    const api = Chessground(el, {
+      fen: latest.fen,
+      orientation: latest.orientation,
+      turnColor: latest.turnColor,
+      check: latest.check,
+      lastMove: latest.lastMove ?? undefined,
+      coordinates: true,
+      disableContextMenu: true,
+      blockTouchScroll: true,
+      trustAllEvents: true,
+      addPieceZIndex: true,
+      jsHover: true,
+      addDimensionsCssVarsTo: el,
+      animation: { enabled: true, duration: 200 },
+      draggable: {
+        enabled: true,
+        showGhost: true,
+        autoDistance: true,
+        distance: 0,
+      },
+      selectable: { enabled: true },
+      highlight: { lastMove: true, check: true },
+      movable: {
+        free: false,
+        color: latest.viewOnly ? undefined : latest.movableColor,
+        dests: latest.dests,
+        showDests: true,
+        rookCastle: true,
+        events: {
+          after: (orig, dest) => onMoveRef.current(orig, dest),
         },
-        selectable: { enabled: true },
-        highlight: { lastMove: true, check: true },
-        movable: {
-          free: false,
-          color: latest.viewOnly ? undefined : latest.movableColor,
-          dests: latest.dests,
-          showDests: true,
-          rookCastle: true,
-          events: {
-            after: (orig, dest) => onMoveRef.current(orig, dest),
-          },
-        },
-        premovable: { enabled: false },
-        predroppable: { enabled: false },
-        drawable: {
-          enabled: false,
-          visible: true,
-          brushes,
-          autoShapes: toShapes(latest.arrows),
-        },
-      });
-      apiRef.current = api;
+      },
+      premovable: { enabled: false },
+      predroppable: { enabled: false },
+      drawable: {
+        enabled: false,
+        visible: true,
+        brushes,
+        autoShapes: toShapes(latest.arrows),
+      },
     });
+    apiRef.current = api;
 
     return () => {
-      alive = false;
-      api?.destroy();
-      apiRef.current?.destroy();
-      apiRef.current = null;
+      api.destroy();
+      if (apiRef.current === api) apiRef.current = null;
+      el.remove();
     };
-  }, []);
+  }, [side]);
 
   useEffect(() => {
     apiRef.current?.set({
@@ -167,9 +186,15 @@ export function ChessBoard({
   ]);
 
   return (
-    <div className="board-frame">
-      <div ref={wrapRef} className="cg-wrap board-cg" />
-    </div>
+    <div
+      ref={hostRef}
+      className="board-frame"
+      style={
+        side > 0
+          ? { width: side, height: side, maxWidth: "none" }
+          : undefined
+      }
+    />
   );
 }
 
