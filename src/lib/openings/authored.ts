@@ -12,7 +12,7 @@ export const authoredProfessor: Record<string, ProfessorScript[]> = {
         title: "Lion house",
         intro:
           "…d6. Same first move as a Pirc — different teeth. Watch the squares this pawn owns.",
-        startPly: 1,
+        startPly: 2,
         branch: [
           {
             san: "d4",
@@ -43,7 +43,7 @@ export const authoredProfessor: Record<string, ProfessorScript[]> = {
         title: "Not a Pirc",
         intro:
           "…Nbd7. This hop is how you tell a Lion from a Pirc. Let me show the e5 break it prepares.",
-        startPly: 5,
+        startPly: 6,
         branch: [
           {
             san: "Nf3",
@@ -75,7 +75,7 @@ export const authoredProfessor: Record<string, ProfessorScript[]> = {
         title: "The e5 pin",
         intro:
           "…e5. Why this square? Because the Lion's whole attack later — …e4, …Nf8-g6 — is built on this stake.",
-        startPly: 7,
+        startPly: 8,
         branch: [
           {
             san: "Bc4",
@@ -125,7 +125,7 @@ export const authoredProfessor: Record<string, ProfessorScript[]> = {
         title: "Coil the queen",
         intro:
           "Queen to c7. Why this square? Watch the file it opens and the squares it watches. Then the rest of the coil.",
-        startPly: 15,
+        startPly: 16,
         branch: [
           {
             san: "h3",
@@ -172,7 +172,7 @@ export const authoredProfessor: Record<string, ProfessorScript[]> = {
         title: "The Nf8 coil",
         intro:
           "…Nf8. Why this ugly-looking hop? Because g6 is the attacking square, and d7 is now a traffic jam.",
-        startPly: 21,
+        startPly: 22,
         branch: [
           {
             san: "Nf5",
@@ -238,7 +238,7 @@ export const authoredProfessor: Record<string, ProfessorScript[]> = {
         title: "London bishop",
         intro:
           "Bf4. Why this diagonal? Because Ne5 later sits in front of it, and h7 is a long-term target.",
-        startPly: 2,
+        startPly: 3,
         branch: [
           {
             san: "Nf6",
@@ -283,7 +283,7 @@ export const authoredProfessor: Record<string, ProfessorScript[]> = {
         title: "Ne5 outpost",
         intro:
           "Ne5. Why this square? Watch the squares the knight should control. Then the f4 clamp.",
-        startPly: 16,
+        startPly: 17,
         branch: [
           {
             san: "Bb7",

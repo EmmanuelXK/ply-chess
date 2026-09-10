@@ -148,6 +148,27 @@ export function validateOpening(opening: Opening): void {
       throw new Error(`[${opening.id}] history ${row.id} whyItMattersHere is too short`);
     }
   }
+  for (const script of opening.professor) {
+    const lesson = script.whyLesson;
+    if (!lesson?.branch?.length) continue;
+    const g = new Chess();
+    for (const san of opening.moves.slice(0, lesson.startPly)) {
+      try {
+        if (!g.move(san)) throw new Error("null");
+      } catch {
+        throw new Error(
+          `[${opening.id}] Why "${lesson.title}" startPly ${lesson.startPly} is illegal`,
+        );
+      }
+    }
+    for (const ply of lesson.branch) {
+      try {
+        if (!g.move(ply.san)) throw new Error("null");
+      } catch {
+        throw new Error(`[${opening.id}] Why "${lesson.title}" illegal branch SAN ${ply.san}`);
+      }
+    }
+  }
 }
 
 export function validateAll(openings: Opening[]): void {

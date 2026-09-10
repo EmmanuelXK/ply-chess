@@ -76,7 +76,7 @@ npm run dev
 App: [http://127.0.0.1:43173](http://127.0.0.1:43173)
 
 ```bash
-npm run validate   # 21 spines legal, fingerprints, quizzes, professor scripts
+npm run validate   # 21 spines legal, fingerprints, quizzes, professor, sourced history, legal Why branches
 npm run build
 ```
 
@@ -88,7 +88,8 @@ On an iPhone: open the URL, Share → Add to Home Screen.
 2. Add a spec in `src/lib/openings/specs.ts` (`bookChunks`, traps, pillars, coach).
 3. Add a fingerprint in `src/lib/openings/fingerprints.ts`.
 4. Optional authored Why/quizzes in `src/lib/openings/authored.ts`.
-5. `makeOpening` compiles chunks + professor. Home and `/drill/[id]` pick it up.
+5. Add at least one sourced `HISTORY_PACK` row in `src/lib/openings/history.ts`.
+6. `makeOpening` compiles chunks + professor + history. Home and `/drill/[id]` pick it up.
 
 Inspired by Lotus / Chessreps *ideas* — no copied code, assets, or branding.
 

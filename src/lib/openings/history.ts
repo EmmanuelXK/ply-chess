@@ -12,11 +12,11 @@ export const HISTORY_PACK: HistoryMilestone[] = [
     openingId: "kings-gambit",
     plyOrFen: 3,
     title: "The old king's pawn",
-    year: 1561,
+    year: 1497,
     era: "Romantic",
     glyph: "debut",
     summary:
-      "The King's Gambit is among the oldest recorded openings. A line appears in a work credited to Luis Ramírez de Lucena, and the Spanish priest Ruy López de Segura was the first to publish analysis of it. Romantic players loved it because White does not merely gambit a pawn — he opens the files that usually hide his own king.",
+      "The King's Gambit is among the oldest recorded openings. Wikipedia places a line in Luis Ramírez de Lucena's 1497 book; the earliest game in ChessBase is dated 1560, and Ruy López de Segura was the first to publish analysis of it. Romantic players loved it because White does not merely gambit a pawn — he opens the files that usually hide his own king.",
     whyItMattersHere:
       "2.f4 is the same offer they wrote down in the 16th century. You are not inventing courage. You are joining a very old argument about initiative.",
     sources: [
@@ -325,11 +325,11 @@ export const HISTORY_PACK: HistoryMilestone[] = [
     openingId: "caro-fantasy",
     plyOrFen: 5,
     title: "The Fantasy 3.f3",
-    year: 1886,
+    year: 1899,
     era: "Romantic",
     glyph: "paper",
     summary:
-      "3.f3 is the Fantasy Variation of the Caro–Kann (also called the Maróczy Variation in some older sources). White supports e4 with a pawn and accepts an open f-file if Black takes. It is a minority try compared with 3.Nc3 and 3.e5, which is why this attacking repertoire picked it: the same f-pawn habit as Vienna, King's Gambit, and Grand Prix.",
+      "3.f3 is the Fantasy Variation of the Caro–Kann, also called the Maróczy or Tartakower Variation. Wikipedia notes a sacrificial line 5.Nf3 exd4 6.Bc4 played as early as 1899 by Géza Maróczy. White supports e4 and accepts an open f-file if Black takes. It is a minority try compared with 3.Nc3 and 3.e5 — the same f-pawn habit as Vienna, King's Gambit, and Grand Prix.",
     whyItMattersHere:
       "f3 is not a beginner's inaccuracy here. It is the system's tell: keep e4, open a file, and refuse to play a slow Caro squeeze.",
     sources: [
@@ -347,7 +347,7 @@ export const HISTORY_PACK: HistoryMilestone[] = [
     era: "Classical",
     glyph: "debut",
     summary:
-      "Irish-American master James Mason was the first player to employ this Bf4 setup regularly at master level, including Vienna 1882. Wikipedia is careful: the opening did not catch on then. Mason sometimes even used Nc3 instead of the later c3 triangle — so the Jobava idea has 19th-century shadows, but it was not yet a named system.",
+      "Irish-American master James Mason was the first player to employ this Bf4 setup regularly at master level, including Vienna 1882. Wikipedia is careful: the opening did not catch on then. The quiet c3 triangle and the later Jobava Nc3 plan are different houses; Mason's games are the ancestor of the bishop, not a license to mix the two.",
     whyItMattersHere:
       "2.Bf4 is Mason's bishop. This spine then builds the c3–d4–e3 triangle. Keep Nc3 off this board; that is the other London.",
     sources: [
@@ -381,7 +381,7 @@ export const HISTORY_PACK: HistoryMilestone[] = [
     era: "Modern",
     glyph: "revival",
     summary:
-      "Wikipedia calls this the Rapport–Jobava System: Bf4 plus Nc3 instead of the London's Nbd2 and c3. It is a 21st-century attacking fashion named for Richárd Rapport and Baadur Jobava. James Mason had already mixed Nc3 into Bf4 setups in the 1880s, so do not claim they invented the piece placement — they named and popularized the modern identity.",
+      "Wikipedia calls this the Rapport–Jobava System: Bf4 plus Nc3 instead of the London's Nbd2 and c3. It is a 21st-century attacking fashion named for Richárd Rapport and Baadur Jobava. Mason's 19th-century Bf4 is the quiet London's ancestor; this Nc3 identity is the modern naming, not a claim that they invented every piece on the board.",
     whyItMattersHere:
       "Nc3 is the tell. You are threatening ideas against c7 and a later e4, not building Mason's quiet triangle. Keep this distinct from classical London.",
     sources: [
@@ -496,11 +496,11 @@ export const HISTORY_PACK: HistoryMilestone[] = [
     openingId: "dragon",
     plyOrFen: 24,
     title: "Yugoslav Attack, Soltis …h5",
-    year: 1970,
+    year: 1995,
     era: "Modern",
     glyph: "paper",
     summary:
-      "White's most dangerous try is the Yugoslav Attack: Be3, f3, Qd2, long castle, then a pawn storm. Wikipedia lists 9.O-O-O, 9.Bc4, and 9.g4 as the main branches. The Soltis idea …h5 (as in this spine) is a known way to slow h4–h5. Kasparov used the Dragon as a surprise against Anand in their 1995 title match, then dropped it.",
+      "White's most dangerous try is the Yugoslav Attack: Be3, f3, Qd2, long castle, then a pawn storm. Wikipedia lists 9.O-O-O, 9.Bc4, and 9.g4 as the main branches. The Soltis idea is 12…h5, holding up the kingside storm; Kasparov played that move three times against Anand in the 1995 title match (two wins, one draw), then dropped the Dragon.",
     whyItMattersHere:
       "…h5 is not panic. It is how this book meets the opposite-side race: hold g4, keep the bishop, and counter on the c-file.",
     sources: [
@@ -588,15 +588,16 @@ export const HISTORY_PACK: HistoryMilestone[] = [
     openingId: "kings-indian",
     plyOrFen: 4,
     title: "The King's Indian house",
-    year: 1922,
+    year: 1924,
     era: "Hypermodern",
     glyph: "debut",
     summary:
-      "The King's Indian Defence (1.d4 Nf6 2.c4 g6) is a hypermodern classic: Black lets White take the centre with pawns and later strikes with …e5 or …c5. It became a main defence in the mid-20th century through Bronstein, Boleslavsky, Geller, Gligorić, Fischer, and Kasparov. Wikipedia is the census; this book chooses one attacking branch, not the whole forest.",
+      "The King's Indian Defence (1.d4 Nf6 2.c4 g6) is a hypermodern classic: Black lets White take the centre with pawns and later strikes with …e5 or …c5. Savielly Tartakower's 1924 Die hypermoderne Schachpartie classifies the Indian defences; Wikipedia notes the opening was still thought suspect into the 1930s, then Bronstein, Boleslavsky, Geller, Gligorić, Fischer, and Kasparov made it a main weapon. This book chooses one attacking branch, not the whole forest.",
     whyItMattersHere:
       "…g6 here is a King's Indian, not a Grünfeld (which would take …d5). You are building the fianchetto to hit a wide white centre.",
     sources: [
       { label: "Wikipedia: King's Indian Defence", url: "https://en.wikipedia.org/wiki/King%27s_Indian_Defence" },
+      { label: "Wikipedia: Indian Defence", url: "https://en.wikipedia.org/wiki/Indian_Defence" },
     ],
   },
   {
@@ -686,6 +687,22 @@ export const HISTORY_PACK: HistoryMilestone[] = [
 
   // --- Dutch Leningrad ---
   {
+    id: "dutch-stein-1789",
+    openingId: "dutch-leningrad",
+    plyOrFen: 2,
+    title: "Stein's 1789 advice",
+    year: 1789,
+    era: "Classical",
+    glyph: "debut",
+    summary:
+      "Wikipedia names the Dutch for Elias Stein, an Alsatian settled in The Hague, who in his 1789 book recommended 1…f5 as the best reply to 1.d4. The opening has never been a main line, but Morphy, Alekhine, Najdorf, Larsen, and later Nakamura have used it. This book does not play Stonewall …e6 or Classical …e6; it plays the Leningrad fianchetto.",
+    whyItMattersHere:
+      "…f5 on move one is Stein's claim on e4. Everything that follows in this spine is a Leningrad dress of that claim, not a Stonewall wall.",
+    sources: [
+      { label: "Wikipedia: Dutch Defence", url: "https://en.wikipedia.org/wiki/Dutch_Defence" },
+    ],
+  },
+  {
     id: "dutch-wcc-1951",
     openingId: "dutch-leningrad",
     plyOrFen: 2,
@@ -694,7 +711,7 @@ export const HISTORY_PACK: HistoryMilestone[] = [
     era: "Hypermodern",
     glyph: "paper",
     summary:
-      "1…f5 is the Dutch Defence. Wikipedia notes it has never been a main line against 1.d4, but Botvinnik and Bronstein both used it in their 1951 World Championship match. Morphy, Alekhine, Najdorf, Larsen, and later Nakamura have also played it. This book does not play Stonewall …e6 or Classical …e6; it plays the Leningrad fianchetto.",
+      "1…f5 is the Dutch Defence. Wikipedia notes it has never been a main line against 1.d4, but Botvinnik and Bronstein both used it in their 1951 World Championship match. This book does not play Stonewall …e6 or Classical …e6; it plays the Leningrad fianchetto.",
     whyItMattersHere:
       "…f5 on move one claims e4. Everything that follows in this spine is a Leningrad dress of that claim, not a Stonewall wall.",
     sources: [
@@ -706,11 +723,11 @@ export const HISTORY_PACK: HistoryMilestone[] = [
     openingId: "dutch-leningrad",
     plyOrFen: 6,
     title: "Leningrad Variation",
-    year: 1960,
+    year: 1789,
     era: "Hypermodern",
-    glyph: "debut",
+    glyph: "paper",
     summary:
-      "The Leningrad Dutch combines …f5 with …g6 and …Bg7 (ECO A87 when White has c4, g3, Bg2, Nf3). Wikipedia lists it as a named branch of the Dutch, alongside Stonewall and Ilyin–Zhenevsky. The name points to the Leningrad school of players who developed the fianchetto treatment; it is not a single famous game.",
+      "The Leningrad Dutch combines …f5 with …g6 and …Bg7. Wikipedia lists it as a named main branch (ECO A87–A89) beside Stonewall and Ilyin–Zhenevsky, and does not pin a single first game. The name points to the Leningrad school. Stein's 1789 Dutch is the documented start of 1…f5; this ply is the fianchetto dress, not a Stonewall.",
     whyItMattersHere:
       "…g6 here makes a King's Indian with an extra f-pawn. Your storm ideas (…e5, kingside space) come from that bishop, not from a Stonewall clamp.",
     sources: [

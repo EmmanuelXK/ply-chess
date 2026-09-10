@@ -12,18 +12,28 @@ import { authoredProfessor, authoredQuizzes } from "./authored";
 
 function moveSquares(san: string, beforeFen: string) {
   const g = new Chess(beforeFen);
-  const move = g.move(san);
-  if (!move) return null;
-  return {
-    from: move.from as Key,
-    to: move.to as Key,
-    fen: g.fen(),
-  };
+  try {
+    const move = g.move(san);
+    if (!move) return null;
+    return {
+      from: move.from as Key,
+      to: move.to as Key,
+      fen: g.fen(),
+    };
+  } catch {
+    return null;
+  }
 }
 
 function autoBranch(opening: Opening, startPly: number, count = 6): WhyPly[] {
   const chess = new Chess();
-  for (let i = 0; i < startPly; i++) chess.move(opening.moves[i]);
+  for (let i = 0; i < startPly; i++) {
+    try {
+      chess.move(opening.moves[i]);
+    } catch {
+      return [];
+    }
+  }
   const branch: WhyPly[] = [];
   const end = Math.min(opening.moves.length, startPly + count);
   for (let ply = startPly; ply < end; ply++) {
@@ -31,7 +41,11 @@ function autoBranch(opening: Opening, startPly: number, count = 6): WhyPly[] {
     const before = chess.fen();
     const played = moveSquares(san, before);
     if (!played) break;
-    chess.move(san);
+    try {
+      chess.move(san);
+    } catch {
+      break;
+    }
     const script = opening.professor.find((p) => p.afterPly === ply);
     const userMove =
       opening.side === "white" ? ply % 2 === 0 : ply % 2 === 1;

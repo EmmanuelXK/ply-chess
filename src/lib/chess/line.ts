@@ -6,9 +6,13 @@ export function playLine(moves: string[], ply: number) {
   let lastMove: Key[] | null = null;
   const capped = Math.max(0, Math.min(ply, moves.length));
   for (let i = 0; i < capped; i++) {
-    const move = chess.move(moves[i]);
-    if (!move) break;
-    lastMove = [move.from as Key, move.to as Key];
+    try {
+      const move = chess.move(moves[i]);
+      if (!move) break;
+      lastMove = [move.from as Key, move.to as Key];
+    } catch {
+      break;
+    }
   }
   return {
     fen: chess.fen(),
