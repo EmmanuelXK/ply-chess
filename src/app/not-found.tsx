@@ -11,7 +11,8 @@ export default function NotFound() {
         That line isn&apos;t in the book.
       </h1>
       <p className="mt-2 text-sm text-zinc-400">
-        v1 is London, Pirc, Black Lion. Pick one of those.
+        Phase 1 is twenty-one attacking systems. Pick one from the home list —
+        London and Jobava are both in there.
       </p>
       <Button asChild className="mt-6">
         <Link href="/">Back to repertoire</Link>
