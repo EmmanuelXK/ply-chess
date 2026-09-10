@@ -2,10 +2,10 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Opening Trainer",
-    short_name: "Openings",
+    name: "Opening Edge",
+    short_name: "Opening Edge",
     description:
-      "iPhone-first chess opening trainer. London, Pirc, Black Lion.",
+      "iPhone-first chess opening trainer. 21 attacking systems, professor Why, hybrid practice.",
     start_url: "/",
     display: "standalone",
     orientation: "portrait",

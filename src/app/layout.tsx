@@ -14,13 +14,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Opening Trainer",
+  title: "Opening Edge",
   description:
-    "iPhone-first PWA. Drill London, Pirc, and the Black Lion to a playable middlegame.",
-  applicationName: "Opening Trainer",
+    "iPhone-first PWA. Drill 21 attacking systems to move 21 — spines, traps, six pillars, professor Why.",
+  applicationName: "Opening Edge",
   appleWebApp: {
     capable: true,
-    title: "Openings",
+    title: "Opening Edge",
     statusBarStyle: "black-translucent",
   },
   icons: {
