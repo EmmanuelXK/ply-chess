@@ -19,6 +19,8 @@ import {
 import { ChessBoard, type BoardArrow } from "@/components/board/chess-board";
 import { Button } from "@/components/ui/button";
 import { AnalyzeSplash } from "@/components/drill/analyze-splash";
+import { HistoryMark } from "@/components/drill/history-mark";
+import { HistorySplash } from "@/components/drill/history-splash";
 import { PlyNav } from "@/components/drill/ply-nav";
 import { PracticePanel } from "@/components/drill/practice-panel";
 import { QuizSheet } from "@/components/drill/quiz-sheet";
@@ -41,6 +43,7 @@ import {
   quizForPly,
   REPS_MODES,
   whyLessonAt,
+  historyAt,
   type Opening,
   type PlanVoice,
   type RepsMode,
@@ -87,6 +90,7 @@ export function DrillScreen({
   const [check, setCheck] = useState(false);
   const [bookOpen, setBookOpen] = useState(false);
   const [whyOpen, setWhyOpen] = useState(false);
+  const [historyOpen, setHistoryOpen] = useState(false);
   const [analyzeOpen, setAnalyzeOpen] = useState(false);
   const [quizOpen, setQuizOpen] = useState(initialReps === "quiz");
   const [thinkOpen, setThinkOpen] = useState(initialReps === "think");
@@ -339,6 +343,7 @@ export function DrillScreen({
   const shownMove = Math.min(Math.ceil(ply / 2), fullMoves);
   const quiz = quizForPly(opening, Math.max(0, ply - 1));
   const why = whyLessonAt(opening, ply);
+  const historyNow = historyAt(opening, ply);
 
   const hint = () => {
     if (mode !== "drill" || hintUsed || busy) return;
@@ -471,24 +476,42 @@ export function DrillScreen({
           >
             Why
           </button>
+          {historyNow.length ? (
+            <HistoryMark
+              glyph={historyNow[0].glyph}
+              label={`${historyNow[0].title} (${historyNow[0].year})`}
+              onClick={() => setHistoryOpen(true)}
+            />
+          ) : null}
         </div>
       </header>
 
       <div className="board-stage">
-        <ChessBoard
-          fen={fen}
-          dests={dests}
-          lastMove={lastMove}
-          arrows={arrows}
-          orientation={orientation}
-          turnColor={turnColor}
-          viewOnly={busy && mode === "drill"}
-          movableColor={movableColor}
-          check={check}
-          animationMs={150}
-          onMove={onMove}
-          onLongPress={() => setAnalyzeOpen(true)}
-        />
+        <div className="board-with-history">
+          <ChessBoard
+            fen={fen}
+            dests={dests}
+            lastMove={lastMove}
+            arrows={arrows}
+            orientation={orientation}
+            turnColor={turnColor}
+            viewOnly={busy && mode === "drill"}
+            movableColor={movableColor}
+            check={check}
+            animationMs={150}
+            onMove={onMove}
+            onLongPress={() => setAnalyzeOpen(true)}
+          />
+          {historyNow.length ? (
+            <div className="history-corner">
+              <HistoryMark
+                glyph={historyNow[0].glyph}
+                label={`${historyNow[0].title} (${historyNow[0].year})`}
+                onClick={() => setHistoryOpen(true)}
+              />
+            </div>
+          ) : null}
+        </div>
       </div>
 
       <PlyNav
@@ -590,6 +613,15 @@ export function DrillScreen({
           lesson={why}
           orientation={orientation}
           onClose={() => setWhyOpen(false)}
+        />
+      ) : null}
+
+      {historyOpen && historyNow.length ? (
+        <HistorySplash
+          opening={opening}
+          milestones={historyNow}
+          orientation={orientation}
+          onClose={() => setHistoryOpen(false)}
         />
       ) : null}
 

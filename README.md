@@ -54,6 +54,18 @@ Large **Back** and **Forward** under the board (thumb zone). Instant ply-by-ply 
 ### Analyze
 **Analyze** on the dock, or **long-press the board**. Fast splash: board, play/pause, Back/Forward, close. Vertical **eval bar** (Lichess/Chess.com style) beside the board — Stockfish primary. The human-plan strip shows Stockfish / Lc0-style / Maia-style votes.
 
+### History Gig Pack
+When the current ply has a real chess-history milestone, a small **paper mark** appears on the coach strip and the board corner. Tap it: fast splash, professor voice (“This is where history kissed the board…”), year, people, why it matters *here*, Wikipedia (and Chess.com when cited). Never blocks training.
+
+Data: `src/lib/openings/history.ts`. Typed `HistoryMilestone` (`plyOrFen`, `era`, `glyph`, `sources`, optional `famousGame`). Validation requires **≥1 sourced milestone per system** and **https** URLs. No folklore — if Wikipedia does not support a game/year, it is not in the pack. Romantic gambits (King’s Gambit, Evans) carry extra marks (Immortal, Evergreen, Kasparov revival). The Black Lion cites Dutch club pages (Jansen–den Ouden, 14 Jan 1967) plus Chess.com book notes, because it has no Wikipedia article.
+
+**Add a milestone**
+
+1. Confirm the fact on Wikipedia (preferred) or another primary page.
+2. Append an object in `HISTORY_PACK` with `openingId`, `plyOrFen` (ply count after the key move, or a FEN), `title`, `year`, `era`, `summary` (2–4 sentences), `whyItMattersHere`, `sources: [{ label, url }]`, `glyph`.
+3. Optional `famousGame` and `trapId` (trap-only marks).
+4. `npm run validate` — fake URLs and empty sources fail the build.
+
 ## Run
 
 ```bash

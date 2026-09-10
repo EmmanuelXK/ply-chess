@@ -145,6 +145,50 @@ export interface OpeningSpec {
   depthNote?: string;
 }
 
+export type HistoryEra =
+  | "Romantic"
+  | "Classical"
+  | "Hypermodern"
+  | "Modern"
+  | "Club-origin";
+
+export type HistoryGlyph = "paper" | "immortal" | "evergreen" | "debut" | "revival";
+
+export interface HistorySource {
+  label: string;
+  url: string;
+}
+
+export interface FamousGame {
+  white: string;
+  black: string;
+  year: number;
+  eco?: string;
+  result?: string;
+}
+
+export interface HistoryMilestone {
+  id: string;
+  openingId: string;
+  /**
+   * Ply count (moves already played) when the paper mark appears,
+   * or a FEN if the historic position is not on this spine.
+   */
+  plyOrFen: number | string;
+  title: string;
+  year: number;
+  era: HistoryEra;
+  /** 2–4 sentences, professor voice. */
+  summary: string;
+  /** 1–2 sentences tying the story to this repertoire move. */
+  whyItMattersHere: string;
+  sources: HistorySource[];
+  famousGame?: FamousGame;
+  glyph: HistoryGlyph;
+  /** Trap-only mark (e.g. Fried Liver). Omit for spine marks. */
+  trapId?: string;
+}
+
 export interface Opening {
   id: string;
   name: string;
@@ -166,4 +210,5 @@ export interface Opening {
   depthNote?: string;
   professor: ProfessorScript[];
   quizzes: PositionalQuiz[];
+  history: HistoryMilestone[];
 }

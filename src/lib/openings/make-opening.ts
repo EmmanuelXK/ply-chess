@@ -12,6 +12,7 @@ import type {
   TrapSpec,
 } from "./types";
 import { enrichOpening } from "./professor";
+import { attachHistory } from "./history";
 
 const RESULTS = new Set(["1-0", "0-1", "1/2-1/2", "*"]);
 
@@ -145,9 +146,10 @@ export function makeOpening(spec: OpeningSpec): Opening {
     depthNote: spec.depthNote,
     professor: [],
     quizzes: [],
+    history: [],
   };
 
-  return enrichOpening(opening);
+  return attachHistory(enrichOpening(opening));
 }
 
 export function openingFromTrap(
@@ -168,7 +170,7 @@ export function openingFromTrap(
     });
   }
 
-  return enrichOpening({
+  return attachHistory(enrichOpening({
     ...opening,
     id: `${opening.id}--${trap.id}`,
     name: `${opening.shortName} · ${trap.name}`,
@@ -187,5 +189,6 @@ export function openingFromTrap(
     depthNote: `Trap off ${opening.name}. Spine stays the main drill.`,
     professor: [],
     quizzes: [],
-  });
+    history: [],
+  }));
 }

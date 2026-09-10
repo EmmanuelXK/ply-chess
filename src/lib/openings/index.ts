@@ -19,11 +19,20 @@ export type {
   MoveGlyph,
   ProfessorScript,
   PositionalQuiz,
+  HistoryMilestone,
+  HistoryEra,
+  HistoryGlyph,
 } from "./types";
 
 export { chunkAt, isUserPly, fullMoveCount, PILLAR_LABELS } from "./helpers";
 export { openingFromTrap } from "./make-opening";
 export { quizForPly, whyLessonAt, professorAt } from "./professor";
+export {
+  historyAt,
+  historyFen,
+  HISTORY_OPENER,
+  HISTORY_PACK,
+} from "./history";
 
 export const openings: Opening[] = openingSpecs.map(makeOpening);
 

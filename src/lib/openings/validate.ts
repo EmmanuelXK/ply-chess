@@ -107,6 +107,47 @@ export function validateOpening(opening: Opening): void {
   if (opening.professor.length === 0) {
     throw new Error(`[${opening.id}] missing professor scripts`);
   }
+
+  const historyIds = new Set<string>();
+  if (opening.history.length === 0) {
+    throw new Error(`[${opening.id}] missing history milestones`);
+  }
+  for (const row of opening.history) {
+    if (historyIds.has(row.id)) {
+      throw new Error(`[${opening.id}] duplicate history id ${row.id}`);
+    }
+    historyIds.add(row.id);
+    if (row.openingId !== opening.id && !opening.id.startsWith(`${row.openingId}--`)) {
+      throw new Error(`[${opening.id}] history ${row.id} has openingId ${row.openingId}`);
+    }
+    if (!row.sources.length) {
+      throw new Error(`[${opening.id}] history ${row.id} needs a source URL`);
+    }
+    for (const src of row.sources) {
+      if (!/^https:\/\//.test(src.url)) {
+        throw new Error(`[${opening.id}] history ${row.id} source is not https: ${src.url}`);
+      }
+    }
+    if (typeof row.plyOrFen === "number") {
+      if (row.plyOrFen < 0 || row.plyOrFen > opening.moves.length) {
+        throw new Error(
+          `[${opening.id}] history ${row.id} ply ${row.plyOrFen} out of range`,
+        );
+      }
+    } else {
+      try {
+        new Chess(row.plyOrFen);
+      } catch {
+        throw new Error(`[${opening.id}] history ${row.id} has a bad FEN`);
+      }
+    }
+    if (row.summary.trim().length < 120) {
+      throw new Error(`[${opening.id}] history ${row.id} summary is too short`);
+    }
+    if (row.whyItMattersHere.trim().length < 40) {
+      throw new Error(`[${opening.id}] history ${row.id} whyItMattersHere is too short`);
+    }
+  }
 }
 
 export function validateAll(openings: Opening[]): void {
@@ -118,5 +159,14 @@ export function validateAll(openings: Opening[]): void {
   }
   if (openings.length !== 21) {
     throw new Error(`expected 21 systems, got ${openings.length}`);
+  }
+  const covered = new Set(openings.map((o) => o.id));
+  const packIds = new Set(
+    openings.flatMap((o) => o.history.map((h) => h.openingId)),
+  );
+  for (const id of covered) {
+    if (!packIds.has(id)) {
+      throw new Error(`[${id}] compiled without history`);
+    }
   }
 }

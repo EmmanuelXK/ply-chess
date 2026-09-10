@@ -377,6 +377,142 @@ body {
   align-items: center;
   justify-content: center;
   padding: 0;
+  position: relative;
+}
+
+.board-with-history {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.history-corner {
+  position: absolute;
+  top: 0.4rem;
+  right: 0.4rem;
+  z-index: 6;
+}
+
+.history-mark {
+  width: 1.75rem;
+  height: 1.9rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+}
+
+.history-mark-sheet {
+  width: 0.98rem;
+  height: 1.18rem;
+  border-radius: 0.07rem 0.26rem 0.07rem 0.07rem;
+  background: linear-gradient(165deg, #f6edd6 0%, #dfc38a 72%, #c4a066 100%);
+  border: 1px solid #9a7844;
+  box-shadow:
+    0 1px 0 #6f542c,
+    inset 0 1px 0 #fff8ea;
+  position: relative;
+}
+
+.history-mark-sheet::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  border-style: solid;
+  border-width: 0 0.38rem 0.38rem 0;
+  border-color: transparent #7d5e32 transparent transparent;
+}
+
+.history-immortal .history-mark-sheet {
+  background: linear-gradient(165deg, #f8e7b4, #c9962a);
+}
+
+.history-evergreen .history-mark-sheet {
+  background: linear-gradient(165deg, #e8f0d4, #7f9a52);
+}
+
+.history-debut .history-mark-sheet {
+  background: linear-gradient(165deg, #f3efe6, #cfc3a6);
+}
+
+.history-revival .history-mark-sheet {
+  background: linear-gradient(165deg, #f6e0c4, #c17a3a);
+}
+
+.history-kicker {
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #e7d3a3;
+  margin: 0;
+}
+
+.history-opener {
+  margin: 0.55rem 0 0;
+  font-size: 13px;
+  font-style: italic;
+  color: #d6c7a1;
+}
+
+.history-here {
+  margin: 0.2rem 0 0.65rem;
+  font-size: 13px;
+  line-height: 1.4;
+  color: #e4e4e7;
+}
+
+.history-board {
+  height: min(58vw, 38dvh);
+}
+
+.history-game {
+  margin: 0.55rem 0 0;
+  font-size: 12px;
+  color: #a1a1aa;
+}
+
+.history-sources {
+  list-style: none;
+  margin: 0.7rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.history-sources a {
+  color: #fbbf24;
+  font-size: 13px;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.history-tabs {
+  display: flex;
+  gap: 0.3rem;
+  margin-top: 0.45rem;
+}
+
+.history-tab {
+  height: 1.55rem;
+  padding: 0 0.55rem;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 650;
+  color: #a1a1aa;
+  background: #18181b;
+  border: 1px solid #27272a;
+}
+
+.history-tab-on {
+  color: #fafafa;
+  background: #292524;
+  border-color: #a16207;
 }
 
 .board-frame {
@@ -910,7 +1046,8 @@ body {
 .study-close:focus-visible,
 .trap-chip:focus-visible,
 .ply-btn:focus-visible,
-.why-chip:focus-visible {
+.why-chip:focus-visible,
+.history-mark:focus-visible {
   outline-offset: 2px;
   outline: 2px solid #fbbf24;
 }
