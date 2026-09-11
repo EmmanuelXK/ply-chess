@@ -197,8 +197,9 @@ export function whyLessonAt(
   opening: Opening,
   ply: number,
 ): WhyLesson | undefined {
-  const script = professorAt(opening, Math.max(0, ply - 1));
-  return script?.whyLesson;
+  const upcoming = opening.professor.find((p) => p.afterPly === ply);
+  if (upcoming?.whyLesson) return upcoming.whyLesson;
+  return professorAt(opening, Math.max(0, ply - 1))?.whyLesson;
 }
 
 export function quizForPly(

@@ -475,6 +475,7 @@ export function DrillScreen({
             className="why-chip"
             onClick={() => setWhyOpen(true)}
             disabled={!why}
+            title={why ? "Why this move" : "Why unlocks on the next taught ply"}
           >
             Why
           </button>
