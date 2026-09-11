@@ -479,6 +479,13 @@ export function DrillScreen({
           >
             Why
           </button>
+          {historyNow.length ? (
+            <HistoryMark
+              glyph={historyNow[0].glyph}
+              label={`${historyNow[0].title} (${historyNow[0].year})`}
+              onClick={() => setHistoryOpen(true)}
+            />
+          ) : null}
         </div>
       </header>
 
