@@ -114,6 +114,7 @@ export function DrillScreen({
       modeRef.current = capped >= opening.moves.length ? "plan" : "drill";
       setLastMove(pos.lastMove);
       setHintKeys(null);
+      setHintUsed(false);
       if (capped === 0) setCoach(coachAtStart(opening));
       else if (capped >= opening.moves.length) {
         setCoach({
@@ -347,6 +348,7 @@ export function DrillScreen({
 
   const hint = () => {
     if (mode !== "drill" || hintUsed || busy) return;
+    if (!isUserPly(opening.side, ply)) return;
     const san = opening.moves[ply];
     if (!san) return;
     const probe = new Chess(gameRef.current.fen());
@@ -476,13 +478,6 @@ export function DrillScreen({
           >
             Why
           </button>
-          {historyNow.length ? (
-            <HistoryMark
-              glyph={historyNow[0].glyph}
-              label={`${historyNow[0].title} (${historyNow[0].year})`}
-              onClick={() => setHistoryOpen(true)}
-            />
-          ) : null}
         </div>
       </header>
 
@@ -551,7 +546,12 @@ export function DrillScreen({
           variant="ghost"
           size="sm"
           onClick={hint}
-          disabled={mode !== "drill" || hintUsed || busy}
+          disabled={
+            mode !== "drill" ||
+            hintUsed ||
+            busy ||
+            !isUserPly(opening.side, ply)
+          }
           className="dock-btn"
         >
           <Lightbulb />

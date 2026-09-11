@@ -37,7 +37,7 @@ export function WhySplash({
 
   const pos = useMemo(() => playLine(line, ply), [line, ply]);
   const branchIndex = ply - lesson.startPly;
-  const step = branchIndex >= 0 ? lesson.branch[branchIndex] : undefined;
+  const step = branchIndex > 0 ? lesson.branch[branchIndex - 1] : undefined;
 
   const arrows = useMemo<BoardArrow[]>(() => {
     const next: BoardArrow[] = [];

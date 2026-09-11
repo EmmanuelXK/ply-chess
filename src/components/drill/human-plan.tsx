@@ -4,7 +4,7 @@ import type { HybridAdvice } from "@/lib/engines/types";
 
 export function HumanPlan({ advice }: { advice: HybridAdvice | null }) {
   if (!advice) {
-    return <p className="human-copy">Hybrid votes warming…</p>;
+    return <p className="human-copy">Reading the position…</p>;
   }
 
   return (

@@ -24,9 +24,12 @@ export async function hybridAdvice(fen: string): Promise<HybridAdvice> {
   let fishReady = false;
   if (stockfishSupported()) {
     try {
+      const coarse =
+        typeof navigator !== "undefined" &&
+        /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
       const { moves, eval: ev } = await stockfishEval(fen, {
-        depth: 11,
-        movetime: 260,
+        depth: coarse ? 8 : 11,
+        movetime: coarse ? 160 : 260,
         multipv: 3,
       });
       const top = moves[0];
