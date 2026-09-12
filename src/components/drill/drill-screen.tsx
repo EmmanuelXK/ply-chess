@@ -16,7 +16,7 @@ import {
 import { ChessBoard, type BoardArrow } from "@/components/board/chess-board";
 import { Button } from "@/components/ui/button";
 import { needsPromotion, toDests } from "@/lib/chess/dests";
-import { silence, speak } from "@/lib/chess/speak";
+import { silence, speak, unlockSpeech } from "@/lib/chess/speak";
 import {
   coachAfterPly,
   coachAtStart,
@@ -131,6 +131,9 @@ export function DrillScreen({ opening }: { opening: Opening }) {
       return;
     }
     speak(coach.text);
+    return () => {
+      silence();
+    };
   }, [coach, tts]);
 
   const dests = useMemo(() => {
@@ -392,7 +395,14 @@ export function DrillScreen({ opening }: { opening: Opening }) {
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => setTts((v) => !v)}
+          onClick={() =>
+            setTts((on) => {
+              const next = !on;
+              if (next) unlockSpeech();
+              else silence();
+              return next;
+            })
+          }
           className="dock-btn"
           aria-pressed={tts}
         >
