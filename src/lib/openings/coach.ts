@@ -10,7 +10,8 @@ export type CoachKind =
   | "pin"
   | "plan"
   | "why"
-  | "quiz";
+  | "quiz"
+  | "history";
 
 export interface CoachState {
   text: string;

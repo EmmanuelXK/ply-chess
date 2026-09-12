@@ -1,18 +1,32 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { speakProfessor } from "@/lib/chess/speak";
-import type { PositionalQuiz } from "@/lib/openings";
+import { speakDialogue } from "@/lib/chess/speak";
+import { SpeakerChip } from "@/components/drill/speaker-chip";
+import {
+  dialogueForQuizReaction,
+  getDuo,
+  type DialogueMode,
+  type DuoId,
+} from "@/lib/dialogue";
+import type { Opening, PositionalQuiz } from "@/lib/openings";
 
 export function QuizSheet({
   quiz,
+  opening,
+  duo,
+  mode,
   onClose,
 }: {
   quiz: PositionalQuiz;
+  opening: Opening;
+  duo: DuoId;
+  mode: DialogueMode;
   onClose: () => void;
 }) {
   const [picked, setPicked] = useState<string | null>(null);
   const chosen = quiz.choices.find((c) => c.id === picked);
+  const pack = getDuo(duo);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -39,7 +53,9 @@ export function QuizSheet({
             Close
           </button>
         </header>
-        <p className="splash-copy">{quiz.prompt}</p>
+        <p className="splash-copy">
+          <SpeakerChip duoId={duo} speaker={pack.right.id} /> {quiz.prompt}
+        </p>
         <div className="quiz-choices">
           {quiz.choices.map((choice) => {
             const state =
@@ -58,7 +74,13 @@ export function QuizSheet({
                 onClick={() => {
                   if (picked) return;
                   setPicked(choice.id);
-                  speakProfessor(choice.reaction);
+                  const scene = dialogueForQuizReaction(
+                    opening,
+                    choice.reaction,
+                    choice.correct,
+                    { duo, mode },
+                  );
+                  speakDialogue(scene.beats, { premium: mode === "dual" });
                 }}
               >
                 {choice.text}
@@ -68,6 +90,10 @@ export function QuizSheet({
         </div>
         {chosen ? (
           <p className={`quiz-react ${chosen.correct ? "quiz-react-ok" : "quiz-react-no"}`}>
+            <SpeakerChip
+              duoId={duo}
+              speaker={chosen.correct ? pack.left.id : pack.right.id}
+            />{" "}
             {chosen.reaction}
           </p>
         ) : null}
