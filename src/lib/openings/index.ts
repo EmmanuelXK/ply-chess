@@ -24,7 +24,14 @@ export type {
   HistoryGlyph,
 } from "./types";
 
-export { chunkAt, isUserPly, fullMoveCount, PILLAR_LABELS } from "./helpers";
+export {
+  chunkAt,
+  isUserPly,
+  fullMoveCount,
+  PILLAR_LABELS,
+  looksLikeMoveList,
+  positionalIdea,
+} from "./helpers";
 export { openingFromTrap } from "./make-opening";
 export { quizForPly, whyLessonAt, professorAt } from "./professor";
 export {

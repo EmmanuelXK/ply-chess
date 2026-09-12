@@ -1,5 +1,6 @@
+import type { ReactNode } from "react";
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Source_Serif_4 } from "next/font/google";
 import "./globals.css";
 import "./chessground.css";
 
@@ -13,10 +14,15 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const prestigeSerif = Source_Serif_4({
+  variable: "--font-prestige",
+  subsets: ["latin"],
+});
+
 export const metadata: Metadata = {
   title: "Opening Edge",
   description:
-    "iPhone-first PWA. Drill 21 attacking systems to move 21 — spines, traps, six pillars, professor Why.",
+    "iPhone-first PWA. Two teachers in your headphones. 21 attacking systems to move 21 — spines, traps, dual-master Why.",
   applicationName: "Opening Edge",
   appleWebApp: {
     capable: true,
@@ -41,11 +47,15 @@ export const viewport: Viewport = {
   themeColor: "#0c0c0e",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({
+  children,
+}: {
+  children: ReactNode;
+}) {
   return (
     <html
       lang="en"
-      className={`dark ${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`dark ${geistSans.variable} ${geistMono.variable} ${prestigeSerif.variable} h-full antialiased`}
     >
       <body className="min-h-full bg-[#0c0c0e] text-zinc-100">{children}</body>
     </html>

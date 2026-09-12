@@ -1,6 +1,6 @@
 import { Chess } from "chess.js";
 import type { Key } from "@lichess-org/chessground/types";
-import { chunkAt } from "./helpers";
+import { chunkAt, positionalIdea } from "./helpers";
 import type {
   Opening,
   PositionalQuiz,
@@ -81,7 +81,7 @@ function generateScripts(opening: Opening): ProfessorScript[] {
       whyLesson: {
         title: chunk?.name ?? san,
         intro: `${san}. Here's why it belongs in ${opening.shortName}.`,
-        startPly: line.afterPly,
+        startPly: Math.min(line.afterPly + 1, opening.moves.length),
         branch: [],
       },
     });
@@ -105,7 +105,9 @@ function generateScripts(opening: Opening): ProfessorScript[] {
 function fillLessons(opening: Opening, scripts: ProfessorScript[]): ProfessorScript[] {
   return scripts.map((script) => {
     if (script.whyLesson && script.whyLesson.branch.length > 0) return script;
-    const start = script.whyLesson?.startPly ?? script.afterPly;
+    const start =
+      script.whyLesson?.startPly ??
+      Math.min(script.afterPly + 1, opening.moves.length);
     return {
       ...script,
       whyLesson: {
@@ -120,11 +122,14 @@ function fillLessons(opening: Opening, scripts: ProfessorScript[]): ProfessorScr
 
 function generateQuizzes(opening: Opening): PositionalQuiz[] {
   return opening.chunks.slice(0, 6).map((chunk, i) => {
-    const correct = chunk.job.replace(/\s+/g, " ").trim();
+    const correct = positionalIdea(
+      chunk.job,
+      `${chunk.name} — ${opening.story.plan}`,
+    );
     const decoys = opening.chunks
       .filter((c) => c.name !== chunk.name)
       .slice(0, 2)
-      .map((c) => c.job);
+      .map((c) => positionalIdea(c.job, c.name));
     while (decoys.length < 2) {
       decoys.push(
         decoys.length === 0
@@ -192,8 +197,9 @@ export function whyLessonAt(
   opening: Opening,
   ply: number,
 ): WhyLesson | undefined {
-  const script = professorAt(opening, Math.max(0, ply - 1));
-  return script?.whyLesson;
+  const upcoming = opening.professor.find((p) => p.afterPly === ply);
+  if (upcoming?.whyLesson) return upcoming.whyLesson;
+  return professorAt(opening, Math.max(0, ply - 1))?.whyLesson;
 }
 
 export function quizForPly(

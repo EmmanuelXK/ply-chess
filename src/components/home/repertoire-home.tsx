@@ -1,7 +1,14 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { DuoPicker } from "@/components/home/duo-picker";
 import { OpeningCard } from "@/components/home/opening-card";
+import {
+  DEFAULT_DUO,
+  readStoredDuo,
+  writeStoredDuo,
+  type DuoId,
+} from "@/lib/dialogue";
 import {
   FAMILY_META,
   openingsInFamily,
@@ -20,6 +27,16 @@ const FILTERS: { id: "all" | Family; label: string }[] = [
 export function RepertoireHome() {
   const [filter, setFilter] = useState<"all" | Family>("all");
   const [reps, setReps] = useState<RepsMode>("spine");
+  const [duo, setDuo] = useState<DuoId>(DEFAULT_DUO);
+
+  useEffect(() => {
+    setDuo(readStoredDuo());
+  }, []);
+
+  const pickDuo = (id: DuoId) => {
+    setDuo(id);
+    writeStoredDuo(id);
+  };
 
   const white = openingsInFamily("white");
   const e4 = openingsInFamily("black-e4");
@@ -42,19 +59,23 @@ export function RepertoireHome() {
       <header className="home-sticky">
         <div className="home-hero">
           <p className="text-[11px] font-medium tracking-[0.18em] text-zinc-500 uppercase">
-            Repertoire · Professor pack
+            Repertoire · Dual masters
           </p>
           <h1 className="mt-1 text-[28px] leading-none font-semibold tracking-tight text-zinc-50">
             Opening Edge
           </h1>
           <p className="mt-3 max-w-[22rem] text-[14px] leading-snug text-zinc-400">
-            Twenty-one attacking systems. Spine to move 21, traps, six pillars —
-            then plan. Professor voice on Why.
+            Two teachers in your headphones. They argue, quiz you, and land the
+            plan. Pick a duo, then a line.
           </p>
           <p className="home-count">
             {white.length} White · {e4.length} vs 1.e4 · {d4.length} vs 1.d4
           </p>
         </div>
+        <section className="duo-home" aria-label="Choose your teachers">
+          <p className="duo-home-label">Before you learn</p>
+          <DuoPicker value={duo} onChange={pickDuo} />
+        </section>
         <div className="filter-row" role="tablist" aria-label="Repertoire filter">
           {FILTERS.map((f) => (
             <button
@@ -114,8 +135,8 @@ export function RepertoireHome() {
 
       <footer className="home-foot">
         <p>
-          Book icon on the drill for pillars and traps. Why auto-plays the
-          branch. After the spine, Plan mode — aggressive is the default voice.
+          Pick a duo before you learn. Why auto-plays the branch. Masters
+          in the drill opens Settings. After the spine, Plan mode.
         </p>
       </footer>
     </div>

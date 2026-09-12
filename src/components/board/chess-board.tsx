@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Chessground } from "@lichess-org/chessground";
 import type { Api } from "@lichess-org/chessground/api";
 import type { Key } from "@lichess-org/chessground/types";
@@ -81,6 +81,8 @@ export function ChessBoard({
     animationMs,
   });
   const [side, setSide] = useState(0);
+  const [ready, setReady] = useState(false);
+  const sideRef = useRef(0);
 
   useEffect(() => {
     onMoveRef.current = onMove;
@@ -100,7 +102,7 @@ export function ChessBoard({
     };
   });
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const host = hostRef.current;
     const parent = host?.parentElement;
     if (!host || !parent) return;
@@ -110,7 +112,9 @@ export function ChessBoard({
         0,
         Math.floor(Math.min(parent.clientWidth, parent.clientHeight)),
       );
+      sideRef.current = next;
       setSide(next);
+      if (next >= 32) setReady(true);
     };
 
     const ro = new ResizeObserver(measure);
@@ -120,13 +124,15 @@ export function ChessBoard({
   }, []);
 
   useEffect(() => {
+    if (!ready) return;
     const host = hostRef.current;
-    if (!host || side < 32) return;
+    if (!host) return;
 
     const el = document.createElement("div");
     el.className = "cg-wrap board-cg";
-    el.style.width = `${side}px`;
-    el.style.height = `${side}px`;
+    const px = Math.max(sideRef.current, 32);
+    el.style.width = `${px}px`;
+    el.style.height = `${px}px`;
     host.replaceChildren(el);
 
     const latest = latestRef.current;
@@ -178,6 +184,15 @@ export function ChessBoard({
       if (apiRef.current === api) apiRef.current = null;
       el.remove();
     };
+  }, [ready]);
+
+  useEffect(() => {
+    if (!apiRef.current || side < 32) return;
+    const wrap = hostRef.current?.querySelector(".cg-wrap") as HTMLElement | null;
+    if (!wrap) return;
+    wrap.style.width = `${side}px`;
+    wrap.style.height = `${side}px`;
+    apiRef.current.redrawAll();
   }, [side]);
 
   useEffect(() => {

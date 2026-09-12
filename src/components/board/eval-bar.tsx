@@ -13,7 +13,7 @@ function fillFromEval(tick: EvalTick): number {
 
 function label(tick: EvalTick): string {
   if (tick.mate != null && tick.mate !== 0) {
-    return tick.mate > 0 ? `M${tick.mate}` : `M${Math.abs(tick.mate)}`;
+    return tick.mate > 0 ? `M${tick.mate}` : `-M${Math.abs(tick.mate)}`;
   }
   const cp = tick.cp ?? 0;
   const pawns = (cp / 100).toFixed(1);

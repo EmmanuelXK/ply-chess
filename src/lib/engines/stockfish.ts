@@ -5,7 +5,19 @@ type Listener = (line: string) => void;
 
 let worker: Worker | null = null;
 let boot: Promise<Worker> | null = null;
+let dead = false;
 const listeners = new Set<Listener>();
+
+function markDead() {
+  dead = true;
+  boot = null;
+  try {
+    worker?.terminate();
+  } catch {
+    /* ignore */
+  }
+  worker = null;
+}
 
 function onMessage(ev: MessageEvent<string>) {
   const line = typeof ev.data === "string" ? ev.data : String(ev.data ?? "");
@@ -13,7 +25,7 @@ function onMessage(ev: MessageEvent<string>) {
 }
 
 export function stockfishSupported(): boolean {
-  return typeof Worker !== "undefined";
+  return typeof Worker !== "undefined" && !dead;
 }
 
 export async function getStockfish(): Promise<Worker> {
@@ -32,7 +44,10 @@ export async function getStockfish(): Promise<Worker> {
         }
       };
       w.addEventListener("message", ready);
-      w.addEventListener("error", (err) => reject(err));
+      w.addEventListener("error", (err) => {
+        markDead();
+        reject(err);
+      });
       w.postMessage("uci");
       window.setTimeout(() => {
         if (!worker) {
@@ -47,6 +62,7 @@ export async function getStockfish(): Promise<Worker> {
         resolve(w);
       }, 1800);
     } catch (err) {
+      markDead();
       reject(err);
     }
   });
@@ -57,15 +73,28 @@ export async function stockfishEval(
   fen: string,
   opts?: { depth?: number; movetime?: number; multipv?: number },
 ): Promise<{ eval: EvalTick; moves: EngineMove[] }> {
-  const depth = opts?.depth ?? 12;
-  const movetime = opts?.movetime ?? 280;
+  const coarse =
+    typeof navigator !== "undefined" &&
+    /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  const depth = opts?.depth ?? (coarse ? 8 : 12);
+  const movetime = opts?.movetime ?? (coarse ? 160 : 280);
   const multipv = opts?.multipv ?? 3;
 
   if (!stockfishSupported()) {
     return { eval: { cp: null, mate: null, depth: 0 }, moves: [] };
   }
 
-  const w = await getStockfish();
+  let w: Worker;
+  try {
+    w = await Promise.race([
+      getStockfish(),
+      new Promise<never>((_, reject) => {
+        window.setTimeout(() => reject(new Error("stockfish boot timeout")), 2400);
+      }),
+    ]);
+  } catch {
+    return { eval: { cp: null, mate: null, depth: 0 }, moves: [] };
+  }
   const collected: EngineMove[] = [];
   let tick: EvalTick = { cp: 0, mate: null, depth: 0 };
 

@@ -1,4 +1,4 @@
-import { chunkAt } from "./helpers";
+import { chunkAt, positionalIdea } from "./helpers";
 import { professorAt } from "./professor";
 import type { Opening } from "./types";
 
@@ -10,7 +10,8 @@ export type CoachKind =
   | "pin"
   | "plan"
   | "why"
-  | "quiz";
+  | "quiz"
+  | "history";
 
 export interface CoachState {
   text: string;
@@ -85,31 +86,19 @@ export function coachAfterPly(opening: Opening, afterPly: number): CoachState {
   };
 }
 
-function explainJob(job: string, expectedSan: string): string {
-  const compact = job.replace(/\s+/g, " ").trim();
-  const looksLikeList =
-    compact.includes("…") ||
-    (/[A-N][a-h]?[1-8]?/.test(compact) &&
-      compact.split(/[.…]/).filter(Boolean).length >= 3);
-
-  if (looksLikeList) {
-    return `The job of this moment is ${expectedSan} — one square, one concept. Not the whole list dumped as a single move. ${compact} is the sequence; play ${expectedSan} now.`;
-  }
-  return `The positional job is: ${compact}. The move that does that job here is ${expectedSan}.`;
-}
-
 export function coachOnFail(opening: Opening, ply: number): CoachState {
   const chunk = chunkAt(opening, ply);
   const expected = opening.moves[ply] ?? "";
   const script = professorAt(opening, Math.max(0, ply - 1));
-  const job = chunk?.job ?? expected;
-  const head = explainJob(job, expected);
-  const why = script?.why
-    ? ` Why: ${script.why}`
-    : "";
+  const idea = positionalIdea(
+    script?.why ?? chunk?.job ?? "",
+    chunk?.name ?? "one square, one job",
+  );
   return {
-    text: `Not that. ${head}`,
-    detail: `${why} Next: ${script?.plan ?? opening.pillars.attackingPlan}`,
+    text: `Not that square. ${idea}`,
+    detail: expected
+      ? `Play ${expected}. That's the job of this moment — not the rest of the sequence.`
+      : "Stay with the idea. One move, then the next.",
     chunkName: chunk?.name,
     kind: "fail",
   };
