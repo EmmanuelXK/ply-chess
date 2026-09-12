@@ -1136,3 +1136,255 @@ body {
     border-radius: 1rem;
   }
 }
+
+.duo-home {
+  margin: 0 0 1rem;
+}
+
+.duo-home-label {
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #a1a1aa;
+  font-size: 10px;
+  font-weight: 650;
+  margin-bottom: 0.45rem;
+}
+
+.duo-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.duo-grid-compact {
+  gap: 0.4rem;
+}
+
+.duo-card {
+  text-align: left;
+  border-radius: 0.95rem;
+  padding: 0.75rem 0.85rem 0.7rem;
+  border: 1px solid #27272a;
+  background: #141416;
+  color: #e4e4e7;
+}
+
+.duo-card h3 {
+  font-size: 15px;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+}
+
+.duo-card-kicker {
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #71717a;
+  margin-bottom: 0.2rem;
+}
+
+.duo-card-blurb {
+  margin-top: 0.28rem;
+  font-size: 12px;
+  line-height: 1.35;
+  color: #a1a1aa;
+}
+
+.duo-card-names {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.45rem;
+  font-size: 11px;
+  color: #d4d4d8;
+}
+
+.duo-card-amp {
+  color: #52525b;
+}
+
+.duo-card-on {
+  border-color: #52525b;
+  box-shadow: 0 0 0 1px #3f3f46 inset;
+}
+
+.duo-voss-draven {
+  background:
+    radial-gradient(120% 90% at 0% 0%, rgb(180 140 50 / 16%), transparent 55%),
+    linear-gradient(180deg, #121810 0%, #0c0e0c 100%);
+  border-color: #3f3a28;
+  box-shadow: inset 0 1px 0 rgb(250 204 21 / 8%);
+}
+
+.duo-voss-draven h3,
+.chip-voss-draven {
+  font-family: var(--font-prestige), "Iowan Old Style", Palatino, Georgia, serif;
+}
+
+.duo-voss-draven.duo-card-on {
+  border-color: #c9a227;
+  box-shadow:
+    inset 0 1px 0 rgb(250 204 21 / 18%),
+    0 0 0 1px rgb(201 162 39 / 35%);
+}
+
+.duo-vale-knox {
+  background:
+    radial-gradient(90% 80% at 0% 0%, rgb(125 211 252 / 14%), transparent 50%),
+    radial-gradient(80% 70% at 100% 100%, rgb(220 38 38 / 16%), transparent 46%),
+    #12141a;
+  border-color: #2a3344;
+}
+
+.duo-vale-knox.duo-card-on {
+  border-color: #7dd3fc;
+}
+
+.duo-crowe-marquez {
+  background:
+    radial-gradient(90% 80% at 0% 0%, rgb(251 191 36 / 12%), transparent 50%),
+    radial-gradient(80% 70% at 100% 100%, rgb(45 212 191 / 14%), transparent 46%),
+    #121212;
+  border-color: #3f3f46;
+}
+
+.duo-crowe-marquez.duo-card-on {
+  border-color: #2dd4bf;
+}
+
+.speaker-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+  height: 1.25rem;
+  padding: 0 0.45rem 0 0.32rem;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  background: rgb(0 0 0 / 28%);
+}
+
+.speaker-dot {
+  width: 0.42rem;
+  height: 0.42rem;
+  border-radius: 999px;
+  display: inline-block;
+}
+
+.speaker-amber,
+.speaker-dot.speaker-amber {
+  color: #fde68a;
+  background: #fbbf24;
+}
+
+.speaker-chip.speaker-amber {
+  color: #fde68a;
+  background: rgb(120 80 10 / 35%);
+}
+
+.speaker-rose,
+.speaker-dot.speaker-rose {
+  background: #fb7185;
+}
+
+.speaker-chip.speaker-rose {
+  color: #fecdd3;
+  background: rgb(136 19 55 / 40%);
+}
+
+.speaker-ice,
+.speaker-dot.speaker-ice {
+  background: #7dd3fc;
+}
+
+.speaker-chip.speaker-ice {
+  color: #e0f2fe;
+  background: rgb(12 74 110 / 45%);
+}
+
+.speaker-ember,
+.speaker-dot.speaker-ember {
+  background: #f43f5e;
+}
+
+.speaker-chip.speaker-ember {
+  color: #ffe4e6;
+  background: rgb(127 29 29 / 42%);
+}
+
+.speaker-slate,
+.speaker-dot.speaker-slate {
+  background: #fbbf24;
+}
+
+.speaker-chip.speaker-slate {
+  color: #fde68a;
+  background: rgb(39 39 42 / 70%);
+}
+
+.speaker-wine,
+.speaker-dot.speaker-wine {
+  background: #2dd4bf;
+}
+
+.speaker-chip.speaker-wine {
+  color: #ccfbf1;
+  background: rgb(17 94 89 / 45%);
+}
+
+.coach-who {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.2rem;
+}
+
+.coach-mode-tag {
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #71717a;
+}
+
+.strip-voss-draven {
+  background: linear-gradient(180deg, #161910 0%, #10140f 100%);
+  border-color: #3f3a28;
+}
+
+.inline-ask {
+  display: flex;
+  flex-direction: column;
+  gap: 0.28rem;
+  margin-top: 0.4rem;
+}
+
+.inline-ask-btn {
+  text-align: left;
+  font-size: 11px;
+  font-weight: 550;
+  line-height: 1.3;
+  padding: 0.35rem 0.5rem;
+  border-radius: 0.55rem;
+  color: #e4e4e7;
+  background: #18181b;
+  border: 1px solid #3f3f46;
+}
+
+.inline-ask-right {
+  border-color: #166534;
+  background: #14532d;
+  color: #bbf7d0;
+}
+
+.inline-ask-wrong {
+  border-color: #7c2d12;
+  background: #3b1d14;
+  color: #fdba74;
+}
+
+.mode-row {
+  display: flex;
+  gap: 0.35rem;
+  margin: 0 0 0.75rem;
+}

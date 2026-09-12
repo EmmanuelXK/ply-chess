@@ -1,3 +1,4 @@
+import { validateDialogue } from "../src/lib/dialogue/validate";
 import { openings } from "../src/lib/openings";
 
 for (const opening of openings) {
@@ -10,4 +11,6 @@ for (const opening of openings) {
   }
 }
 
+validateDialogue(openings);
 console.log(`\n${openings.length} openings legal from the start position.`);
+console.log("✓ Dual-master dialogue for all three duos on Lion + London.");

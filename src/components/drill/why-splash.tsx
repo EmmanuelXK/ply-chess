@@ -7,7 +7,14 @@ import { X } from "lucide-react";
 import { ChessBoard, type BoardArrow, type BoardGlyph } from "@/components/board/chess-board";
 import { PlyNav } from "@/components/drill/ply-nav";
 import { playLine } from "@/lib/chess/line";
-import { silence, speakProfessor, type SpeakHandle } from "@/lib/chess/speak";
+import { silence, speakDialogue, type SpeakHandle } from "@/lib/chess/speak";
+import { SpeakerChip } from "@/components/drill/speaker-chip";
+import {
+  dialogueForWhy,
+  getDuo,
+  type DialogueMode,
+  type DuoId,
+} from "@/lib/dialogue";
 import type { Opening, WhyLesson } from "@/lib/openings";
 
 const EMPTY_DESTS = new Map<Key, Key[]>();
@@ -16,11 +23,15 @@ export function WhySplash({
   opening,
   lesson,
   orientation,
+  duo,
+  mode,
   onClose,
 }: {
   opening: Opening;
   lesson: WhyLesson;
   orientation: "white" | "black";
+  duo: DuoId;
+  mode: DialogueMode;
   onClose: () => void;
 }) {
   const prefix = useMemo(
@@ -78,11 +89,14 @@ export function WhySplash({
       ply === lesson.startPly && branchIndex <= 0
         ? lesson.intro
         : (step?.narrate ?? lesson.intro);
-    handleRef.current = speakProfessor(text);
+    const scene = dialogueForWhy(opening, lesson, text, { duo, mode });
+    handleRef.current = speakDialogue(scene.beats, {
+      premium: mode === "dual",
+    });
     return () => stopVoice();
     // Narration is ply-driven; step/branch are derived from ply.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ply, lesson.intro, lesson.startPly]);
+  }, [ply, lesson.intro, lesson.startPly, duo, mode, opening]);
 
   useEffect(() => {
     if (!playing || ply >= line.length) return;
@@ -144,7 +158,17 @@ export function WhySplash({
             Close
           </button>
         </header>
-        <p className="splash-copy">{step?.narrate ?? lesson.intro}</p>
+        <p className="splash-copy">
+          <SpeakerChip
+            duoId={duo}
+            speaker={
+              mode === "dual" && step
+                ? getDuo(duo).right.id
+                : getDuo(duo).left.id
+            }
+          />{" "}
+          {step?.narrate ?? lesson.intro}
+        </p>
         <div className="splash-board">
           <ChessBoard
             fen={pos.fen}
