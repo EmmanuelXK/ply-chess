@@ -47,6 +47,11 @@ export function validateDialogue(openings: Opening[]): void {
               `[${opening.id}/${duo.id}] ply ${ply} beat is ${n} words: "${beat.text}"`,
             );
           }
+          if (beat.kind !== "quiz" && n < 6) {
+            throw new Error(
+              `[${opening.id}/${duo.id}] ply ${ply} beat is too thin (${n}w): "${beat.text}"`,
+            );
+          }
           if (LEAK.test(beat.text)) {
             throw new Error(
               `[${opening.id}/${duo.id}] professor leak at ply ${ply}: "${beat.text}"`,

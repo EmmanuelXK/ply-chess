@@ -54,8 +54,8 @@ export function ChatHeads({
       };
       const next = targets.map((sq) => {
         const { x, y } = squareCenter(sq, orientation, boardBox, stage);
-        const midX = origin.x + (x - origin.x) * 0.55;
-        const midY = origin.y + (y - origin.y) * 0.35 - 18;
+        const midX = origin.x + (x - origin.x) * 0.5;
+        const midY = Math.min(origin.y, y) - 22;
         return `M ${origin.x} ${origin.y} Q ${midX} ${midY} ${x} ${y}`;
       });
       setPaths(next);
@@ -101,9 +101,7 @@ export function ChatHeads({
           speaker === duo.left.id ? "chat-head-talk" : ""
         }`}
       >
-        <span className="chat-face" role="img" aria-label={duo.left.short}>
-          {duo.left.gender === "male" ? "👨" : "👩"}
-        </span>
+        <CoachFace gender={duo.left.gender} label={duo.left.short} />
       </div>
       <div
         ref={rightRef}
@@ -111,11 +109,45 @@ export function ChatHeads({
           speaker === duo.right.id ? "chat-head-talk" : ""
         }`}
       >
-        <span className="chat-face" role="img" aria-label={duo.right.short}>
-          {duo.right.gender === "male" ? "👨" : "👩"}
-        </span>
+        <CoachFace gender={duo.right.gender} label={duo.right.short} />
       </div>
     </div>
+  );
+}
+
+function CoachFace({
+  gender,
+  label,
+}: {
+  gender: "male" | "female";
+  label: string;
+}) {
+  if (gender === "female") {
+    return (
+      <svg viewBox="0 0 64 64" className="chat-face-svg" role="img" aria-label={label}>
+        <circle cx="32" cy="32" r="32" fill="#1f1a16" />
+        <circle cx="32" cy="36" r="18" fill="#e8b48a" />
+        <path
+          d="M14 30c2-16 34-18 38 2 1 8-4 12-8 10-6-3-16-2-22 1-6 2-9-4-8-13z"
+          fill="#5a3a28"
+        />
+        <path d="M12 28c8-14 32-16 40 0-6-10-32-12-40 0z" fill="#3d261c" />
+        <ellipse cx="25" cy="38" rx="2.2" ry="2.6" fill="#2a1c14" />
+        <ellipse cx="39" cy="38" rx="2.2" ry="2.6" fill="#2a1c14" />
+        <path d="M28 46c2.2 2 5.8 2 8 0" stroke="#8a4a38" strokeWidth="1.4" fill="none" />
+      </svg>
+    );
+  }
+  return (
+    <svg viewBox="0 0 64 64" className="chat-face-svg" role="img" aria-label={label}>
+      <circle cx="32" cy="32" r="32" fill="#161412" />
+      <circle cx="32" cy="34" r="17" fill="#c48a5a" />
+      <path d="M16 28c3-14 29-14 32 0v6c-4-8-26-8-32 0z" fill="#2b1f18" />
+      <path d="M22 48c3 7 17 7 20 0-2 4-16 4-20 0z" fill="#3a2a22" />
+      <ellipse cx="25" cy="36" rx="2" ry="2.4" fill="#1a120e" />
+      <ellipse cx="39" cy="36" rx="2" ry="2.4" fill="#1a120e" />
+      <path d="M24 44c4 4 12 4 16 0" stroke="#5a3a28" strokeWidth="1.6" fill="none" />
+    </svg>
   );
 }
 

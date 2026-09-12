@@ -1,6 +1,6 @@
 import type { DuoPack, LessonFacts, DialogueAsk, DialogueBeat } from "./types";
 import { hookAt } from "./hooks";
-import { limitWords, nugget, withSan, wordCount } from "./short";
+import { limitWords, nugget, wordCount } from "./short";
 
 function hashSeed(facts: LessonFacts): number {
   const key = `${facts.openingId}:${facts.ply}:${facts.kind}:${facts.san ?? ""}`;
@@ -24,11 +24,16 @@ function pair(facts: LessonFacts): { hook: string; punch: string } {
   if (authored && facts.kind !== "fail" && facts.kind !== "hint") {
     return { hook: authored.hook, punch: authored.punch };
   }
-  const idea = nugget(facts.concept || facts.chunkName || facts.shortName, 7);
-  const plan = nugget(facts.plan || facts.why, 7);
-  const hook = withSan(facts.san, idea || plan);
-  const punch = plan && plan !== idea ? plan : `Don't sit. ${idea || "Take the square."}`;
-  return { hook, punch: limitWords(punch) };
+  const idea = nugget(facts.concept || facts.chunkName || facts.shortName, 8);
+  const plan = nugget(facts.plan || facts.why, 8);
+  const job = idea || plan || facts.shortName;
+  const hook = facts.san
+    ? limitWords(`${facts.san} does the job: ${job}`)
+    : limitWords(job);
+  const punch = plan && plan !== idea
+    ? limitWords(`Now this: ${plan}`)
+    : limitWords(`Don't sit — take the square. ${job}`);
+  return { hook, punch };
 }
 
 function pride(facts: LessonFacts, line: string): string {
@@ -37,9 +42,11 @@ function pride(facts: LessonFacts, line: string): string {
   }
   const seed = hashSeed(facts);
   if (seed % 4 !== 1) return line;
-  const cheers = ["Yes!", "That's it.", "Nice.", "Love that."];
+  const cheers = ["Yes —", "Nice —", "Love that —", "Good —"];
   const cheer = cheers[seed % cheers.length];
-  if (line.startsWith(cheer)) return line;
+  if (line.startsWith("Yes") || line.startsWith("Nice") || line.startsWith("Love") || line.startsWith("Good")) {
+    return line;
+  }
   return limitWords(`${cheer} ${line}`);
 }
 
@@ -62,7 +69,11 @@ function askFromFacts(
   grader: DialogueBeat["speaker"],
 ): DialogueAsk | undefined {
   if (!facts.quizPrompt || !facts.quizChoices?.length) return undefined;
-  if (facts.kind === "fail" || facts.kind === "hint") return undefined;
+  if (facts.kind === "fail" || facts.kind === "hint" || facts.kind === "history") {
+    return undefined;
+  }
+  // Occasional mid-line quiz, plus authored start quizzes — not every ply.
+  if (facts.kind !== "start" && hashSeed(facts) % 3 !== 0) return undefined;
   return {
     prompt: facts.quizPrompt,
     choices: facts.quizChoices,
@@ -83,7 +94,11 @@ function beat(
   kind: DialogueBeat["kind"],
   ask?: DialogueAsk,
 ): DialogueBeat {
-  return { speaker, text: limitWords(text), kind, ask };
+  let line = limitWords(text);
+  if (kind !== "quiz" && wordCount(line) < 6) {
+    line = limitWords(`${line} That's the idea.`);
+  }
+  return { speaker, text: line, kind, ask };
 }
 
 type FlavorFn = (facts: LessonFacts, duo: DuoPack) => DialogueBeat[];
@@ -105,7 +120,7 @@ const vossDraven: FlavorFn = (facts, duo) => {
   }
   if (facts.kind === "hint") {
     return [
-      beat(A, `Play ${facts.san ?? "the book move"}. ${nugget(facts.concept, 6)}`, "hint"),
+      beat(A, `Play ${facts.san ?? "the book move"} — ${nugget(facts.concept, 7) || "that's the idea"}.`, "hint"),
       beat(K, `Don't wait. ${nugget(facts.plan, 7)}`, "challenge"),
     ];
   }
@@ -120,8 +135,8 @@ const vossDraven: FlavorFn = (facts, duo) => {
   const beats: DialogueBeat[] = argue
     ? [
         beat(A, pride(facts, hook), "teach"),
-        beat(K, `Nah. Don't sit — ${nugget(facts.plan || punch, 7)}`, "challenge"),
-        beat(A, `Fine. One plan: ${nugget(facts.plan || hook, 6)}`, "agree"),
+        beat(K, `Don't sit — ${nugget(facts.plan || punch, 8) || "take the center now"}`, "challenge"),
+        beat(A, `One plan then: ${nugget(facts.plan || hook, 8) || punch}`, "agree"),
       ]
     : [
         beat(A, pride(facts, hook), "teach"),
@@ -133,7 +148,7 @@ const vossDraven: FlavorFn = (facts, duo) => {
     if (beats.length > 2) beats.pop();
   }
   if (ask) {
-    beats.push(beat(K, "Quiz time. What's the job?", "quiz", ask));
+    beats.push(beat(K, "Quiz time — what's the job here?", "quiz", ask));
   }
   return beats;
 };
@@ -154,7 +169,7 @@ const valeKnox: FlavorFn = (facts, duo) => {
   }
   if (facts.kind === "hint") {
     return [
-      beat(S, `${facts.san ?? "Book"}. Hold it.`, "hint"),
+      beat(S, `Play ${facts.san ?? "the book move"} and hold that square.`, "hint"),
       beat(R, `Feel the tension. ${nugget(facts.plan, 7)}`, "challenge"),
     ];
   }
@@ -166,13 +181,13 @@ const valeKnox: FlavorFn = (facts, duo) => {
   }
 
   const argue = shouldArgue(facts);
-  const spare = limitWords(`${facts.san ?? "This"}. Hold that square.`);
+  const spare = limitWords(hook);
   const fire = pride(facts, punch);
   const beats: DialogueBeat[] = argue
     ? [
         beat(S, spare, "teach"),
-        beat(R, `No — the story is ${nugget(facts.why || hook, 6)}`, "challenge"),
-        beat(S, `Agreed. ${nugget(facts.plan, 7)}`, "agree"),
+        beat(R, `No — the story is ${nugget(facts.why || hook, 8)}`, "challenge"),
+        beat(S, `Agreed — ${nugget(facts.plan || punch, 8)}`, "agree"),
       ]
     : [
         beat(S, spare, "teach"),
@@ -210,7 +225,7 @@ const croweMarquez: FlavorFn = (facts, duo) => {
   }
   if (facts.kind === "hint") {
     return [
-      beat(C, `Primary: ${facts.san ?? "the book move"}. Stay on plan.`, "hint"),
+      beat(C, `Primary is ${facts.san ?? "the book move"}. Stay on the plan.`, "hint"),
       beat(L, `Don't stall. ${nugget(facts.concept, 7)}`, "challenge"),
     ];
   }

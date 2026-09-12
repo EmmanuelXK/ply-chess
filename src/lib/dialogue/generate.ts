@@ -79,12 +79,16 @@ export function collectFacts(input: {
     historySummary: mark?.summary,
     historyHere: mark?.whyItMattersHere,
     famousGame: famousLine(mark),
-    quizPrompt: quiz?.prompt,
-    quizChoices: quiz?.choices.map((c) => ({
-      id: c.id,
-      text: c.text,
-      correct: c.correct,
-    })),
+    quizPrompt: authored?.quizPrompt ?? (after >= 0 ? quiz?.prompt : undefined),
+    quizChoices:
+      authored?.quizChoices ??
+      (after >= 0
+        ? quiz?.choices.map((c) => ({
+            id: c.id,
+            text: c.text,
+            correct: c.correct,
+          }))
+        : undefined),
     kind,
     fen: input.fen,
     ply: after,

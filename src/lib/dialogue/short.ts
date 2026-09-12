@@ -25,17 +25,18 @@ export function stripProfessor(text: string): string {
     .trim();
 }
 
-/** Hard cap. Drops a leftover fragment rather than trailing off with an ellipsis. */
+/** Hard cap. Keeps a few short sentences if they still fit; never trailing ellipsis. */
 export function limitWords(text: string, max = MAX_BEAT_WORDS): string {
   const cleaned = stripProfessor(text.replace(/\s+/g, " ").trim());
   if (!cleaned) return "";
+  const all = wordsOf(cleaned);
+  if (all.length <= max) return cleaned;
   const sentence = firstSentence(cleaned);
-  const words = wordsOf(sentence);
-  if (words.length <= max) return words.join(" ");
-  const cut = words.slice(0, max);
-  const last = cut[cut.length - 1] ?? "";
-  if (/[—.!?,;:]$/.test(last)) return cut.join(" ");
-  return cut.join(" ").replace(/[—,;:]+$/, "");
+  const sentenceWords = wordsOf(sentence);
+  if (sentenceWords.length >= 6 && sentenceWords.length <= max) {
+    return sentence;
+  }
+  return all.slice(0, max).join(" ").replace(/[—,;:]+$/, "");
 }
 
 /** Core positional idea only — never a dumped SAN list or professor paragraph. */

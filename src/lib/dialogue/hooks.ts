@@ -12,7 +12,7 @@ export const SHORT_HOOKS: Record<string, ShortHook[]> = {
     {
       ply: -1,
       hook: "Italian, then b4. Don't let the bishop breathe.",
-      punch: "Kick the bishop. Castle, then take d4.",
+      punch: "Kick the bishop. Castle, then take d4 now.",
     },
     {
       ply: 3,
@@ -26,7 +26,7 @@ export const SHORT_HOOKS: Record<string, ShortHook[]> = {
     },
     {
       ply: 11,
-      hook: "Castle, then take d4. Simple.",
+      hook: "Castle, then take d4. Keep it simple.",
       punch: "Recapture and park on Bb6. Keep going.",
     },
   ],
@@ -81,8 +81,7 @@ export function hookAt(facts: LessonFacts): ShortHook | undefined {
   if (!rows?.length) return undefined;
   const exact = rows.find((r) => r.ply === facts.ply);
   if (exact) return exact;
-  if (facts.ply < 0) return rows[0];
   return [...rows]
-    .filter((r) => r.ply <= facts.ply && r.ply >= 0)
+    .filter((r) => r.ply <= facts.ply)
     .sort((a, b) => b.ply - a.ply)[0];
 }
