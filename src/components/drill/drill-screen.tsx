@@ -603,9 +603,9 @@ export function DrillScreen({
               )}
             </div>
             <p>{scene.beats[beatIndex]?.text ?? coach.text}</p>
-            {ask ? (
+            {(ask ?? scene.beats.find((b) => b.ask)?.ask) ? (
               <InlineAsk
-                ask={ask}
+                ask={(ask ?? scene.beats.find((b) => b.ask)?.ask)!}
                 picked={askPicked}
                 onPick={(id) => {
                   setAskPicked(id);

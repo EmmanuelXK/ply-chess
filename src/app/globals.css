@@ -297,7 +297,7 @@ body {
 .coach-strip {
   margin-top: 0.45rem;
   min-height: 2.55rem;
-  max-height: 4.55rem;
+  max-height: 9.5rem;
   display: flex;
   align-items: flex-start;
   gap: 0.45rem;
@@ -311,7 +311,7 @@ body {
   font-weight: 650;
   letter-spacing: -0.02em;
   line-height: 1.25;
-  overflow: hidden;
+  overflow: auto;
 }
 
 .coach-strip p {
