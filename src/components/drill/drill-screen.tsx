@@ -722,8 +722,6 @@ export function DrillScreen({
               duoId={duo}
               speaker={scene.beats[beatIndex]?.speaker ?? scene.speaker}
               text={scene.beats[beatIndex]?.text ?? coach.text}
-              fen={fen}
-              san={opening.moves[Math.max(0, ply - 1)]}
               orientation={orientation}
             />
           ) : null}

@@ -9,15 +9,11 @@ export function ChatHeads({
   duoId,
   speaker,
   text,
-  fen,
-  san,
   orientation,
 }: {
   duoId: DuoId;
   speaker: SpeakerId;
   text: string;
-  fen?: string;
-  san?: string;
   orientation: "white" | "black";
 }) {
   const duo = getDuo(duoId);
@@ -26,10 +22,7 @@ export function ChatHeads({
   const rightRef = useRef<HTMLDivElement>(null);
   const [paths, setPaths] = useState<string[]>([]);
 
-  const targets = useMemo(
-    () => squaresInSpeech(text, { fen, san }).slice(0, 2),
-    [text, fen, san],
-  );
+  const targets = useMemo(() => squaresInSpeech(text).slice(0, 2), [text]);
 
   useEffect(() => {
     const root = rootRef.current;
