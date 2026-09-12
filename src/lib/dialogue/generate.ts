@@ -5,11 +5,13 @@ import type { HistoryMilestone, Opening, WhyLesson } from "@/lib/openings/types"
 import { authoredAt } from "./authored-facts";
 import { getDuo } from "./duos";
 import { flavorBeats } from "./flavor";
+import { limitWords, nugget } from "./short";
 import type {
   DialogueMode,
   DialogueScene,
   DuoId,
   LessonFacts,
+  MissMemory,
 } from "./types";
 import type { CoachKind } from "@/lib/openings/coach";
 
@@ -40,6 +42,7 @@ export function collectFacts(input: {
   san?: string;
   whyLesson?: WhyLesson;
   milestone?: HistoryMilestone;
+  misses?: MissMemory[];
 }): LessonFacts {
   const { opening, ply, kind } = input;
   const after = Math.max(-1, ply);
@@ -86,14 +89,14 @@ export function collectFacts(input: {
     fen: input.fen,
     ply: after,
     romantic,
+    misses: input.misses,
   };
 
   return mergeFacts(base, authored);
 }
 
-function headlineFrom(facts: LessonFacts, dual: boolean): string {
-  if (dual) return firstSentence(facts.concept);
-  return facts.concept;
+function headlineFrom(facts: LessonFacts): string {
+  return limitWords(nugget(facts.concept || facts.chunkName, 10) || facts.shortName);
 }
 
 export function sceneFromFacts(
@@ -104,9 +107,11 @@ export function sceneFromFacts(
 ): DialogueScene {
   const duo = getDuo(duoId);
   if (mode === "solo") {
-    const text =
+    const raw =
       soloText?.trim() ||
-      `${facts.concept} ${facts.why} ${facts.plan}`.replace(/\s+/g, " ").trim();
+      nugget(facts.concept, 10) ||
+      nugget(facts.plan, 10);
+    const text = limitWords(raw);
     return {
       beats: [
         {
@@ -116,7 +121,6 @@ export function sceneFromFacts(
         },
       ],
       headline: firstSentence(text),
-      detail: facts.plan,
       speaker: duo.left.id,
       kind: facts.kind,
     };
@@ -125,8 +129,7 @@ export function sceneFromFacts(
   const beats = flavorBeats(facts, duo);
   return {
     beats,
-    headline: headlineFrom(facts, true),
-    detail: beats[1]?.text ?? facts.plan,
+    headline: headlineFrom(facts),
     speaker: beats[0]?.speaker ?? duo.left.id,
     kind: facts.kind,
   };
@@ -141,6 +144,7 @@ export function dialogueForPly(
     kind?: CoachKind;
     fen?: string;
     soloText?: string;
+    misses?: MissMemory[];
   },
 ): DialogueScene {
   const facts = collectFacts({
@@ -148,13 +152,14 @@ export function dialogueForPly(
     ply: afterPly,
     kind: opts.kind ?? "ok",
     fen: opts.fen,
+    misses: opts.misses,
   });
   return sceneFromFacts(facts, opts.duo, opts.mode, opts.soloText);
 }
 
 export function dialogueForStart(
   opening: Opening,
-  opts: { duo: DuoId; mode: DialogueMode; soloText?: string },
+  opts: { duo: DuoId; mode: DialogueMode; soloText?: string; misses?: MissMemory[] },
 ): DialogueScene {
   return dialogueForPly(opening, -1, {
     ...opts,
@@ -174,9 +179,9 @@ export function dialogueForWhy(
     kind: "why",
     whyLesson: lesson,
   });
-  facts.concept = narrate;
-  facts.why = lesson.intro;
-  return sceneFromFacts(facts, opts.duo, opts.mode, narrate);
+  facts.concept = nugget(narrate, 10) || facts.concept;
+  facts.why = nugget(lesson.intro, 8);
+  return sceneFromFacts(facts, opts.duo, opts.mode, nugget(narrate, 12));
 }
 
 export function dialogueForHistory(
@@ -191,7 +196,7 @@ export function dialogueForHistory(
     kind: "history",
     milestone,
   });
-  const solo = `${milestone.summary} ${milestone.whyItMattersHere}`;
+  const solo = nugget(milestone.whyItMattersHere || milestone.summary, 12);
   return sceneFromFacts(facts, opts.duo, opts.mode, solo);
 }
 
@@ -207,11 +212,13 @@ export function dialogueForQuizReaction(
     beats: [
       {
         speaker,
-        text: reaction,
+        text: limitWords(
+          correct ? "Yes. That's the job." : nugget(reaction, 10) || "Not that. Try again.",
+        ),
         kind: correct ? "agree" : "challenge",
       },
     ],
-    headline: firstSentence(reaction),
+    headline: correct ? "Yes." : "Not that.",
     speaker,
     kind: "quiz",
   };

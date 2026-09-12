@@ -3,7 +3,19 @@ import type { CoachKind } from "@/lib/openings/coach";
 
 export type DialogueMode = "dual" | "solo";
 
+/** Podcast autoplays the line. Teach waits for the student. */
+export type LessonStyle = "podcast" | "teach";
+
 export type DuoId = "voss-draven" | "vale-knox" | "crowe-marquez";
+
+export const MAX_BEAT_WORDS = 15;
+export const MIN_BEAT_WORDS = 5;
+
+export interface MissMemory {
+  ply: number;
+  san: string;
+  idea: string;
+}
 
 export type BeatKind =
   | "teach"
@@ -50,6 +62,7 @@ export interface Teacher {
   short: string;
   role: string;
   color: string;
+  gender: "male" | "female";
 }
 
 export interface DuoPack {
@@ -82,4 +95,5 @@ export interface LessonFacts {
   fen?: string;
   ply: number;
   romantic?: boolean;
+  misses?: MissMemory[];
 }

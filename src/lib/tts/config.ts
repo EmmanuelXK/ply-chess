@@ -4,7 +4,7 @@ import type { SpeakerId } from "./types";
 
 export { SPEAKER_PROSODY, speakerProsody } from "./prosody";
 
-export const MAX_TTS_CHARS = 800;
+export const MAX_TTS_CHARS = 140;
 
 /**
  * Stock / neural IDs only. Never celebrity clones.
@@ -14,31 +14,31 @@ export const MAX_TTS_CHARS = 800;
  */
 export const DEFAULT_EDGE_VOICES: Record<SpeakerId, string> = {
   aldric: "en-GB-RyanNeural",
-  kael: "en-US-GuyNeural",
+  kael: "en-US-AvaNeural",
   soren: "en-GB-ThomasNeural",
-  rhea: "en-US-AriaNeural",
-  silas: "en-US-ChristopherNeural",
-  lena: "en-US-JennyNeural",
+  rhea: "en-US-JennyNeural",
+  silas: "en-US-AndrewNeural",
+  lena: "en-US-EmmaNeural",
 };
 
 /** WaveNet defaults — 4M free chars/month, more generous than Neural2's 1M. */
 export const DEFAULT_GOOGLE_VOICES: Record<SpeakerId, string> = {
   aldric: "en-GB-Wavenet-B",
-  kael: "en-US-Wavenet-D",
+  kael: "en-US-Wavenet-F",
   soren: "en-GB-Wavenet-D",
-  rhea: "en-US-Wavenet-F",
-  silas: "en-US-Wavenet-B",
+  rhea: "en-US-Wavenet-E",
+  silas: "en-US-Wavenet-D",
   lena: "en-US-Wavenet-C",
 };
 
 /** ElevenLabs premade library voices — not likeness clones. */
 export const DEFAULT_ELEVENLABS_VOICES: Record<SpeakerId, string> = {
-  aldric: "JBFqnCBsd6RMkjVDRZzb", // George
-  kael: "pNInz6obpgDQGcFmaJgB", // Adam
-  soren: "onwK4e9ZLuTAKqWW03F9", // Daniel
-  rhea: "EXAVITQu4vr4xnSDxMaL", // Bella
-  silas: "TxGEqnHWrfWFTfGW9XjX", // Josh
-  lena: "21m00Tcm4TlvDq8ikWAM", // Rachel
+  aldric: "JBFqnCBsd6RMkjVDRZzb", // George — stock male
+  kael: "XB0fDUnXU5powFXDhCwa", // Charlotte — stock female
+  soren: "onwK4e9ZLuTAKqWW03F9", // Daniel — stock male
+  rhea: "EXAVITQu4vr4xnSDxMaL", // Bella — stock female
+  silas: "TxGEqnHWrfWFTfGW9XjX", // Josh — stock male
+  lena: "21m00Tcm4TlvDq8ikWAM", // Rachel — stock female
 };
 
 function env(name: string): string | undefined {
