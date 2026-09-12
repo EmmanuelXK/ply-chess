@@ -210,5 +210,6 @@ export function quizForPly(
 }
 
 export function speakableProfessor(script: ProfessorScript): string {
-  return `${script.concept} Why: ${script.why} Next: ${script.plan}`;
+  const first = script.concept.replace(/\s+/g, " ").trim().split(" ").slice(0, 15);
+  return first.join(" ");
 }

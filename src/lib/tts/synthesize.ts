@@ -8,6 +8,7 @@ import {
   googleConfigured,
   MAX_TTS_CHARS,
 } from "./config";
+import { isWhitelistedEdgeVoice } from "./prefs";
 import { synthesizeEdgeTts } from "./edge";
 import { synthesizeElevenLabs } from "./elevenlabs";
 import { synthesizeGoogleTts } from "./google";
@@ -80,7 +81,10 @@ export async function synthesizeSpeech(request: TtsRequest): Promise<TtsClip> {
     }
   }
 
-  const voice = edgeVoice(speaker);
+  const voice =
+    request.voice && isWhitelistedEdgeVoice(speaker, request.voice)
+      ? request.voice
+      : edgeVoice(speaker);
   const cacheKey = clipHash("edge", speaker, voice, text);
   const hit = serverCache.get(cacheKey);
   if (hit) return hit;

@@ -22,6 +22,8 @@ export interface TtsRequest {
   speaker: SpeakerId;
   /** Character voices via ElevenLabs when a key is present. */
   premium?: boolean;
+  /** Whitelisted Edge voice remap from Settings. */
+  voice?: string;
 }
 
 export interface TtsClip {

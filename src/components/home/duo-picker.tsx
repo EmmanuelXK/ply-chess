@@ -46,10 +46,10 @@ function DuoCard({
       <p className="duo-card-blurb">{duo.blurb}</p>
       <p className="duo-card-names">
         <span className={`speaker-dot speaker-${duo.left.color}`} />
-        {duo.left.short}
+        {duo.left.short} {duo.left.gender === "male" ? "♂" : "♀"}
         <span className="duo-card-amp">·</span>
         <span className={`speaker-dot speaker-${duo.right.color}`} />
-        {duo.right.short}
+        {duo.right.short} {duo.right.gender === "male" ? "♂" : "♀"}
       </p>
     </button>
   );
