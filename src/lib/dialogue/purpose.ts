@@ -1,4 +1,5 @@
 import type { SpeakerId } from "@/lib/tts/types";
+import { looksLikeMoveList } from "@/lib/openings/helpers";
 import { hookAt } from "./hooks";
 import { limitWords, nugget, wordCount } from "./short";
 import type { DialogueAsk, DialogueBeat, LessonFacts, PurposeTag } from "./types";
@@ -65,12 +66,24 @@ function blob(facts: LessonFacts): string {
 export function inferPurpose(facts: LessonFacts): PurposeTag {
   const text = blob(facts);
   const lion = facts.openingId === "black-lion";
+  const san = (facts.san ?? "").toLowerCase();
 
   if (facts.kind === "pin" || /\bpin\b/.test(text)) return "notice-the-pin";
   if (/\bunpin|free the|trapped|get .* out/.test(text)) return "free-piece";
-  if (/\bcastl|connect the rooks|king safety/.test(text)) return "castle-and-connect";
+
+  if (lion) {
+    if (san === "e5" || facts.ply === 7) return "wake-the-line";
+    if (facts.ply <= 6 || /\bcoil|house|philidor|hide\b/.test(text)) {
+      return "coil-then-strike";
+    }
+    if (/\be5|wake|yawn|bite\b/.test(text)) return "wake-the-line";
+  }
+
+  if (/\b(O-O-O|O-O)\b/.test(facts.san ?? "") || /\bcastl(e|ing) now|connect the rooks\b/.test(text)) {
+    return "castle-and-connect";
+  }
   if (/\b(file|semi-open|rook road)\b/.test(text)) return "open-the-file";
-  if (/\b(f7|h7|c7|weak square|outpost|hole|soft square)\b/.test(text)) {
+  if (/\b(f7|h7|weak square|outpost|hole|soft square)\b/.test(text)) {
     return "attack-weak-square";
   }
   if (/\b(stop|prevent|don't let|deny|kill their)\b/.test(text)) {
@@ -78,12 +91,10 @@ export function inferPurpose(facts: LessonFacts): PurposeTag {
   }
   if (/\b(tempo|develop|kick|harass)\b/.test(text)) return "develop-with-tempo";
   if (/\b(pawn chain|triangle|c3|e3 chain)\b/.test(text)) return "fix-pawn-chain";
-  if (/\b(provoke|weaken|ask)\b/.test(text)) return "provoke-weakness";
-  if (lion && (facts.ply <= 5 || /\bcoil|house|philidor\b/.test(text))) {
-    return "coil-then-strike";
+  if (/\b(provoke|weaken)\b/.test(text)) return "provoke-weakness";
+  if (/\b(break|crack|blow)\b/.test(text) || san === "e5" || san === "d5" || san === "c5") {
+    return "break-center";
   }
-  if (lion && /\be5|wake|yawn|bite\b/.test(text)) return "wake-the-line";
-  if (/\b(break|crack|blow|…e5|\.e5)\b/.test(text)) return "break-center";
   if (/\b(grab|take|own|seize).{0,12}cent|\bcent(er|re).{0,12}(grab|take|own)\b/.test(text)) {
     return "grab-center";
   }
@@ -92,7 +103,6 @@ export function inferPurpose(facts: LessonFacts): PurposeTag {
   if (/\bcent(er|re)\b/.test(text)) {
     return facts.ply < 8 ? "grab-center" : "stabilize-center";
   }
-  if (lion) return facts.ply < 8 ? "coil-then-strike" : "wake-the-line";
   return facts.ply < 6 ? "develop-with-tempo" : "hold-the-square";
 }
 
@@ -139,18 +149,27 @@ function withFloor(text: string, purpose: PurposeTag): string {
   return line;
 }
 
+function ideaOf(...parts: Array<string | undefined>): string {
+  for (const part of parts) {
+    if (!part) continue;
+    if (looksLikeMoveList(part)) continue;
+    const bit = nugget(part, 7);
+    if (bit && !looksLikeMoveList(bit)) return bit;
+  }
+  return "";
+}
+
 function composeBody(facts: LessonFacts, purpose: PurposeTag, seed: number): string {
   const tag = phrase(purpose, seed);
   const authored = hookAt(facts);
-  const idea = nugget(facts.why || facts.concept || facts.chunkJob, 7);
-  const plan = nugget(facts.plan, 6);
+  const idea = ideaOf(facts.why, facts.concept, facts.chunkJob);
   const san = facts.san;
 
   if (facts.kind === "fail") {
     const variants = [
       `Not that. ${tag} — play ${san ?? "the book move"}.`,
       `Walk it back. ${tag}. ${san ?? "The book move"} is the job.`,
-      `Easy. ${nugget(facts.concept, 5) || tag}. Play ${san ?? "the book"}.`,
+      `Easy. ${ideaOf(facts.concept) || tag}. Play ${san ?? "the book"}.`,
     ];
     return variants[seed % variants.length];
   }
@@ -160,24 +179,24 @@ function composeBody(facts: LessonFacts, purpose: PurposeTag, seed: number): str
   if (facts.kind === "history") {
     return `${facts.historyYear ?? "Here"}. ${nugget(facts.historyTitle, 5)}. ${tag}.`;
   }
-  if (facts.kind === "start") {
-    const start = authored
-      ? `${tag}. ${nugget(authored.hook, 8)}`
-      : `${tag}. ${nugget(facts.concept || facts.chunkName, 8)}`;
-    return start;
+  if (facts.kind === "start" || facts.ply < 0) {
+    const hook = authored ? limitWords(authored.hook, 9) : ideaOf(facts.concept, facts.chunkName);
+    return hook ? `${tag}. ${hook}` : tag;
+  }
+
+  if (authored && facts.ply === authored.ply) {
+    const line = seed % 2 === 0 ? authored.hook : authored.punch;
+    return `${tag}. ${limitWords(line, 9)}`;
   }
 
   const variants = [
-    san ? `${san}. ${tag} — ${idea || plan || "that's the job"}.` : `${tag}. ${idea || plan}`,
-    san ? `${tag} with ${san}. ${idea || plan}` : `${tag}. ${plan || idea}`,
+    san ? `${san}. ${tag} — ${idea || "that's the job"}.` : `${tag}. ${idea}`,
     authored
       ? `${tag}. ${nugget(seed % 2 === 0 ? authored.hook : authored.punch, 8)}`
-      : `${tag}. ${idea || plan || facts.shortName}`,
-    san
-      ? `${san} because we ${tag.toLowerCase()}. ${nugget(facts.chunkJob, 5)}`
-      : `${tag} now. ${nugget(facts.chunkName, 6)}`,
-  ];
-  return variants[seed % variants.length];
+      : `${tag}. ${idea || facts.shortName}`,
+    san ? `${tag} with ${san}. ${idea || "One square, one job."}` : `${tag}. ${idea}`,
+  ].filter((line) => line.trim() && !looksLikeMoveList(line));
+  return variants[seed % variants.length] || `${tag}. ${idea || facts.shortName}`;
 }
 
 function previousLine(facts: LessonFacts): string | undefined {

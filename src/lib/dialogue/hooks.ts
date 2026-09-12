@@ -37,9 +37,14 @@ export const SHORT_HOOKS: Record<string, ShortHook[]> = {
       punch: "Coil …e5. Don't rush the fianchetto.",
     },
     {
+      ply: 0,
+      hook: "e4 asks for a cheap Italian. Coil first.",
+      punch: "Don't meet it with …g6. Hide, then …e5.",
+    },
+    {
       ply: 1,
       hook: "…d6 is the house. Hold e5.",
-      punch: "Good. Now knights, then the yawn.",
+      punch: "Now knights, then the yawn.",
     },
     {
       ply: 5,

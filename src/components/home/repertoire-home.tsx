@@ -46,9 +46,8 @@ export function RepertoireHome() {
           ))}
         </div>
         <p className="dash-mode-blurb">
-          {STUDY_MODES.find((m) => m.id === mode)?.blurb}
+          {STUDY_MODES.find((m) => m.id === mode)?.blurb} {mode === "progress" ? lotusHint : ""}
         </p>
-        <p className="dash-lotus">{lotusHint}</p>
       </header>
 
       <div className="dash-scroll dash-scroll-split">
