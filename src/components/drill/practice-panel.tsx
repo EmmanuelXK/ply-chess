@@ -83,7 +83,7 @@ export function PracticePanel({
               orientation={orientation}
               turnColor={pos.turnColor}
               check={pos.check}
-              animationMs={140}
+              animationMs={90}
             />
           </div>
         </div>

@@ -183,6 +183,34 @@ body,
   color: #a1a1aa;
 }
 
+.mode-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.3rem;
+  margin: 0 0 0.35rem;
+}
+
+.mode-grid .filter-chip {
+  flex: none;
+  width: 100%;
+  padding: 0 0.35rem;
+  height: 1.7rem;
+  font-size: 10px;
+}
+
+.dash-mode-blurb,
+.dash-lotus,
+.dash-family-blurb {
+  margin: 0 0 0.35rem;
+  font-size: 11px;
+  line-height: 1.35;
+  color: #a1a1aa;
+}
+
+.dash-lotus {
+  color: #71717a;
+}
+
 .dash-scroll {
   flex: 1 1 auto;
   min-height: 0;
@@ -226,9 +254,9 @@ body,
 .dash-tile {
   display: flex;
   flex-direction: column;
-  gap: 0.12rem;
-  min-height: 5.4rem;
-  padding: 0.55rem 0.6rem 0.5rem;
+  gap: 0.08rem;
+  min-height: 4.35rem;
+  padding: 0.42rem 0.55rem 0.4rem;
   border-radius: 0.85rem;
   background: #141416;
   border: 1px solid #27272a;
@@ -1635,12 +1663,67 @@ body,
   margin: 0 0 0.75rem;
 }
 
+.coach-head-layer,
 .chat-heads {
   position: absolute;
   inset: 0;
   z-index: 5;
   pointer-events: none;
   overflow: visible;
+}
+
+.coach-head-slot {
+  position: absolute;
+  width: 3.55rem;
+  height: 3.55rem;
+  z-index: 8;
+  pointer-events: auto;
+  touch-action: none;
+  cursor: grab;
+  transform: translate(-50%, -50%);
+  transition:
+    left 520ms cubic-bezier(0.22, 1.28, 0.36, 1),
+    top 520ms cubic-bezier(0.22, 1.28, 0.36, 1);
+  will-change: left, top;
+}
+
+.coach-head-drag {
+  cursor: grabbing;
+  transition: none;
+}
+
+.coach-head-dilly {
+  width: 100%;
+  height: 100%;
+  transform-origin: 50% 70%;
+  animation: dilly-dally 3.6s cubic-bezier(0.37, 0.02, 0.2, 1) infinite;
+  will-change: transform;
+}
+
+.coach-head-parked .coach-head-dilly {
+  animation-duration: 4.4s;
+}
+
+@keyframes dilly-dally {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(-2.2deg);
+  }
+  16% {
+    transform: translate3d(7px, -11px, 0) rotate(3.4deg);
+  }
+  34% {
+    transform: translate3d(-9px, -3px, 0) rotate(-4.2deg);
+  }
+  52% {
+    transform: translate3d(5px, -15px, 0) rotate(1.6deg);
+  }
+  70% {
+    transform: translate3d(-6px, -2px, 0) rotate(4.1deg);
+  }
+  86% {
+    transform: translate3d(4px, -8px, 0) rotate(-1.4deg);
+  }
 }
 
 .chat-arrows-draw {
@@ -1876,13 +1959,15 @@ body,
 @media (prefers-reduced-motion: reduce) {
   .chat-bob-left,
   .chat-bob-right,
+  .coach-head-dilly,
   .chat-pill-talk .chat-face,
   .chat-pill-talk .chat-ring,
   .chat-arrow-in {
     animation: none;
   }
 
-  .chat-slot {
+  .chat-slot,
+  .coach-head-slot {
     transition: none;
   }
 }

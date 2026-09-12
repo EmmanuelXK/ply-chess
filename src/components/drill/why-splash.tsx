@@ -9,12 +9,7 @@ import { PlyNav } from "@/components/drill/ply-nav";
 import { playLine } from "@/lib/chess/line";
 import { silence, speakDialogue, type SpeakHandle } from "@/lib/chess/speak";
 import { SpeakerChip } from "@/components/drill/speaker-chip";
-import {
-  dialogueForWhy,
-  getDuo,
-  type DialogueMode,
-  type DuoId,
-} from "@/lib/dialogue";
+import { ACTIVE_COACH, dialogueForWhy } from "@/lib/dialogue";
 import type { Opening, WhyLesson } from "@/lib/openings";
 
 const EMPTY_DESTS = new Map<Key, Key[]>();
@@ -23,15 +18,11 @@ export function WhySplash({
   opening,
   lesson,
   orientation,
-  duo,
-  mode,
   onClose,
 }: {
   opening: Opening;
   lesson: WhyLesson;
   orientation: "white" | "black";
-  duo: DuoId;
-  mode: DialogueMode;
   onClose: () => void;
 }) {
   const prefix = useMemo(
@@ -89,14 +80,15 @@ export function WhySplash({
       ply === lesson.startPly && branchIndex <= 0
         ? lesson.intro
         : (step?.narrate ?? lesson.intro);
-    const scene = dialogueForWhy(opening, lesson, text, { duo, mode });
-    handleRef.current = speakDialogue(scene.beats, {
-      premium: mode === "dual",
+    const scene = dialogueForWhy(opening, lesson, text, {
+      duo: ACTIVE_COACH,
+      mode: "solo",
     });
+    handleRef.current = speakDialogue(scene.beats);
     return () => stopVoice();
     // Narration is ply-driven; step/branch are derived from ply.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ply, lesson.intro, lesson.startPly, duo, mode, opening]);
+  }, [ply, lesson.intro, lesson.startPly, opening]);
 
   useEffect(() => {
     if (!playing || ply >= line.length) return;
@@ -106,10 +98,10 @@ export function WhySplash({
       if (handle) {
         await Promise.race([
           handle.done,
-          new Promise((r) => window.setTimeout(r, 5200)),
+          new Promise((r) => window.setTimeout(r, 2400)),
         ]);
       } else {
-        await new Promise((r) => window.setTimeout(r, 900));
+        await new Promise((r) => window.setTimeout(r, 420));
       }
       if (cancelled) return;
       setPly((p) => Math.min(p + 1, line.length));
@@ -159,14 +151,7 @@ export function WhySplash({
           </button>
         </header>
         <p className="splash-copy">
-          <SpeakerChip
-            duoId={duo}
-            speaker={
-              mode === "dual" && step
-                ? getDuo(duo).right.id
-                : getDuo(duo).left.id
-            }
-          />{" "}
+          <SpeakerChip />{" "}
           {step?.narrate ?? lesson.intro}
         </p>
         <div className="splash-board">
@@ -183,7 +168,7 @@ export function WhySplash({
             movableColor={undefined}
             check={pos.check}
             coordinates={false}
-            animationMs={140}
+            animationMs={90}
             onMove={() => {}}
           />
         </div>

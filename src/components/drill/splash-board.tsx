@@ -20,7 +20,7 @@ export function SplashBoard({
   arrows,
   glyphs,
   circles,
-  animationMs = 140,
+  animationMs = 90,
 }: {
   fen: string;
   lastMove: Key[] | null;

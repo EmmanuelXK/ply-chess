@@ -37,7 +37,7 @@ export function AnalyzeSplash({
     const t = window.setTimeout(() => {
       if (cancelled) return;
       setPly((p) => Math.min(p + 1, line.length));
-    }, 480);
+    }, 260);
     return () => {
       cancelled = true;
       window.clearTimeout(t);
@@ -99,7 +99,7 @@ export function AnalyzeSplash({
               orientation={orientation}
               turnColor={pos.turnColor}
               check={pos.check}
-              animationMs={140}
+              animationMs={90}
             />
           </div>
         </div>

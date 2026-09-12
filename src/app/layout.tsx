@@ -22,7 +22,7 @@ const prestigeSerif = Source_Serif_4({
 export const metadata: Metadata = {
   title: "Opening Edge",
   description:
-    "iPhone-first PWA. Two teachers in your headphones. 21 attacking systems to move 21 — spines, traps, dual-master Why.",
+    "iPhone-first PWA. One coach. 21 attacking systems to move 21 — White and Black dashboards, purpose-tagged Why.",
   applicationName: "Opening Edge",
   appleWebApp: {
     capable: true,

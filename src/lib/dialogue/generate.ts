@@ -1,10 +1,10 @@
-import { chunkAt, firstSentence, positionalIdea } from "@/lib/openings/helpers";
+import { chunkAt, positionalIdea } from "@/lib/openings/helpers";
 import { historyAt } from "@/lib/openings/history";
 import { professorAt, quizForPly, speakableProfessor } from "@/lib/openings/professor";
 import type { HistoryMilestone, Opening, WhyLesson } from "@/lib/openings/types";
 import { authoredAt } from "./authored-facts";
 import { getDuo } from "./duos";
-import { flavorBeats } from "./flavor";
+import { purposeBeats } from "./purpose";
 import { limitWords, nugget } from "./short";
 import type {
   DialogueMode,
@@ -106,36 +106,17 @@ function headlineFrom(facts: LessonFacts): string {
 export function sceneFromFacts(
   facts: LessonFacts,
   duoId: DuoId,
-  mode: DialogueMode,
+  _mode: DialogueMode,
   soloText?: string,
 ): DialogueScene {
   const duo = getDuo(duoId);
-  if (mode === "solo") {
-    const raw =
-      soloText?.trim() ||
-      nugget(facts.concept, 10) ||
-      nugget(facts.plan, 10);
-    const text = limitWords(raw);
-    return {
-      beats: [
-        {
-          speaker: duo.left.id,
-          text,
-          kind: facts.kind === "fail" ? "fail" : "teach",
-        },
-      ],
-      headline: firstSentence(text),
-      speaker: duo.left.id,
-      kind: facts.kind,
-    };
-  }
-
-  const beats = flavorBeats(facts, duo);
+  const beats = purposeBeats(facts, soloText);
   return {
     beats,
     headline: headlineFrom(facts),
     speaker: beats[0]?.speaker ?? duo.left.id,
     kind: facts.kind,
+    purpose: beats[0]?.purpose,
   };
 }
 
@@ -212,19 +193,24 @@ export function dialogueForQuizReaction(
 ): DialogueScene {
   const duo = getDuo(opts.duo);
   const speaker = correct ? duo.left.id : duo.right.id;
+  const purpose = correct ? "hold-the-square" : "stop-opponent-plan";
   return {
     beats: [
       {
         speaker,
         text: limitWords(
-          correct ? "Yes. That's the job." : nugget(reaction, 10) || "Not that. Try again.",
+          correct
+            ? "Yes. That's the job — hold the square."
+            : nugget(reaction, 10) || "Not that. Stop their plan.",
         ),
         kind: correct ? "agree" : "challenge",
+        purpose,
       },
     ],
     headline: correct ? "Yes." : "Not that.",
     speaker,
     kind: "quiz",
+    purpose,
   };
 }
 

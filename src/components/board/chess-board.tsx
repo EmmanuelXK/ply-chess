@@ -59,7 +59,7 @@ export function ChessBoard({
   movableColor,
   check = false,
   coordinates = true,
-  animationMs = 150,
+  animationMs = 90,
   onMove,
   onLongPress,
 }: ChessBoardProps) {

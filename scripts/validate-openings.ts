@@ -13,4 +13,4 @@ for (const opening of openings) {
 
 validateDialogue(openings);
 console.log(`\n${openings.length} openings legal from the start position.`);
-console.log("✓ Dual-master dialogue (≤15 words) for all three duos on Lion, London, Evans.");
+console.log("✓ Single-coach purpose dialogue (≤15 words, no repeats) on Lion, London, Evans.");

@@ -1,6 +1,7 @@
 import type { Opening } from "@/lib/openings/types";
-import { DUOS } from "./duos";
+import { ACTIVE_COACH } from "./coach";
 import { dialogueForPly, dialogueForStart } from "./generate";
+import { PURPOSE_LABELS } from "./purpose";
 import { wordCount } from "./short";
 import { MAX_BEAT_WORDS } from "./types";
 
@@ -19,80 +20,77 @@ export function validateDialogue(openings: Opening[]): void {
   }
 
   for (const opening of samples) {
-    for (const duo of DUOS) {
-      const start = dialogueForStart(opening, { duo: duo.id, mode: "dual" });
-      if (start.beats.length < 2) {
-        throw new Error(
-          `[${opening.id}/${duo.id}] start must have two teachers talking`,
-        );
-      }
-      const speakers = new Set(start.beats.map((b) => b.speaker));
-      if (speakers.size < 2) {
-        throw new Error(`[${opening.id}/${duo.id}] start does not alternate`);
-      }
+    const start = dialogueForStart(opening, { duo: ACTIVE_COACH, mode: "solo" });
+    if (start.beats.length < 1) {
+      throw new Error(`[${opening.id}] start must have a coach beat`);
+    }
+    if (start.beats.length > 2) {
+      throw new Error(`[${opening.id}] start should be one coach, not a duo`);
+    }
 
-      const plies = [-1, 0, 3, 7, 11, 15].filter((p) => p < opening.moves.length);
-      for (const ply of plies) {
-        const scene =
-          ply < 0
-            ? start
-            : dialogueForPly(opening, ply, { duo: duo.id, mode: "dual" });
-        if (!scene.beats.length) {
-          throw new Error(`[${opening.id}/${duo.id}] empty scene at ply ${ply}`);
-        }
-        for (const beat of scene.beats) {
-          const n = wordCount(beat.text);
-          if (n > MAX_BEAT_WORDS) {
-            throw new Error(
-              `[${opening.id}/${duo.id}] ply ${ply} beat is ${n} words: "${beat.text}"`,
-            );
-          }
-          if (beat.kind !== "quiz" && n < 6) {
-            throw new Error(
-              `[${opening.id}/${duo.id}] ply ${ply} beat is too thin (${n}w): "${beat.text}"`,
-            );
-          }
-          if (LEAK.test(beat.text)) {
-            throw new Error(
-              `[${opening.id}/${duo.id}] professor leak at ply ${ply}: "${beat.text}"`,
-            );
-          }
-        }
-        const blob = scene.beats.map((b) => b.text).join(" ");
-        if (BANNED.test(blob)) {
+    const plies = [-1, 0, 3, 7, 11, 15].filter((p) => p < opening.moves.length);
+    const seen = new Set<string>();
+    for (const ply of plies) {
+      const scene =
+        ply < 0
+          ? start
+          : dialogueForPly(opening, ply, { duo: ACTIVE_COACH, mode: "solo" });
+      if (!scene.beats.length) {
+        throw new Error(`[${opening.id}] empty scene at ply ${ply}`);
+      }
+      if (scene.beats.length > 2) {
+        throw new Error(`[${opening.id}] ply ${ply} has duo-length beats`);
+      }
+      for (const beat of scene.beats) {
+        const n = wordCount(beat.text);
+        if (n > MAX_BEAT_WORDS) {
           throw new Error(
-            `[${opening.id}/${duo.id}] banned likeness/name in dialogue`,
+            `[${opening.id}] ply ${ply} beat is ${n} words: "${beat.text}"`,
           );
         }
+        if (beat.kind !== "quiz" && n < 6) {
+          throw new Error(
+            `[${opening.id}] ply ${ply} beat is too thin (${n}w): "${beat.text}"`,
+          );
+        }
+        if (LEAK.test(beat.text)) {
+          throw new Error(`[${opening.id}] professor leak at ply ${ply}: "${beat.text}"`);
+        }
+        if (!beat.purpose || !PURPOSE_LABELS[beat.purpose]) {
+          throw new Error(`[${opening.id}] ply ${ply} missing purpose tag`);
+        }
       }
+      const line = scene.beats[0]?.text ?? "";
+      if (seen.has(line)) {
+        throw new Error(`[${opening.id}] repeated identical line "${line}"`);
+      }
+      seen.add(line);
+      if (BANNED.test(scene.beats.map((b) => b.text).join(" "))) {
+        throw new Error(`[${opening.id}] banned likeness/name in dialogue`);
+      }
+    }
 
-      const fail = dialogueForPly(opening, 0, {
-        duo: duo.id,
-        mode: "dual",
-        kind: "fail",
-        misses: [{ ply: 0, san: opening.moves[0] ?? "e4", idea: "center" }],
-      });
-      if (!fail.beats.some((b) => wordCount(b.text) <= MAX_BEAT_WORDS)) {
-        throw new Error(`[${opening.id}/${duo.id}] fail beats too long`);
-      }
-
-      const solo = dialogueForStart(opening, { duo: duo.id, mode: "solo" });
-      if (solo.beats.length !== 1) {
-        throw new Error(`[${opening.id}/${duo.id}] solo must be one speaker`);
-      }
-      if (wordCount(solo.beats[0].text) > MAX_BEAT_WORDS) {
-        throw new Error(`[${opening.id}/${duo.id}] solo start is too long`);
-      }
+    const fail = dialogueForPly(opening, 0, {
+      duo: ACTIVE_COACH,
+      mode: "solo",
+      kind: "fail",
+      misses: [{ ply: 0, san: opening.moves[0] ?? "e4", idea: "center" }],
+    });
+    if (!fail.beats.some((b) => wordCount(b.text) <= MAX_BEAT_WORDS)) {
+      throw new Error(`[${opening.id}] fail beats too long`);
+    }
+    if (!fail.beats[0]?.purpose) {
+      throw new Error(`[${opening.id}] fail missing purpose`);
     }
   }
 
   for (const opening of openings) {
     const scene = dialogueForPly(opening, 0, {
-      duo: "voss-draven",
-      mode: "dual",
+      duo: ACTIVE_COACH,
+      mode: "solo",
     });
     if (!scene.beats.length) {
-      throw new Error(`[${opening.id}] dual scene empty at ply 0`);
+      throw new Error(`[${opening.id}] coach scene empty at ply 0`);
     }
     for (const beat of scene.beats) {
       if (wordCount(beat.text) > MAX_BEAT_WORDS) {
@@ -100,10 +98,9 @@ export function validateDialogue(openings: Opening[]): void {
           `[${opening.id}] ply 0 beat is ${wordCount(beat.text)} words: "${beat.text}"`,
         );
       }
+      if (beat.kind !== "quiz" && !beat.purpose) {
+        throw new Error(`[${opening.id}] ply 0 missing purpose`);
+      }
     }
-  }
-
-  if (DUOS.some((d) => d.left.gender !== "male" || d.right.gender !== "female")) {
-    throw new Error("each duo must be male + female");
   }
 }
