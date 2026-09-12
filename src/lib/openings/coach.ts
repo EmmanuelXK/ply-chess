@@ -1,6 +1,14 @@
-import { chunkAt, positionalIdea } from "./helpers";
+import { chunkAt, firstSentence, positionalIdea } from "./helpers";
 import { professorAt } from "./professor";
 import type { Opening } from "./types";
+
+function shortLine(text: string | undefined, max = 15): string {
+  const compact = (text ?? "").replace(/\s+/g, " ").trim();
+  if (!compact) return "";
+  const sentence = firstSentence(compact);
+  const words = sentence.split(" ").filter(Boolean).slice(0, max);
+  return words.join(" ");
+}
 
 export type CoachKind =
   | "start"
@@ -23,14 +31,15 @@ export interface CoachState {
 
 function professorLine(opening: Opening, afterPly: number): string | undefined {
   const script = professorAt(opening, afterPly);
-  return script?.concept;
+  if (!script) return undefined;
+  return shortLine(script.concept, 12);
 }
 
 export function coachAtStart(opening: Opening): CoachState {
   const line = opening.coach.find((c) => c.afterPly === -1);
   return {
-    text: line?.text ?? opening.story.cast,
-    detail: opening.story.plan,
+    text: shortLine(opening.chunks[0]?.name ?? opening.story.cast, 12),
+    detail: shortLine(opening.story.plan, 12),
     chunkName: opening.chunks[0]?.name,
     kind: "start",
   };
@@ -95,10 +104,10 @@ export function coachOnFail(opening: Opening, ply: number): CoachState {
     chunk?.name ?? "one square, one job",
   );
   return {
-    text: `Not that square. ${idea}`,
+    text: shortLine(`Not that square. ${idea}`, 14),
     detail: expected
-      ? `Play ${expected}. That's the job of this moment — not the rest of the sequence.`
-      : "Stay with the idea. One move, then the next.",
+      ? `Play ${expected}. That's the job.`
+      : "Stay with the idea. One move.",
     chunkName: chunk?.name,
     kind: "fail",
   };
@@ -109,8 +118,8 @@ export function coachOnHint(opening: Opening, ply: number): CoachState {
   const san = opening.moves[ply] ?? "";
   const script = professorAt(opening, ply);
   return {
-    text: `Play ${san}. ${script?.concept ?? chunk?.job ?? ""}`.trim(),
-    detail: script?.why,
+    text: shortLine(`Play ${san}. ${script?.concept ?? chunk?.job ?? ""}`, 14),
+    detail: shortLine(script?.why, 12),
     chunkName: chunk?.name,
     kind: "hint",
   };

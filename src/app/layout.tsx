@@ -57,7 +57,7 @@ export default function RootLayout({
       lang="en"
       className={`dark ${geistSans.variable} ${geistMono.variable} ${prestigeSerif.variable} h-full antialiased`}
     >
-      <body className="min-h-full bg-[#0c0c0e] text-zinc-100">{children}</body>
+      <body className="app-body bg-[#0c0c0e] text-zinc-100">{children}</body>
     </html>
   );
 }

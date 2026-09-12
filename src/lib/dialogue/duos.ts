@@ -12,6 +12,7 @@ export const DUOS: DuoPack[] = [
       short: "Aldric",
       role: "Structure, history, plans that age well",
       color: "amber",
+      gender: "male",
     },
     right: {
       id: "kael",
@@ -19,6 +20,7 @@ export const DUOS: DuoPack[] = [
       short: "Kael",
       role: "Traps, gambits, romantic brilliance",
       color: "rose",
+      gender: "female",
     },
   },
   {
@@ -32,6 +34,7 @@ export const DUOS: DuoPack[] = [
       short: "Soren",
       role: "Elite calculator. Few words. Lasting squares.",
       color: "ice",
+      gender: "male",
     },
     right: {
       id: "rhea",
@@ -39,6 +42,7 @@ export const DUOS: DuoPack[] = [
       short: "Rhea",
       role: "Emotional stakes, patterns, the story on the board",
       color: "ember",
+      gender: "female",
     },
   },
   {
@@ -52,6 +56,7 @@ export const DUOS: DuoPack[] = [
       short: "Silas",
       role: "Meticulous plans, backups, the quiet line that holds",
       color: "slate",
+      gender: "male",
     },
     right: {
       id: "lena",
@@ -59,6 +64,7 @@ export const DUOS: DuoPack[] = [
       short: "Lena",
       role: "Sharp questions, pressure, she catches the soft move",
       color: "wine",
+      gender: "female",
     },
   },
 ];

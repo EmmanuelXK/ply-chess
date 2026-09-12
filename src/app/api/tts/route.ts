@@ -25,6 +25,10 @@ export async function POST(request: Request) {
   );
   const premium =
     "premium" in record && (record as { premium: unknown }).premium === true;
+  const voiceRaw =
+    "voice" in record && typeof (record as { voice: unknown }).voice === "string"
+      ? (record as { voice: string }).voice
+      : undefined;
 
   if (typeof text !== "string") {
     return NextResponse.json({ error: "text_required" }, { status: 400 });
@@ -40,6 +44,7 @@ export async function POST(request: Request) {
       text: normalized,
       speaker,
       premium,
+      voice: voiceRaw,
     });
     return new NextResponse(new Uint8Array(clip.audio), {
       status: 200,

@@ -1,7 +1,9 @@
+import { limitWords } from "@/lib/dialogue/short";
 import type { DialogueBeat } from "@/lib/dialogue/types";
 import { ClipCache } from "@/lib/tts/cache";
 import { clipHash } from "@/lib/tts/hash";
-import { SPEAKER_PROSODY } from "@/lib/tts/prosody";
+import { edgeVoiceFor, readTtsRate } from "@/lib/tts/prefs";
+import { rateScale, SPEAKER_PROSODY } from "@/lib/tts/prosody";
 import type { SpeakerId } from "@/lib/tts/types";
 import { pickWebVoice } from "@/lib/tts/voices-web";
 
@@ -74,7 +76,7 @@ function speakWeb(text: string, speaker: SpeakerId, gen: number): Promise<void> 
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = voice?.lang ?? "en-GB";
     if (voice) utterance.voice = voice;
-    utterance.rate = prosody.webRate;
+    utterance.rate = Math.min(1.2, prosody.webRate * rateScale(readTtsRate()));
     utterance.pitch = prosody.webPitch;
     utterance.onend = () => resolve();
     utterance.onerror = () => resolve();
@@ -135,7 +137,12 @@ async function speakNeural(
     const response = await fetch("/api/tts", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text, speaker, premium }),
+      body: JSON.stringify({
+        text,
+        speaker,
+        premium,
+        voice: edgeVoiceFor(speaker),
+      }),
       signal: mergeAbort(controller, 12_000),
     });
     if (gen !== playGen) return;
@@ -175,7 +182,7 @@ export function speak(
   text: string,
   opts?: { speaker?: SpeakerId; premium?: boolean; interrupt?: boolean },
 ): SpeakHandle {
-  const trimmed = text.replace(/\s+/g, " ").trim();
+  const trimmed = limitWords(text.replace(/\s+/g, " ").trim());
   const speaker = opts?.speaker ?? "aldric";
   const premium = opts?.premium === true;
   if (!trimmed) {
@@ -220,7 +227,12 @@ export function speakDialogue(
       const beat = beats[i];
       opts?.onBeat?.(i, beat);
       const handleGen = playGen;
-      await speakNeural(beat.text, beat.speaker, opts?.premium === true, handleGen);
+      await speakNeural(
+        limitWords(beat.text),
+        beat.speaker,
+        opts?.premium === true,
+        handleGen,
+      );
       if (stopped || gen !== playGen) return;
       if (beat.ask && opts?.waitForAsk) {
         const choice = await opts.waitForAsk(beat);

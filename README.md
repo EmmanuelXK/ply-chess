@@ -1,6 +1,6 @@
 # Opening Edge
 
-iPhone-first PWA. **21 attacking systems** (11 White · 5 vs 1.e4 · 5 vs 1.d4). Each line is a **spine to move 21**, **traps**, and **six pillars** — then Plan mode. This pack adds **dual-master headphone dialogue**, a **Why** flow, positional quizzes, hybrid practice, fingertip Back/Forward, and Analyze with an eval bar.
+iPhone-first PWA dashboard (`100dvh`, no page scroll). **21 attacking systems** (11 White · 5 vs 1.e4 · 5 vs 1.d4). Each line is a **spine to move 21**, **traps**, and **six pillars** — then Plan mode. Dual coaches speak in **short beats**, wander as chat heads, and point at named squares.
 
 Production: [https://blitzbar.app](https://blitzbar.app) (Vercel project `ply-chess`, GitHub `EmmanuelXK/ply-chess`).
 
@@ -16,15 +16,13 @@ Home filters: All 21 / White / vs 1.e4 / vs 1.d4. Reps chips: **Spine · Traps �
 
 ## Dual masters
 
-Headphone training is **two teachers**, not one coach with a sidekick. They argue, agree, quiz you mid-line, and land a takeaway. Default mode is **Dual masters**. Solo mentor is an optional Settings toggle.
-
-Pick a duo on the home screen **before Learn**, or **Masters** in the drill (Settings). Last duo is stored in `localStorage` (`opening-edge.duo`).
+Headphone training is **two teachers**, not one coach with a sidekick. Beats are **8–15 words**, one positional idea, friendly (pride on good moves, concern + a fix on a miss). They argue about 1/5 of the time and still land one plan. Duo / Podcast↔Teach / Dual↔Solo / voices live on the **Settings** tab only. Masters on the drill deep-links there.
 
 | Duo | Teachers | Feel |
 | --- | --- | --- |
-| **Voss & Draven** (default) | Aldric Voss · Kael Draven | Prestige mentor vs darkly brilliant provocateur. Deep greens, golds, serif accents. |
-| **Vale & Knox** | Soren Vale · Rhea Knox | Ice-cold calculator vs obsessive narrative fire. Blues/silvers vs crimson. |
-| **Crowe & Marquez** | Silas Crowe · Lena Marquez | Quiet planner vs relentless investigator. Charcoal/amber vs teal. |
+| **Voss & Draven** (default) | Aldric Voss ♂ · Kael Draven ♀ | Warm mentor vs punchy romantic tease. |
+| **Vale & Knox** | Soren Vale ♂ · Rhea Knox ♀ | Ice-cold calculator vs narrative fire. |
+| **Crowe & Marquez** | Silas Crowe ♂ · Lena Marquez ♀ | Quiet planner vs relentless investigator. |
 
 All six names are **original characters**. No real or fictional IP names, likenesses, voice clones, or catchphrases.
 
@@ -48,12 +46,12 @@ The production build is green with **zero cloud keys**.
 
 | Speaker | Edge | Google WaveNet | ElevenLabs stock |
 | --- | --- | --- | --- |
-| Aldric | `en-GB-RyanNeural` | `en-GB-Wavenet-B` | George `JBFqnCBsd6RMkjVDRZzb` |
-| Kael | `en-US-GuyNeural` | `en-US-Wavenet-D` | Adam `pNInz6obpgDQGcFmaJgB` |
-| Soren | `en-GB-ThomasNeural` | `en-GB-Wavenet-D` | Daniel `onwK4e9ZLuTAKqWW03F9` |
-| Rhea | `en-US-AriaNeural` | `en-US-Wavenet-F` | Bella `EXAVITQu4vr4xnSDxMaL` |
-| Silas | `en-US-ChristopherNeural` | `en-US-Wavenet-B` | Josh `TxGEqnHWrfWFTfGW9XjX` |
-| Lena | `en-US-JennyNeural` | `en-US-Wavenet-C` | Rachel `21m00Tcm4TlvDq8ikWAM` |
+| Aldric ♂ | `en-GB-RyanNeural` | `en-GB-Wavenet-B` | George `JBFqnCBsd6RMkjVDRZzb` |
+| Kael ♀ | `en-US-AvaNeural` | `en-US-Wavenet-F` | Charlotte `XB0fDUnXU5powFXDhCwa` |
+| Soren ♂ | `en-GB-ThomasNeural` | `en-GB-Wavenet-D` | Daniel `onwK4e9ZLuTAKqWW03F9` |
+| Rhea ♀ | `en-US-JennyNeural` | `en-US-Wavenet-E` | Bella `EXAVITQu4vr4xnSDxMaL` |
+| Silas ♂ | `en-US-AndrewNeural` | `en-US-Wavenet-D` | Josh `TxGEqnHWrfWFTfGW9XjX` |
+| Lena ♀ | `en-US-EmmaNeural` | `en-US-Wavenet-C` | Rachel `21m00Tcm4TlvDq8ikWAM` |
 
 Override with `TTS_VOICE_<SPEAKER>` or provider-specific `EDGE_TTS_VOICE_<SPEAKER>`, `GOOGLE_TTS_VOICE_<SPEAKER>`, `ELEVENLABS_VOICE_<SPEAKER>`. See `.env.example`.
 
