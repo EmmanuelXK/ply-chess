@@ -1653,9 +1653,24 @@ body,
 
 .chat-arrow {
   fill: none;
-  stroke-width: 2.4;
+  stroke-width: 2.35;
   stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.92;
   filter: drop-shadow(0 1px 1px rgb(0 0 0 / 45%));
+}
+
+.chat-arrow-in {
+  animation: chat-arrow-draw 380ms cubic-bezier(0.22, 1.15, 0.36, 1) both;
+}
+
+@keyframes chat-arrow-draw {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.92;
+  }
 }
 
 .chat-arrow-aldric,
@@ -1674,18 +1689,95 @@ body,
   fill: #fbbf24;
 }
 
-.chat-head {
+.chat-slot {
   position: absolute;
-  width: 3.35rem;
-  height: 3.35rem;
-  border-radius: 999px;
-  display: grid;
-  place-items: center;
-  background: #1c1c1f;
-  border: 2px solid #3f3f46;
-  box-shadow: 0 6px 16px rgb(0 0 0 / 35%);
-  overflow: hidden;
+  width: 3.45rem;
+  height: 3.45rem;
+  z-index: 2;
+  transform: translate3d(var(--drift-x, 0px), var(--drift-y, 0px), 0)
+    rotate(var(--look, 0deg));
+  transition:
+    transform 720ms cubic-bezier(0.22, 1.28, 0.36, 1),
+    opacity 280ms ease;
   will-change: transform;
+}
+
+.chat-slot-left {
+  top: 38%;
+  left: 20%;
+}
+
+.chat-slot-right {
+  top: 30%;
+  left: 58%;
+}
+
+.chat-slot-talk {
+  z-index: 7;
+}
+
+.chat-bob {
+  width: 100%;
+  height: 100%;
+  transform-origin: 50% 70%;
+  will-change: transform;
+}
+
+.chat-bob-left {
+  animation: grok-bob-a 4.2s cubic-bezier(0.37, 0.02, 0.2, 1) infinite;
+}
+
+.chat-bob-right {
+  animation: grok-bob-b 4.85s cubic-bezier(0.37, 0.02, 0.2, 1) infinite;
+  animation-delay: -2.2s;
+}
+
+@keyframes grok-bob-a {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(-1.5deg);
+  }
+  50% {
+    transform: translate3d(0, -8px, 0) rotate(1.7deg);
+  }
+}
+
+@keyframes grok-bob-b {
+  0%,
+  100% {
+    transform: translate3d(0, 1px, 0) rotate(1.4deg);
+  }
+  50% {
+    transform: translate3d(0, -7px, 0) rotate(-1.8deg);
+  }
+}
+
+.chat-pill {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 999px;
+  background: #141216;
+  border: 1.5px solid rgb(255 255 255 / 14%);
+  box-shadow:
+    0 10px 22px rgb(0 0 0 / 42%),
+    0 2px 4px rgb(0 0 0 / 28%),
+    inset 0 1px 0 rgb(255 255 255 / 18%);
+  overflow: visible;
+  opacity: 0.92;
+  transition:
+    box-shadow 280ms ease,
+    border-color 280ms ease,
+    opacity 220ms ease;
+}
+
+.chat-face {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 999px;
+  overflow: hidden;
+  transform-origin: 50% 60%;
 }
 
 .chat-face-svg {
@@ -1694,66 +1786,103 @@ body,
   display: block;
 }
 
-.chat-head-left {
-  top: 36%;
-  left: 22%;
-  animation: chat-wander-a 9s ease-in-out infinite;
+.chat-ring {
+  position: absolute;
+  inset: -5px;
+  border-radius: 999px;
+  pointer-events: none;
+  opacity: 0;
+  box-shadow: 0 0 0 2px rgb(251 191 36 / 0%);
 }
 
-.chat-head-right {
-  top: 28%;
-  left: 58%;
-  animation: chat-wander-b 11s ease-in-out infinite;
-}
-
-.chat-head-talk {
-  transform: scale(1.08);
-  border-color: #fbbf24;
+.chat-pill-talk {
+  opacity: 1;
+  border-color: #fcd34d;
   box-shadow:
-    0 0 0 3px rgb(251 191 36 / 28%),
-    0 8px 18px rgb(0 0 0 / 40%);
+    0 0 0 3px rgb(251 191 36 / 26%),
+    0 12px 26px rgb(0 0 0 / 48%),
+    0 2px 4px rgb(0 0 0 / 30%),
+    inset 0 1px 0 rgb(255 255 255 / 28%);
 }
 
-.chat-head-rose.chat-head-talk,
-.chat-head-ember.chat-head-talk,
-.chat-head-wine.chat-head-talk {
+.chat-pill-talk .chat-face {
+  animation: grok-speak 1.2s cubic-bezier(0.22, 1.2, 0.36, 1) infinite;
+}
+
+.chat-pill-talk .chat-ring {
+  animation: grok-ring 1.35s cubic-bezier(0.16, 0.8, 0.3, 1) infinite;
+}
+
+.chat-pill-rose.chat-pill-talk,
+.chat-pill-ember.chat-pill-talk,
+.chat-pill-wine.chat-pill-talk {
   border-color: #fb7185;
   box-shadow:
-    0 0 0 3px rgb(251 113 133 / 30%),
-    0 8px 18px rgb(0 0 0 / 40%);
+    0 0 0 3px rgb(251 113 133 / 28%),
+    0 12px 26px rgb(0 0 0 / 48%),
+    0 2px 4px rgb(0 0 0 / 30%),
+    inset 0 1px 0 rgb(255 255 255 / 22%);
 }
 
-@keyframes chat-wander-a {
+.chat-pill-rose.chat-pill-talk .chat-ring,
+.chat-pill-ember.chat-pill-talk .chat-ring,
+.chat-pill-wine.chat-pill-talk .chat-ring {
+  animation-name: grok-ring-rose;
+}
+
+@keyframes grok-speak {
   0%,
   100% {
-    transform: translate(0, 0);
+    transform: scale(1);
   }
-  50% {
-    transform: translate(10px, -8px);
+  38% {
+    transform: scale(1.075);
+  }
+  68% {
+    transform: scale(1.02);
   }
 }
 
-@keyframes chat-wander-b {
-  0%,
+@keyframes grok-ring {
+  0% {
+    opacity: 0.7;
+    box-shadow: 0 0 0 0 rgb(251 191 36 / 42%);
+  }
+  70% {
+    opacity: 0;
+    box-shadow: 0 0 0 10px rgb(251 191 36 / 0%);
+  }
   100% {
-    transform: translate(0, 0);
-  }
-  50% {
-    transform: translate(-12px, 7px);
+    opacity: 0;
+    box-shadow: 0 0 0 10px rgb(251 191 36 / 0%);
   }
 }
 
-.chat-head-talk.chat-head-left {
-  animation: chat-wander-a 9s ease-in-out infinite;
-}
-
-.chat-head-talk.chat-head-right {
-  animation: chat-wander-b 11s ease-in-out infinite;
+@keyframes grok-ring-rose {
+  0% {
+    opacity: 0.7;
+    box-shadow: 0 0 0 0 rgb(251 113 133 / 42%);
+  }
+  70% {
+    opacity: 0;
+    box-shadow: 0 0 0 10px rgb(251 113 133 / 0%);
+  }
+  100% {
+    opacity: 0;
+    box-shadow: 0 0 0 10px rgb(251 113 133 / 0%);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .chat-head-left,
-  .chat-head-right {
+  .chat-bob-left,
+  .chat-bob-right,
+  .chat-pill-talk .chat-face,
+  .chat-pill-talk .chat-ring,
+  .chat-arrow-in {
     animation: none;
+  }
+
+  .chat-slot {
+    transition: none;
   }
 }
