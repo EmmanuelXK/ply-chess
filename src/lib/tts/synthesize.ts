@@ -1,10 +1,11 @@
 import "server-only";
 
 import { ClipCache } from "./cache";
+import { isAllowedEdgeVoice } from "./catalog";
 import {
   edgeVoice,
   elevenLabsKey,
-  elevenLabsVoiceId,
+  elevenLabsVoiceOverride,
   googleConfigured,
   MAX_TTS_CHARS,
 } from "./config";
@@ -38,7 +39,8 @@ export function parseSpeaker(value: unknown): SpeakerId {
 
 /**
  * Priority:
- * 1. ElevenLabs — only when a key is set AND the lesson asked for premium characters
+ * 1. ElevenLabs — only when a key is set AND this speaker has
+ *    ELEVENLABS_VOICE_<NAME> (Instant Voice Clone or stock ID)
  * 2. Google Cloud TTS — when credentials / API key are configured
  * 3. Edge TTS — free neural path (needs network; not true offline)
  *
@@ -48,21 +50,19 @@ export async function synthesizeSpeech(request: TtsRequest): Promise<TtsClip> {
   const text = request.text;
   const speaker = request.speaker;
 
-  if (request.premium) {
-    const key = elevenLabsKey();
-    if (key) {
-      const voice = elevenLabsVoiceId(speaker);
-      const cacheKey = clipHash("elevenlabs", speaker, voice, text);
-      const hit = serverCache.get(cacheKey);
-      if (hit) return hit;
-      try {
-        const raw = await synthesizeElevenLabs(text, key, voice, speaker);
-        const clip: TtsClip = { ...raw, provider: "elevenlabs" };
-        serverCache.set(cacheKey, clip);
-        return clip;
-      } catch {
-        // Fall through to Google / Edge.
-      }
+  const key = elevenLabsKey();
+  const cloneId = elevenLabsVoiceOverride(speaker);
+  if (key && cloneId) {
+    const cacheKey = clipHash("elevenlabs", speaker, cloneId, text);
+    const hit = serverCache.get(cacheKey);
+    if (hit) return hit;
+    try {
+      const raw = await synthesizeElevenLabs(text, key, cloneId, speaker);
+      const clip: TtsClip = { ...raw, provider: "elevenlabs" };
+      serverCache.set(cacheKey, clip);
+      return clip;
+    } catch {
+      // Fall through to Google / Edge.
     }
   }
 
@@ -80,7 +80,9 @@ export async function synthesizeSpeech(request: TtsRequest): Promise<TtsClip> {
     }
   }
 
-  const voice = edgeVoice(speaker);
+  const remapped =
+    request.voice && isAllowedEdgeVoice(request.voice) ? request.voice : undefined;
+  const voice = remapped || edgeVoice(speaker);
   const cacheKey = clipHash("edge", speaker, voice, text);
   const hit = serverCache.get(cacheKey);
   if (hit) return hit;

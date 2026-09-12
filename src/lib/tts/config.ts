@@ -1,8 +1,14 @@
 import "server-only";
 
-import type { SpeakerId } from "./types";
+import {
+  DEFAULT_EDGE_VOICES,
+  DEFAULT_GOOGLE_VOICES,
+  maskVoiceId,
+} from "./catalog";
+import { SPEAKER_IDS, type SpeakerId } from "./types";
 
 export { SPEAKER_PROSODY, speakerProsody } from "./prosody";
+export { DEFAULT_EDGE_VOICES, DEFAULT_GOOGLE_VOICES } from "./catalog";
 
 export const MAX_TTS_CHARS = 800;
 
@@ -11,34 +17,21 @@ export const MAX_TTS_CHARS = 800;
  * Override any speaker with TTS_VOICE_<SPEAKER> (active provider)
  * or EDGE_TTS_VOICE_<SPEAKER> / GOOGLE_TTS_VOICE_<SPEAKER> /
  * ELEVENLABS_VOICE_<SPEAKER>.
+ * Settings can remap Edge voices per coach without env vars.
  */
-export const DEFAULT_EDGE_VOICES: Record<SpeakerId, string> = {
-  aldric: "en-GB-RyanNeural",
-  kael: "en-US-GuyNeural",
-  soren: "en-GB-ThomasNeural",
-  rhea: "en-US-AriaNeural",
-  silas: "en-US-ChristopherNeural",
-  lena: "en-US-JennyNeural",
-};
 
-/** WaveNet defaults — 4M free chars/month, more generous than Neural2's 1M. */
-export const DEFAULT_GOOGLE_VOICES: Record<SpeakerId, string> = {
-  aldric: "en-GB-Wavenet-B",
-  kael: "en-US-Wavenet-D",
-  soren: "en-GB-Wavenet-D",
-  rhea: "en-US-Wavenet-F",
-  silas: "en-US-Wavenet-B",
-  lena: "en-US-Wavenet-C",
-};
-
-/** ElevenLabs premade library voices — not likeness clones. */
+/**
+ * Example stock library IDs (M/F matched). Not used unless pasted
+ * as ELEVENLABS_VOICE_<SPEAKER>. Instant Voice Clone IDs go in the
+ * same env slots. Never celebrity / likeness clones.
+ */
 export const DEFAULT_ELEVENLABS_VOICES: Record<SpeakerId, string> = {
-  aldric: "JBFqnCBsd6RMkjVDRZzb", // George
-  kael: "pNInz6obpgDQGcFmaJgB", // Adam
-  soren: "onwK4e9ZLuTAKqWW03F9", // Daniel
-  rhea: "EXAVITQu4vr4xnSDxMaL", // Bella
-  silas: "TxGEqnHWrfWFTfGW9XjX", // Josh
-  lena: "21m00Tcm4TlvDq8ikWAM", // Rachel
+  aldric: "JBFqnCBsd6RMkjVDRZzb", // George (male)
+  kael: "AZnzlk1XvdvUeBnXmlld", // Domi (female)
+  soren: "onwK4e9ZLuTAKqWW03F9", // Daniel (male)
+  rhea: "EXAVITQu4vr4xnSDxMaL", // Bella (female)
+  silas: "TxGEqnHWrfWFTfGW9XjX", // Josh (male)
+  lena: "21m00Tcm4TlvDq8ikWAM", // Rachel (female)
 };
 
 function env(name: string): string | undefined {
@@ -68,12 +61,29 @@ export function googleVoice(speaker: SpeakerId): string {
   );
 }
 
+/** Instant Voice Clone (or stock) ID pasted for this coach. */
+export function elevenLabsVoiceOverride(
+  speaker: SpeakerId,
+): string | undefined {
+  return speakerEnv("ELEVENLABS_VOICE", speaker);
+}
+
 export function elevenLabsVoiceId(speaker: SpeakerId): string {
-  return (
-    speakerEnv("ELEVENLABS_VOICE", speaker) ||
-    env("ELEVENLABS_VOICE_ID") ||
-    DEFAULT_ELEVENLABS_VOICES[speaker]
-  );
+  return elevenLabsVoiceOverride(speaker) || DEFAULT_ELEVENLABS_VOICES[speaker];
+}
+
+export function elevenLabsSpeakerStatus(): Record<
+  SpeakerId,
+  { configured: boolean; masked?: string }
+> {
+  const out = {} as Record<SpeakerId, { configured: boolean; masked?: string }>;
+  for (const speaker of SPEAKER_IDS) {
+    const id = elevenLabsVoiceOverride(speaker);
+    out[speaker] = id
+      ? { configured: true, masked: maskVoiceId(id) }
+      : { configured: false };
+  }
+  return out;
 }
 
 export function elevenLabsKey(): string | undefined {

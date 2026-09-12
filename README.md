@@ -16,9 +16,13 @@ Home filters: All 21 / White / vs 1.e4 / vs 1.d4. Reps chips: **Spine · Traps �
 
 ## Dual masters
 
-Headphone training is **two teachers**, not one coach with a sidekick. They argue, agree, quiz you mid-line, and land a takeaway. Default mode is **Dual masters**. Solo mentor is an optional Settings toggle.
+Headphone training is **two friendly coaches**, not one lecture. Beats stay **8–15 words**. They argue about 1 in 4–5 plies, then concede and land one takeaway.
 
-Pick a duo on the home screen **before Learn**, or **Masters** in the drill (Settings). Last duo is stored in `localStorage` (`opening-edge.duo`).
+**Teach** waits for your move (pride on book, one fix on a soft-fail). **Podcast** autoplays the line as a short turn-taking show. Last lesson mode is stored in `localStorage` (`opening-edge.lesson-mode`).
+
+Default dialogue is **Dual masters**. Solo mentor is an optional Settings toggle.
+
+Pick a duo on the home screen **before Learn**, or **Masters** in the drill (Settings). Last duo is stored in `localStorage` (`opening-edge.duo`). Each duo is **one male + one female** voice for headphone contrast.
 
 | Duo | Teachers | Feel |
 | --- | --- | --- |
@@ -44,18 +48,40 @@ Toggle **Voice** on the drill dock. Mute, Restart, Back/Forward, and navigation 
 
 The production build is green with **zero cloud keys**.
 
-**Default free voices (Edge)**
+**Default free voices (Edge) — male / female per duo**
 
-| Speaker | Edge | Google WaveNet | ElevenLabs stock |
+| Speaker | Gender | Edge (free) | Google WaveNet |
 | --- | --- | --- | --- |
-| Aldric | `en-GB-RyanNeural` | `en-GB-Wavenet-B` | George `JBFqnCBsd6RMkjVDRZzb` |
-| Kael | `en-US-GuyNeural` | `en-US-Wavenet-D` | Adam `pNInz6obpgDQGcFmaJgB` |
-| Soren | `en-GB-ThomasNeural` | `en-GB-Wavenet-D` | Daniel `onwK4e9ZLuTAKqWW03F9` |
-| Rhea | `en-US-AriaNeural` | `en-US-Wavenet-F` | Bella `EXAVITQu4vr4xnSDxMaL` |
-| Silas | `en-US-ChristopherNeural` | `en-US-Wavenet-B` | Josh `TxGEqnHWrfWFTfGW9XjX` |
-| Lena | `en-US-JennyNeural` | `en-US-Wavenet-C` | Rachel `21m00Tcm4TlvDq8ikWAM` |
+| Aldric Voss | male | `en-GB-RyanNeural` | `en-GB-Wavenet-D` |
+| Kael Draven | female | `en-US-JennyNeural` | `en-US-Wavenet-F` |
+| Soren Vale | male | `en-GB-ThomasNeural` | `en-GB-Wavenet-B` |
+| Rhea Knox | female | `en-US-AvaNeural` | `en-US-Wavenet-H` |
+| Silas Crowe | male | `en-US-AndrewNeural` | `en-US-Wavenet-I` |
+| Lena Marquez | female | `en-IE-EmilyNeural` | `en-US-Wavenet-C` |
 
-Override with `TTS_VOICE_<SPEAKER>` or provider-specific `EDGE_TTS_VOICE_<SPEAKER>`, `GOOGLE_TTS_VOICE_<SPEAKER>`, `ELEVENLABS_VOICE_<SPEAKER>`. See `.env.example`.
+Remap Edge voices in **Settings → Voices** (same gender only, so the M/F pair stays). Override with `TTS_VOICE_<SPEAKER>` or `EDGE_TTS_VOICE_<SPEAKER>` / `GOOGLE_TTS_VOICE_<SPEAKER>`. See `.env.example`.
+
+### Instant Voice Clone (optional)
+
+Record **original coaches only** — never a celebrity or IP likeness.
+
+1. Record 30–60s of clean speech per coach (quiet room, conversational, in character).
+2. In ElevenLabs create an **Instant Voice Clone** from that sample.
+3. Paste the voice ID into Vercel env (and `.env.local` for local):
+
+```
+ELEVENLABS_API_KEY=...
+ELEVENLABS_VOICE_ALDRIC=
+ELEVENLABS_VOICE_KAEL=
+ELEVENLABS_VOICE_SOREN=
+ELEVENLABS_VOICE_RHEA=
+ELEVENLABS_VOICE_SILAS=
+ELEVENLABS_VOICE_LENA=
+```
+
+4. Redeploy. That character uses the clone; coaches without an ID stay on the free Edge/Google/Web stack.
+
+Settings shows which IDs are configured (**masked**, last four characters). The app does not upload audio in v1 — paste IDs in env.
 
 ### GCP setup (optional)
 

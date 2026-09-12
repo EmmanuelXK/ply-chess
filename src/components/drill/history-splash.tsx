@@ -12,6 +12,7 @@ import {
   getDuo,
   type DialogueMode,
   type DuoId,
+  type LessonMode,
 } from "@/lib/dialogue";
 import {
   HISTORY_OPENER,
@@ -34,6 +35,7 @@ export function HistorySplash({
   orientation,
   duo,
   mode,
+  lessonMode = "teach",
   onClose,
 }: {
   opening: Opening;
@@ -41,6 +43,7 @@ export function HistorySplash({
   orientation: "white" | "black";
   duo: DuoId;
   mode: DialogueMode;
+  lessonMode?: LessonMode;
   onClose: () => void;
 }) {
   const [idx, setIdx] = useState(0);
@@ -62,10 +65,14 @@ export function HistorySplash({
 
   useEffect(() => {
     if (!milestone) return;
-    const scene = dialogueForHistory(opening, milestone, { duo, mode });
+    const scene = dialogueForHistory(opening, milestone, {
+      duo,
+      mode,
+      lesson: lessonMode,
+    });
     const handle = speakDialogue(scene.beats, { premium: mode === "dual" });
     return () => handle.stop();
-  }, [milestone, opening, duo, mode]);
+  }, [milestone, opening, duo, mode, lessonMode]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {

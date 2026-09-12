@@ -1,26 +1,32 @@
 "use client";
 
 import { X } from "lucide-react";
+import { LessonSwitch } from "@/components/home/lesson-switch";
 import { DuoPicker } from "@/components/home/duo-picker";
-import type { DialogueMode, DuoId } from "@/lib/dialogue";
+import { VoiceMap } from "@/components/drill/voice-map";
+import type { DialogueMode, DuoId, LessonMode } from "@/lib/dialogue";
 
 export function DuoSheet({
   duo,
   mode,
+  lesson,
   onDuo,
   onMode,
+  onLesson,
   onClose,
 }: {
   duo: DuoId;
   mode: DialogueMode;
+  lesson: LessonMode;
   onDuo: (id: DuoId) => void;
   onMode: (mode: DialogueMode) => void;
+  onLesson: (mode: LessonMode) => void;
   onClose: () => void;
 }) {
   return (
     <div className="splash-root" role="dialog" aria-modal="true" aria-label="Teachers">
       <button type="button" className="splash-scrim" aria-label="Close teachers" onClick={onClose} />
-      <div className="splash-card splash-in">
+      <div className="splash-card splash-in splash-card-wide">
         <header className="splash-head">
           <div>
             <p className="text-[11px] font-medium tracking-[0.16em] text-amber-200/80 uppercase">
@@ -36,9 +42,11 @@ export function DuoSheet({
           </button>
         </header>
         <p className="splash-copy">
-          Two original teachers. They argue, quiz you, and land one takeaway.
-          Solo is the older single-mentor script.
+          Two friendly coaches. Short beats. Teach waits for you. Podcast
+          plays the line. Paste Instant Voice Clone IDs in env.
         </p>
+        <p className="duo-home-label">Lesson</p>
+        <LessonSwitch value={lesson} onChange={onLesson} />
         <div className="mode-row" role="tablist" aria-label="Dialogue mode">
           <button
             type="button"
@@ -60,6 +68,7 @@ export function DuoSheet({
           </button>
         </div>
         <DuoPicker value={duo} onChange={onDuo} compact />
+        <VoiceMap />
       </div>
     </div>
   );

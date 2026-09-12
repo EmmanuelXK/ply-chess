@@ -1,8 +1,9 @@
 import { DEFAULT_DUO, isDuoId } from "./duos";
-import type { DialogueMode, DuoId } from "./types";
+import type { DialogueMode, DuoId, LessonMode } from "./types";
 
 const DUO_KEY = "opening-edge.duo";
 const MODE_KEY = "opening-edge.dialogue-mode";
+const LESSON_KEY = "opening-edge.lesson-mode";
 
 export function readStoredDuo(): DuoId {
   if (typeof window === "undefined") return DEFAULT_DUO;
@@ -39,6 +40,26 @@ export function writeStoredMode(mode: DialogueMode): void {
   if (typeof window === "undefined") return;
   try {
     window.localStorage.setItem(MODE_KEY, mode);
+  } catch {
+    /* ignore */
+  }
+}
+
+export function readStoredLesson(): LessonMode {
+  if (typeof window === "undefined") return "teach";
+  try {
+    const raw = window.localStorage.getItem(LESSON_KEY);
+    if (raw === "podcast" || raw === "teach") return raw;
+  } catch {
+    /* ignore */
+  }
+  return "teach";
+}
+
+export function writeStoredLesson(mode: LessonMode): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(LESSON_KEY, mode);
   } catch {
     /* ignore */
   }

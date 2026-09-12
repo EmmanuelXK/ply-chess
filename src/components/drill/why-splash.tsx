@@ -14,6 +14,7 @@ import {
   getDuo,
   type DialogueMode,
   type DuoId,
+  type LessonMode,
 } from "@/lib/dialogue";
 import type { Opening, WhyLesson } from "@/lib/openings";
 
@@ -25,6 +26,7 @@ export function WhySplash({
   orientation,
   duo,
   mode,
+  lessonMode = "teach",
   onClose,
 }: {
   opening: Opening;
@@ -32,6 +34,7 @@ export function WhySplash({
   orientation: "white" | "black";
   duo: DuoId;
   mode: DialogueMode;
+  lessonMode?: LessonMode;
   onClose: () => void;
 }) {
   const prefix = useMemo(
@@ -89,14 +92,18 @@ export function WhySplash({
       ply === lesson.startPly && branchIndex <= 0
         ? lesson.intro
         : (step?.narrate ?? lesson.intro);
-    const scene = dialogueForWhy(opening, lesson, text, { duo, mode });
+    const scene = dialogueForWhy(opening, lesson, text, {
+      duo,
+      mode,
+      lesson: lessonMode,
+    });
     handleRef.current = speakDialogue(scene.beats, {
       premium: mode === "dual",
     });
     return () => stopVoice();
     // Narration is ply-driven; step/branch are derived from ply.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ply, lesson.intro, lesson.startPly, duo, mode, opening]);
+  }, [ply, lesson.intro, lesson.startPly, duo, mode, lessonMode, opening]);
 
   useEffect(() => {
     if (!playing || ply >= line.length) return;

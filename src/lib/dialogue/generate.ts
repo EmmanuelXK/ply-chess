@@ -5,11 +5,13 @@ import type { HistoryMilestone, Opening, WhyLesson } from "@/lib/openings/types"
 import { authoredAt } from "./authored-facts";
 import { getDuo } from "./duos";
 import { flavorBeats } from "./flavor";
+import { capWords } from "./short";
 import type {
   DialogueMode,
   DialogueScene,
   DuoId,
   LessonFacts,
+  LessonMode,
 } from "./types";
 import type { CoachKind } from "@/lib/openings/coach";
 
@@ -70,6 +72,15 @@ export function collectFacts(input: {
       script?.why ??
       positionalIdea(chunk?.job ?? opening.story.conflict, opening.story.plan),
     plan: script?.plan ?? opening.story.plan,
+    idea: capWords(
+      script?.concept ??
+        positionalIdea(chunk?.job ?? opening.story.cast, opening.story.cast),
+    ),
+    whyShort: capWords(
+      script?.why ??
+        positionalIdea(chunk?.job ?? opening.story.conflict, opening.story.plan),
+    ),
+    planShort: capWords(script?.plan ?? opening.story.plan),
     historyTitle: mark?.title,
     historyYear: mark?.year,
     historyEra: mark?.era,
@@ -92,8 +103,8 @@ export function collectFacts(input: {
 }
 
 function headlineFrom(facts: LessonFacts, dual: boolean): string {
-  if (dual) return firstSentence(facts.concept);
-  return facts.concept;
+  if (dual) return capWords(facts.idea ?? facts.concept);
+  return capWords(facts.concept);
 }
 
 export function sceneFromFacts(
@@ -101,12 +112,11 @@ export function sceneFromFacts(
   duoId: DuoId,
   mode: DialogueMode,
   soloText?: string,
+  lesson: LessonMode = "teach",
 ): DialogueScene {
   const duo = getDuo(duoId);
   if (mode === "solo") {
-    const text =
-      soloText?.trim() ||
-      `${facts.concept} ${facts.why} ${facts.plan}`.replace(/\s+/g, " ").trim();
+    const text = capWords(soloText?.trim() || facts.idea || facts.concept);
     return {
       beats: [
         {
@@ -115,18 +125,17 @@ export function sceneFromFacts(
           kind: facts.kind === "fail" ? "fail" : "teach",
         },
       ],
-      headline: firstSentence(text),
-      detail: facts.plan,
+      headline: text,
       speaker: duo.left.id,
       kind: facts.kind,
     };
   }
 
-  const beats = flavorBeats(facts, duo);
+  const beats = flavorBeats(facts, duo, lesson);
   return {
     beats,
     headline: headlineFrom(facts, true),
-    detail: beats[1]?.text ?? facts.plan,
+    detail: beats.find((b) => b.kind === "takeaway")?.text,
     speaker: beats[0]?.speaker ?? duo.left.id,
     kind: facts.kind,
   };
@@ -138,9 +147,12 @@ export function dialogueForPly(
   opts: {
     duo: DuoId;
     mode: DialogueMode;
+    lesson?: LessonMode;
     kind?: CoachKind;
     fen?: string;
     soloText?: string;
+    studentMove?: boolean;
+    recall?: string;
   },
 ): DialogueScene {
   const facts = collectFacts({
@@ -149,12 +161,20 @@ export function dialogueForPly(
     kind: opts.kind ?? "ok",
     fen: opts.fen,
   });
-  return sceneFromFacts(facts, opts.duo, opts.mode, opts.soloText);
+  facts.studentMove = opts.studentMove;
+  facts.recall = opts.recall;
+  return sceneFromFacts(
+    facts,
+    opts.duo,
+    opts.mode,
+    opts.soloText,
+    opts.lesson ?? "teach",
+  );
 }
 
 export function dialogueForStart(
   opening: Opening,
-  opts: { duo: DuoId; mode: DialogueMode; soloText?: string },
+  opts: { duo: DuoId; mode: DialogueMode; lesson?: LessonMode; soloText?: string },
 ): DialogueScene {
   return dialogueForPly(opening, -1, {
     ...opts,
@@ -166,7 +186,7 @@ export function dialogueForWhy(
   opening: Opening,
   lesson: WhyLesson,
   narrate: string,
-  opts: { duo: DuoId; mode: DialogueMode },
+  opts: { duo: DuoId; mode: DialogueMode; lesson?: LessonMode },
 ): DialogueScene {
   const facts = collectFacts({
     opening,
@@ -175,14 +195,22 @@ export function dialogueForWhy(
     whyLesson: lesson,
   });
   facts.concept = narrate;
+  facts.idea = capWords(narrate);
   facts.why = lesson.intro;
-  return sceneFromFacts(facts, opts.duo, opts.mode, narrate);
+  facts.whyShort = capWords(lesson.intro);
+  return sceneFromFacts(
+    facts,
+    opts.duo,
+    opts.mode,
+    narrate,
+    opts.lesson ?? "teach",
+  );
 }
 
 export function dialogueForHistory(
   opening: Opening,
   milestone: HistoryMilestone,
-  opts: { duo: DuoId; mode: DialogueMode },
+  opts: { duo: DuoId; mode: DialogueMode; lesson?: LessonMode },
 ): DialogueScene {
   const ply = typeof milestone.plyOrFen === "number" ? milestone.plyOrFen : 0;
   const facts = collectFacts({
@@ -191,8 +219,13 @@ export function dialogueForHistory(
     kind: "history",
     milestone,
   });
-  const solo = `${milestone.summary} ${milestone.whyItMattersHere}`;
-  return sceneFromFacts(facts, opts.duo, opts.mode, solo);
+  return sceneFromFacts(
+    facts,
+    opts.duo,
+    opts.mode,
+    capWords(milestone.whyItMattersHere),
+    opts.lesson ?? "teach",
+  );
 }
 
 export function dialogueForQuizReaction(
@@ -203,15 +236,16 @@ export function dialogueForQuizReaction(
 ): DialogueScene {
   const duo = getDuo(opts.duo);
   const speaker = correct ? duo.left.id : duo.right.id;
+  const text = capWords(reaction);
   return {
     beats: [
       {
         speaker,
-        text: reaction,
+        text,
         kind: correct ? "agree" : "challenge",
       },
     ],
-    headline: firstSentence(reaction),
+    headline: text,
     speaker,
     kind: "quiz",
   };

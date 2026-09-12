@@ -2,6 +2,7 @@ import type { SpeakerId } from "@/lib/tts/types";
 import type { CoachKind } from "@/lib/openings/coach";
 
 export type DialogueMode = "dual" | "solo";
+export type LessonMode = "podcast" | "teach";
 
 export type DuoId = "voss-draven" | "vale-knox" | "crowe-marquez";
 
@@ -50,6 +51,7 @@ export interface Teacher {
   short: string;
   role: string;
   color: string;
+  gender: "male" | "female";
 }
 
 export interface DuoPack {
@@ -70,6 +72,10 @@ export interface LessonFacts {
   concept: string;
   why: string;
   plan: string;
+  /** Short positional kernels (8–15 words). Flavor must not dump the long copies. */
+  idea?: string;
+  whyShort?: string;
+  planShort?: string;
   historyTitle?: string;
   historyYear?: number;
   historyEra?: string;
@@ -82,4 +88,8 @@ export interface LessonFacts {
   fen?: string;
   ply: number;
   romantic?: boolean;
+  /** Student just played the book move (Teach). */
+  studentMove?: boolean;
+  /** Earlier soft-fail SAN in this line, if any. */
+  recall?: string;
 }

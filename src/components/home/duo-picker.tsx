@@ -1,6 +1,7 @@
 "use client";
 
 import { DUOS, type DuoId, type DuoPack } from "@/lib/dialogue";
+import { SPEAKER_VOICE_BLURB } from "@/lib/tts/catalog";
 
 export function DuoPicker({
   value,
@@ -50,6 +51,10 @@ function DuoCard({
         <span className="duo-card-amp">·</span>
         <span className={`speaker-dot speaker-${duo.right.color}`} />
         {duo.right.short}
+      </p>
+      <p className="duo-card-voices">
+        {SPEAKER_VOICE_BLURB[duo.left.id].edge} ·{" "}
+        {SPEAKER_VOICE_BLURB[duo.right.id].edge}
       </p>
     </button>
   );

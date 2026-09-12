@@ -2,6 +2,7 @@ import type { DialogueBeat } from "@/lib/dialogue/types";
 import { ClipCache } from "@/lib/tts/cache";
 import { clipHash } from "@/lib/tts/hash";
 import { SPEAKER_PROSODY } from "@/lib/tts/prosody";
+import { remappedEdgeVoice } from "@/lib/tts/remap";
 import type { SpeakerId } from "@/lib/tts/types";
 import { pickWebVoice } from "@/lib/tts/voices-web";
 
@@ -135,7 +136,12 @@ async function speakNeural(
     const response = await fetch("/api/tts", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text, speaker, premium }),
+      body: JSON.stringify({
+        text,
+        speaker,
+        premium,
+        voice: remappedEdgeVoice(speaker),
+      }),
       signal: mergeAbort(controller, 12_000),
     });
     if (gen !== playGen) return;

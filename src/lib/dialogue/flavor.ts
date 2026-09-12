@@ -1,275 +1,283 @@
-import { firstSentence } from "@/lib/openings/helpers";
+import type { LessonMode } from "./types";
 import type { DuoPack, LessonFacts, DialogueAsk, DialogueBeat } from "./types";
+import { capWords, shouldArgue } from "./short";
 
-function clip(text: string, max = 160): string {
-  const compact = text.replace(/\s+/g, " ").trim();
-  if (compact.length <= max) return compact;
-  const sentence = firstSentence(compact);
-  return sentence.length <= max ? sentence : `${sentence.slice(0, max - 1)}…`;
+function kernels(facts: LessonFacts) {
+  return {
+    idea: capWords(facts.idea ?? facts.concept),
+    why: capWords(facts.whyShort ?? facts.why),
+    plan: capWords(facts.planShort ?? facts.plan),
+    san: facts.san,
+  };
 }
 
 function askFromFacts(
   facts: LessonFacts,
   asker: DialogueBeat["speaker"],
   grader: DialogueBeat["speaker"],
+  include: boolean,
 ): DialogueAsk | undefined {
-  if (!facts.quizPrompt || !facts.quizChoices?.length) return undefined;
+  if (!include || !facts.quizPrompt || !facts.quizChoices?.length) {
+    return undefined;
+  }
+  const k = kernels(facts);
   return {
-    prompt: facts.quizPrompt,
-    choices: facts.quizChoices,
+    prompt: capWords(facts.quizPrompt, 12),
+    choices: facts.quizChoices.map((c) => ({
+      ...c,
+      text: capWords(c.text, 10),
+    })),
     onCorrect: {
       speaker: grader,
-      text: `Yes. ${clip(facts.plan)} That's the job — not a random tactic.`,
+      text: capWords(`Nice. ${k.plan}`),
     },
     onWrong: {
       speaker: asker,
-      text: `Not that. The job is ${clip(facts.why)} Stay with the square.`,
+      text: capWords(`Not quite. ${k.why}`),
     },
   };
 }
 
-type FlavorFn = (facts: LessonFacts, duo: DuoPack) => DialogueBeat[];
+function includeQuiz(facts: LessonFacts, lesson: LessonMode): boolean {
+  if (!facts.quizPrompt) return false;
+  if (facts.kind === "start") return true;
+  if (lesson === "podcast") return facts.ply > 0 && facts.ply % 16 === 15;
+  return Boolean(facts.quizChoices?.length);
+}
 
-/** Wise patient philosophy vs sharp ambitious punch. */
-const vossDraven: FlavorFn = (facts, duo) => {
-  const A = duo.left.id;
-  const K = duo.right.id;
-  const ask = askFromFacts(facts, K, A);
+function prideLead(
+  facts: LessonFacts,
+  lesson: LessonMode,
+  idea: string,
+  yes: string,
+): string {
+  if (lesson === "teach" && facts.studentMove && facts.kind !== "start") {
+    return `${yes} ${idea}`;
+  }
+  return idea;
+}
 
-  if (facts.kind === "fail") {
-    return [
-      {
-        speaker: K,
-        text: `Soft. That's not the job. ${clip(facts.concept)}`,
-        kind: "fail",
-      },
-      {
-        speaker: A,
-        text: `Breathe. ${clip(facts.why)} One square, then the next.`,
-        kind: "teach",
-      },
-    ];
-  }
-  if (facts.kind === "hint") {
-    return [
-      {
-        speaker: A,
-        text: `Play ${facts.san ?? "the book move"}. ${clip(facts.concept)}`,
-        kind: "hint",
-      },
-      {
-        speaker: K,
-        text: `Don't wait. Punch. ${clip(facts.plan)}`,
-        kind: "challenge",
-      },
-    ];
-  }
-  if (facts.kind === "history" && facts.historySummary) {
-    return [
-      {
-        speaker: A,
-        text: `Paper on the board. ${facts.historyYear ?? ""} — ${facts.historyTitle ?? "a real game"}. ${clip(facts.historySummary, 220)}`,
-        kind: "history",
-      },
-      {
-        speaker: K,
-        text: facts.famousGame
-          ? `${facts.famousGame}. Here's why it bites here: ${clip(facts.historyHere ?? facts.why, 180)}`
-          : `Here's why it bites here: ${clip(facts.historyHere ?? facts.why, 180)}`,
-        kind: facts.romantic ? "romantic" : "challenge",
-      },
-    ];
-  }
+type FlavorFn = (
+  facts: LessonFacts,
+  duo: DuoPack,
+  lesson: LessonMode,
+) => DialogueBeat[];
 
+function trio(
+  facts: LessonFacts,
+  duo: DuoPack,
+  lines: { lead: string; reply: string; land: string },
+  replyKind: DialogueBeat["kind"],
+  ask?: DialogueAsk,
+): DialogueBeat[] {
   const beats: DialogueBeat[] = [
+    { speaker: duo.left.id, text: capWords(lines.lead), kind: "teach" },
+    { speaker: duo.right.id, text: capWords(lines.reply), kind: replyKind },
     {
-      speaker: A,
-      text: `${clip(facts.concept)} Why this ages well: ${clip(facts.why)}`,
-      kind: "teach",
-    },
-    {
-      speaker: K,
-      text: facts.romantic
-        ? `Beautiful. Don't apologize. ${clip(facts.plan)}`
-        : `Fine. Now punch: ${clip(facts.plan)}`,
-      kind: facts.romantic ? "romantic" : "challenge",
+      speaker: duo.left.id,
+      text: capWords(lines.land),
+      kind: "takeaway",
     },
   ];
   if (ask) {
     beats.push({
-      speaker: K,
-      text: `${ask.prompt} Student — answer. Don't monologue it back.`,
+      speaker: duo.right.id,
+      text: capWords(ask.prompt),
       kind: "quiz",
       ask,
     });
   }
   return beats;
+}
+
+function recallBeat(recall: string | undefined, fallback: string): string {
+  if (!recall) return fallback;
+  return `Yeah — same rush as ${recall}.`;
+}
+
+/** Prestige mentor vs dark punch. Warm trainers, not a lecture. */
+const vossDraven: FlavorFn = (facts, duo, lesson) => {
+  const k = kernels(facts);
+  const A = duo.left.id;
+  const K = duo.right.id;
+  const ask = askFromFacts(facts, K, A, includeQuiz(facts, lesson));
+  const argue = shouldArgue(facts.openingId, facts.ply, facts.kind);
+
+  if (facts.kind === "fail") {
+    return [
+      {
+        speaker: K,
+        text: capWords(recallBeat(facts.recall, "Hold up. Wrong square.")),
+        kind: "fail",
+      },
+      { speaker: A, text: capWords(`You're close. ${k.why}`), kind: "teach" },
+      {
+        speaker: A,
+        text: capWords(`Play ${k.san ?? "the book"}. That's the fix.`),
+        kind: "takeaway",
+      },
+    ];
+  }
+  if (facts.kind === "hint") {
+    return [
+      {
+        speaker: A,
+        text: capWords(`Try ${k.san ?? "the book"}. ${k.idea}`),
+        kind: "hint",
+      },
+      { speaker: K, text: capWords(`Yeah. ${k.plan}`), kind: "challenge" },
+    ];
+  }
+  if (facts.kind === "history") {
+    return [
+      {
+        speaker: A,
+        text: capWords(
+          `${facts.historyYear ?? ""} ${facts.historyTitle ?? "Sourced paper"}.`,
+        ),
+        kind: "history",
+      },
+      {
+        speaker: K,
+        text: capWords(facts.historyHere ?? k.why),
+        kind: "challenge",
+      },
+    ];
+  }
+
+  return trio(
+    facts,
+    duo,
+    {
+      lead: prideLead(facts, lesson, k.idea, "Nice."),
+      reply: argue
+        ? facts.romantic
+          ? "Pretty. Still punch the break."
+          : `Hold up. ${k.why}`
+        : `Yeah. ${k.why}`,
+      land: argue ? `Alright. ${k.plan}` : `That's it. ${k.plan}`,
+    },
+    argue ? "challenge" : "agree",
+    ask,
+  );
 };
 
-/** Ice-cold calculator vs obsessive narrative fire. */
-const valeKnox: FlavorFn = (facts, duo) => {
+/** Ice calculator vs narrative fire. */
+const valeKnox: FlavorFn = (facts, duo, lesson) => {
+  const k = kernels(facts);
   const S = duo.left.id;
   const R = duo.right.id;
-  const ask = askFromFacts(facts, R, S);
+  const ask = askFromFacts(facts, R, S, includeQuiz(facts, lesson));
+  const argue = shouldArgue(facts.openingId, facts.ply, facts.kind);
 
   if (facts.kind === "fail") {
     return [
       {
         speaker: S,
-        text: `Inaccuracy. The square was ${clip(facts.concept, 90)}`,
+        text: capWords(recallBeat(facts.recall, "Not that file. Recalculate.")),
         kind: "fail",
       },
-      {
-        speaker: R,
-        text: `You broke the story. ${clip(facts.why)} Rewrite it. Now.`,
-        kind: "challenge",
-      },
+      { speaker: R, text: capWords(`We've got you. ${k.why}`), kind: "challenge" },
+      { speaker: S, text: capWords(k.plan), kind: "takeaway" },
     ];
   }
   if (facts.kind === "hint") {
     return [
       {
         speaker: S,
-        text: `${facts.san ?? "Book"}. ${clip(facts.concept, 100)}`,
+        text: capWords(`Try ${k.san ?? "book"}. ${k.idea}`),
         kind: "hint",
       },
-      {
-        speaker: R,
-        text: `Feel the tension. ${clip(facts.plan)}`,
-        kind: "challenge",
-      },
+      { speaker: R, text: capWords(`Feel that? ${k.plan}`), kind: "challenge" },
     ];
   }
-  if (facts.kind === "history" && facts.historySummary) {
+  if (facts.kind === "history") {
     return [
       {
         speaker: S,
-        text: `${facts.historyYear ?? ""}. ${facts.historyTitle ?? "Sourced"}. ${clip(facts.historySummary, 200)}`,
+        text: capWords(
+          `${facts.historyYear ?? ""} ${facts.historyTitle ?? "The file"}.`,
+        ),
         kind: "history",
       },
       {
         speaker: R,
-        text: `That's the story under this ply. ${clip(facts.historyHere ?? facts.why, 180)}`,
-        kind: facts.romantic ? "romantic" : "challenge",
+        text: capWords(facts.historyHere ?? k.why),
+        kind: "challenge",
       },
     ];
   }
 
-  const beats: DialogueBeat[] = [
+  return trio(
+    facts,
+    duo,
     {
-      speaker: S,
-      text: `${clip(facts.concept, 110)} Correct. Hold it.`,
-      kind: "teach",
+      lead: prideLead(facts, lesson, k.idea, "Correct."),
+      reply: argue ? `That's bloodless. ${k.why}` : `Feel that? ${k.why}`,
+      land: argue ? `Fine. ${k.plan}` : k.plan,
     },
-    {
-      speaker: R,
-      text: facts.romantic
-        ? `This is the chapter. ${clip(facts.plan)} Don't look away.`
-        : `The story of this position: ${clip(facts.why)} Then ${clip(facts.plan, 90)}`,
-      kind: facts.romantic ? "romantic" : "challenge",
-    },
-  ];
-  if (ask) {
-    beats.push({
-      speaker: R,
-      text: `${ask.prompt} Tell me the pattern. Not the move name.`,
-      kind: "quiz",
-      ask: {
-        ...ask,
-        onCorrect: {
-          speaker: S,
-          text: `Correct. ${clip(facts.plan, 100)}`,
-        },
-        onWrong: {
-          speaker: R,
-          text: `You missed the thread. ${clip(facts.why)}`,
-        },
-      },
-    });
-  }
-  return beats;
+    argue ? "challenge" : "agree",
+    ask,
+  );
 };
 
-/** Quiet planner vs relentless investigator. */
-const croweMarquez: FlavorFn = (facts, duo) => {
+/** Quiet planner vs investigator. */
+const croweMarquez: FlavorFn = (facts, duo, lesson) => {
+  const k = kernels(facts);
   const C = duo.left.id;
   const L = duo.right.id;
-  const ask = askFromFacts(facts, L, C);
+  const ask = askFromFacts(facts, L, C, includeQuiz(facts, lesson));
+  const argue = shouldArgue(facts.openingId, facts.ply, facts.kind);
 
   if (facts.kind === "fail") {
     return [
       {
         speaker: L,
-        text: `I saw that. Soft. Walk it back. ${clip(facts.concept)}`,
+        text: capWords(recallBeat(facts.recall, "Easy. Look again.")),
         kind: "fail",
       },
-      {
-        speaker: C,
-        text: `Contingency: ${clip(facts.why)} Then resume the line.`,
-        kind: "teach",
-      },
+      { speaker: C, text: capWords(`We've got you. ${k.why}`), kind: "teach" },
+      { speaker: C, text: capWords(`Resume: ${k.plan}`), kind: "takeaway" },
     ];
   }
   if (facts.kind === "hint") {
     return [
       {
         speaker: C,
-        text: `Primary: ${facts.san ?? "the book move"}. Backup if they deviate: stay on ${clip(facts.plan, 80)}`,
+        text: capWords(`Try ${k.san ?? "the book"}. ${k.idea}`),
         kind: "hint",
       },
-      {
-        speaker: L,
-        text: `Don't stall. Play it. ${clip(facts.concept, 90)}`,
-        kind: "challenge",
-      },
+      { speaker: L, text: capWords(`Yeah. ${k.plan}`), kind: "challenge" },
     ];
   }
-  if (facts.kind === "history" && facts.historySummary) {
+  if (facts.kind === "history") {
     return [
       {
         speaker: C,
-        text: `The file: ${facts.historyYear ?? ""} — ${facts.historyTitle ?? "sourced"}. ${clip(facts.historySummary, 220)}`,
+        text: capWords(
+          `${facts.historyYear ?? ""} ${facts.historyTitle ?? "The file"}.`,
+        ),
         kind: "history",
       },
       {
         speaker: L,
-        text: `So why does it matter on this ply? ${clip(facts.historyHere ?? facts.why, 180)}`,
+        text: capWords(facts.historyHere ?? k.why),
         kind: "challenge",
       },
     ];
   }
 
-  const beats: DialogueBeat[] = [
+  return trio(
+    facts,
+    duo,
     {
-      speaker: C,
-      text: `The plan has two layers. First: ${clip(facts.concept)} If they decline: ${clip(facts.plan, 80)}`,
-      kind: "teach",
+      lead: prideLead(facts, lesson, k.idea, "Good."),
+      reply: argue ? "If you delay, I catch it." : `Yeah. ${k.why}`,
+      land: argue ? `Agreed. ${k.plan}` : `Clean. ${k.plan}`,
     },
-    {
-      speaker: L,
-      text: `I'm watching the soft move. ${clip(facts.why)} Don't give me one.`,
-      kind: "challenge",
-    },
-  ];
-  if (ask) {
-    beats.push({
-      speaker: L,
-      text: `${ask.prompt} Answer. I'll know if you're guessing.`,
-      kind: "quiz",
-      ask: {
-        ...ask,
-        onCorrect: {
-          speaker: C,
-          text: `That matches the plan. ${clip(facts.plan)}`,
-        },
-        onWrong: {
-          speaker: L,
-          text: `Caught. ${clip(facts.why)} Again.`,
-        },
-      },
-    });
-  }
-  return beats;
+    argue ? "challenge" : "agree",
+    ask,
+  );
 };
 
 const FLAVOR: Record<DuoPack["id"], FlavorFn> = {
@@ -278,7 +286,11 @@ const FLAVOR: Record<DuoPack["id"], FlavorFn> = {
   "crowe-marquez": croweMarquez,
 };
 
-export function flavorBeats(facts: LessonFacts, duo: DuoPack): DialogueBeat[] {
-  const beats = FLAVOR[duo.id](facts, duo).filter((b) => b.text.trim());
-  return beats.length ? beats : vossDraven(facts, duo);
+export function flavorBeats(
+  facts: LessonFacts,
+  duo: DuoPack,
+  lesson: LessonMode = "teach",
+): DialogueBeat[] {
+  const beats = FLAVOR[duo.id](facts, duo, lesson).filter((b) => b.text.trim());
+  return beats.length ? beats : vossDraven(facts, duo, lesson);
 }

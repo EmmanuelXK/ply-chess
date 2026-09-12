@@ -1388,3 +1388,93 @@ body {
   gap: 0.35rem;
   margin: 0 0 0.75rem;
 }
+
+.duo-card-voices {
+  margin-top: 0.28rem;
+  font-size: 10px;
+  line-height: 1.35;
+  color: #a1a1aa;
+}
+
+.splash-card-wide {
+  max-height: min(92dvh, 44rem);
+  overflow: auto;
+}
+
+.voice-map {
+  margin-top: 0.85rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid #27272a;
+}
+
+.voice-map-note {
+  font-size: 12px;
+  line-height: 1.4;
+  color: #a1a1aa;
+  margin: 0 0 0.65rem;
+}
+
+.voice-duo {
+  margin-bottom: 0.7rem;
+}
+
+.voice-duo-title {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #71717a;
+  margin-bottom: 0.35rem;
+}
+
+.voice-row {
+  padding: 0.45rem 0;
+  border-bottom: 1px solid #27272a;
+}
+
+.voice-row-who {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.voice-row-name {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.voice-row-gender {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #71717a;
+}
+
+.voice-row-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin-top: 0.35rem;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #a1a1aa;
+}
+
+.voice-select {
+  appearance: none;
+  width: 100%;
+  border-radius: 0.55rem;
+  border: 1px solid #3f3f46;
+  background: #18181b;
+  color: #e4e4e7;
+  font-size: 12px;
+  letter-spacing: 0;
+  text-transform: none;
+  padding: 0.4rem 0.55rem;
+}
+
+.voice-clone {
+  margin-top: 0.28rem;
+  font-size: 11px;
+  color: #a1a1aa;
+}

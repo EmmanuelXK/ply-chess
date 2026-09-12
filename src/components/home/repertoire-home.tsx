@@ -2,12 +2,16 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { DuoPicker } from "@/components/home/duo-picker";
+import { LessonSwitch } from "@/components/home/lesson-switch";
 import { OpeningCard } from "@/components/home/opening-card";
 import {
   DEFAULT_DUO,
   readStoredDuo,
+  readStoredLesson,
   writeStoredDuo,
+  writeStoredLesson,
   type DuoId,
+  type LessonMode,
 } from "@/lib/dialogue";
 import {
   FAMILY_META,
@@ -28,14 +32,21 @@ export function RepertoireHome() {
   const [filter, setFilter] = useState<"all" | Family>("all");
   const [reps, setReps] = useState<RepsMode>("spine");
   const [duo, setDuo] = useState<DuoId>(DEFAULT_DUO);
+  const [lesson, setLesson] = useState<LessonMode>("teach");
 
   useEffect(() => {
     setDuo(readStoredDuo());
+    setLesson(readStoredLesson());
   }, []);
 
   const pickDuo = (id: DuoId) => {
     setDuo(id);
     writeStoredDuo(id);
+  };
+
+  const pickLesson = (mode: LessonMode) => {
+    setLesson(mode);
+    writeStoredLesson(mode);
   };
 
   const white = openingsInFamily("white");
@@ -65,14 +76,16 @@ export function RepertoireHome() {
             Opening Edge
           </h1>
           <p className="mt-3 max-w-[22rem] text-[14px] leading-snug text-zinc-400">
-            Two teachers in your headphones. They argue, quiz you, and land the
-            plan. Pick a duo, then a line.
+            Two friendly coaches in your headphones. Short beats. Teach waits
+            for you; Podcast plays the line. Pick a duo, then a line.
           </p>
           <p className="home-count">
             {white.length} White · {e4.length} vs 1.e4 · {d4.length} vs 1.d4
           </p>
         </div>
         <section className="duo-home" aria-label="Choose your teachers">
+          <p className="duo-home-label">Lesson</p>
+          <LessonSwitch value={lesson} onChange={pickLesson} />
           <p className="duo-home-label">Before you learn</p>
           <DuoPicker value={duo} onChange={pickDuo} />
         </section>
@@ -135,8 +148,8 @@ export function RepertoireHome() {
 
       <footer className="home-foot">
         <p>
-          Pick a duo before you learn. Why auto-plays the branch. Masters
-          in the drill opens Settings. After the spine, Plan mode.
+          Pick Teach or Podcast, then a duo. Why auto-plays the branch.
+          Masters in the drill opens voices. After the spine, Plan mode.
         </p>
       </footer>
     </div>

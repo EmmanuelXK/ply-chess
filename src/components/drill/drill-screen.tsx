@@ -42,13 +42,16 @@ import {
   dialogueForPly,
   dialogueForStart,
   readStoredDuo,
+  readStoredLesson,
   readStoredMode,
   writeStoredDuo,
+  writeStoredLesson,
   writeStoredMode,
   type DialogueAsk,
   type DialogueMode,
   type DialogueScene,
   type DuoId,
+  type LessonMode,
 } from "@/lib/dialogue";
 import {
   coachAfterPly,
@@ -119,6 +122,9 @@ export function DrillScreen({
   const [reps, setReps] = useState<RepsMode>(initialReps);
   const [duo, setDuo] = useState<DuoId>(DEFAULT_DUO);
   const [dialogueMode, setDialogueMode] = useState<DialogueMode>("dual");
+  const [lesson, setLesson] = useState<LessonMode>("teach");
+  const [podcastPlaying, setPodcastPlaying] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
   const [scene, setScene] = useState<DialogueScene>(() =>
     dialogueForStart(opening, { duo: DEFAULT_DUO, mode: "dual" }),
   );
@@ -128,16 +134,28 @@ export function DrillScreen({
   const [duoOpen, setDuoOpen] = useState(false);
   const duoRef = useRef(duo);
   const modeRefDialogue = useRef(dialogueMode);
+  const lessonRef = useRef<LessonMode>("teach");
+  const podcastPlayingRef = useRef(false);
+  const missesRef = useRef<string[]>([]);
+  const studentMoveRef = useRef(false);
   const askWaitRef = useRef<((id: string | null) => void) | null>(null);
   const speechRef = useRef<SpeakHandle | null>(null);
 
   useEffect(() => {
     const storedDuo = readStoredDuo();
     const storedMode = readStoredMode();
+    const storedLesson = readStoredLesson();
     setDuo(storedDuo);
     setDialogueMode(storedMode);
+    setLesson(storedLesson);
     duoRef.current = storedDuo;
     modeRefDialogue.current = storedMode;
+    lessonRef.current = storedLesson;
+    if (storedLesson === "podcast") {
+      setPodcastPlaying(true);
+      podcastPlayingRef.current = true;
+    }
+    setHydrated(true);
   }, []);
 
   useEffect(() => {
@@ -146,6 +164,12 @@ export function DrillScreen({
   useEffect(() => {
     modeRefDialogue.current = dialogueMode;
   }, [dialogueMode]);
+  useEffect(() => {
+    lessonRef.current = lesson;
+  }, [lesson]);
+  useEffect(() => {
+    podcastPlayingRef.current = podcastPlaying;
+  }, [podcastPlaying]);
 
   const sync = useCallback(() => {
     const g = gameRef.current;
@@ -159,20 +183,31 @@ export function DrillScreen({
   const pushScene = useCallback(
     (next: CoachState, afterPly: number, kind?: CoachKind) => {
       setCoach(next);
+      const sceneKind = kind ?? next.kind;
+      const misses = missesRef.current;
+      const recall =
+        sceneKind === "fail" && misses.length > 1
+          ? misses[misses.length - 2]
+          : undefined;
       const nextScene =
         afterPly < 0
           ? dialogueForStart(opening, {
               duo: duoRef.current,
               mode: modeRefDialogue.current,
+              lesson: lessonRef.current,
               soloText: next.detail ? `${next.text} ${next.detail}` : next.text,
             })
           : dialogueForPly(opening, afterPly, {
               duo: duoRef.current,
               mode: modeRefDialogue.current,
-              kind: kind ?? next.kind,
+              lesson: lessonRef.current,
+              kind: sceneKind,
               fen: gameRef.current.fen(),
               soloText: next.detail ? `${next.text} ${next.detail}` : next.text,
+              studentMove: studentMoveRef.current,
+              recall,
             });
+      studentMoveRef.current = false;
       setScene(nextScene);
       setBeatIndex(0);
       setAsk(null);
@@ -226,10 +261,13 @@ export function DrillScreen({
   );
 
   useEffect(() => {
+    if (!hydrated) return;
     gameRef.current = new Chess();
     plyRef.current = 0;
     modeRef.current = "drill";
     lockRef.current = false;
+    missesRef.current = [];
+    studentMoveRef.current = false;
     setFen(gameRef.current.fen());
     setPly(0);
     setPlayed([]);
@@ -249,6 +287,7 @@ export function DrillScreen({
     let cancelled = false;
 
     const kick = async () => {
+      if (lessonRef.current === "podcast") return;
       while (
         !cancelled &&
         modeRef.current === "drill" &&
@@ -275,7 +314,7 @@ export function DrillScreen({
         timerRef.current = null;
       }
     };
-  }, [opening, playSan, session, initialReps, pushScene]);
+  }, [hydrated, opening, playSan, session, initialReps, pushScene]);
 
   useEffect(() => {
     askWaitRef.current?.(null);
@@ -312,6 +351,52 @@ export function DrillScreen({
       if (speechRef.current === handle) speechRef.current = null;
     };
   }, [scene, tts, dialogueMode]);
+
+  const playBookPly = useCallback(() => {
+    if (modeRef.current !== "drill") return;
+    if (plyRef.current >= opening.moves.length) return;
+    const san = opening.moves[plyRef.current];
+    if (!san) return;
+    studentMoveRef.current = isUserPly(opening.side, plyRef.current);
+    const move = playSan(san);
+    if (!move) return;
+    if (plyRef.current >= opening.moves.length) {
+      modeRef.current = "plan";
+      pushScene(
+        {
+          text: "Book done. Pick a plan.",
+          chunkName: "Plan mode",
+          kind: "plan",
+        },
+        opening.moves.length - 1,
+        "plan",
+      );
+      setPodcastPlaying(false);
+      podcastPlayingRef.current = false;
+      return;
+    }
+    pushScene(coachAfterPly(opening, plyRef.current - 1), plyRef.current - 1);
+  }, [opening, playSan, pushScene]);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    if (lesson !== "podcast" || !podcastPlaying) return;
+    if (mode === "plan") return;
+    let cancelled = false;
+    const wait =
+      tts && speechRef.current
+        ? speechRef.current.done
+        : sleep(1000);
+    void wait.then(() => {
+      if (cancelled || !podcastPlayingRef.current) return;
+      if (modeRef.current === "plan") return;
+      if (plyRef.current >= opening.moves.length) return;
+      playBookPly();
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [hydrated, scene, tts, lesson, podcastPlaying, mode, opening.moves.length, playBookPly]);
 
   const dests = useMemo(() => {
     const g = new Chess(fen);
@@ -395,6 +480,8 @@ export function DrillScreen({
 
       if (!ok) {
         g.undo();
+        if (bookSan) missesRef.current.push(bookSan);
+        studentMoveRef.current = false;
         pushScene(coachOnFail(opening, plyNow), plyNow, "fail");
         setHintKeys(null);
         sync();
@@ -402,6 +489,7 @@ export function DrillScreen({
       }
 
       plyRef.current += 1;
+      studentMoveRef.current = true;
       setLastMove([move.from as Key, move.to as Key]);
       setHintKeys(null);
       setHintUsed(false);
@@ -596,11 +684,12 @@ export function DrillScreen({
                 duoId={duo}
                 speaker={scene.beats[beatIndex]?.speaker ?? scene.speaker}
               />
-              {dialogueMode === "dual" ? (
-                <span className="coach-mode-tag">Dual</span>
-              ) : (
+              <span className="coach-mode-tag">
+                {lesson === "podcast" ? "Podcast" : "Teach"}
+              </span>
+              {dialogueMode === "solo" ? (
                 <span className="coach-mode-tag">Solo</span>
-              )}
+              ) : null}
             </div>
             <p>{scene.beats[beatIndex]?.text ?? coach.text}</p>
             {(ask ?? scene.beats.find((b) => b.ask)?.ask) ? (
@@ -644,8 +733,10 @@ export function DrillScreen({
             arrows={arrows}
             orientation={orientation}
             turnColor={turnColor}
-            viewOnly={busy && mode === "drill"}
-            movableColor={movableColor}
+            viewOnly={(busy && mode === "drill") || (lesson === "podcast" && podcastPlaying)}
+            movableColor={
+              lesson === "podcast" && podcastPlaying ? undefined : movableColor
+            }
             check={check}
             animationMs={150}
             onMove={onMove}
@@ -664,10 +755,31 @@ export function DrillScreen({
       </div>
 
       <PlyNav
-        onBack={stepBack}
-        onForward={stepForward}
+        onBack={() => {
+          setPodcastPlaying(false);
+          podcastPlayingRef.current = false;
+          stepBack();
+        }}
+        onForward={() => {
+          setPodcastPlaying(false);
+          podcastPlayingRef.current = false;
+          stepForward();
+        }}
         canBack={ply > 0}
         canForward={ply < opening.moves.length}
+        playing={lesson === "podcast" && podcastPlaying}
+        onPlay={
+          lesson === "podcast"
+            ? () => {
+                if (mode === "plan") return;
+                setPodcastPlaying((on) => {
+                  const next = !on;
+                  podcastPlayingRef.current = next;
+                  return next;
+                });
+              }
+            : undefined
+        }
       />
 
       {mode === "plan" ? (
@@ -774,6 +886,7 @@ export function DrillScreen({
           orientation={orientation}
           duo={duo}
           mode={dialogueMode}
+          lessonMode={lesson}
           onClose={() => setWhyOpen(false)}
         />
       ) : null}
@@ -785,6 +898,7 @@ export function DrillScreen({
           orientation={orientation}
           duo={duo}
           mode={dialogueMode}
+          lessonMode={lesson}
           onClose={() => setHistoryOpen(false)}
         />
       ) : null}
@@ -821,6 +935,7 @@ export function DrillScreen({
         <DuoSheet
           duo={duo}
           mode={dialogueMode}
+          lesson={lesson}
           onDuo={(id) => {
             setDuo(id);
             writeStoredDuo(id);
@@ -831,6 +946,15 @@ export function DrillScreen({
             setDialogueMode(next);
             writeStoredMode(next);
             modeRefDialogue.current = next;
+            applyPly(plyRef.current);
+          }}
+          onLesson={(next) => {
+            setLesson(next);
+            writeStoredLesson(next);
+            lessonRef.current = next;
+            const play = next === "podcast";
+            setPodcastPlaying(play);
+            podcastPlayingRef.current = play;
             applyPly(plyRef.current);
           }}
           onClose={() => setDuoOpen(false)}
