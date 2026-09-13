@@ -32,7 +32,12 @@ export function AtlasSheet({
     : "white";
 
   return (
-    <div className="splash-root" role="dialog" aria-modal aria-label={entry.name}>
+    <div
+      className="splash-root atlas-overlay"
+      role="dialog"
+      aria-modal
+      aria-label={entry.name}
+    >
       <button type="button" className="splash-scrim" onClick={onClose} />
       <div className="splash-card splash-in atlas-sheet">
         <header className="splash-head">
