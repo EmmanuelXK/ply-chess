@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Source_Serif_4 } from "next/font/google";
+import { AuthProvider } from "@/components/auth/auth-provider";
 import "./globals.css";
 import "./chessground.css";
 
@@ -57,7 +58,9 @@ export default function RootLayout({
       lang="en"
       className={`dark ${geistSans.variable} ${geistMono.variable} ${prestigeSerif.variable} h-full antialiased`}
     >
-      <body className="app-body bg-[#070708] text-[#f3ebe0]">{children}</body>
+      <body className="app-body bg-[#070708] text-[#f3ebe0]">
+        <AuthProvider>{children}</AuthProvider>
+      </body>
     </html>
   );
 }

@@ -2508,6 +2508,129 @@ body,
   }
 }
 
+.auth-shell {
+  min-height: 100dvh;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem 1rem calc(env(safe-area-inset-bottom) + 1.25rem);
+  background: var(--ink);
+}
+
+.auth-card {
+  width: min(100%, 22rem);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.auth-mark {
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 1rem;
+  margin-bottom: 0.4rem;
+}
+
+.auth-card h1 {
+  margin: 0.1rem 0 0;
+  font-family: var(--font-heading);
+  font-size: 1.7rem;
+  color: var(--cream);
+}
+
+.auth-lead,
+.auth-note,
+.auth-foot {
+  margin: 0.2rem 0 0.45rem;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--mist);
+}
+
+.auth-foot {
+  margin-top: 1rem;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+}
+
+.auth-google,
+.auth-phone,
+.auth-signout {
+  height: 2.7rem;
+  border-radius: 0.85rem;
+  font-size: 14px;
+  font-weight: 750;
+  letter-spacing: 0.02em;
+}
+
+.auth-google {
+  color: var(--ink);
+  background: linear-gradient(180deg, var(--ember-soft), var(--ember));
+}
+
+.auth-phone {
+  margin-top: 0.45rem;
+  color: var(--cream);
+  background: var(--charcoal-2);
+  border: 1px solid var(--line-strong);
+}
+
+.auth-signout {
+  margin-top: 0.7rem;
+  width: 100%;
+  color: var(--mist);
+  background: transparent;
+  border: 1px solid var(--line);
+}
+
+.auth-or {
+  margin: 0.55rem 0 0.2rem;
+  text-align: center;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--mist-2);
+}
+
+.auth-label {
+  margin: 0.45rem 0 0.2rem;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ember);
+}
+
+.auth-input {
+  height: 2.6rem;
+  border-radius: 0.75rem;
+  background: var(--charcoal);
+  border: 1px solid var(--line);
+  color: var(--cream);
+  padding: 0 0.75rem;
+  font-size: 16px;
+}
+
+.profile-row {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin-bottom: 0.45rem;
+}
+
+.profile-avatar {
+  flex: none;
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: var(--ember);
+  color: var(--ink);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
 .sr-only {
   position: absolute;
   width: 1px;

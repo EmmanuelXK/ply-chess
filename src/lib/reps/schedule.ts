@@ -1,3 +1,4 @@
+import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Opening } from "@/lib/openings/types";
 
 export type StudyMode =
@@ -17,8 +18,53 @@ export const STUDY_MODES: { id: StudyMode; label: string; blurb: string }[] = [
   { id: "progress", label: "Progress", blurb: "What stuck — and what to review next." },
 ];
 
-const REPS_KEY = "opening-edge.reps.v1";
-const PROGRESS_KEY = "opening-edge.progress.v1";
+const REPS_BASE = "opening-edge.reps.v1";
+const PROGRESS_BASE = "opening-edge.progress.v1";
+const USER_KEY = "opening-edge.progress-user";
+
+let progressUser: string | null = null;
+let dirtyHandler: (() => void) | null = null;
+
+export function setProgressUser(id: string | null): void {
+  progressUser = id;
+  if (typeof window === "undefined") return;
+  try {
+    if (id) window.localStorage.setItem(USER_KEY, id);
+    else window.localStorage.removeItem(USER_KEY);
+  } catch {
+    /* ignore */
+  }
+}
+
+export function setProgressDirtyHandler(fn: (() => void) | null): void {
+  dirtyHandler = fn;
+}
+
+function repsKey(): string {
+  return progressUser ? `${REPS_BASE}.${progressUser}` : REPS_BASE;
+}
+
+function progressKey(): string {
+  return progressUser ? `${PROGRESS_BASE}.${progressUser}` : PROGRESS_BASE;
+}
+
+export function adoptAnonIfNeeded(userId: string): void {
+  if (typeof window === "undefined") return;
+  try {
+    const nextReps = `${REPS_BASE}.${userId}`;
+    const nextProg = `${PROGRESS_BASE}.${userId}`;
+    if (!window.localStorage.getItem(nextReps)) {
+      const anon = window.localStorage.getItem(REPS_BASE);
+      if (anon) window.localStorage.setItem(nextReps, anon);
+    }
+    if (!window.localStorage.getItem(nextProg)) {
+      const anon = window.localStorage.getItem(PROGRESS_BASE);
+      if (anon) window.localStorage.setItem(nextProg, anon);
+    }
+  } catch {
+    /* ignore */
+  }
+}
 
 interface RepEntry {
   openingId: string;
@@ -45,13 +91,18 @@ function readJson<T>(key: string, fallback: T): T {
   }
 }
 
-function writeJson(key: string, value: unknown): void {
+function writeJson(key: string, value: unknown, remote = true): void {
   if (typeof window === "undefined") return;
   try {
     window.localStorage.setItem(key, JSON.stringify(value));
+    if (remote) dirtyHandler?.();
   } catch {
     /* ignore */
   }
+}
+
+export function getProgressUser(): string | null {
+  return progressUser;
 }
 
 export function parseStudyMode(value?: string | null): StudyMode {
@@ -72,7 +123,7 @@ export function parseStudyMode(value?: string | null): StudyMode {
 }
 
 export function markReviewed(openingId: string, ply: number, ok: boolean): void {
-  const rows = readJson<RepEntry[]>(REPS_KEY, []);
+  const rows = readJson<RepEntry[]>(repsKey(), []);
   const now = Date.now();
   const idx = rows.findIndex((r) => r.openingId === openingId && r.ply === ply);
   const prev = idx >= 0 ? rows[idx] : { openingId, ply, due: now, ease: 2.3, streak: 0 };
@@ -88,7 +139,7 @@ export function markReviewed(openingId: string, ply: number, ok: boolean): void 
   };
   if (idx >= 0) rows[idx] = next;
   else rows.push(next);
-  writeJson(REPS_KEY, rows);
+  writeJson(repsKey(), rows);
 }
 
 function plyRecord(
@@ -105,7 +156,7 @@ function recordIsWeak(rec: RepEntry | undefined, now: number): boolean {
 }
 
 export function duePly(openingId: string, maxPly: number): number {
-  const rows = readJson<RepEntry[]>(REPS_KEY, []).filter((r) => r.openingId === openingId);
+  const rows = readJson<RepEntry[]>(repsKey(), []).filter((r) => r.openingId === openingId);
   const now = Date.now();
   const due = rows
     .filter((r) => r.due <= now && r.ply < maxPly)
@@ -119,7 +170,7 @@ export function dueChunks(opening: Opening): {
   name: string;
   due: boolean;
 }[] {
-  const rows = readJson<RepEntry[]>(REPS_KEY, []).filter(
+  const rows = readJson<RepEntry[]>(repsKey(), []).filter(
     (r) => r.openingId === opening.id,
   );
   const now = Date.now();
@@ -147,7 +198,7 @@ export function reviewStartPly(opening: Opening): number {
 }
 
 export function markProgress(openingId: string, ply: number): void {
-  const rows = readJson<ProgressEntry[]>(PROGRESS_KEY, []);
+  const rows = readJson<ProgressEntry[]>(progressKey(), []);
   const idx = rows.findIndex((r) => r.openingId === openingId);
   const prev = idx >= 0 ? rows[idx] : { openingId, seen: 0, best: 0, lastAt: 0 };
   const next: ProgressEntry = {
@@ -158,17 +209,83 @@ export function markProgress(openingId: string, ply: number): void {
   };
   if (idx >= 0) rows[idx] = next;
   else rows.push(next);
-  writeJson(PROGRESS_KEY, rows);
+  writeJson(progressKey(), rows);
 }
 
 export function progressFor(openingId: string): { seen: number; best: number } {
-  const row = readJson<ProgressEntry[]>(PROGRESS_KEY, []).find((r) => r.openingId === openingId);
+  const row = readJson<ProgressEntry[]>(progressKey(), []).find((r) => r.openingId === openingId);
   return { seen: row?.seen ?? 0, best: row?.best ?? 0 };
 }
 
 export function dueCount(openingId: string): number {
   const now = Date.now();
-  return readJson<RepEntry[]>(REPS_KEY, []).filter(
+  return readJson<RepEntry[]>(repsKey(), []).filter(
     (r) => r.openingId === openingId && r.due <= now,
   ).length;
+}
+
+export async function pullRemoteProgress(
+  supabase: SupabaseClient,
+  userId: string,
+): Promise<void> {
+  const [{ data: progress }, { data: reps }] = await Promise.all([
+    supabase.from("opening_progress").select("opening_id, seen, best, last_at").eq("user_id", userId),
+    supabase.from("opening_reps").select("opening_id, ply, due, ease, streak").eq("user_id", userId),
+  ]);
+  if (Array.isArray(progress) && progress.length) {
+    writeJson(
+      `${PROGRESS_BASE}.${userId}`,
+      progress.map((row) => ({
+        openingId: String(row.opening_id),
+        seen: Number(row.seen) || 0,
+        best: Number(row.best) || 0,
+        lastAt: Date.parse(String(row.last_at)) || Date.now(),
+      })),
+      false,
+    );
+  }
+  if (Array.isArray(reps) && reps.length) {
+    writeJson(
+      `${REPS_BASE}.${userId}`,
+      reps.map((row) => ({
+        openingId: String(row.opening_id),
+        ply: Number(row.ply) || 0,
+        due: Date.parse(String(row.due)) || Date.now(),
+        ease: Number(row.ease) || 2.3,
+        streak: Number(row.streak) || 0,
+      })),
+      false,
+    );
+  }
+}
+
+export async function pushRemoteProgress(
+  supabase: SupabaseClient,
+  userId: string,
+): Promise<void> {
+  const progress = readJson<ProgressEntry[]>(`${PROGRESS_BASE}.${userId}`, []);
+  const reps = readJson<RepEntry[]>(`${REPS_BASE}.${userId}`, []);
+  if (progress.length) {
+    await supabase.from("opening_progress").upsert(
+      progress.map((row) => ({
+        user_id: userId,
+        opening_id: row.openingId,
+        seen: row.seen,
+        best: row.best,
+        last_at: new Date(row.lastAt || Date.now()).toISOString(),
+      })),
+    );
+  }
+  if (reps.length) {
+    await supabase.from("opening_reps").upsert(
+      reps.map((row) => ({
+        user_id: userId,
+        opening_id: row.openingId,
+        ply: row.ply,
+        due: new Date(row.due).toISOString(),
+        ease: row.ease,
+        streak: row.streak,
+      })),
+    );
+  }
 }

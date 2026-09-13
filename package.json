@@ -1,6 +1,6 @@
 {
   "name": "opening-trainer",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev --port 43173 --hostname 0.0.0.0",
@@ -13,6 +13,8 @@
   },
   "dependencies": {
     "@lichess-org/chessground": "^10.1.1",
+    "@supabase/ssr": "^0.12.7",
+    "@supabase/supabase-js": "^2.116.0",
     "chess.js": "^1.4.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

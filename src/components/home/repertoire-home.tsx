@@ -10,10 +10,12 @@ import {
   type Opening,
   type StudyMode,
 } from "@/lib/openings";
+import { useAuth } from "@/components/auth/auth-provider";
 import { dueCount, progressFor } from "@/lib/reps/schedule";
 
 export function RepertoireHome() {
   const [mode, setMode] = useState<StudyMode>("learn");
+  const { profile } = useAuth();
   const white = openingsForSide("white");
   const black = openingsForSide("black");
 
@@ -25,10 +27,11 @@ export function RepertoireHome() {
   return (
     <div className="dash-shell dash-repertoire">
       <header className="dash-head">
-        <p className="dash-kicker">Repertoire</p>
+        <p className="dash-kicker">Your Weapons</p>
         <h1>Opening Edge</h1>
         <p className="dash-sub">
-          {white.length} White · {black.length} Black · one coach
+          {white.length} White · {black.length} Black
+          {profile?.displayName ? ` · ${profile.displayName}` : " · systems you actually train"}
         </p>
         <div className="mode-grid" role="tablist" aria-label="Study mode">
           {STUDY_MODES.map((m) => (

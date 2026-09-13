@@ -20,7 +20,7 @@ export function TheoryAtlas() {
   return (
     <div className="dash-shell theory-shell">
       <header className="dash-head">
-        <p className="dash-kicker">World tree</p>
+        <p className="dash-kicker">The Map</p>
         <h1>Universal Openings</h1>
         <p className="dash-sub">
           {treeSummary() || ATLAS.length} cases · expand a branch · 1250-friendly plans
