@@ -117,6 +117,37 @@ function playBlob(
   });
 }
 
+async function fetchClip(
+  text: string,
+  speaker: SpeakerId,
+  premium: boolean,
+  signal?: AbortSignal,
+): Promise<Blob | null> {
+  const key = clipHash(speaker, premium ? "p" : "f", text);
+  const cached = sessionClips.get(key);
+  if (cached) return cached;
+  try {
+    const response = await fetch("/api/tts", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        text,
+        speaker,
+        premium,
+        voice: edgeVoiceFor(speaker),
+      }),
+      signal,
+    });
+    if (!response.ok) return null;
+    const blob = await response.blob();
+    if (!blob.size) return null;
+    sessionClips.set(key, blob);
+    return blob;
+  } catch {
+    return null;
+  }
+}
+
 async function speakNeural(
   text: string,
   speaker: SpeakerId,
@@ -134,35 +165,39 @@ async function speakNeural(
   inflight = controller;
 
   try {
-    const response = await fetch("/api/tts", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        text,
-        speaker,
-        premium,
-        voice: edgeVoiceFor(speaker),
-      }),
-      signal: mergeAbort(controller, 12_000),
-    });
+    const blob = await fetchClip(
+      text,
+      speaker,
+      premium,
+      mergeAbort(controller, 12_000),
+    );
     if (gen !== playGen) return;
-    if (!response.ok) {
+    if (!blob) {
       await speakWeb(text, speaker, gen);
       return;
     }
-    const blob = await response.blob();
-    if (gen !== playGen) return;
-    if (!blob.size) {
-      await speakWeb(text, speaker, gen);
-      return;
-    }
-    sessionClips.set(key, blob);
     await playBlob(blob, text, speaker, gen);
   } catch {
     if (gen !== playGen) return;
     await speakWeb(text, speaker, gen);
   } finally {
     if (inflight === controller) inflight = null;
+  }
+}
+
+/** Warm the next ply's clips so Forward / autoplay has no post-move gap. */
+export function prefetchDialogue(
+  beats: DialogueBeat[],
+  opts?: { premium?: boolean },
+): void {
+  if (typeof window === "undefined") return;
+  const premium = opts?.premium === true;
+  for (const beat of beats) {
+    const text = limitWords(beat.text);
+    if (!text) continue;
+    const key = clipHash(beat.speaker, premium ? "p" : "f", text);
+    if (sessionClips.get(key)) continue;
+    void fetchClip(text, beat.speaker, premium);
   }
 }
 

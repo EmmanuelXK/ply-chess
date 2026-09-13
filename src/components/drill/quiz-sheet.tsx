@@ -3,30 +3,20 @@
 import { useEffect, useState } from "react";
 import { speakDialogue } from "@/lib/chess/speak";
 import { SpeakerChip } from "@/components/drill/speaker-chip";
-import {
-  dialogueForQuizReaction,
-  getDuo,
-  type DialogueMode,
-  type DuoId,
-} from "@/lib/dialogue";
+import { ACTIVE_COACH, dialogueForQuizReaction } from "@/lib/dialogue";
 import type { Opening, PositionalQuiz } from "@/lib/openings";
 
 export function QuizSheet({
   quiz,
   opening,
-  duo,
-  mode,
   onClose,
 }: {
   quiz: PositionalQuiz;
   opening: Opening;
-  duo: DuoId;
-  mode: DialogueMode;
   onClose: () => void;
 }) {
   const [picked, setPicked] = useState<string | null>(null);
   const chosen = quiz.choices.find((c) => c.id === picked);
-  const pack = getDuo(duo);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -54,7 +44,7 @@ export function QuizSheet({
           </button>
         </header>
         <p className="splash-copy">
-          <SpeakerChip duoId={duo} speaker={pack.right.id} /> {quiz.prompt}
+          <SpeakerChip /> {quiz.prompt}
         </p>
         <div className="quiz-choices">
           {quiz.choices.map((choice) => {
@@ -78,9 +68,9 @@ export function QuizSheet({
                     opening,
                     choice.reaction,
                     choice.correct,
-                    { duo, mode },
+                    { duo: ACTIVE_COACH, mode: "solo" },
                   );
-                  speakDialogue(scene.beats, { premium: mode === "dual" });
+                  speakDialogue(scene.beats);
                 }}
               >
                 {choice.text}
@@ -90,10 +80,7 @@ export function QuizSheet({
         </div>
         {chosen ? (
           <p className={`quiz-react ${chosen.correct ? "quiz-react-ok" : "quiz-react-no"}`}>
-            <SpeakerChip
-              duoId={duo}
-              speaker={chosen.correct ? pack.left.id : pack.right.id}
-            />{" "}
+            <SpeakerChip purpose={chosen.correct ? "hold-the-square" : "stop-opponent-plan"} />{" "}
             {chosen.reaction}
           </p>
         ) : null}

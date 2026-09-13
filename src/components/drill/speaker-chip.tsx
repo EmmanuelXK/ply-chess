@@ -1,21 +1,18 @@
 "use client";
 
-import { getDuo, type DuoId } from "@/lib/dialogue";
-import type { SpeakerId } from "@/lib/tts/types";
+import { PURPOSE_LABELS, type PurposeTag } from "@/lib/dialogue";
 
 export function SpeakerChip({
-  duoId,
-  speaker,
+  purpose,
 }: {
-  duoId: DuoId;
-  speaker: SpeakerId;
+  purpose?: PurposeTag;
+  speaker?: string;
+  duoId?: string;
 }) {
-  const duo = getDuo(duoId);
-  const teacher = speaker === duo.right.id ? duo.right : duo.left;
   return (
-    <span className={`speaker-chip speaker-${teacher.color} chip-${duoId}`}>
-      <span className={`speaker-dot speaker-${teacher.color}`} aria-hidden />
-      {teacher.short}
+    <span className="speaker-chip speaker-amber">
+      <span className="speaker-dot speaker-amber" aria-hidden />
+      {purpose ? PURPOSE_LABELS[purpose] : "Coach"}
     </span>
   );
 }

@@ -1,7 +1,11 @@
 import { makeOpening } from "./make-opening";
 import { openingSpecs } from "./specs";
 import { validateAll } from "./validate";
-import type { Family, Opening, RepsMode, Side } from "./types";
+import type { Family, Opening, Side } from "./types";
+import {
+  STUDY_MODES,
+  parseStudyMode,
+} from "@/lib/reps/schedule";
 
 export type {
   Opening,
@@ -12,6 +16,7 @@ export type {
   StoryBeat,
   Family,
   RepsMode,
+  StudyMode,
   Pillars,
   Trap,
   WhyLesson,
@@ -55,10 +60,17 @@ export const FAMILY_META: Record<
   Family,
   { title: string; blurb: string }
 > = {
-  white: { title: "White", blurb: "You move first. Pick the system." },
+  white: { title: "White opening systems", blurb: "You move first. Pick the system." },
   "black-e4": { title: "Black vs 1.e4", blurb: "They open the king file." },
   "black-d4": { title: "Black vs 1.d4", blurb: "They want the queen file." },
 };
+
+export const SIDE_META = {
+  white: { title: "White opening systems", blurb: "You move first. Practical attacking systems." },
+  black: { title: "Black opening systems", blurb: "Answer 1.e4 and 1.d4 with human lines." },
+} as const;
+
+export { STUDY_MODES, parseStudyMode };
 
 export function openingsInFamily(family: Family): Opening[] {
   return openings.filter((o) => o.family === family);
@@ -68,9 +80,9 @@ export function countBySide(side: Side): number {
   return openings.filter((o) => o.side === side).length;
 }
 
-export const REPS_MODES: { id: RepsMode; label: string; blurb: string }[] = [
-  { id: "spine", label: "Spine", blurb: "Main line to move 21" },
-  { id: "traps", label: "Traps", blurb: "Pack shots off the spine" },
-  { id: "quiz", label: "Quiz", blurb: "Positional questions from here" },
-  { id: "think", label: "Think", blurb: "Hybrid engines — human plans" },
-];
+/** @deprecated use STUDY_MODES */
+export const REPS_MODES = STUDY_MODES;
+
+export function openingsForSide(side: Side): Opening[] {
+  return openings.filter((o) => o.side === side);
+}

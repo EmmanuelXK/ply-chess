@@ -1,6 +1,23 @@
 import type { SpeakerId } from "@/lib/tts/types";
 import type { CoachKind } from "@/lib/openings/coach";
 
+export type PurposeTag =
+  | "grab-center"
+  | "stabilize-center"
+  | "break-center"
+  | "attack-weak-square"
+  | "notice-the-pin"
+  | "free-piece"
+  | "stop-opponent-plan"
+  | "develop-with-tempo"
+  | "castle-and-connect"
+  | "open-the-file"
+  | "fix-pawn-chain"
+  | "provoke-weakness"
+  | "coil-then-strike"
+  | "hold-the-square"
+  | "wake-the-line";
+
 export type DialogueMode = "dual" | "solo";
 
 /** Podcast autoplays the line. Teach waits for the student. */
@@ -46,6 +63,7 @@ export interface DialogueBeat {
   text: string;
   kind: BeatKind;
   ask?: DialogueAsk;
+  purpose?: PurposeTag;
 }
 
 export interface DialogueScene {
@@ -54,6 +72,7 @@ export interface DialogueScene {
   detail?: string;
   speaker: SpeakerId;
   kind: CoachKind;
+  purpose?: PurposeTag;
 }
 
 export interface Teacher {

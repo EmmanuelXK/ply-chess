@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { fullMoveCount, type Opening, type RepsMode } from "@/lib/openings";
+import { fullMoveCount, parseStudyMode, type Opening, type RepsMode } from "@/lib/openings";
 
 const accents: Record<string, string> = {
   white: "from-amber-500/20 to-transparent",
@@ -11,17 +11,18 @@ const accents: Record<string, string> = {
 
 export function OpeningCard({
   opening,
-  reps = "spine",
+  reps = "learn",
 }: {
   opening: Opening;
   reps?: RepsMode;
 }) {
   const moves = fullMoveCount(opening);
   const accent = accents[opening.family] ?? "from-zinc-500/20 to-transparent";
+  const mode = parseStudyMode(typeof reps === "string" ? reps : "learn");
   const href =
-    reps === "spine"
+    mode === "learn"
       ? `/drill/${opening.id}`
-      : `/drill/${opening.id}?reps=${reps}`;
+      : `/drill/${opening.id}?reps=${mode}`;
 
   return (
     <Link

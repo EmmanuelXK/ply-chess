@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { DrillScreen } from "@/components/drill/drill-screen";
-import { getOpening, openings, type RepsMode } from "@/lib/openings";
+import { getOpening, openings, parseStudyMode, type StudyMode } from "@/lib/openings";
 
 export function generateStaticParams() {
   return openings.map((opening) => ({ id: opening.id }));
@@ -18,10 +18,9 @@ export async function generateMetadata({
   };
 }
 
-function parseReps(value: string | string[] | undefined): RepsMode {
+function parseReps(value: string | string[] | undefined): StudyMode {
   const v = Array.isArray(value) ? value[0] : value;
-  if (v === "traps" || v === "quiz" || v === "think" || v === "spine") return v;
-  return "spine";
+  return parseStudyMode(v);
 }
 
 export default async function DrillPage({

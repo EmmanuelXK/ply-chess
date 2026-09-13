@@ -1,6 +1,6 @@
 # Opening Edge
 
-iPhone-first PWA dashboard (`100dvh`, no page scroll). **21 attacking systems** (11 White · 5 vs 1.e4 · 5 vs 1.d4). Each line is a **spine to move 21**, **traps**, and **six pillars** — then Plan mode. Dual coaches speak in **short beats**, wander as chat heads, and point at named squares.
+iPhone-first PWA dashboard (`100dvh`, no page scroll). **21 attacking systems** (11 White · 5 vs 1.e4 · 5 vs 1.d4) on one **White / Black** home. Each line is a **spine to move 21**, **traps**, and **six pillars** — then Plan mode. One coach head wanders, fidgets, and teaches **why** with purpose tags.
 
 Production: [https://blitzbar.app](https://blitzbar.app) (Vercel project `ply-chess`, GitHub `EmmanuelXK/ply-chess`).
 
@@ -12,23 +12,19 @@ Black vs 1.e4: Black Lion, Pirc, Sicilian Dragon, Scandinavian, Alekhine.
 
 Black vs 1.d4: King's Indian, Modern Benoni, Benko, Dutch Leningrad, Budapest.
 
-Home filters: All 21 / White / vs 1.e4 / vs 1.d4. Reps chips: **Spine · Traps · Quiz · Think**.
+Home modes: **Learn · Reps · Practice · Drill · Time Trial · Progress**. Systems sit in **White opening systems** and **Black opening systems**.
 
-## Dual masters
+## Single coach
 
-Headphone training is **two teachers**, not one coach with a sidekick. Beats are **8–15 words**, one positional idea, friendly (pride on good moves, concern + a fix on a miss). They argue about 1/5 of the time and still land one plan. Duo / Podcast↔Teach / Dual↔Solo / voices live on the **Settings** tab only. Masters on the drill deep-links there.
+One Grok-style head on the board. It bobs, dilly-dallies, points at named squares, and you can **drag it off the board** — it parks on the rim and keeps teaching.
 
-| Duo | Teachers | Feel |
-| --- | --- | --- |
-| **Voss & Draven** (default) | Aldric Voss ♂ · Kael Draven ♀ | Warm mentor vs punchy romantic tease. |
-| **Vale & Knox** | Soren Vale ♂ · Rhea Knox ♀ | Ice-cold calculator vs narrative fire. |
-| **Crowe & Marquez** | Silas Crowe ♂ · Lena Marquez ♀ | Quiet planner vs relentless investigator. |
+Speech is **why this move** with a purpose tag: grab center, stabilize center, break center, attack weak square, notice the pin, free piece, stop opponent plan, and so on. Beats stay **6–15 words**. Consecutive plies do not repeat the same line. TTS clips for the next plies are prefetched so Forward / autoplay does not wait.
 
-All six names are **original characters**. No real or fictional IP names, likenesses, voice clones, or catchphrases.
+Aldric ♂ and Kael ♀ stay as internal voices. Settings has **no coach picker, no duos, no Dual/Solo switch**.
 
-Shared lesson facts (concept / why / plan / sourced history / quizzes) are flavored per duo. Lion and London have authored facts; other systems generate from the professor pack + History Gig Pack.
+Lion and London have authored facts; other systems generate from the professor pack + History Gig Pack.
 
-The coach strip shows **who is speaking**. Mid-line questions appear as tap chips.
+The coach strip shows the **purpose tag**. Mid-line questions appear as tap chips.
 
 ### Voice
 Toggle **Voice** on the drill dock. Mute, Restart, Back/Forward, and navigation cancel in-flight audio.
@@ -99,7 +95,7 @@ When they disagree, the panel explains the **human-practical** choice. Mate or a
 No env vars. Engines load lazily the first time you open Analyze or Think.
 
 ### Back / Forward
-Large **Back** and **Forward** under the board (thumb zone). Instant ply-by-ply through the spine — hurry the repertoire. Same control set inside Why and Analyze. Chessground animations ~150ms (no teleports).
+Large **Back** and **Forward** under the board (thumb zone). Instant ply-by-ply through the spine — hurry the repertoire. Same control set inside Why and Analyze. Chessground animations ~90ms (no teleports).
 
 ### Analyze
 **Analyze** on the dock, or **long-press the board**. Fast splash: board, play/pause, Back/Forward, close. Vertical **eval bar** (Lichess/Chess.com style) beside the board — Stockfish primary. The human-plan strip shows Stockfish / Lc0-style / Maia-style votes.

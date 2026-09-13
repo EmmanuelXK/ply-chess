@@ -7,12 +7,7 @@ import { SplashBoard } from "@/components/drill/splash-board";
 import { playLine } from "@/lib/chess/line";
 import { speakDialogue } from "@/lib/chess/speak";
 import { SpeakerChip } from "@/components/drill/speaker-chip";
-import {
-  dialogueForHistory,
-  getDuo,
-  type DialogueMode,
-  type DuoId,
-} from "@/lib/dialogue";
+import { ACTIVE_COACH, dialogueForHistory } from "@/lib/dialogue";
 import {
   HISTORY_OPENER,
   historyFen,
@@ -32,15 +27,11 @@ export function HistorySplash({
   opening,
   milestones,
   orientation,
-  duo,
-  mode,
   onClose,
 }: {
   opening: Opening;
   milestones: HistoryMilestone[];
   orientation: "white" | "black";
-  duo: DuoId;
-  mode: DialogueMode;
   onClose: () => void;
 }) {
   const [idx, setIdx] = useState(0);
@@ -62,10 +53,13 @@ export function HistorySplash({
 
   useEffect(() => {
     if (!milestone) return;
-    const scene = dialogueForHistory(opening, milestone, { duo, mode });
-    const handle = speakDialogue(scene.beats, { premium: mode === "dual" });
+    const scene = dialogueForHistory(opening, milestone, {
+      duo: ACTIVE_COACH,
+      mode: "solo",
+    });
+    const handle = speakDialogue(scene.beats);
     return () => handle.stop();
-  }, [milestone, opening, duo, mode]);
+  }, [milestone, opening]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -114,12 +108,12 @@ export function HistorySplash({
         ) : null}
 
         <p className="history-opener">
-          <SpeakerChip duoId={duo} speaker={getDuo(duo).left.id} />{" "}
+          <SpeakerChip purpose="wake-the-line" />{" "}
           {HISTORY_OPENER}
         </p>
         <p className="splash-copy">{milestone.summary}</p>
         <p className="history-here">
-          <SpeakerChip duoId={duo} speaker={getDuo(duo).right.id} />{" "}
+          <SpeakerChip purpose="hold-the-square" />{" "}
           {milestone.whyItMattersHere}
         </p>
 
@@ -130,7 +124,7 @@ export function HistorySplash({
             orientation={orientation}
             turnColor={pos.turnColor}
             check={pos.check}
-            animationMs={140}
+            animationMs={90}
           />
         </div>
 

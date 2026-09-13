@@ -36,7 +36,6 @@ function professorLine(opening: Opening, afterPly: number): string | undefined {
 }
 
 export function coachAtStart(opening: Opening): CoachState {
-  const line = opening.coach.find((c) => c.afterPly === -1);
   return {
     text: shortLine(opening.chunks[0]?.name ?? opening.story.cast, 12),
     detail: shortLine(opening.story.plan, 12),
