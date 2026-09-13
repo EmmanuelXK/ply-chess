@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { TabBar } from "@/components/app/tab-bar";
 import { OpeningTile } from "@/components/home/opening-tile";
 import {
@@ -18,11 +18,6 @@ export function RepertoireHome() {
   const { profile } = useAuth();
   const white = openingsForSide("white");
   const black = openingsForSide("black");
-
-  const lotusHint = useMemo(() => {
-    if (mode !== "progress") return "Link games later — we'll rank these by your practical win rate.";
-    return "Progress is local for now. Lotus-style import from your games is next.";
-  }, [mode]);
 
   return (
     <div className="dash-shell dash-repertoire">
@@ -49,7 +44,9 @@ export function RepertoireHome() {
           ))}
         </div>
         <p className="dash-mode-blurb">
-          {STUDY_MODES.find((m) => m.id === mode)?.blurb} {mode === "progress" ? lotusHint : ""}
+          {mode === "progress"
+            ? "What stuck. Weak houses light up on the tiles."
+            : STUDY_MODES.find((m) => m.id === mode)?.blurb}
         </p>
       </header>
 

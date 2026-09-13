@@ -52,7 +52,7 @@ export function OpeningTree({
   };
 
   if (!view.length) {
-    return <p className="atlas-empty">No cases on the tree. Try another search.</p>;
+    return <p className="atlas-empty">Nothing on this branch. Clear search or try All.</p>;
   }
 
   return (

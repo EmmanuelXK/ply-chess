@@ -23,7 +23,7 @@ export function TheoryAtlas() {
         <p className="dash-kicker">The Map</p>
         <h1>Universal Openings</h1>
         <p className="dash-sub">
-          {treeSummary() || ATLAS.length} cases · expand a branch · 1250-friendly plans
+          {treeSummary() || ATLAS.length} cases · expand a family · train if it lives on Home
         </p>
         <label className="atlas-search">
           <span className="sr-only">Search openings</span>

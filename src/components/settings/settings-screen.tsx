@@ -3,18 +3,13 @@
 import { useEffect, useState } from "react";
 import { TabBar } from "@/components/app/tab-bar";
 import { useAuth } from "@/components/auth/auth-provider";
-import { activeTeachers } from "@/lib/dialogue";
 import {
   readTtsRate,
-  readVoiceMap,
   readVoiceOnDefault,
-  VOICE_PRESETS,
   writeTtsRate,
   writeVoiceOnDefault,
-  writeVoicePreset,
 } from "@/lib/tts/prefs";
 import type { TtsRatePref } from "@/lib/tts/prosody";
-import type { SpeakerId } from "@/lib/tts/types";
 import type { SidePref } from "@/lib/auth/sanitize";
 import { APP_MILESTONE, APP_VERSION } from "@/lib/version";
 
@@ -22,13 +17,11 @@ export function SettingsScreen() {
   const { configured, user, profile, save } = useAuth();
   const [rate, setRate] = useState<TtsRatePref>(() => readTtsRate());
   const [voiceOn, setVoiceOn] = useState(() => readVoiceOnDefault());
-  const [map, setMap] = useState<Partial<Record<SpeakerId, string>>>(() => readVoiceMap());
   const [displayName, setDisplayName] = useState("");
   const [initials, setInitials] = useState("");
   const [sidePref, setSidePref] = useState<SidePref>("both");
   const [clubTag, setClubTag] = useState("");
   const [saved, setSaved] = useState("");
-  const teachers = activeTeachers();
 
   useEffect(() => {
     if (!profile) return;
@@ -135,7 +128,7 @@ export function SettingsScreen() {
         <section className="set-block" id="voices">
           <h2>Voice</h2>
           <p className="set-help">
-            One playful coach head. No picker. No dual heads.
+            One coach. Rate and mute. That’s the whole voice desk.
           </p>
           <div className="mode-row" role="tablist" aria-label="Speech rate">
             {(["slow", "clear", "brisk"] as const).map((id) => (
@@ -165,40 +158,12 @@ export function SettingsScreen() {
             />
             Start drills with Voice on
           </label>
-          <div className="voice-remap">
-            {[teachers.left, teachers.right].map((teacher) => (
-              <div key={teacher.id} className="voice-row">
-                <p>
-                  <span className={`speaker-dot speaker-${teacher.color}`} />
-                  {teacher.gender === "male" ? "Warm male" : "Bright female"}
-                </p>
-                <div className="mode-row">
-                  {VOICE_PRESETS[teacher.id].map((preset) => {
-                    const on = (map[teacher.id] ?? "default") === preset.id;
-                    return (
-                      <button
-                        key={preset.id}
-                        type="button"
-                        className={on ? "filter-chip filter-chip-on" : "filter-chip"}
-                        onClick={() => {
-                          writeVoicePreset(teacher.id, preset.id);
-                          setMap((prev) => ({ ...prev, [teacher.id]: preset.id }));
-                        }}
-                      >
-                        {preset.label}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            ))}
-          </div>
         </section>
 
         <section className="set-block" id="about">
           <h2>About</h2>
           <p className="set-help">
-            {APP_VERSION} — {APP_MILESTONE}. Full access. No paywall.
+            {APP_VERSION} — {APP_MILESTONE}. Weapons, the Map, Memory OS, one coach.
           </p>
         </section>
       </div>
