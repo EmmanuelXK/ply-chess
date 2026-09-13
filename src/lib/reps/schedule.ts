@@ -1,3 +1,5 @@
+import type { Opening } from "@/lib/openings/types";
+
 export type StudyMode =
   | "learn"
   | "reps"
@@ -89,6 +91,19 @@ export function markReviewed(openingId: string, ply: number, ok: boolean): void 
   writeJson(REPS_KEY, rows);
 }
 
+function plyRecord(
+  rows: RepEntry[],
+  openingId: string,
+  ply: number,
+): RepEntry | undefined {
+  return rows.find((r) => r.openingId === openingId && r.ply === ply);
+}
+
+function recordIsWeak(rec: RepEntry | undefined, now: number): boolean {
+  if (!rec) return false;
+  return rec.due <= now || rec.ease < 2.2 || rec.streak === 0;
+}
+
 export function duePly(openingId: string, maxPly: number): number {
   const rows = readJson<RepEntry[]>(REPS_KEY, []).filter((r) => r.openingId === openingId);
   const now = Date.now();
@@ -96,6 +111,39 @@ export function duePly(openingId: string, maxPly: number): number {
     .filter((r) => r.due <= now && r.ply < maxPly)
     .sort((a, b) => a.ply - b.ply);
   return due[0]?.ply ?? 0;
+}
+
+/** Houses that contain a failed, stale, or due review ply. */
+export function dueChunks(opening: Opening): {
+  start: number;
+  name: string;
+  due: boolean;
+}[] {
+  const rows = readJson<RepEntry[]>(REPS_KEY, []).filter(
+    (r) => r.openingId === opening.id,
+  );
+  const now = Date.now();
+  return opening.chunks.map((chunk) => {
+    let due = false;
+    for (let ply = chunk.fromPly; ply <= chunk.toPly; ply++) {
+      if (recordIsWeak(plyRecord(rows, opening.id, ply), now)) {
+        due = true;
+        break;
+      }
+    }
+    return { start: chunk.fromPly, name: chunk.name, due };
+  });
+}
+
+export function weakHouseName(opening: Opening): string | null {
+  return dueChunks(opening).find((chunk) => chunk.due)?.name ?? null;
+}
+
+/** First ply of the weakest due house, else the oldest due ply. */
+export function reviewStartPly(opening: Opening): number {
+  const house = dueChunks(opening).find((chunk) => chunk.due);
+  if (house) return house.start;
+  return duePly(opening.id, opening.moves.length);
 }
 
 export function markProgress(openingId: string, ply: number): void {

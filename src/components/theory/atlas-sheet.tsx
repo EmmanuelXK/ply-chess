@@ -5,6 +5,7 @@ import Link from "next/link";
 import { playLine } from "@/lib/chess/line";
 import type { AtlasEntry } from "@/lib/atlas";
 import { SplashBoard } from "@/components/drill/splash-board";
+import { getOpening, housePicture, storyLine } from "@/lib/openings";
 
 export function AtlasSheet({
   entry,
@@ -30,6 +31,7 @@ export function AtlasSheet({
   const orientation = entry.sides.includes("black") && !entry.sides.includes("white")
     ? "black"
     : "white";
+  const drill = entry.trainId ? getOpening(entry.trainId) : undefined;
 
   return (
     <div
@@ -99,6 +101,43 @@ export function AtlasSheet({
           ))}
         </div>
         <p className="atlas-route-note">{entry.routes[routeIndex]?.note}</p>
+
+        {drill ? (
+          <section className="atlas-memory">
+            <p className="atlas-story">{storyLine(drill)}</p>
+            <p className="atlas-story-plan">{drill.story.plan}</p>
+            <div className="mem-chunks" role="list" aria-label="Houses">
+              {drill.chunks.slice(0, 6).map((chunk) => (
+                <span
+                  key={`${chunk.fromPly}-${chunk.name}`}
+                  role="listitem"
+                  className="mem-chip"
+                  title={housePicture(chunk)}
+                >
+                  {chunk.name}
+                </span>
+              ))}
+            </div>
+            {drill.pins.length ? (
+              <div className="mem-journey atlas-journey" aria-label="Journey">
+                <span className="mem-journey-line" aria-hidden />
+                {drill.pins.map((pin) => (
+                  <span
+                    key={`${pin.afterPly}-${pin.label}`}
+                    className="mem-pin mem-pin-hit"
+                    style={{
+                      left: `${Math.min(
+                        100,
+                        (pin.afterPly / Math.max(1, drill.moves.length - 1)) * 100,
+                      )}%`,
+                    }}
+                    title={pin.label}
+                  />
+                ))}
+              </div>
+            ) : null}
+          </section>
+        ) : null}
 
         <section className="atlas-plans">
           <article>

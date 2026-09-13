@@ -555,6 +555,125 @@ body,
   min-height: 2.1rem;
 }
 
+.mem-rail {
+  margin-top: 0.32rem;
+}
+
+.mem-chunks {
+  display: flex;
+  gap: 0.28rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  padding: 0.02rem 0.02rem 0.18rem;
+}
+
+.mem-chunks::-webkit-scrollbar {
+  display: none;
+}
+
+.mem-chip {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  height: 1.55rem;
+  padding: 0 0.58rem;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 0.03em;
+  color: var(--mist);
+  background: var(--charcoal-2);
+  border: 1px solid var(--line);
+  white-space: nowrap;
+}
+
+.mem-chip-on {
+  color: var(--ink);
+  background: linear-gradient(180deg, var(--ember-soft), var(--ember));
+  border-color: var(--ember);
+}
+
+.mem-chip-done {
+  color: var(--ember-soft);
+  border-color: rgb(245 158 11 / 34%);
+}
+
+.mem-chip-weak {
+  box-shadow: 0 0 0 2px var(--ember-glow);
+}
+
+.mem-journey {
+  position: relative;
+  height: 1.05rem;
+  margin: 0.02rem 0.45rem 0;
+}
+
+.mem-journey-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  background: var(--line-strong);
+}
+
+.mem-you {
+  position: absolute;
+  top: 50%;
+  width: 0.42rem;
+  height: 0.42rem;
+  margin: -0.21rem 0 0 -0.21rem;
+  border-radius: 999px;
+  background: var(--cream);
+  box-shadow: 0 0 0 3px var(--ember-glow);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.mem-pin {
+  appearance: none;
+  position: absolute;
+  top: 50%;
+  width: 0.7rem;
+  height: 0.7rem;
+  margin: -0.35rem 0 0 -0.35rem;
+  padding: 0;
+  border-radius: 999px;
+  background: var(--ink);
+  border: 1.5px solid var(--ember);
+  z-index: 1;
+}
+
+.mem-pin-hit {
+  background: var(--ember);
+}
+
+.atlas-memory {
+  margin: 0.55rem 0 0.15rem;
+}
+
+.atlas-story,
+.atlas-story-plan,
+.splash-picture {
+  margin: 0 0 0.28rem;
+  font-size: 13px;
+  line-height: 1.35;
+  color: var(--cream);
+}
+
+.atlas-story-plan,
+.splash-picture {
+  color: var(--ember-soft);
+  font-weight: 650;
+}
+
+.atlas-journey {
+  margin-top: 0.35rem;
+}
+
 .reps-row {
   display: flex;
   gap: 0.3rem;
@@ -620,8 +739,8 @@ body,
 .coach-detail {
   margin-top: 0.18rem !important;
   font-size: 12px;
-  font-weight: 500;
-  color: #a1a1aa;
+  font-weight: 550;
+  color: var(--ember-soft);
   line-height: 1.35;
   -webkit-line-clamp: 2;
 }

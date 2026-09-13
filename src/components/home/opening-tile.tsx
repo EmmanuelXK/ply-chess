@@ -6,6 +6,7 @@ import {
   type Opening,
   type RepsMode,
 } from "@/lib/openings";
+import { weakHouseName } from "@/lib/reps/schedule";
 
 export function OpeningTile({
   opening,
@@ -23,6 +24,8 @@ export function OpeningTile({
   const moves = fullMoveCount(opening);
   const kind = openingKind(opening.id);
   const mode = parseStudyMode(typeof reps === "string" ? reps : "learn");
+  const reviewHouse =
+    showProgress && due > 0 ? weakHouseName(opening) : null;
   const href =
     mode === "learn"
       ? `/drill/${opening.id}`
@@ -46,7 +49,11 @@ export function OpeningTile({
       </p>
       <p className="dash-tile-chunk">
         <span className="dash-tile-kind">{kind === "system" ? "System" : "Semi"}</span>
-        {opening.chunks[0]?.name ? ` · ${opening.chunks[0].name}` : ""}
+        {reviewHouse
+          ? ` · Review ${reviewHouse}`
+          : opening.chunks[0]?.name
+            ? ` · ${opening.chunks[0].name}`
+            : ""}
       </p>
     </Link>
   );

@@ -1,7 +1,7 @@
 import { ATLAS } from "../src/lib/atlas";
 import { validateAtlas } from "../src/lib/atlas/validate";
 import { validateDialogue } from "../src/lib/dialogue/validate";
-import { openings } from "../src/lib/openings";
+import { housePicture, looksLikeMoveList, openings } from "../src/lib/openings";
 
 for (const opening of openings) {
   const moves = Math.ceil(opening.moves.length / 2);
@@ -10,6 +10,12 @@ for (const opening of openings) {
   );
   if (opening.depthNote) {
     console.log(`  note: ${opening.depthNote}`);
+  }
+  for (const chunk of opening.chunks) {
+    const picture = housePicture(chunk);
+    if (looksLikeMoveList(picture)) {
+      throw new Error(`${opening.id} house "${chunk.name}" picture dumps moves: ${picture}`);
+    }
   }
 }
 

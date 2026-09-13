@@ -20,6 +20,7 @@ import { ChessBoard, type BoardArrow } from "@/components/board/chess-board";
 import { Button } from "@/components/ui/button";
 import { AnalyzeSplash } from "@/components/drill/analyze-splash";
 import { CoachHead } from "@/components/drill/coach-head";
+import { MemoryRail } from "@/components/drill/memory-rail";
 import { HistoryMark } from "@/components/drill/history-mark";
 import { HistorySplash } from "@/components/drill/history-splash";
 import { InlineAsk } from "@/components/drill/inline-ask";
@@ -49,8 +50,10 @@ import {
 } from "@/lib/dialogue";
 import { readVoiceOnDefault } from "@/lib/tts/prefs";
 import {
+  dueChunks,
   markProgress,
   markReviewed,
+  reviewStartPly,
   type StudyMode,
 } from "@/lib/reps/schedule";
 import {
@@ -376,16 +379,32 @@ export function DrillScreen({
         ? undefined
         : opening.side;
 
+  const fullMoves = Math.ceil(opening.moves.length / 2);
+  const shownMove = Math.min(Math.ceil(ply / 2), fullMoves);
+  const quiz = quizForPly(opening, Math.max(0, ply - 1));
+  const why = whyLessonAt(opening, ply);
+  const historyNow = historyAt(opening, ply);
+  const weakFrom = dueChunks(opening).find((chunk) => chunk.due)?.start ?? -1;
+
   const arrows = useMemo<BoardArrow[]>(() => {
     const next: BoardArrow[] = [];
     if (lastMove && lastMove.length === 2) {
       next.push({ orig: lastMove[0], dest: lastMove[1], brush: "last" });
     }
+    const idea = (why?.branch[0]?.arrows ?? []).slice(0, 2);
+    for (const a of idea) {
+      if (a.orig === lastMove?.[0] && a.dest === lastMove?.[1]) continue;
+      next.push({
+        orig: a.orig as Key,
+        dest: a.dest as Key,
+        brush: a.brush,
+      });
+    }
     if (hintKeys && hintKeys.length === 2) {
       next.push({ orig: hintKeys[0], dest: hintKeys[1], brush: "hint" });
     }
     return next;
-  }, [lastMove, hintKeys]);
+  }, [lastMove, hintKeys, why]);
 
   const cancelTimer = () => {
     if (timerRef.current !== null) {
@@ -528,12 +547,6 @@ export function DrillScreen({
     [opening, playSan, pushScene, sync],
   );
 
-  const fullMoves = Math.ceil(opening.moves.length / 2);
-  const shownMove = Math.min(Math.ceil(ply / 2), fullMoves);
-  const quiz = quizForPly(opening, Math.max(0, ply - 1));
-  const why = whyLessonAt(opening, ply);
-  const historyNow = historyAt(opening, ply);
-
   const hint = () => {
     if (mode !== "drill" || hintUsed || busy) return;
     if (!isUserPly(opening.side, ply)) return;
@@ -609,11 +622,11 @@ export function DrillScreen({
                 {shownMove}/{fullMoves}
               </p>
             </div>
-            <p className="truncate text-[11px] text-zinc-500">
-              {mode === "plan"
-                ? "Plan mode — free play"
-                : (coach.chunkName ?? opening.chunks[0]?.name)}
-            </p>
+            {mode === "plan" ? (
+              <p className="truncate text-[11px] text-[var(--mist)]">
+                Plan mode — free play
+              </p>
+            ) : null}
           </div>
           <Button
             variant="ghost"
@@ -625,6 +638,18 @@ export function DrillScreen({
             <BookOpen />
           </Button>
         </div>
+
+        {mode !== "plan" ? (
+          <MemoryRail
+            opening={opening}
+            ply={ply}
+            weakFrom={weakFrom}
+            onJump={(next) => {
+              cancelTimer();
+              applyPly(next);
+            }}
+          />
+        ) : null}
 
         <div className="reps-row" role="tablist" aria-label="Study mode">
           {STUDY_MODES.filter((m) => m.id !== "progress").map((m) => (
@@ -644,6 +669,10 @@ export function DrillScreen({
                 if (m.id === "learn") {
                   setLineId(null);
                   if (lineId) setSession((n) => n + 1);
+                }
+                if (m.id === "reps") {
+                  cancelTimer();
+                  applyPly(reviewStartPly(opening));
                 }
               }}
             >
@@ -669,7 +698,12 @@ export function DrillScreen({
                 <span className="coach-mode-tag">{trialLeft}s</span>
               ) : null}
             </div>
-            <p>{scene.beats[beatIndex]?.text ?? coach.text}</p>
+            <p className="coach-line">
+              {scene.beats[beatIndex]?.text ?? coach.text}
+            </p>
+            {coach.detail ? (
+              <p className="coach-detail">{coach.detail}</p>
+            ) : null}
             {ask ? (
               <InlineAsk
                 ask={ask}

@@ -1,4 +1,5 @@
-import { chunkAt, positionalIdea } from "@/lib/openings/helpers";
+import { chunkAt, firstSentence, looksLikeMoveList, positionalIdea } from "@/lib/openings/helpers";
+import { housePicture } from "@/lib/openings/memory";
 import { historyAt } from "@/lib/openings/history";
 import { professorAt, quizForPly, speakableProfessor } from "@/lib/openings/professor";
 import type { HistoryMilestone, Opening, WhyLesson } from "@/lib/openings/types";
@@ -53,6 +54,8 @@ export function collectFacts(input: {
   const mark = input.milestone ?? marks[0];
   const authored = authoredAt(opening.id, after);
   const san = input.san ?? (after >= 0 ? opening.moves[after] : undefined);
+  const picture = housePicture(chunk);
+  const conceptRaw = script?.concept ?? picture;
   const romantic =
     mark?.era === "Romantic" ||
     /gambit|immortal|evergreen|sacrifice/i.test(
@@ -66,12 +69,13 @@ export function collectFacts(input: {
     san,
     chunkName: chunk?.name,
     chunkJob: chunk?.job,
-    concept:
-      script?.concept ??
-      positionalIdea(chunk?.job ?? opening.story.cast, opening.story.cast),
+    concept: looksLikeMoveList(conceptRaw)
+      ? picture
+      : positionalIdea(conceptRaw, picture),
     why:
-      script?.why ??
-      positionalIdea(chunk?.job ?? opening.story.conflict, opening.story.plan),
+      script?.why && !looksLikeMoveList(script.why)
+        ? firstSentence(script.why)
+        : positionalIdea(chunk?.job ?? opening.story.conflict, picture),
     plan: script?.plan ?? opening.story.plan,
     historyTitle: mark?.title,
     historyYear: mark?.year,

@@ -10,6 +10,7 @@ import { playLine } from "@/lib/chess/line";
 import { silence, speakDialogue, type SpeakHandle } from "@/lib/chess/speak";
 import { SpeakerChip } from "@/components/drill/speaker-chip";
 import { ACTIVE_COACH, dialogueForWhy } from "@/lib/dialogue";
+import { chunkAt, housePicture } from "@/lib/openings";
 import type { Opening, WhyLesson } from "@/lib/openings";
 
 const EMPTY_DESTS = new Map<Key, Key[]>();
@@ -40,6 +41,8 @@ export function WhySplash({
   const pos = useMemo(() => playLine(line, ply), [line, ply]);
   const branchIndex = ply - lesson.startPly;
   const step = branchIndex > 0 ? lesson.branch[branchIndex - 1] : undefined;
+  const house = chunkAt(opening, Math.max(0, lesson.startPly - 1));
+  const picture = housePicture(house);
 
   const arrows = useMemo<BoardArrow[]>(() => {
     const next: BoardArrow[] = [];
@@ -138,8 +141,8 @@ export function WhySplash({
       <div className="splash-card splash-in">
         <header className="splash-head">
           <div className="min-w-0">
-            <p className="text-[11px] font-medium tracking-[0.16em] text-amber-200/80 uppercase">
-              Why
+            <p className="text-[11px] font-medium tracking-[0.16em] text-[var(--ember)] uppercase">
+              Why{house ? ` · ${house.name}` : ""}
             </p>
             <h2 className="truncate text-[17px] font-semibold tracking-tight">
               {lesson.title}
@@ -150,6 +153,7 @@ export function WhySplash({
             Close
           </button>
         </header>
+        <p className="splash-picture">{picture}</p>
         <p className="splash-copy">
           <SpeakerChip />{" "}
           {step?.narrate ?? lesson.intro}

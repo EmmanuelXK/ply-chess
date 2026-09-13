@@ -38,6 +38,14 @@ export {
   openingKind,
   positionalIdea,
 } from "./helpers";
+export {
+  housePicture,
+  housePictureAt,
+  pinSpeech,
+  storyLine,
+  chunkIndexAt,
+  visualLine,
+} from "./memory";
 export { openingFromTrap } from "./make-opening";
 export { quizForPly, whyLessonAt, professorAt } from "./professor";
 export {
