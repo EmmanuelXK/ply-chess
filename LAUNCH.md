@@ -2,10 +2,11 @@
 
 Club-ready cut. Signed-in friends get everything. No subscriptions.
 
-## Auth (only these two)
+## Auth (Google only for V1)
 
-1. **Google** — Supabase Auth → Providers → Google. Paste the Google client id + secret in the Supabase dashboard (never in this repo).
-2. **Phone OTP** — Supabase Auth → Phone. Twilio (or the Supabase phone provider) stays in the dashboard. The app never sees those keys. The login field defaults to France `+33` and turns `07 44 89 98 85` into E.164 before SMS. If Google or Phone is still off in the dashboard, the app stays on `/login` with a short message (it does not dump raw Supabase JSON).
+1. **Google** — Supabase Auth → Providers → Google. Paste the Google client id + secret in the Supabase dashboard (never in this repo). If Google is still off in the dashboard, the app stays on `/login` with a short message (it does not dump raw Supabase JSON).
+
+**Phone OTP is deferred** — no Twilio / SMS work in this cut. Do not treat Phone as a V1 login method.
 
 Redirect URLs in Supabase Auth:
 
@@ -57,7 +58,7 @@ Without keys, local/preview can still open Home / Learn for craft work. Producti
 - [x] `.gitignore` covers `.env*` (`.env.example` placeholders only)
 - [x] Client uses public URL + publishable/anon key
 - [x] RLS on `profiles`, `opening_progress`, `opening_reps` via `auth.uid()`
-- [x] Login UI is Google + Phone only
+- [x] Login UI is Google only (Phone deferred)
 - [x] Git history on this branch: no committed `.env` or private keys found
 
 If a secret was ever pasted into Vercel or a chat, rotate it in the provider dashboard.

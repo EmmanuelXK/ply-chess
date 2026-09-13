@@ -26,17 +26,6 @@ export function sanitizeSide(raw: string): SidePref {
   return "both";
 }
 
-export function sanitizePhone(raw: string): string | null {
-  const compact = raw.replace(/[^\d+]/g, "");
-  if (!/^\+[1-9]\d{7,14}$/.test(compact)) return null;
-  return compact;
-}
-
-export function sanitizeOtp(raw: string): string | null {
-  const digits = raw.replace(/\D/g, "").slice(0, 8);
-  return digits.length >= 6 ? digits : null;
-}
-
 export function draftFromRaw(input: {
   displayName: string;
   initials: string;
