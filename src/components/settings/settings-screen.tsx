@@ -26,7 +26,7 @@ export function SettingsScreen() {
       <header className="dash-head">
         <p className="dash-kicker">Opening Edge</p>
         <h1>Settings</h1>
-        <p className="dash-sub">Voice, rate, and speech. One coach on the board.</p>
+        <p className="dash-sub">Voice and rate. One coach. No dual heads.</p>
       </header>
 
       <div className="dash-scroll">

@@ -35,6 +35,7 @@ export {
   fullMoveCount,
   PILLAR_LABELS,
   looksLikeMoveList,
+  openingKind,
   positionalIdea,
 } from "./helpers";
 export { openingFromTrap } from "./make-opening";

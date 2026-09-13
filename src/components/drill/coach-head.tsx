@@ -7,28 +7,30 @@ import {
   useState,
   type PointerEvent as ReactPointerEvent,
 } from "react";
-import type { Key } from "@lichess-org/chessground/types";
 import { squaresInSpeech } from "@/lib/dialogue";
 import type { SpeakerId } from "@/lib/tts/types";
 
 type Park = "board" | "rim";
+type Gag = "idle" | "pop" | "shrink" | "tease" | "hint";
+
+const HINTS = ["Psst.", "Look closer.", "Not there.", "Nice try.", "This file."];
 
 export function CoachHead({
-  speaker,
+  speaker: _speaker,
   text,
-  orientation,
+  orientation: _orientation,
 }: {
   speaker: SpeakerId;
   text: string;
   orientation: "white" | "black";
 }) {
   const rootRef = useRef<HTMLDivElement>(null);
-  const pillRef = useRef<HTMLDivElement>(null);
-  const pathRefs = useRef<Array<SVGPathElement | null>>([]);
   const [park, setPark] = useState<Park>("board");
   const [pos, setPos] = useState({ x: 28, y: 36 });
   const [dragging, setDragging] = useState(false);
   const [wander, setWander] = useState({ x: 0, y: 0 });
+  const [gag, setGag] = useState<Gag>("idle");
+  const [hint, setHint] = useState<string | null>(null);
   const dragRef = useRef<{
     pointer: number;
     ox: number;
@@ -37,8 +39,8 @@ export function CoachHead({
     py: number;
   } | null>(null);
 
-  const targets = useMemo(() => squaresInSpeech(text).slice(0, 2), [text]);
   const talking = text.trim().length > 0;
+  const named = useMemo(() => squaresInSpeech(text)[0], [text]);
 
   useEffect(() => {
     if (dragging || park === "rim") return;
@@ -52,46 +54,31 @@ export function CoachHead({
   }, [dragging, park]);
 
   useEffect(() => {
-    const root = rootRef.current;
-    if (!root) return;
+    if (dragging) return;
+    let timer = 0;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduced) return;
 
-    const update = () => {
-      const board = root.parentElement?.querySelector(".board-frame") as
-        | HTMLElement
-        | null;
-      const head = pillRef.current;
-      if (!board || !head || !targets.length) return;
-      const stage = root.getBoundingClientRect();
-      const boardBox = board.getBoundingClientRect();
-      const headBox = head.getBoundingClientRect();
-      const origin = {
-        x: headBox.left + headBox.width / 2 - stage.left,
-        y: headBox.top + headBox.height / 2 - stage.top,
-      };
-      targets.forEach((sq, i) => {
-        const node = pathRefs.current[i];
-        if (!node) return;
-        const { x, y } = squareCenter(sq, orientation, boardBox, stage);
-        const midX = origin.x + (x - origin.x) * 0.48;
-        const midY = Math.min(origin.y, y) - 18;
-        node.setAttribute("d", `M ${origin.x} ${origin.y} Q ${midX} ${midY} ${x} ${y}`);
-      });
-    };
-
-    update();
-    const ro = new ResizeObserver(update);
-    ro.observe(root);
-    let frame = 0;
     const tick = () => {
-      update();
-      frame = window.requestAnimationFrame(tick);
+      const roll = Math.random();
+      const next: Gag =
+        roll < 0.28 ? "pop" : roll < 0.5 ? "shrink" : roll < 0.74 ? "tease" : "hint";
+      setGag(next);
+      if (next === "hint") {
+        setHint(named ? `Look at ${named}.` : HINTS[Math.floor(Math.random() * HINTS.length)]);
+      } else {
+        setHint(null);
+      }
+      timer = window.setTimeout(() => {
+        setGag("idle");
+        setHint(null);
+        timer = window.setTimeout(tick, 2200 + Math.random() * 2800);
+      }, 820);
     };
-    frame = window.requestAnimationFrame(tick);
-    return () => {
-      ro.disconnect();
-      window.cancelAnimationFrame(frame);
-    };
-  }, [targets, orientation, pos, park, wander]);
+
+    timer = window.setTimeout(tick, 1600 + Math.random() * 1800);
+    return () => window.clearTimeout(timer);
+  }, [dragging, named, text]);
 
   const onPointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
     if (event.button !== 0) return;
@@ -99,7 +86,6 @@ export function CoachHead({
     event.stopPropagation();
     const root = rootRef.current;
     if (!root) return;
-    const box = root.getBoundingClientRect();
     dragRef.current = {
       pointer: event.pointerId,
       ox: event.clientX,
@@ -108,8 +94,9 @@ export function CoachHead({
       py: pos.y,
     };
     setDragging(true);
+    setGag("idle");
+    setHint(null);
     event.currentTarget.setPointerCapture(event.pointerId);
-    void box;
   };
 
   const onPointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
@@ -155,45 +142,19 @@ export function CoachHead({
 
   return (
     <div ref={rootRef} className="coach-head-layer" aria-hidden>
-      <svg className="chat-arrows chat-arrows-draw">
-        <defs>
-          <marker
-            id="coach-arrowhead"
-            markerWidth="8"
-            markerHeight="8"
-            refX="6"
-            refY="4"
-            orient="auto"
-          >
-            <path d="M0,0 L8,4 L0,8 Z" className="chat-arrow-mark" />
-          </marker>
-        </defs>
-        {targets.map((sq, i) => (
-          <path
-            key={`${sq}-${i}`}
-            ref={(node) => {
-              pathRefs.current[i] = node;
-            }}
-            d=""
-            className={`chat-arrow chat-arrow-${speaker} chat-arrow-in`}
-            markerEnd="url(#coach-arrowhead)"
-          />
-        ))}
-      </svg>
-
       <div
-        className={`coach-head-slot ${park === "rim" ? "coach-head-parked" : ""} ${
-          talking ? "coach-head-talk" : ""
-        } ${dragging ? "coach-head-drag" : ""}`}
+        className={`coach-head-slot coach-gag-${gag} ${
+          park === "rim" ? "coach-head-parked" : ""
+        } ${talking ? "coach-head-talk" : ""} ${dragging ? "coach-head-drag" : ""}`}
         style={{ left: `${left}%`, top: `${top}%` }}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerUp}
       >
+        {hint ? <span className="coach-hint-bubble">{hint}</span> : null}
         <div className="coach-head-dilly">
           <div
-            ref={pillRef}
             className={`chat-pill chat-pill-amber ${talking ? "chat-pill-talk" : ""}`}
           >
             <span className="chat-ring" />
@@ -210,34 +171,18 @@ export function CoachHead({
 function BotFace() {
   return (
     <svg viewBox="0 0 64 64" className="chat-face-svg" role="img" aria-label="Coach">
-      <circle cx="32" cy="32" r="32" fill="#1c1814" />
-      <circle cx="32" cy="34" r="17.5" fill="#d4a574" />
-      <path d="M14 26c5-13 31-13 36 0v8c-6-9-29-9-36 0z" fill="#2a211b" />
-      <ellipse cx="24.5" cy="36" rx="2.2" ry="2.5" fill="#1a120e" />
-      <ellipse cx="39.5" cy="36" rx="2.2" ry="2.5" fill="#1a120e" />
-      <path d="M24 45c4.2 3.6 12 3.6 16 0" stroke="#6a4030" strokeWidth="1.8" fill="none" />
-      <circle cx="18" cy="22" r="3.2" fill="#fbbf24" />
-      <circle cx="46" cy="22" r="3.2" fill="#fbbf24" />
+      <circle cx="32" cy="32" r="32" fill="#14110e" />
+      <path d="M10 28c6-16 38-16 44 0v6c-7-10-36-10-44 0z" fill="#1c1814" />
+      <circle cx="32" cy="36" r="16.5" fill="#c4a07a" />
+      <ellipse className="coach-eye" cx="24.6" cy="36.2" rx="2.15" ry="2.45" fill="#1a120e" />
+      <ellipse className="coach-eye" cx="39.4" cy="36.2" rx="2.15" ry="2.45" fill="#1a120e" />
+      <path d="M25 45.2c3.6 2.4 10.4 2.4 14 0" stroke="#6a4030" strokeWidth="1.6" fill="none" />
+      <circle cx="17.5" cy="22.5" r="2.6" fill="#f59e0b" />
+      <circle cx="46.5" cy="22.5" r="2.6" fill="#f59e0b" />
     </svg>
   );
 }
 
 function clamp(n: number, min: number, max: number) {
   return Math.min(max, Math.max(min, n));
-}
-
-function squareCenter(
-  square: Key,
-  orientation: "white" | "black",
-  board: DOMRect,
-  stage: DOMRect,
-) {
-  const file = square.charCodeAt(0) - 97;
-  const rank = Number(square[1]) - 1;
-  const x = orientation === "white" ? file : 7 - file;
-  const y = orientation === "white" ? 7 - rank : rank;
-  return {
-    x: board.left - stage.left + ((x + 0.5) * board.width) / 8,
-    y: board.top - stage.top + ((y + 0.5) * board.height) / 8,
-  };
 }

@@ -22,7 +22,7 @@ const prestigeSerif = Source_Serif_4({
 export const metadata: Metadata = {
   title: "Opening Edge",
   description:
-    "iPhone-first PWA. One coach. 21 attacking systems to move 21 — White and Black dashboards, purpose-tagged Why.",
+    "iPhone-first PWA. Noir repertoire, world openings atlas, one playful coach.",
   applicationName: "Opening Edge",
   appleWebApp: {
     capable: true,
@@ -44,7 +44,7 @@ export const viewport: Viewport = {
   maximumScale: 1,
   userScalable: false,
   viewportFit: "cover",
-  themeColor: "#0c0c0e",
+  themeColor: "#070708",
 };
 
 export default function RootLayout({
@@ -57,7 +57,7 @@ export default function RootLayout({
       lang="en"
       className={`dark ${geistSans.variable} ${geistMono.variable} ${prestigeSerif.variable} h-full antialiased`}
     >
-      <body className="app-body bg-[#0c0c0e] text-zinc-100">{children}</body>
+      <body className="app-body bg-[#070708] text-[#f3ebe0]">{children}</body>
     </html>
   );
 }
