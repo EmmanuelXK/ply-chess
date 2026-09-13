@@ -1,6 +1,6 @@
 # Opening Edge
 
-iPhone-first PWA. **21 attacking systems** (11 White · 5 vs 1.e4 · 5 vs 1.d4). Each line is a **spine to move 21**, **traps**, and **six pillars** — then Plan mode. This pack adds a **professor Why** flow, positional quizzes, hybrid practice, fingertip Back/Forward, and Analyze with an eval bar.
+iPhone-first PWA dashboard (`100dvh`, no page scroll). **21 attacking systems** (11 White · 5 vs 1.e4 · 5 vs 1.d4). Each line is a **spine to move 21**, **traps**, and **six pillars** — then Plan mode. Dual coaches speak in **short beats**, wander as chat heads, and point at named squares.
 
 Production: [https://blitzbar.app](https://blitzbar.app) (Vercel project `ply-chess`, GitHub `EmmanuelXK/ply-chess`).
 
@@ -14,10 +14,60 @@ Black vs 1.d4: King's Indian, Modern Benoni, Benko, Dutch Leningrad, Budapest.
 
 Home filters: All 21 / White / vs 1.e4 / vs 1.d4. Reps chips: **Spine · Traps · Quiz · Think**.
 
-## Professor pack
+## Dual masters
+
+Headphone training is **two teachers**, not one coach with a sidekick. Beats are **8–15 words**, one positional idea, friendly (pride on good moves, concern + a fix on a miss). They argue about 1/5 of the time and still land one plan. Duo / Podcast↔Teach / Dual↔Solo / voices live on the **Settings** tab only. Masters on the drill deep-links there.
+
+| Duo | Teachers | Feel |
+| --- | --- | --- |
+| **Voss & Draven** (default) | Aldric Voss ♂ · Kael Draven ♀ | Warm mentor vs punchy romantic tease. |
+| **Vale & Knox** | Soren Vale ♂ · Rhea Knox ♀ | Ice-cold calculator vs narrative fire. |
+| **Crowe & Marquez** | Silas Crowe ♂ · Lena Marquez ♀ | Quiet planner vs relentless investigator. |
+
+All six names are **original characters**. No real or fictional IP names, likenesses, voice clones, or catchphrases.
+
+Shared lesson facts (concept / why / plan / sourced history / quizzes) are flavored per duo. Lion and London have authored facts; other systems generate from the professor pack + History Gig Pack.
+
+The coach strip shows **who is speaking**. Mid-line questions appear as tap chips.
 
 ### Voice
-Toggle **Voice** on the drill dock. The professor is a deep, unhurried English male when the device has one (Daniel / UK male / similar), with human pacing — clauses, tiny rate jitter, slower on SAN. Not a metronome, not a shout.
+Toggle **Voice** on the drill dock. Mute, Restart, Back/Forward, and navigation cancel in-flight audio.
+
+**Priority when speaking**
+
+1. **ElevenLabs** — only if `ELEVENLABS_API_KEY` is set *and* Dual masters requested character voices.
+2. **Google Cloud TTS** — when `GOOGLE_CLOUD_TTS` / `GOOGLE_CLOUD_TTS_API_KEY` / `GOOGLE_APPLICATION_CREDENTIALS` is configured. Defaults are **WaveNet** (typically **4M free characters/month**). Neural2 is typically **1M/month**. Confirm current quotas on [Google Cloud TTS pricing](https://cloud.google.com/text-to-speech/pricing). Billing must be enabled for the API; the monthly free allowance still applies.
+3. **Edge TTS** — free neural path via `/api/tts` (Node.js, outbound WebSocket, in-memory MP3). **Needs network. It is not true offline.**
+4. **Web Speech API** — true offline / local browser fallback.
+
+The production build is green with **zero cloud keys**.
+
+**Default free voices (Edge)**
+
+| Speaker | Edge | Google WaveNet | ElevenLabs stock |
+| --- | --- | --- | --- |
+| Aldric ♂ | `en-GB-RyanNeural` | `en-GB-Wavenet-B` | George `JBFqnCBsd6RMkjVDRZzb` |
+| Kael ♀ | `en-US-AvaNeural` | `en-US-Wavenet-F` | Charlotte `XB0fDUnXU5powFXDhCwa` |
+| Soren ♂ | `en-GB-ThomasNeural` | `en-GB-Wavenet-D` | Daniel `onwK4e9ZLuTAKqWW03F9` |
+| Rhea ♀ | `en-US-JennyNeural` | `en-US-Wavenet-E` | Bella `EXAVITQu4vr4xnSDxMaL` |
+| Silas ♂ | `en-US-AndrewNeural` | `en-US-Wavenet-D` | Josh `TxGEqnHWrfWFTfGW9XjX` |
+| Lena ♀ | `en-US-EmmaNeural` | `en-US-Wavenet-C` | Rachel `21m00Tcm4TlvDq8ikWAM` |
+
+Override with `TTS_VOICE_<SPEAKER>` or provider-specific `EDGE_TTS_VOICE_<SPEAKER>`, `GOOGLE_TTS_VOICE_<SPEAKER>`, `ELEVENLABS_VOICE_<SPEAKER>`. See `.env.example`.
+
+### GCP setup (optional)
+
+```bash
+# enable Cloud Text-to-Speech, create an API key, then:
+cp .env.example .env.local
+# GOOGLE_CLOUD_TTS_API_KEY=...
+npm run dev
+```
+
+Vercel: Project → Settings → Environment Variables. Server-only — never `NEXT_PUBLIC_`.
+
+### Why this still deploys without keys
+`/api/tts` uses the `ws` package only (no Python, no native binaries). Short clips finish under the function limit (`maxDuration` 15s). If Edge is down or you are offline, the client falls back to Web Speech.
 
 Every book move teaches:
 

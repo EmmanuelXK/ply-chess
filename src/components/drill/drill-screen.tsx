@@ -19,22 +19,46 @@ import {
 import { ChessBoard, type BoardArrow } from "@/components/board/chess-board";
 import { Button } from "@/components/ui/button";
 import { AnalyzeSplash } from "@/components/drill/analyze-splash";
+import { ChatHeads } from "@/components/drill/chat-heads";
 import { HistoryMark } from "@/components/drill/history-mark";
 import { HistorySplash } from "@/components/drill/history-splash";
+import { InlineAsk } from "@/components/drill/inline-ask";
 import { PlyNav } from "@/components/drill/ply-nav";
 import { PracticePanel } from "@/components/drill/practice-panel";
 import { QuizSheet } from "@/components/drill/quiz-sheet";
+import { SpeakerChip } from "@/components/drill/speaker-chip";
 import { StudySheet } from "@/components/drill/study-sheet";
 import { WhySplash } from "@/components/drill/why-splash";
 import { needsPromotion, toDests } from "@/lib/chess/dests";
 import { playLine } from "@/lib/chess/line";
-import { silence, speakProfessor } from "@/lib/chess/speak";
+import {
+  silence,
+  speakDialogue,
+  unlockSpeech,
+  type SpeakHandle,
+} from "@/lib/chess/speak";
+import {
+  DEFAULT_DUO,
+  dialogueForPly,
+  dialogueForStart,
+  readStoredDuo,
+  readStoredLesson,
+  readStoredMode,
+  type DialogueAsk,
+  type DialogueMode,
+  type DialogueScene,
+  type DuoId,
+  type LessonStyle,
+  type MissMemory,
+} from "@/lib/dialogue";
+import { readVoiceOnDefault } from "@/lib/tts/prefs";
 import {
   coachAfterPly,
   coachAtStart,
   coachOnFail,
   coachOnHint,
   coachOnPlan,
+  type CoachKind,
   type CoachState,
 } from "@/lib/openings/coach";
 import {
@@ -86,6 +110,9 @@ export function DrillScreen({
   const [hintUsed, setHintUsed] = useState(false);
   const [voice, setVoice] = useState<PlanVoice>("aggressive");
   const [tts, setTts] = useState(false);
+  const [lessonStyle, setLessonStyle] = useState<LessonStyle>("teach");
+  const [podcastPlaying, setPodcastPlaying] = useState(false);
+  const [misses, setMisses] = useState<MissMemory[]>([]);
   const [busy, setBusy] = useState(false);
   const [check, setCheck] = useState(false);
   const [bookOpen, setBookOpen] = useState(false);
@@ -95,6 +122,47 @@ export function DrillScreen({
   const [quizOpen, setQuizOpen] = useState(initialReps === "quiz");
   const [thinkOpen, setThinkOpen] = useState(initialReps === "think");
   const [reps, setReps] = useState<RepsMode>(initialReps);
+  const [duo, setDuo] = useState<DuoId>(DEFAULT_DUO);
+  const [dialogueMode, setDialogueMode] = useState<DialogueMode>("dual");
+  const [scene, setScene] = useState<DialogueScene>(() =>
+    dialogueForStart(opening, { duo: DEFAULT_DUO, mode: "dual" }),
+  );
+  const [beatIndex, setBeatIndex] = useState(0);
+  const [ask, setAsk] = useState<DialogueAsk | null>(null);
+  const [askPicked, setAskPicked] = useState<string | null>(null);
+  const duoRef = useRef(duo);
+  const modeRefDialogue = useRef(dialogueMode);
+  const lessonRef = useRef(lessonStyle);
+  const missesRef = useRef<MissMemory[]>([]);
+  const askWaitRef = useRef<((id: string | null) => void) | null>(null);
+  const speechRef = useRef<SpeakHandle | null>(null);
+
+  useEffect(() => {
+    const storedDuo = readStoredDuo();
+    const storedMode = readStoredMode();
+    const storedLesson = readStoredLesson();
+    setDuo(storedDuo);
+    setDialogueMode(storedMode);
+    setLessonStyle(storedLesson);
+    setPodcastPlaying(storedLesson === "podcast");
+    setTts(readVoiceOnDefault());
+    duoRef.current = storedDuo;
+    modeRefDialogue.current = storedMode;
+    lessonRef.current = storedLesson;
+  }, []);
+
+  useEffect(() => {
+    duoRef.current = duo;
+  }, [duo]);
+  useEffect(() => {
+    modeRefDialogue.current = dialogueMode;
+  }, [dialogueMode]);
+  useEffect(() => {
+    lessonRef.current = lessonStyle;
+  }, [lessonStyle]);
+  useEffect(() => {
+    missesRef.current = misses;
+  }, [misses]);
 
   const sync = useCallback(() => {
     const g = gameRef.current;
@@ -105,6 +173,33 @@ export function DrillScreen({
     setMode(modeRef.current);
   }, []);
 
+  const pushScene = useCallback(
+    (next: CoachState, afterPly: number, kind?: CoachKind) => {
+      setCoach(next);
+      const nextScene =
+        afterPly < 0
+          ? dialogueForStart(opening, {
+              duo: duoRef.current,
+              mode: modeRefDialogue.current,
+              soloText: next.text,
+              misses: missesRef.current,
+            })
+          : dialogueForPly(opening, afterPly, {
+              duo: duoRef.current,
+              mode: modeRefDialogue.current,
+              kind: kind ?? next.kind,
+              fen: gameRef.current.fen(),
+              soloText: next.text,
+              misses: missesRef.current,
+            });
+      setScene(nextScene);
+      setBeatIndex(0);
+      setAsk(null);
+      setAskPicked(null);
+    },
+    [opening],
+  );
+
   const applyPly = useCallback(
     (nextPly: number) => {
       const capped = Math.max(0, Math.min(nextPly, opening.moves.length));
@@ -114,19 +209,24 @@ export function DrillScreen({
       modeRef.current = capped >= opening.moves.length ? "plan" : "drill";
       setLastMove(pos.lastMove);
       setHintKeys(null);
-      if (capped === 0) setCoach(coachAtStart(opening));
+      setHintUsed(false);
+      if (capped === 0) pushScene(coachAtStart(opening), -1, "start");
       else if (capped >= opening.moves.length) {
-        setCoach({
-          text: "Book done. Pick a plan.",
-          chunkName: "Plan mode",
-          kind: "plan",
-        });
+        pushScene(
+          {
+            text: "Book done. Pick a plan.",
+            chunkName: "Plan mode",
+            kind: "plan",
+          },
+          opening.moves.length - 1,
+          "plan",
+        );
       } else {
-        setCoach(coachAfterPly(opening, capped - 1));
+        pushScene(coachAfterPly(opening, capped - 1), capped - 1);
       }
       sync();
     },
-    [opening, sync],
+    [opening, pushScene, sync],
   );
 
   const playSan = useCallback(
@@ -155,19 +255,23 @@ export function DrillScreen({
     setLastMove(null);
     setOrientation(opening.side);
     setMode("drill");
-    setCoach(coachAtStart(opening));
+    pushScene(coachAtStart(opening), -1, "start");
     setHintKeys(null);
     setHintUsed(false);
     setVoice("aggressive");
     setBusy(false);
     setCheck(false);
+    setMisses([]);
+    missesRef.current = [];
     setBookOpen(initialReps === "traps");
     setQuizOpen(initialReps === "quiz");
     setThinkOpen(initialReps === "think");
+    if (lessonRef.current === "podcast") setPodcastPlaying(true);
 
     let cancelled = false;
 
     const kick = async () => {
+      if (lessonRef.current === "podcast") return;
       while (
         !cancelled &&
         modeRef.current === "drill" &&
@@ -179,7 +283,7 @@ export function DrillScreen({
         await sleep(plyRef.current === 0 ? 280 : OPPONENT_MS);
         if (cancelled) return;
         const move = playSan(opening.moves[plyRef.current]);
-        if (move) setCoach(coachAfterPly(opening, plyRef.current - 1));
+        if (move) pushScene(coachAfterPly(opening, plyRef.current - 1), plyRef.current - 1);
       }
       lockRef.current = false;
       setBusy(false);
@@ -194,27 +298,85 @@ export function DrillScreen({
         timerRef.current = null;
       }
     };
-  }, [opening, playSan, session, initialReps]);
+  }, [opening, playSan, session, initialReps, pushScene]);
 
   useEffect(() => {
+    askWaitRef.current?.(null);
+    askWaitRef.current = null;
+    speechRef.current?.stop();
+    speechRef.current = null;
     if (!tts) {
       silence();
       return;
     }
-    const text = coach.detail ? `${coach.text} ${coach.detail}` : coach.text;
-    const handle = speakProfessor(text);
-    return () => handle.stop();
-  }, [coach, tts]);
+    const handle = speakDialogue(scene.beats, {
+      premium: dialogueMode === "dual",
+      onBeat: (index, beat) => {
+        setBeatIndex(index);
+        setAsk(beat.ask ?? null);
+        setAskPicked(null);
+      },
+      waitForAsk: (beat) =>
+        new Promise((resolve) => {
+          askWaitRef.current = (id) => {
+            askWaitRef.current = null;
+            resolve(id);
+          };
+          window.setTimeout(() => {
+            if (askWaitRef.current) {
+              askWaitRef.current(null);
+            }
+          }, 14_000);
+        }),
+    });
+    speechRef.current = handle;
+    return () => {
+      handle.stop();
+      if (speechRef.current === handle) speechRef.current = null;
+    };
+  }, [scene, tts, dialogueMode]);
+
+  useEffect(() => {
+    if (lessonStyle !== "podcast" || !podcastPlaying) return;
+    let cancelled = false;
+    const run = async () => {
+      const handle = speechRef.current;
+      if (handle) {
+        await Promise.race([
+          handle.done,
+          new Promise((r) => window.setTimeout(r, tts ? 7200 : 1300)),
+        ]);
+      } else {
+        await new Promise((r) => window.setTimeout(r, tts ? 1600 : 1100));
+      }
+      if (cancelled) return;
+      if (plyRef.current < opening.moves.length) {
+        applyPly(plyRef.current + 1);
+      } else {
+        setPodcastPlaying(false);
+      }
+    };
+    void run();
+    return () => {
+      cancelled = true;
+    };
+  }, [scene, lessonStyle, podcastPlaying, tts, opening.moves.length, applyPly]);
 
   const dests = useMemo(() => {
     const g = new Chess(fen);
-    if (mode === "drill" && busy) return new Map<Key, Key[]>();
+    if (mode === "drill" && (busy || lessonStyle === "podcast")) {
+      return new Map<Key, Key[]>();
+    }
     return toDests(g);
-  }, [fen, mode, busy]);
+  }, [fen, mode, busy, lessonStyle]);
 
   const turnColor = fen.includes(" w ") ? "white" : "black";
   const movableColor =
-    mode === "plan" ? "both" : busy ? undefined : opening.side;
+    mode === "plan"
+      ? "both"
+      : busy || lessonStyle === "podcast"
+        ? undefined
+        : opening.side;
 
   const arrows = useMemo<BoardArrow[]>(() => {
     const next: BoardArrow[] = [];
@@ -238,6 +400,10 @@ export function DrillScreen({
 
   const onMove = useCallback(
     (from: Key, to: Key) => {
+      if (lessonRef.current === "podcast") {
+        sync();
+        return;
+      }
       if (lockRef.current && modeRef.current === "drill") {
         sync();
         return;
@@ -288,7 +454,18 @@ export function DrillScreen({
 
       if (!ok) {
         g.undo();
-        setCoach(coachOnFail(opening, plyNow));
+        const fail = coachOnFail(opening, plyNow);
+        const miss: MissMemory = {
+          ply: plyNow,
+          san: bookSan,
+          idea: fail.text,
+        };
+        setMisses((prev) => {
+          const next = [...prev, miss].slice(-4);
+          missesRef.current = next;
+          return next;
+        });
+        pushScene(fail, plyNow, "fail");
         setHintKeys(null);
         sync();
         return;
@@ -301,16 +478,20 @@ export function DrillScreen({
 
       if (plyRef.current >= opening.moves.length) {
         modeRef.current = "plan";
-        setCoach({
-          text: "Book done. Pick a plan.",
-          chunkName: "Plan mode",
-          kind: "plan",
-        });
+        pushScene(
+          {
+            text: "Book done. Pick a plan.",
+            chunkName: "Plan mode",
+            kind: "plan",
+          },
+          opening.moves.length - 1,
+          "plan",
+        );
         sync();
         return;
       }
 
-      setCoach(coachAfterPly(opening, plyRef.current - 1));
+      pushScene(coachAfterPly(opening, plyRef.current - 1), plyRef.current - 1);
       sync();
 
       if (!isUserPly(opening.side, plyRef.current)) {
@@ -322,13 +503,20 @@ export function DrillScreen({
           const reply = playSan(opening.moves[plyRef.current]);
           if (reply) {
             if (modeRef.current === "plan") {
-              setCoach({
-                text: "Book done. Pick a plan.",
-                chunkName: "Plan mode",
-                kind: "plan",
-              });
+              pushScene(
+                {
+                  text: "Book done. Pick a plan.",
+                  chunkName: "Plan mode",
+                  kind: "plan",
+                },
+                opening.moves.length - 1,
+                "plan",
+              );
             } else {
-              setCoach(coachAfterPly(opening, plyRef.current - 1));
+              pushScene(
+                coachAfterPly(opening, plyRef.current - 1),
+                plyRef.current - 1,
+              );
             }
           }
           lockRef.current = false;
@@ -336,7 +524,7 @@ export function DrillScreen({
         }, OPPONENT_MS);
       }
     },
-    [opening, playSan, sync],
+    [opening, playSan, pushScene, sync],
   );
 
   const fullMoves = Math.ceil(opening.moves.length / 2);
@@ -347,6 +535,7 @@ export function DrillScreen({
 
   const hint = () => {
     if (mode !== "drill" || hintUsed || busy) return;
+    if (!isUserPly(opening.side, ply)) return;
     const san = opening.moves[ply];
     if (!san) return;
     const probe = new Chess(gameRef.current.fen());
@@ -355,7 +544,7 @@ export function DrillScreen({
       if (!move) return;
       setHintKeys([move.from as Key, move.to as Key]);
       setHintUsed(true);
-      setCoach(coachOnHint(opening, ply));
+      pushScene(coachOnHint(opening, ply), ply, "hint");
     } catch {
       /* ignore */
     }
@@ -369,16 +558,18 @@ export function DrillScreen({
 
   const pickVoice = (next: PlanVoice) => {
     setVoice(next);
-    setCoach(coachOnPlan(next, opening));
+    pushScene(coachOnPlan(next, opening), opening.moves.length - 1, "plan");
   };
 
   const stepBack = () => {
     cancelTimer();
+    if (lessonStyle === "podcast") setPodcastPlaying(false);
     applyPly(plyRef.current - 1);
   };
 
   const stepForward = () => {
     cancelTimer();
+    if (lessonStyle === "podcast") setPodcastPlaying(false);
     if (plyRef.current >= opening.moves.length) return;
     applyPly(plyRef.current + 1);
   };
@@ -456,23 +647,47 @@ export function DrillScreen({
               {m.label}
             </button>
           ))}
+          <Link href="/settings?focus=duo" className="reps-chip reps-link">
+            Masters
+          </Link>
         </div>
 
         <div
-          className={`coach-strip coach-${coach.kind}`}
+          className={`coach-strip coach-${coach.kind} strip-${duo} strip-speaker-${scene.beats[beatIndex]?.speaker ?? scene.speaker}`}
           role="status"
           aria-live="polite"
         >
           {coach.kind === "pin" ? <span className="pin-dot" aria-hidden /> : null}
           <div className="min-w-0 flex-1">
-            <p>{coach.text}</p>
-            {coach.detail ? <p className="coach-detail">{coach.detail}</p> : null}
+            <div className="coach-who">
+              <SpeakerChip
+                duoId={duo}
+                speaker={scene.beats[beatIndex]?.speaker ?? scene.speaker}
+              />
+              {lessonStyle === "podcast" ? (
+                <span className="coach-mode-tag">Podcast</span>
+              ) : null}
+            </div>
+            <p>{scene.beats[beatIndex]?.text ?? coach.text}</p>
+            {ask ? (
+              <InlineAsk
+                ask={ask}
+                picked={askPicked}
+                onPick={(id) => {
+                  setAskPicked(id);
+                  askWaitRef.current?.(id);
+                }}
+              />
+            ) : scene.detail && dialogueMode === "solo" ? (
+              <p className="coach-detail">{scene.detail}</p>
+            ) : null}
           </div>
           <button
             type="button"
             className="why-chip"
             onClick={() => setWhyOpen(true)}
             disabled={!why}
+            title={why ? "Why this move" : "Why unlocks on the next taught ply"}
           >
             Why
           </button>
@@ -495,13 +710,21 @@ export function DrillScreen({
             arrows={arrows}
             orientation={orientation}
             turnColor={turnColor}
-            viewOnly={busy && mode === "drill"}
+            viewOnly={(busy && mode === "drill") || lessonStyle === "podcast"}
             movableColor={movableColor}
             check={check}
             animationMs={150}
             onMove={onMove}
             onLongPress={() => setAnalyzeOpen(true)}
           />
+          {dialogueMode === "dual" ? (
+            <ChatHeads
+              duoId={duo}
+              speaker={scene.beats[beatIndex]?.speaker ?? scene.speaker}
+              text={scene.beats[beatIndex]?.text ?? coach.text}
+              orientation={orientation}
+            />
+          ) : null}
           {historyNow.length ? (
             <div className="history-corner">
               <HistoryMark
@@ -519,6 +742,19 @@ export function DrillScreen({
         onForward={stepForward}
         canBack={ply > 0}
         canForward={ply < opening.moves.length}
+        playing={lessonStyle === "podcast" ? podcastPlaying : undefined}
+        onPlay={
+          lessonStyle === "podcast"
+            ? () => {
+                if (plyRef.current >= opening.moves.length) {
+                  applyPly(0);
+                  setPodcastPlaying(true);
+                  return;
+                }
+                setPodcastPlaying((on) => !on);
+              }
+            : undefined
+        }
       />
 
       {mode === "plan" ? (
@@ -551,7 +787,12 @@ export function DrillScreen({
           variant="ghost"
           size="sm"
           onClick={hint}
-          disabled={mode !== "drill" || hintUsed || busy}
+          disabled={
+            mode !== "drill" ||
+            hintUsed ||
+            busy ||
+            !isUserPly(opening.side, ply)
+          }
           className="dock-btn"
         >
           <Lightbulb />
@@ -584,7 +825,13 @@ export function DrillScreen({
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => setTts((v) => !v)}
+          onClick={() => {
+            setTts((v) => {
+              const next = !v;
+              if (next) unlockSpeech();
+              return next;
+            });
+          }}
           className="dock-btn"
           aria-pressed={tts}
         >
@@ -612,6 +859,8 @@ export function DrillScreen({
           opening={opening}
           lesson={why}
           orientation={orientation}
+          duo={duo}
+          mode={dialogueMode}
           onClose={() => setWhyOpen(false)}
         />
       ) : null}
@@ -621,6 +870,8 @@ export function DrillScreen({
           opening={opening}
           milestones={historyNow}
           orientation={orientation}
+          duo={duo}
+          mode={dialogueMode}
           onClose={() => setHistoryOpen(false)}
         />
       ) : null}
@@ -635,7 +886,13 @@ export function DrillScreen({
       ) : null}
 
       {quizOpen && quiz ? (
-        <QuizSheet quiz={quiz} onClose={() => setQuizOpen(false)} />
+        <QuizSheet
+          quiz={quiz}
+          opening={opening}
+          duo={duo}
+          mode={dialogueMode}
+          onClose={() => setQuizOpen(false)}
+        />
       ) : null}
 
       {thinkOpen ? (
@@ -646,6 +903,7 @@ export function DrillScreen({
           onClose={() => setThinkOpen(false)}
         />
       ) : null}
+
     </div>
   );
 }
