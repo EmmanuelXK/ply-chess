@@ -12,6 +12,7 @@ import {
   normalizePhone,
   phoneHint,
 } from "@/lib/auth/phone";
+import { safeInternalPath } from "@/lib/auth/redirect";
 import { sanitizeOtp } from "@/lib/auth/sanitize";
 import { APP_MARK } from "@/lib/version";
 
@@ -26,8 +27,7 @@ export function LoginScreen() {
   const [phoneError, setPhoneError] = useState("");
   const [note, setNote] = useState(() => noteFromSearchParams(params));
 
-  const next = params.get("next") ?? "/";
-  const safeNext = next.startsWith("/") && !next.startsWith("//") ? next : "/";
+  const safeNext = safeInternalPath(params.get("next"));
   const selected = countryByIso(country);
 
   const resolvedPhone = () => {
