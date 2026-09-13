@@ -5,7 +5,7 @@ Club-ready cut. Signed-in friends get everything. No subscriptions.
 ## Auth (only these two)
 
 1. **Google** — Supabase Auth → Providers → Google. Paste the Google client id + secret in the Supabase dashboard (never in this repo).
-2. **Phone OTP** — Supabase Auth → Phone. Twilio (or the Supabase phone provider) stays in the dashboard. The app never sees those keys.
+2. **Phone OTP** — Supabase Auth → Phone. Twilio (or the Supabase phone provider) stays in the dashboard. The app never sees those keys. The login field defaults to France `+33` and turns `07 44 89 98 85` into E.164 before SMS. If Google or Phone is still off in the dashboard, the app stays on `/login` with a short message (it does not dump raw Supabase JSON).
 
 Redirect URLs in Supabase Auth:
 

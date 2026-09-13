@@ -4,48 +4,80 @@ import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { createBrowserSupabase } from "@/lib/supabase/client";
 import { supabasePublicConfig } from "@/lib/supabase/env";
-import { sanitizeOtp, sanitizePhone } from "@/lib/auth/sanitize";
+import { friendlyAuthMessage, noteFromSearchParams } from "@/lib/auth/errors";
+import {
+  DEFAULT_PHONE_COUNTRY,
+  PHONE_COUNTRIES,
+  countryByIso,
+  normalizePhone,
+  phoneHint,
+} from "@/lib/auth/phone";
+import { sanitizeOtp } from "@/lib/auth/sanitize";
 import { APP_MARK } from "@/lib/version";
 
 export function LoginScreen() {
   const params = useSearchParams();
   const configured = supabasePublicConfig().configured;
+  const [country, setCountry] = useState(DEFAULT_PHONE_COUNTRY);
   const [phone, setPhone] = useState("");
   const [code, setCode] = useState("");
   const [sent, setSent] = useState(false);
   const [busy, setBusy] = useState<"google" | "sms" | "otp" | null>(null);
-  const [note, setNote] = useState(() => {
-    if (params.get("error") === "google") return "Google sign-in did not finish. Try again.";
-    return "";
-  });
+  const [phoneError, setPhoneError] = useState("");
+  const [note, setNote] = useState(() => noteFromSearchParams(params));
 
   const next = params.get("next") ?? "/";
   const safeNext = next.startsWith("/") && !next.startsWith("//") ? next : "/";
+  const selected = countryByIso(country);
+
+  const resolvedPhone = () => {
+    const result = normalizePhone(country, phone);
+    if (!result.ok) {
+      setPhoneError(phoneHint(country, result.reason));
+      return null;
+    }
+    setPhoneError("");
+    return result.e164;
+  };
 
   const google = async () => {
     const supabase = createBrowserSupabase();
     if (!supabase) {
-      setNote("Auth is not configured on this deploy.");
+      setNote(friendlyAuthMessage("config", "google"));
       return;
     }
     setBusy("google");
     setNote("");
-    const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(safeNext)}`;
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo },
-    });
-    if (error) {
-      setNote(error.message);
-      setBusy(null);
+    try {
+      const probe = await fetch("/auth/google/status", { cache: "no-store" });
+      const status = (await probe.json()) as { enabled?: boolean | null };
+      if (status.enabled === false) {
+        setNote(friendlyAuthMessage("provider", "google"));
+        setBusy(null);
+        return;
+      }
+    } catch {
+      /* Probe is best-effort. Still try OAuth so a flaky check cannot block a working provider. */
     }
+    const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(safeNext)}`;
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo, skipBrowserRedirect: true },
+    });
+    if (error || !data.url) {
+      setNote(friendlyAuthMessage(error?.message ?? "google", "google"));
+      setBusy(null);
+      return;
+    }
+    window.location.assign(data.url);
   };
 
   const sendSms = async () => {
     const supabase = createBrowserSupabase();
-    const e164 = sanitizePhone(phone);
-    if (!supabase || !e164) {
-      setNote("Use an international number, like +447911123456.");
+    const e164 = resolvedPhone();
+    if (!e164) return;
+    if (!supabase) {
+      setNote(friendlyAuthMessage("config", "phone"));
       return;
     }
     setBusy("sms");
@@ -53,7 +85,7 @@ export function LoginScreen() {
     const { error } = await supabase.auth.signInWithOtp({ phone: e164 });
     setBusy(null);
     if (error) {
-      setNote(error.message);
+      setNote(friendlyAuthMessage(error.message, "phone"));
       return;
     }
     setSent(true);
@@ -62,9 +94,10 @@ export function LoginScreen() {
 
   const verify = async () => {
     const supabase = createBrowserSupabase();
-    const e164 = sanitizePhone(phone);
+    const e164 = resolvedPhone();
     const token = sanitizeOtp(code);
-    if (!supabase || !e164 || !token) {
+    if (!e164) return;
+    if (!supabase || !token) {
       setNote("Enter the 6-digit code from your text.");
       return;
     }
@@ -76,7 +109,7 @@ export function LoginScreen() {
     });
     setBusy(null);
     if (error) {
-      setNote(error.message);
+      setNote(friendlyAuthMessage(error.message, "otp"));
       return;
     }
     window.location.assign(safeNext);
@@ -113,16 +146,49 @@ export function LoginScreen() {
         <label className="auth-label" htmlFor="phone">
           Phone
         </label>
-        <input
-          id="phone"
-          className="auth-input"
-          type="tel"
-          inputMode="tel"
-          autoComplete="tel"
-          placeholder="+44 7911 123456"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-        />
+        <div className="auth-phone-row">
+          <label className="sr-only" htmlFor="phone-cc">
+            Country code
+          </label>
+          <select
+            id="phone-cc"
+            className="auth-cc"
+            value={country}
+            autoComplete="tel-country-code"
+            disabled={sent || busy !== null}
+            onChange={(e) => {
+              setCountry(e.target.value);
+              setPhoneError("");
+            }}
+          >
+            {PHONE_COUNTRIES.map((item) => (
+              <option key={item.iso} value={item.iso}>
+                {item.flag} +{item.dial}
+              </option>
+            ))}
+          </select>
+          <input
+            id="phone"
+            className="auth-input"
+            type="tel"
+            inputMode="tel"
+            autoComplete="tel-national"
+            placeholder={selected.placeholder}
+            value={phone}
+            disabled={sent}
+            aria-invalid={phoneError ? true : undefined}
+            aria-describedby={phoneError ? "phone-hint" : undefined}
+            onChange={(e) => {
+              setPhone(e.target.value);
+              setPhoneError("");
+            }}
+          />
+        </div>
+        {phoneError ? (
+          <p id="phone-hint" className="auth-note auth-note-warn" role="alert">
+            {phoneError}
+          </p>
+        ) : null}
         {sent ? (
           <>
             <label className="auth-label" htmlFor="otp">
@@ -146,6 +212,18 @@ export function LoginScreen() {
             >
               {busy === "otp" ? "Checking…" : "Verify code"}
             </button>
+            <button
+              type="button"
+              className="auth-signout"
+              onClick={() => {
+                setSent(false);
+                setCode("");
+                setNote("");
+              }}
+              disabled={busy !== null}
+            >
+              Different number
+            </button>
           </>
         ) : (
           <button
@@ -158,7 +236,11 @@ export function LoginScreen() {
           </button>
         )}
 
-        {note ? <p className="auth-note">{note}</p> : null}
+        {note ? (
+          <p className={note.startsWith("Code sent") ? "auth-note" : "auth-note auth-note-warn"}>
+            {note}
+          </p>
+        ) : null}
         <p className="auth-foot">{APP_MARK}</p>
       </div>
     </div>

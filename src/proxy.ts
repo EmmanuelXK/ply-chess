@@ -2,7 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { authIsRequired, supabasePublicConfig } from "@/lib/supabase/env";
 
-const PUBLIC_PATHS = ["/login", "/auth/callback", "/auth/sign-out"];
+const PUBLIC_PATHS = ["/login", "/auth/callback", "/auth/sign-out", "/auth/google"];
 
 function isPublic(pathname: string): boolean {
   return PUBLIC_PATHS.some(

@@ -2557,6 +2557,10 @@ body,
   color: var(--mist);
 }
 
+.auth-note-warn {
+  color: var(--ember-soft);
+}
+
 .auth-foot {
   margin-top: 1rem;
   font-size: 11px;
@@ -2618,6 +2622,45 @@ body,
   color: var(--cream);
   padding: 0 0.75rem;
   font-size: 16px;
+}
+
+.auth-phone-row {
+  display: flex;
+  gap: 0.45rem;
+}
+
+.auth-phone-row .auth-input {
+  flex: 1;
+  min-width: 0;
+}
+
+.auth-cc {
+  flex: none;
+  width: 6.8rem;
+  height: 2.6rem;
+  border-radius: 0.75rem;
+  background: var(--charcoal);
+  border: 1px solid var(--line);
+  color: var(--cream);
+  padding: 0 1.35rem 0 0.45rem;
+  font-size: 15px;
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, var(--mist) 50%),
+    linear-gradient(135deg, var(--mist) 50%, transparent 50%);
+  background-position:
+    calc(100% - 14px) 50%,
+    calc(100% - 9px) 50%;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+}
+
+.auth-cc:disabled,
+.auth-input:disabled {
+  opacity: 0.7;
+}
+
+.auth-input[aria-invalid="true"] {
+  border-color: var(--ember);
 }
 
 .profile-row {
