@@ -1,10 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Opening Edge">
   <rect width="512" height="512" fill="#070708"/>
-  <g fill="#f3ebe0">
-    <path d="M72 208h88v20H96v20h56v20H96v28h64v20H72z"/>
-    <path d="M176 208h46c28 0 46 16 46 48s-18 48-46 48h-46zm24 20v56h20c16 0 24-10 24-28s-8-28-24-28z"/>
-    <path d="M286 208h70v20h-46v20h38v20h-38v36h-24z"/>
-    <path d="M374 208h88v20h-64v20h56v20h-56v28h64v20h-88z"/>
-  </g>
-  <path d="M64 188l72 136" fill="none" stroke="#f59e0b" stroke-width="14" stroke-linecap="square"/>
+  <text
+    x="256"
+    y="292"
+    text-anchor="middle"
+    fill="#f4eee6"
+    font-family="Didot, 'Bodoni 72', 'Times New Roman', Georgia, serif"
+    font-size="92"
+    letter-spacing="6"
+  >EDGE</text>
+  <path d="M118 286 L178 226" fill="none" stroke="#ea7a14" stroke-width="4" stroke-linecap="round"/>
 </svg>
