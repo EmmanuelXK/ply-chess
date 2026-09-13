@@ -36,9 +36,8 @@ export function SettingsScreen() {
       <header className="dash-head">
         <p className="dash-kicker">Opening Edge</p>
         <h1>Settings</h1>
-        <p className="dash-sub">
-          {APP_VERSION} · {APP_MILESTONE}
-        </p>
+        <p className="dash-sub">{APP_VERSION}</p>
+        <p className="dash-mode-blurb">{APP_MILESTONE}</p>
       </header>
 
       <div className="dash-scroll">
@@ -162,9 +161,8 @@ export function SettingsScreen() {
 
         <section className="set-block" id="about">
           <h2>About</h2>
-          <p className="set-help">
-            {APP_VERSION} — {APP_MILESTONE}. Weapons, the Map, Memory OS, one coach.
-          </p>
+          <p className="set-version">{APP_VERSION}</p>
+          <p className="set-help">{APP_MILESTONE}</p>
         </section>
       </div>
 
