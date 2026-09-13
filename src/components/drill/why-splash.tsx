@@ -179,6 +179,7 @@ export function WhySplash({
         <PlyNav
           canBack={ply > 0}
           canForward={ply < line.length}
+          lastSan={ply > 0 ? line[ply - 1] : "Start"}
           playing={playing && ply < line.length}
           onBack={() => {
             setPlaying(false);

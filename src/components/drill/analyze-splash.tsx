@@ -110,6 +110,7 @@ export function AnalyzeSplash({
         <PlyNav
           canBack={ply > 0}
           canForward={ply < line.length}
+          lastSan={ply > 0 ? line[ply - 1] : "Start"}
           playing={autoplaying}
           onBack={() => {
             setPlaying(false);
