@@ -10,6 +10,16 @@ export type {
 } from "./types";
 export { ATLAS_FAMILY_META } from "./types";
 export { ATLAS } from "./catalog";
+export {
+  ATLAS_TREE,
+  entryById,
+  entryMatchesQuery,
+  sideDimmed,
+  treeLeafCount,
+  validateAtlasTree,
+  type AtlasTreeBranch,
+  type AtlasTreeFamily,
+} from "./tree";
 
 export const ATLAS_FAMILIES: AtlasFamily[] = [
   "open",

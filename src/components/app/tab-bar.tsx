@@ -5,7 +5,7 @@ import { BookOpen, Home, Settings } from "lucide-react";
 
 const TABS = [
   { id: "home", href: "/", label: "Home", icon: Home },
-  { id: "theory", href: "/theory", label: "Theory", icon: BookOpen },
+  { id: "theory", href: "/theory", label: "Openings", icon: BookOpen },
   { id: "settings", href: "/settings", label: "Settings", icon: Settings },
 ] as const;
 

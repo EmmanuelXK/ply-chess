@@ -1,6 +1,7 @@
 import { Chess } from "chess.js";
 import { getOpening } from "@/lib/openings";
 import { ATLAS } from "./catalog";
+import { validateAtlasTree } from "./tree";
 import type { AtlasEntry } from "./types";
 
 function playSan(label: string, san: string): string[] {
@@ -48,6 +49,7 @@ export function validateAtlas(entries: AtlasEntry[] = ATLAS) {
       throw new Error(`[${entry.id}] missing 1250-friendly plans`);
     }
   }
+  validateAtlasTree(entries);
 }
 
 export function atlasMoves(entry: AtlasEntry, routeSan = ""): string[] {

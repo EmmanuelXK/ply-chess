@@ -1998,6 +1998,236 @@ body,
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.uni-tree {
+  padding: 0 0 0.4rem;
+}
+
+.uni-family {
+  margin: 0 0 0.55rem;
+}
+
+.uni-family-btn,
+.uni-branch-btn,
+.uni-leaf-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  color: inherit;
+  padding: 0;
+}
+
+.uni-family-btn {
+  min-height: 2.55rem;
+  padding: 0.35rem 0.15rem 0.35rem 0;
+}
+
+.uni-family-copy,
+.uni-branch-copy,
+.uni-leaf-copy {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.05rem;
+}
+
+.uni-family-copy strong {
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  color: var(--cream);
+}
+
+.uni-family-copy em,
+.uni-branch-copy em,
+.uni-leaf-copy em {
+  font-style: normal;
+  font-size: 11px;
+  color: var(--mist);
+  letter-spacing: 0.02em;
+}
+
+.uni-leaf-copy em {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.3;
+}
+
+.uni-count {
+  flex: none;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--ember);
+}
+
+.uni-family-blurb {
+  margin: 0 0 0.35rem 1.35rem;
+  font-size: 12px;
+  color: var(--mist);
+}
+
+.uni-chevron {
+  flex: none;
+  width: 0.55rem;
+  height: 0.55rem;
+  border-right: 1.5px solid var(--ember);
+  border-bottom: 1.5px solid var(--ember);
+  transform: rotate(-45deg);
+  transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.uni-chevron-sm {
+  width: 0.42rem;
+  height: 0.42rem;
+}
+
+.uni-family-btn[aria-expanded="true"] .uni-chevron,
+.uni-branch-btn[aria-expanded="true"] .uni-chevron {
+  transform: rotate(45deg);
+}
+
+.uni-fold {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.uni-fold > * {
+  overflow: hidden;
+  min-height: 0;
+}
+
+.uni-fold-on {
+  grid-template-rows: 1fr;
+}
+
+.uni-branch-list,
+.uni-leaf-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.uni-leaf-list {
+  padding-left: 0.35rem;
+}
+
+.uni-branch,
+.uni-leaf {
+  position: relative;
+  padding-left: 0.85rem;
+}
+
+.uni-branch-btn,
+.uni-leaf-btn {
+  min-height: 2.15rem;
+  padding: 0.28rem 0.1rem 0.28rem 0.15rem;
+  border-radius: 0.55rem;
+}
+
+.uni-leaf-btn:active {
+  background: rgb(245 158 11 / 8%);
+}
+
+.uni-branch-copy strong {
+  font-size: 14px;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  color: var(--cream);
+}
+
+.uni-leaf-copy strong {
+  font-size: 13px;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  color: var(--cream);
+}
+
+.uni-rail {
+  position: absolute;
+  left: 0.28rem;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  pointer-events: none;
+}
+
+.uni-branch::before,
+.uni-leaf::before {
+  content: "";
+  position: absolute;
+  left: 0.28rem;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: linear-gradient(180deg, var(--ember-dim), var(--line-strong));
+  opacity: 0.7;
+}
+
+.uni-branch::after,
+.uni-leaf::after {
+  content: "";
+  position: absolute;
+  left: 0.28rem;
+  top: 1.05rem;
+  width: 0.7rem;
+  height: 1px;
+  background: var(--ember);
+  opacity: 0.55;
+}
+
+.uni-last::before {
+  bottom: auto;
+  height: 1.05rem;
+}
+
+.uni-leaf-dot {
+  flex: none;
+  width: 0.38rem;
+  height: 0.38rem;
+  border-radius: 999px;
+  background: var(--ember);
+  box-shadow: 0 0 0 3px var(--ember-glow);
+}
+
+.uni-train-pip {
+  flex: none;
+  font-size: 9px;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: var(--ember);
+  border-radius: 999px;
+  padding: 0.14rem 0.4rem;
+}
+
+.uni-dim {
+  opacity: 0.34;
+  transition: opacity 200ms ease;
+}
+
+.uni-dim .uni-leaf-btn,
+.uni-dim .uni-branch-btn,
+.uni-dim .uni-family-btn {
+  pointer-events: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .uni-fold,
+  .uni-chevron {
+    transition: none;
+  }
+}
+
 .atlas-family-blurb,
 .atlas-empty,
 .atlas-route-note,
