@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { playLine } from "@/lib/chess/line";
 import type { AtlasEntry } from "@/lib/atlas";
+import { PlyNav } from "@/components/drill/ply-nav";
 import { SplashBoard } from "@/components/drill/splash-board";
 import { getOpening, housePicture, storyLine } from "@/lib/openings";
 
@@ -64,24 +65,13 @@ export function AtlasSheet({
           />
         </div>
 
-        <div className="ply-nav">
-          <button
-            type="button"
-            className="ply-btn"
-            disabled={ply <= 0}
-            onClick={() => setPly((n) => Math.max(0, n - 1))}
-          >
-            Back
-          </button>
-          <button
-            type="button"
-            className="ply-btn ply-btn-fwd"
-            disabled={ply >= moves.length}
-            onClick={() => setPly((n) => Math.min(moves.length, n + 1))}
-          >
-            Forward
-          </button>
-        </div>
+        <PlyNav
+          canBack={ply > 0}
+          canForward={ply < moves.length}
+          lastSan={ply > 0 ? moves[ply - 1] : "Start"}
+          onBack={() => setPly((n) => Math.max(0, n - 1))}
+          onForward={() => setPly((n) => Math.min(moves.length, n + 1))}
+        />
 
         <div className="atlas-routes" role="tablist" aria-label="Key routes">
           {entry.routes.map((route, i) => (

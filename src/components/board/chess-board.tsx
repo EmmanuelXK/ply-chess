@@ -42,7 +42,7 @@ const brushes: DrawBrushes = {
   blue: { key: "b", color: "#003088", opacity: 1, lineWidth: 10 },
   yellow: { key: "y", color: "#e68f00", opacity: 1, lineWidth: 10 },
   purple: { key: "p", color: "#7e22ce", opacity: 0.92, lineWidth: 9 },
-  last: { key: "last", color: "#0a0a0a", opacity: 0.94, lineWidth: 6 },
+  last: { key: "last", color: "#d97706", opacity: 0.92, lineWidth: 7 },
   hint: { key: "hint", color: "#7aa2ff", opacity: 0.88, lineWidth: 9 },
 };
 
@@ -107,10 +107,18 @@ export function ChessBoard({
     const parent = host?.parentElement;
     if (!host || !parent) return;
 
+    const well =
+      parent.closest(".board-with-history") ??
+      parent.closest(".splash-board") ??
+      parent.closest(".analyze-board") ??
+      parent.closest(".atlas-board") ??
+      parent.closest(".history-board") ??
+      parent;
+
     const measure = () => {
       const next = Math.max(
         0,
-        Math.floor(Math.min(parent.clientWidth, parent.clientHeight)),
+        Math.floor(Math.min(well.clientWidth, well.clientHeight)),
       );
       sideRef.current = next;
       setSide(next);
@@ -118,7 +126,7 @@ export function ChessBoard({
     };
 
     const ro = new ResizeObserver(measure);
-    ro.observe(parent);
+    ro.observe(well);
     measure();
     return () => ro.disconnect();
   }, []);

@@ -8,7 +8,15 @@ export default function DrillLoading() {
         </div>
       </div>
       <div className="board-stage">
-        <div className="board-frame animate-pulse bg-zinc-900" />
+        <div className="board-stack">
+          <div className="board-with-history">
+            <div className="board-frame animate-pulse bg-zinc-900" />
+          </div>
+          <div className="ply-nav" aria-hidden>
+            <span className="ply-btn" />
+            <span className="ply-btn ply-btn-fwd" />
+          </div>
+        </div>
       </div>
     </div>
   );

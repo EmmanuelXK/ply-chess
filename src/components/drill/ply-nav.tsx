@@ -9,6 +9,7 @@ export function PlyNav({
   canForward,
   playing,
   onPlay,
+  lastSan,
 }: {
   onBack: () => void;
   onForward: () => void;
@@ -16,6 +17,7 @@ export function PlyNav({
   canForward: boolean;
   playing?: boolean;
   onPlay?: () => void;
+  lastSan?: string | null;
 }) {
   return (
     <div className="ply-nav" role="group" aria-label="Step through the line">
@@ -39,6 +41,10 @@ export function PlyNav({
         >
           {playing ? <Pause /> : <Play />}
         </button>
+      ) : lastSan ? (
+        <p className="ply-san" aria-live="polite">
+          {lastSan}
+        </p>
       ) : null}
       <button
         type="button"

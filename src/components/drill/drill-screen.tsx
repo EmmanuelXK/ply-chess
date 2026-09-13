@@ -575,18 +575,54 @@ export function DrillScreen({
     pushScene(coachOnPlan(next, opening), opening.moves.length - 1, "plan");
   };
 
-  const stepBack = () => {
+  const stepBack = useCallback(() => {
     cancelTimer();
     if (lessonStyle === "podcast") setPodcastPlaying(false);
     applyPly(plyRef.current - 1);
-  };
+  }, [applyPly, lessonStyle]);
 
-  const stepForward = () => {
+  const stepForward = useCallback(() => {
     cancelTimer();
     if (lessonStyle === "podcast") setPodcastPlaying(false);
     if (plyRef.current >= opening.moves.length) return;
     applyPly(plyRef.current + 1);
-  };
+  }, [applyPly, lessonStyle, opening.moves.length]);
+
+  useEffect(() => {
+    const sheetOpen =
+      bookOpen || whyOpen || historyOpen || analyzeOpen || quizOpen || thinkOpen;
+    const onKey = (event: KeyboardEvent) => {
+      if (sheetOpen) return;
+      const target = event.target as HTMLElement | null;
+      if (
+        target &&
+        (target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.isContentEditable)
+      ) {
+        return;
+      }
+      if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        stepBack();
+      }
+      if (event.key === "ArrowRight") {
+        event.preventDefault();
+        stepForward();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [
+    analyzeOpen,
+    bookOpen,
+    historyOpen,
+    quizOpen,
+    stepBack,
+    stepForward,
+    thinkOpen,
+    whyOpen,
+  ]);
 
   const switchTrap = (next: Trap | null) => {
     setLineId(next?.id ?? null);
@@ -735,57 +771,59 @@ export function DrillScreen({
       </header>
 
       <div className="board-stage">
-        <div className="board-with-history">
-          <ChessBoard
-            fen={fen}
-            dests={dests}
-            lastMove={lastMove}
-            arrows={arrows}
-            orientation={orientation}
-            turnColor={turnColor}
-            viewOnly={(busy && mode === "drill") || lessonStyle === "podcast"}
-            movableColor={movableColor}
-            check={check}
-            animationMs={MOVE_MS}
-            onMove={onMove}
-            onLongPress={() => setAnalyzeOpen(true)}
+        <div className="board-stack">
+          <div className="board-with-history">
+            <ChessBoard
+              fen={fen}
+              dests={dests}
+              lastMove={lastMove}
+              arrows={arrows}
+              orientation={orientation}
+              turnColor={turnColor}
+              viewOnly={(busy && mode === "drill") || lessonStyle === "podcast"}
+              movableColor={movableColor}
+              check={check}
+              animationMs={MOVE_MS}
+              onMove={onMove}
+              onLongPress={() => setAnalyzeOpen(true)}
+            />
+            <CoachHead
+              speaker={scene.beats[beatIndex]?.speaker ?? scene.speaker}
+              text={scene.beats[beatIndex]?.text ?? coach.text}
+              orientation={orientation}
+            />
+            {historyNow.length ? (
+              <div className="history-corner">
+                <HistoryMark
+                  glyph={historyNow[0].glyph}
+                  label={`${historyNow[0].title} (${historyNow[0].year})`}
+                  onClick={() => setHistoryOpen(true)}
+                />
+              </div>
+            ) : null}
+          </div>
+          <PlyNav
+            onBack={stepBack}
+            onForward={stepForward}
+            canBack={ply > 0}
+            canForward={ply < opening.moves.length}
+            lastSan={played.at(-1) ?? "Start"}
+            playing={lessonStyle === "podcast" ? podcastPlaying : undefined}
+            onPlay={
+              lessonStyle === "podcast"
+                ? () => {
+                    if (plyRef.current >= opening.moves.length) {
+                      applyPly(0);
+                      setPodcastPlaying(true);
+                      return;
+                    }
+                    setPodcastPlaying((on) => !on);
+                  }
+                : undefined
+            }
           />
-          <CoachHead
-            speaker={scene.beats[beatIndex]?.speaker ?? scene.speaker}
-            text={scene.beats[beatIndex]?.text ?? coach.text}
-            orientation={orientation}
-          />
-          {historyNow.length ? (
-            <div className="history-corner">
-              <HistoryMark
-                glyph={historyNow[0].glyph}
-                label={`${historyNow[0].title} (${historyNow[0].year})`}
-                onClick={() => setHistoryOpen(true)}
-              />
-            </div>
-          ) : null}
         </div>
       </div>
-
-      <PlyNav
-        onBack={stepBack}
-        onForward={stepForward}
-        canBack={ply > 0}
-        canForward={ply < opening.moves.length}
-        playing={lessonStyle === "podcast" ? podcastPlaying : undefined}
-        onPlay={
-          lessonStyle === "podcast"
-            ? () => {
-                if (plyRef.current >= opening.moves.length) {
-                  applyPly(0);
-                  setPodcastPlaying(true);
-                  return;
-                }
-                setPodcastPlaying((on) => !on);
-              }
-            : undefined
-        }
-      />
 
       {mode === "plan" ? (
         <div className="plan-bar">
