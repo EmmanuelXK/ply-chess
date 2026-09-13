@@ -23,4 +23,4 @@ validateDialogue(openings);
 validateAtlas();
 console.log(`\n${openings.length} openings legal from the start position.`);
 console.log(`✓ Theory atlas: ${ATLAS.length} mainstream openings, legal routes.`);
-console.log("✓ Single-coach purpose dialogue (≤15 words, no repeats) on Lion, London, Evans.");
+console.log("✓ Single male coach; key-ply purpose dialogue (≤15 words) on Lion, London, Evans.");

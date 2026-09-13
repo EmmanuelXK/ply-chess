@@ -48,6 +48,8 @@ export {
 } from "./memory";
 export { openingFromTrap } from "./make-opening";
 export { quizForPly, whyLessonAt, professorAt } from "./professor";
+export { isKeyPly, keyPlyReasons, type KeyPlyReason } from "./key-ply";
+export { shouldSpeakCoach } from "./coach";
 export {
   historyAt,
   historyFen,

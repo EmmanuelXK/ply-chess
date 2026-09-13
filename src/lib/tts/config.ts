@@ -12,33 +12,39 @@ export const MAX_TTS_CHARS = 140;
  * or EDGE_TTS_VOICE_<SPEAKER> / GOOGLE_TTS_VOICE_<SPEAKER> /
  * ELEVENLABS_VOICE_<SPEAKER>.
  */
+const MALE_EDGE = "en-GB-RyanNeural";
+
 export const DEFAULT_EDGE_VOICES: Record<SpeakerId, string> = {
-  aldric: "en-GB-RyanNeural",
-  kael: "en-US-AvaNeural",
-  soren: "en-GB-ThomasNeural",
-  rhea: "en-US-JennyNeural",
-  silas: "en-US-AndrewNeural",
-  lena: "en-US-EmmaNeural",
+  aldric: MALE_EDGE,
+  kael: MALE_EDGE,
+  soren: MALE_EDGE,
+  rhea: MALE_EDGE,
+  silas: MALE_EDGE,
+  lena: MALE_EDGE,
 };
 
 /** WaveNet defaults — 4M free chars/month, more generous than Neural2's 1M. */
+const MALE_GOOGLE = "en-GB-Wavenet-B";
+
 export const DEFAULT_GOOGLE_VOICES: Record<SpeakerId, string> = {
-  aldric: "en-GB-Wavenet-B",
-  kael: "en-US-Wavenet-F",
-  soren: "en-GB-Wavenet-D",
-  rhea: "en-US-Wavenet-E",
-  silas: "en-US-Wavenet-D",
-  lena: "en-US-Wavenet-C",
+  aldric: MALE_GOOGLE,
+  kael: MALE_GOOGLE,
+  soren: MALE_GOOGLE,
+  rhea: MALE_GOOGLE,
+  silas: MALE_GOOGLE,
+  lena: MALE_GOOGLE,
 };
 
 /** ElevenLabs premade library voices — not likeness clones. */
+const MALE_ELEVEN = "JBFqnCBsd6RMkjVDRZzb"; // George — stock male
+
 export const DEFAULT_ELEVENLABS_VOICES: Record<SpeakerId, string> = {
-  aldric: "JBFqnCBsd6RMkjVDRZzb", // George — stock male
-  kael: "XB0fDUnXU5powFXDhCwa", // Charlotte — stock female
-  soren: "onwK4e9ZLuTAKqWW03F9", // Daniel — stock male
-  rhea: "EXAVITQu4vr4xnSDxMaL", // Bella — stock female
-  silas: "TxGEqnHWrfWFTfGW9XjX", // Josh — stock male
-  lena: "21m00Tcm4TlvDq8ikWAM", // Rachel — stock female
+  aldric: MALE_ELEVEN,
+  kael: MALE_ELEVEN,
+  soren: MALE_ELEVEN,
+  rhea: MALE_ELEVEN,
+  silas: MALE_ELEVEN,
+  lena: MALE_ELEVEN,
 };
 
 function env(name: string): string | undefined {
@@ -51,28 +57,31 @@ function speakerEnv(prefix: string, speaker: SpeakerId): string | undefined {
 }
 
 export function edgeVoice(speaker: SpeakerId): string {
+  void speaker;
   return (
-    speakerEnv("EDGE_TTS_VOICE", speaker) ||
-    speakerEnv("TTS_VOICE", speaker) ||
+    speakerEnv("EDGE_TTS_VOICE", "aldric") ||
+    speakerEnv("TTS_VOICE", "aldric") ||
     env("EDGE_TTS_VOICE") ||
-    DEFAULT_EDGE_VOICES[speaker]
+    DEFAULT_EDGE_VOICES.aldric
   );
 }
 
 export function googleVoice(speaker: SpeakerId): string {
+  void speaker;
   return (
-    speakerEnv("GOOGLE_TTS_VOICE", speaker) ||
-    speakerEnv("TTS_VOICE", speaker) ||
+    speakerEnv("GOOGLE_TTS_VOICE", "aldric") ||
+    speakerEnv("TTS_VOICE", "aldric") ||
     env("GOOGLE_TTS_VOICE") ||
-    DEFAULT_GOOGLE_VOICES[speaker]
+    DEFAULT_GOOGLE_VOICES.aldric
   );
 }
 
 export function elevenLabsVoiceId(speaker: SpeakerId): string {
+  void speaker;
   return (
-    speakerEnv("ELEVENLABS_VOICE", speaker) ||
+    speakerEnv("ELEVENLABS_VOICE", "aldric") ||
     env("ELEVENLABS_VOICE_ID") ||
-    DEFAULT_ELEVENLABS_VOICES[speaker]
+    DEFAULT_ELEVENLABS_VOICES.aldric
   );
 }
 

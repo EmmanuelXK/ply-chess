@@ -3,8 +3,9 @@ import { housePicture } from "@/lib/openings/memory";
 import { historyAt } from "@/lib/openings/history";
 import { professorAt, quizForPly, speakableProfessor } from "@/lib/openings/professor";
 import type { HistoryMilestone, Opening, WhyLesson } from "@/lib/openings/types";
+import { shouldSpeakCoach, type CoachKind } from "@/lib/openings/coach";
+import { COACH_SPEAKER } from "@/lib/tts/types";
 import { authoredAt } from "./authored-facts";
-import { getDuo } from "./duos";
 import { purposeBeats } from "./purpose";
 import { limitWords, nugget } from "./short";
 import type {
@@ -14,7 +15,6 @@ import type {
   LessonFacts,
   MissMemory,
 } from "./types";
-import type { CoachKind } from "@/lib/openings/coach";
 
 function famousLine(row?: HistoryMilestone): string | undefined {
   if (!row?.famousGame) return undefined;
@@ -107,18 +107,29 @@ function headlineFrom(facts: LessonFacts): string {
   return limitWords(nugget(facts.concept || facts.chunkName, 10) || facts.shortName);
 }
 
+export function silentScene(kind: CoachKind = "ok"): DialogueScene {
+  return {
+    beats: [],
+    headline: "",
+    speaker: COACH_SPEAKER,
+    kind,
+  };
+}
+
 export function sceneFromFacts(
   facts: LessonFacts,
-  duoId: DuoId,
+  _duoId: DuoId,
   _mode: DialogueMode,
   soloText?: string,
 ): DialogueScene {
-  const duo = getDuo(duoId);
-  const beats = purposeBeats(facts, soloText);
+  const beats = purposeBeats(facts, soloText).map((beat) => ({
+    ...beat,
+    speaker: COACH_SPEAKER,
+  }));
   return {
     beats,
     headline: headlineFrom(facts),
-    speaker: beats[0]?.speaker ?? duo.left.id,
+    speaker: COACH_SPEAKER,
     kind: facts.kind,
     purpose: beats[0]?.purpose,
   };
@@ -136,10 +147,14 @@ export function dialogueForPly(
     misses?: MissMemory[];
   },
 ): DialogueScene {
+  const kind = opts.kind ?? "ok";
+  if (!shouldSpeakCoach(kind, opening, afterPly)) {
+    return silentScene(kind);
+  }
   const facts = collectFacts({
     opening,
     ply: afterPly,
-    kind: opts.kind ?? "ok",
+    kind,
     fen: opts.fen,
     misses: opts.misses,
   });
@@ -195,13 +210,13 @@ export function dialogueForQuizReaction(
   correct: boolean,
   opts: { duo: DuoId; mode: DialogueMode },
 ): DialogueScene {
-  const duo = getDuo(opts.duo);
-  const speaker = correct ? duo.left.id : duo.right.id;
+  void opening;
+  void opts;
   const purpose = correct ? "hold-the-square" : "stop-opponent-plan";
   return {
     beats: [
       {
-        speaker,
+        speaker: COACH_SPEAKER,
         text: limitWords(
           correct
             ? "Yes. That's the job — hold the square."
@@ -212,7 +227,7 @@ export function dialogueForQuizReaction(
       },
     ],
     headline: correct ? "Yes." : "Not that.",
-    speaker,
+    speaker: COACH_SPEAKER,
     kind: "quiz",
     purpose,
   };

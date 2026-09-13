@@ -127,7 +127,8 @@ export function SettingsScreen() {
         <section className="set-block" id="voices">
           <h2>Voice</h2>
           <p className="set-help">
-            One coach. Rate and mute. That’s the whole voice desk.
+            One man. He talks on key moves — pins, history, purpose beats.
+            Why and Analyze stay on tap for more.
           </p>
           <div className="mode-row" role="tablist" aria-label="Speech rate">
             {(["slow", "clear", "brisk"] as const).map((id) => (

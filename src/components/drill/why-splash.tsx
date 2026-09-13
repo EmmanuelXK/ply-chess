@@ -19,11 +19,13 @@ export function WhySplash({
   opening,
   lesson,
   orientation,
+  voiceOn = true,
   onClose,
 }: {
   opening: Opening;
   lesson: WhyLesson;
   orientation: "white" | "black";
+  voiceOn?: boolean;
   onClose: () => void;
 }) {
   const prefix = useMemo(
@@ -79,19 +81,14 @@ export function WhySplash({
 
   useEffect(() => {
     stopVoice();
-    const text =
-      ply === lesson.startPly && branchIndex <= 0
-        ? lesson.intro
-        : (step?.narrate ?? lesson.intro);
-    const scene = dialogueForWhy(opening, lesson, text, {
+    if (!voiceOn) return;
+    const scene = dialogueForWhy(opening, lesson, lesson.intro, {
       duo: ACTIVE_COACH,
       mode: "solo",
     });
     handleRef.current = speakDialogue(scene.beats);
     return () => stopVoice();
-    // Narration is ply-driven; step/branch are derived from ply.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ply, lesson.intro, lesson.startPly, opening]);
+  }, [lesson, opening, voiceOn]);
 
   useEffect(() => {
     if (!playing || ply >= line.length) return;

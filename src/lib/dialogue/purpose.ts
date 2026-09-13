@@ -1,4 +1,4 @@
-import type { SpeakerId } from "@/lib/tts/types";
+import { COACH_SPEAKER, type SpeakerId } from "@/lib/tts/types";
 import { looksLikeMoveList } from "@/lib/openings/helpers";
 import { hookAt } from "./hooks";
 import { limitWords, nugget, wordCount } from "./short";
@@ -106,17 +106,8 @@ export function inferPurpose(facts: LessonFacts): PurposeTag {
   return facts.ply < 6 ? "develop-with-tempo" : "hold-the-square";
 }
 
-function pickSpeaker(facts: LessonFacts, purpose: PurposeTag): SpeakerId {
-  const punch: PurposeTag[] = [
-    "break-center",
-    "attack-weak-square",
-    "provoke-weakness",
-    "wake-the-line",
-    "stop-opponent-plan",
-  ];
-  if (facts.kind === "fail" || facts.kind === "hint") return "aldric";
-  if (punch.includes(purpose) || facts.romantic) return "kael";
-  return hashSeed(facts) % 5 === 0 ? "kael" : "aldric";
+function pickSpeaker(): SpeakerId {
+  return COACH_SPEAKER;
 }
 
 function phrase(purpose: PurposeTag, seed: number): string {
@@ -132,7 +123,7 @@ function askFromFacts(
   if (facts.kind === "fail" || facts.kind === "hint" || facts.kind === "history") {
     return undefined;
   }
-  if (facts.kind !== "start" && hashSeed(facts) % 4 !== 0) return undefined;
+  if (facts.kind !== "start" && facts.kind !== "quiz") return undefined;
   return {
     prompt: facts.quizPrompt,
     choices: facts.quizChoices,
@@ -208,7 +199,7 @@ function previousLine(facts: LessonFacts): string | undefined {
 
 export function purposeBeats(facts: LessonFacts, soloText?: string): DialogueBeat[] {
   const purpose = inferPurpose(facts);
-  const speaker = pickSpeaker(facts, purpose);
+  const speaker = pickSpeaker();
   let seed = hashSeed(facts);
   let text = composeBody(facts, purpose, seed);
 

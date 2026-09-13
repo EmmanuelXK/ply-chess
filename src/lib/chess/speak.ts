@@ -4,7 +4,7 @@ import { ClipCache } from "@/lib/tts/cache";
 import { clipHash } from "@/lib/tts/hash";
 import { edgeVoiceFor, readTtsRate } from "@/lib/tts/prefs";
 import { rateScale, SPEAKER_PROSODY } from "@/lib/tts/prosody";
-import type { SpeakerId } from "@/lib/tts/types";
+import { COACH_SPEAKER, type SpeakerId } from "@/lib/tts/types";
 import { pickWebVoice } from "@/lib/tts/voices-web";
 
 export type SpeakHandle = {
@@ -71,8 +71,8 @@ function speakWeb(text: string, speaker: SpeakerId, gen: number): Promise<void> 
       return;
     }
     window.speechSynthesis.cancel();
-    const voice = pickWebVoice(speaker);
-    const prosody = SPEAKER_PROSODY[speaker];
+    const voice = pickWebVoice(COACH_SPEAKER);
+    const prosody = SPEAKER_PROSODY[COACH_SPEAKER];
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = voice?.lang ?? "en-GB";
     if (voice) utterance.voice = voice;
@@ -134,7 +134,7 @@ async function fetchClip(
         text,
         speaker,
         premium,
-        voice: edgeVoiceFor(speaker),
+        voice: edgeVoiceFor(COACH_SPEAKER),
       }),
       signal,
     });
@@ -195,9 +195,9 @@ export function prefetchDialogue(
   for (const beat of beats) {
     const text = limitWords(beat.text);
     if (!text) continue;
-    const key = clipHash(beat.speaker, premium ? "p" : "f", text);
+    const key = clipHash(COACH_SPEAKER, premium ? "p" : "f", text);
     if (sessionClips.get(key)) continue;
-    void fetchClip(text, beat.speaker, premium);
+    void fetchClip(text, COACH_SPEAKER, premium);
   }
 }
 
@@ -218,7 +218,7 @@ export function speak(
   opts?: { speaker?: SpeakerId; premium?: boolean; interrupt?: boolean },
 ): SpeakHandle {
   const trimmed = limitWords(text.replace(/\s+/g, " ").trim());
-  const speaker = opts?.speaker ?? "aldric";
+  const speaker = COACH_SPEAKER;
   const premium = opts?.premium === true;
   if (!trimmed) {
     return { stop() {}, done: Promise.resolve() };
@@ -264,7 +264,7 @@ export function speakDialogue(
       const handleGen = playGen;
       await speakNeural(
         limitWords(beat.text),
-        beat.speaker,
+        COACH_SPEAKER,
         opts?.premium === true,
         handleGen,
       );
@@ -279,7 +279,7 @@ export function speakDialogue(
         opts?.onBeat?.(i, { ...beat, text: reaction.text, speaker: reaction.speaker });
         await speakNeural(
           reaction.text,
-          reaction.speaker,
+          COACH_SPEAKER,
           opts?.premium === true,
           playGen,
         );

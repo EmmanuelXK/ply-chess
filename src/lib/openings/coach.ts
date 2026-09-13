@@ -1,4 +1,5 @@
 import { chunkAt, firstSentence, positionalIdea } from "./helpers";
+import { isKeyPly } from "./key-ply";
 import { housePicture, pinSpeech } from "./memory";
 import { professorAt } from "./professor";
 import type { Opening } from "./types";
@@ -52,15 +53,41 @@ export function coachAtStart(opening: Opening): CoachState {
   };
 }
 
+const ALWAYS_SPEAK: ReadonlySet<CoachKind> = new Set([
+  "start",
+  "fail",
+  "hint",
+  "pin",
+  "plan",
+  "why",
+  "quiz",
+  "history",
+]);
+
+/** Auto-teach only on key / highlighted plies. Fail, hint, Why, and plan stay live. */
+export function shouldSpeakCoach(
+  kind: CoachKind,
+  opening: Opening,
+  afterPly: number,
+): boolean {
+  if (ALWAYS_SPEAK.has(kind)) return true;
+  return isKeyPly(opening, afterPly);
+}
+
 export function coachAfterPly(opening: Opening, afterPly: number): CoachState {
   const chunk = chunkAt(opening, afterPly);
+  if (!isKeyPly(opening, afterPly)) {
+    return {
+      text: "",
+      chunkName: chunk?.name,
+      kind: "ok",
+    };
+  }
+
   const pin = opening.pins.find((p) => p.afterPly === afterPly);
   const beat = opening.storyBeats.find((b) => b.afterPly === afterPly);
   const line = opening.coach.find((c) => c.afterPly === afterPly);
   const concept = professorLine(opening, afterPly);
-  const enteredChunk =
-    chunk && (afterPly === chunk.fromPly || afterPly === chunk.fromPly + 1);
-
   const picture = housePicture(chunk);
 
   if (pin) {
@@ -77,14 +104,6 @@ export function coachAfterPly(opening: Opening, afterPly: number): CoachState {
       text: shortLine(concept ?? beat.beat ?? picture, 14),
       detail: shortLine(chunk?.job ?? picture, 12),
       chunkName: chunk?.name,
-      kind: "ok",
-    };
-  }
-  if (enteredChunk && chunk) {
-    return {
-      text: shortLine(picture, 12),
-      detail: shortLine(chunk.job, 12),
-      chunkName: chunk.name,
       kind: "ok",
     };
   }

@@ -38,5 +38,7 @@ export {
   dialogueForStart,
   dialogueForWhy,
   sceneFromFacts,
+  silentScene,
 } from "./generate";
 export { validateDialogue } from "./validate";
+export { COACH_SPEAKER, toCoachSpeaker } from "@/lib/tts/types";
