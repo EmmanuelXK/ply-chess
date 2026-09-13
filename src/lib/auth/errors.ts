@@ -1,5 +1,3 @@
-export type AuthKind = "google" | "phone" | "otp";
-
 function extractErrorText(raw: string): string {
   const trimmed = raw.trim();
   if (trimmed.startsWith("{")) {
@@ -36,7 +34,7 @@ export function classifyAuthError(raw: string): "provider" | "google" | "config"
   return "google";
 }
 
-export function friendlyAuthMessage(raw: string, kind: AuthKind): string {
+export function friendlyAuthMessage(raw: string): string {
   const extracted = extractErrorText(raw);
   const lower = extracted.toLowerCase();
 
@@ -45,35 +43,14 @@ export function friendlyAuthMessage(raw: string, kind: AuthKind): string {
   }
 
   if (isProviderDisabledError(raw) || lower === "provider") {
-    return kind === "google"
-      ? "Google sign-in is not switched on yet. Ask the club host to enable it."
-      : "Phone sign-in is not switched on yet. Ask the club host to enable it.";
+    return "Google sign-in is not switched on yet. Ask the club host to enable it.";
   }
 
-  if (/rate.?limit|too many|over_sms|sms_send/.test(lower)) {
-    return "Too many codes. Wait a minute and try again.";
+  if (/access_denied|user.?denied|cancelled|canceled/.test(lower)) {
+    return "Google sign-in was cancelled. Try again when you are ready.";
   }
 
-  if (kind === "otp" && /invalid|expired|otp|token/.test(lower)) {
-    return "That code did not match. Check the text and try again.";
-  }
-
-  if (kind === "phone" && /invalid|phone|unprocessable/.test(lower)) {
-    return "Check the number. Use a mobile that can receive texts.";
-  }
-
-  if (kind === "google") {
-    if (/access_denied|user.?denied|cancelled|canceled/.test(lower)) {
-      return "Google sign-in was cancelled. Try again when you are ready.";
-    }
-    return "Google sign-in did not finish. Try again.";
-  }
-
-  if (kind === "otp") {
-    return "That code did not match. Check the text and try again.";
-  }
-
-  return "Could not send a text. Check the number and try again.";
+  return "Google sign-in did not finish. Try again.";
 }
 
 export function noteFromSearchParams(params: {
@@ -86,5 +63,5 @@ export function noteFromSearchParams(params: {
     params.get("msg"),
   ].filter((value): value is string => Boolean(value));
   if (parts.length === 0) return "";
-  return friendlyAuthMessage(parts.join(" "), "google");
+  return friendlyAuthMessage(parts.join(" "));
 }
