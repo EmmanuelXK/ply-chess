@@ -19,7 +19,6 @@ import {
 import { ChessBoard, type BoardArrow } from "@/components/board/chess-board";
 import { Button } from "@/components/ui/button";
 import { AnalyzeSplash } from "@/components/drill/analyze-splash";
-import { CoachHead } from "@/components/drill/coach-head";
 import { MemoryRail } from "@/components/drill/memory-rail";
 import { HistoryMark } from "@/components/drill/history-mark";
 import { HistorySplash } from "@/components/drill/history-splash";
@@ -720,7 +719,7 @@ export function DrillScreen({
         </div>
 
         <div
-          className={`coach-strip coach-${coach.kind} strip-speaker-aldric${
+          className={`coach-strip coach-${coach.kind}${
             coachLine ? "" : " coach-quiet"
           }`}
           role="status"
@@ -786,11 +785,6 @@ export function DrillScreen({
               animationMs={MOVE_MS}
               onMove={onMove}
               onLongPress={() => setAnalyzeOpen(true)}
-            />
-            <CoachHead
-              speaker={scene.beats[beatIndex]?.speaker ?? scene.speaker}
-              text={scene.beats[beatIndex]?.text ?? coach.text}
-              orientation={orientation}
             />
             {historyNow.length ? (
               <div className="history-corner">
