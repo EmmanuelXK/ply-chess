@@ -43,6 +43,10 @@ const SYSTEM_OPENINGS = new Set([
   "black-lion",
   "kings-indian",
   "pirc",
+  "alapin",
+  "english",
+  "caro-kann",
+  "slav",
 ]);
 
 export function openingKind(id: string): "system" | "semi" {

@@ -20,5 +20,10 @@ export const fingerprints: Record<string, string[]> = {
   "benko": ["d4", "Nf6", "c4", "c5", "d5", "b5"],
   "dutch-leningrad": ["d4", "f5", "g3", "Nf6", "Bg2", "g6"],
   "budapest": ["d4", "Nf6", "c4", "e5"],
+  alapin: ["e4", "c5", "c3"],
+  english: ["c4", "e5", "Nc3", "Nc6", "g3"],
+  "caro-kann": ["e4", "c6", "d4", "d5", "e5", "Bf5"],
+  "queens-gambit": ["d4", "d5", "c4", "e6", "Nc3", "Nf6", "cxd5"],
+  slav: ["d4", "d5", "c4", "c6"],
 };
 
