@@ -3,7 +3,12 @@ import { housePicture } from "@/lib/openings/memory";
 import { historyAt } from "@/lib/openings/history";
 import { professorAt, quizForPly, speakableProfessor } from "@/lib/openings/professor";
 import type { HistoryMilestone, Opening, WhyLesson } from "@/lib/openings/types";
-import { shouldSpeakCoach, type CoachKind } from "@/lib/openings/coach";
+import {
+  coachAfterPly,
+  coachAtStart,
+  shouldSpeakCoach,
+  type CoachKind,
+} from "@/lib/openings/coach";
 import { COACH_SPEAKER } from "@/lib/tts/types";
 import { authoredAt } from "./authored-facts";
 import { purposeBeats } from "./purpose";
@@ -151,6 +156,13 @@ export function dialogueForPly(
   if (!shouldSpeakCoach(kind, opening, afterPly)) {
     return silentScene(kind);
   }
+  const soloText =
+    opts.soloText ??
+    (kind === "start"
+      ? coachAtStart(opening).text
+      : kind === "ok"
+        ? coachAfterPly(opening, afterPly).text
+        : undefined);
   const facts = collectFacts({
     opening,
     ply: afterPly,
@@ -158,7 +170,7 @@ export function dialogueForPly(
     fen: opts.fen,
     misses: opts.misses,
   });
-  return sceneFromFacts(facts, opts.duo, opts.mode, opts.soloText);
+  return sceneFromFacts(facts, opts.duo, opts.mode, soloText);
 }
 
 export function dialogueForStart(

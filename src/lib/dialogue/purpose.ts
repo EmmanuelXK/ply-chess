@@ -119,11 +119,8 @@ function askFromFacts(
   facts: LessonFacts,
   speaker: SpeakerId,
 ): DialogueAsk | undefined {
+  if (facts.kind !== "quiz") return undefined;
   if (!facts.quizPrompt || !facts.quizChoices?.length) return undefined;
-  if (facts.kind === "fail" || facts.kind === "hint" || facts.kind === "history") {
-    return undefined;
-  }
-  if (facts.kind !== "start" && facts.kind !== "quiz") return undefined;
   return {
     prompt: facts.quizPrompt,
     choices: facts.quizChoices,
@@ -201,17 +198,16 @@ export function purposeBeats(facts: LessonFacts, soloText?: string): DialogueBea
   const purpose = inferPurpose(facts);
   const speaker = pickSpeaker();
   let seed = hashSeed(facts);
-  let text = composeBody(facts, purpose, seed);
-
-  if (soloText?.trim() && facts.kind !== "ok" && facts.kind !== "start") {
-    text = `${phrase(purpose, seed)}. ${nugget(soloText, 8)}`;
-  }
+  const keyPoint = soloText?.trim();
+  let text = keyPoint ? limitWords(keyPoint) : composeBody(facts, purpose, seed);
 
   const prior = previousLine(facts);
   let guard = 0;
   while (prior && limitWords(text) === prior && guard < 4) {
     seed += 17;
-    text = composeBody(facts, purpose, seed);
+    text = keyPoint
+      ? limitWords(`${keyPoint} ${phrase(purpose, seed)}`)
+      : composeBody(facts, purpose, seed);
     guard += 1;
   }
 

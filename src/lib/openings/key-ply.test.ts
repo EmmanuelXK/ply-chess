@@ -3,7 +3,7 @@ import { describe, it } from "node:test";
 import { dialogueForPly, dialogueForStart } from "../dialogue";
 import { COACH_SPEAKER } from "../tts/types";
 import { coachAfterPly, shouldSpeakCoach } from "./coach";
-import { getOpening, openings } from "./index";
+import { explainLessonAt, getOpening, openings } from "./index";
 import { isKeyPly, keyPlyReasons } from "./key-ply";
 
 describe("isKeyPly", () => {
@@ -47,6 +47,16 @@ describe("isKeyPly", () => {
     });
     assert.equal(scene.beats.length, 0);
   });
+
+  it("still builds Why/Explain for a quiet developing move", () => {
+    const lion = getOpening("black-lion");
+    assert.ok(lion);
+    const quietPly = lion.moves.findIndex((_, ply) => !isKeyPly(lion, ply));
+    assert.ok(quietPly >= 0);
+    const lesson = explainLessonAt(lion, quietPly + 1);
+    assert.ok(lesson.intro.trim().length > 20, "Explain should have a real why");
+    assert.ok(lesson.branch.length >= 1, "Explain should show a short branch");
+  });
 });
 
 describe("male-only coach", () => {
@@ -60,6 +70,12 @@ describe("male-only coach", () => {
     const wake = dialogueForPly(lion, 7, { duo: "voss-draven", mode: "solo" });
     assert.ok(wake.beats.length >= 1);
     assert.ok(wake.beats.every((beat) => beat.speaker === COACH_SPEAKER));
+    assert.equal(wake.beats.length, 1, "no quiz/ask on a key ply");
+    assert.match(wake.beats[0].text, /e5|Lion|wake|d4|house/i);
+    assert.doesNotMatch(
+      wake.beats[0].text,
+      /^(Grab the center|Coil, then strike|Develop with tempo|Wake the line up)\b/,
+    );
   });
 
   it("stays sparse across the repertoire", () => {

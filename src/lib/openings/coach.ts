@@ -39,15 +39,8 @@ function professorLine(opening: Opening, afterPly: number): string | undefined {
 
 export function coachAtStart(opening: Opening): CoachState {
   const house = opening.chunks[0];
-  const picture = housePicture(house);
   return {
     text: shortLine(opening.story.cast, 12),
-    detail: shortLine(
-      house?.name && picture !== house.name
-        ? `${house.name}: ${picture}`
-        : picture,
-      14,
-    ),
     chunkName: house?.name,
     kind: "start",
   };
@@ -93,7 +86,6 @@ export function coachAfterPly(opening: Opening, afterPly: number): CoachState {
   if (pin) {
     return {
       text: shortLine(`${pinSpeech(pin)} ${picture}`, 15),
-      detail: shortLine(chunk?.job ?? opening.story.plan, 12),
       chunkName: chunk?.name,
       kind: "pin",
       pinLabel: pin.label,
@@ -102,7 +94,6 @@ export function coachAfterPly(opening: Opening, afterPly: number): CoachState {
   if (beat) {
     return {
       text: shortLine(concept ?? beat.beat ?? picture, 14),
-      detail: shortLine(chunk?.job ?? picture, 12),
       chunkName: chunk?.name,
       kind: "ok",
     };
@@ -110,14 +101,12 @@ export function coachAfterPly(opening: Opening, afterPly: number): CoachState {
   if (line) {
     return {
       text: shortLine(concept ?? line.text ?? picture, 14),
-      detail: shortLine(chunk?.job ?? picture, 12),
       chunkName: chunk?.name,
       kind: "ok",
     };
   }
   return {
     text: shortLine(concept ?? picture ?? opening.story.plan, 14),
-    detail: shortLine(chunk?.job ?? opening.story.conflict, 12),
     chunkName: chunk?.name,
     kind: "ok",
   };

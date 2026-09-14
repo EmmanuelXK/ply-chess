@@ -717,12 +717,12 @@ body,
 
 .coach-strip {
   margin-top: 0.45rem;
-  min-height: 2.35rem;
-  max-height: 5.4rem;
+  min-height: 2.1rem;
+  max-height: 3.4rem;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 0.45rem;
-  padding: 0.5rem 0.55rem 0.5rem 0.7rem;
+  padding: 0.42rem 0.5rem 0.42rem 0.65rem;
   border-radius: 0.85rem;
   background: linear-gradient(180deg, var(--charcoal-2) 0%, var(--ink-2) 100%);
   border: 1px solid var(--line);
@@ -746,7 +746,8 @@ body,
 }
 
 .coach-strip.coach-quiet {
-  opacity: 0.78;
+  opacity: 0.7;
+  box-shadow: none;
 }
 
 .coach-strip.coach-quiet .coach-line {
