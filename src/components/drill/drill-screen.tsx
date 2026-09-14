@@ -26,7 +26,6 @@ import { InlineAsk } from "@/components/drill/inline-ask";
 import { PlyNav } from "@/components/drill/ply-nav";
 import { PracticePanel } from "@/components/drill/practice-panel";
 import { QuizSheet } from "@/components/drill/quiz-sheet";
-import { SpeakerChip } from "@/components/drill/speaker-chip";
 import { StudySheet } from "@/components/drill/study-sheet";
 import { WhySplash } from "@/components/drill/why-splash";
 import { needsPromotion, toDests } from "@/lib/chess/dests";
@@ -66,10 +65,11 @@ import {
 } from "@/lib/openings/coach";
 import {
   isUserPly,
+  openingDossier,
   openingFromTrap,
   quizForPly,
   STUDY_MODES,
-  whyLessonAt,
+  explainLessonAt,
   historyAt,
   type Opening,
   type PlanVoice,
@@ -381,7 +381,7 @@ export function DrillScreen({
   const fullMoves = Math.ceil(opening.moves.length / 2);
   const shownMove = Math.min(Math.ceil(ply / 2), fullMoves);
   const quiz = quizForPly(opening, Math.max(0, ply - 1));
-  const why = whyLessonAt(opening, ply);
+  const why = useMemo(() => explainLessonAt(opening, ply), [opening, ply]);
   const historyNow = historyAt(opening, ply);
   const weakFrom = dueChunks(opening).find((chunk) => chunk.due)?.start ?? -1;
 
@@ -390,20 +390,11 @@ export function DrillScreen({
     if (lastMove && lastMove.length === 2) {
       next.push({ orig: lastMove[0], dest: lastMove[1], brush: "last" });
     }
-    const idea = (why?.branch[0]?.arrows ?? []).slice(0, 2);
-    for (const a of idea) {
-      if (a.orig === lastMove?.[0] && a.dest === lastMove?.[1]) continue;
-      next.push({
-        orig: a.orig as Key,
-        dest: a.dest as Key,
-        brush: a.brush,
-      });
-    }
     if (hintKeys && hintKeys.length === 2) {
       next.push({ orig: hintKeys[0], dest: hintKeys[1], brush: "hint" });
     }
     return next;
-  }, [lastMove, hintKeys, why]);
+  }, [lastMove, hintKeys]);
 
   const cancelTimer = () => {
     if (timerRef.current !== null) {
@@ -634,7 +625,7 @@ export function DrillScreen({
     [played, opening.moves, ply],
   );
   const coachLine = (scene.beats[beatIndex]?.text ?? coach.text).trim();
-  const coachPurpose = scene.beats[beatIndex]?.purpose ?? scene.purpose;
+  const lastSan = played.at(-1) ?? "";
 
   return (
     <div className="drill-shell">
@@ -663,7 +654,9 @@ export function DrillScreen({
               <p className="truncate text-[11px] text-[var(--mist)]">
                 Plan mode — free play
               </p>
-            ) : null}
+            ) : (
+              <p className="drill-dossier">{openingDossier(root)}</p>
+            )}
           </div>
           <Button
             variant="ghost"
@@ -727,18 +720,14 @@ export function DrillScreen({
         >
           {coach.kind === "pin" ? <span className="pin-dot" aria-hidden /> : null}
           <div className="min-w-0 flex-1">
-            <div className="coach-who">
-              <SpeakerChip purpose={coachLine ? coachPurpose : undefined} />
-              {reps === "trial" ? (
+            {reps === "trial" ? (
+              <div className="coach-who">
                 <span className="coach-mode-tag">{trialLeft}s</span>
-              ) : null}
-            </div>
-            <p className="coach-line">
-              {coachLine || "Play the book. He’ll talk on the key move."}
-            </p>
-            {coach.detail && coachLine ? (
-              <p className="coach-detail">{coach.detail}</p>
+              </div>
             ) : null}
+            <p className="coach-line">
+              {coachLine || lastSan || "Your move"}
+            </p>
             {ask ? (
               <InlineAsk
                 ask={ask}
@@ -754,8 +743,8 @@ export function DrillScreen({
             type="button"
             className="why-chip"
             onClick={() => setWhyOpen(true)}
-            disabled={!why}
-            title={why ? "Why this move" : "Why unlocks on the next taught ply"}
+            title="Explain this move"
+            aria-label="Explain this move"
           >
             Why
           </button>
@@ -786,15 +775,6 @@ export function DrillScreen({
               onMove={onMove}
               onLongPress={() => setAnalyzeOpen(true)}
             />
-            {historyNow.length ? (
-              <div className="history-corner">
-                <HistoryMark
-                  glyph={historyNow[0].glyph}
-                  label={`${historyNow[0].title} (${historyNow[0].year})`}
-                  onClick={() => setHistoryOpen(true)}
-                />
-              </div>
-            ) : null}
           </div>
           <PlyNav
             onBack={stepBack}
@@ -839,11 +819,12 @@ export function DrillScreen({
           variant="ghost"
           size="sm"
           onClick={() => setWhyOpen(true)}
-          disabled={!why}
           className="dock-btn"
+          title="Explain this move"
+          aria-label="Explain this move"
         >
           <HelpCircle />
-          Why
+          Explain
         </Button>
         <Button
           variant="ghost"
@@ -916,7 +897,7 @@ export function DrillScreen({
         />
       ) : null}
 
-      {whyOpen && why ? (
+      {whyOpen ? (
         <WhySplash
           opening={opening}
           lesson={why}

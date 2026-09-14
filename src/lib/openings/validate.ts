@@ -57,6 +57,36 @@ export function validateOpening(opening: Opening): void {
   if (opening.id === "jobava-london" && !head.includes("Nc3")) {
     throw new Error("[jobava-london] missing Nc3 — that's the Jobava tell.");
   }
+  if (opening.id === "alapin") {
+    if (opening.moves[2] !== "c3") {
+      throw new Error("[alapin] 2.c3 is the house — don't mix in a Morra d4.");
+    }
+  }
+  if (opening.id === "english") {
+    if (opening.moves[0] !== "c4" || !head.includes("e4")) {
+      throw new Error("[english] Botvinnik clamp needs c4 and e4.");
+    }
+    if (head.includes("Nf3")) {
+      throw new Error("[english] Nf3 in the first 12 plies blocks the f-pawn. Use Nge2.");
+    }
+  }
+  if (opening.id === "caro-kann") {
+    const bishop = opening.moves.indexOf("Bf5");
+    const e6 = opening.moves.indexOf("e6");
+    if (bishop < 0 || (e6 >= 0 && e6 < bishop)) {
+      throw new Error("[caro-kann] bishop out before …e6 — that's the Caro.");
+    }
+  }
+  if (opening.id === "queens-gambit" && !head.includes("cxd5")) {
+    throw new Error("[queens-gambit] Exchange tell is cxd5. Keep the minority package.");
+  }
+  if (opening.id === "slav") {
+    const bishop = opening.moves.indexOf("Bf5");
+    const e6 = opening.moves.indexOf("e6");
+    if (bishop < 0 || (e6 >= 0 && e6 < bishop)) {
+      throw new Error("[slav] bishop out before …e6 — that's Slav, not Semi-Slav.");
+    }
+  }
 
   const covered = new Array<boolean>(opening.moves.length).fill(false);
   for (const chunk of opening.chunks) {
@@ -178,8 +208,8 @@ export function validateAll(openings: Opening[]): void {
     ids.add(opening.id);
     validateOpening(opening);
   }
-  if (openings.length !== 21) {
-    throw new Error(`expected 21 systems, got ${openings.length}`);
+  if (openings.length !== 26) {
+    throw new Error(`expected 26 systems, got ${openings.length}`);
   }
   const covered = new Set(openings.map((o) => o.id));
   const packIds = new Set(

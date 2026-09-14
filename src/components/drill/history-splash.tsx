@@ -110,12 +110,12 @@ export function HistorySplash({
         ) : null}
 
         <p className="history-opener">
-          <SpeakerChip purpose="wake-the-line" />{" "}
+          <SpeakerChip />{" "}
           {HISTORY_OPENER}
         </p>
         <p className="splash-copy">{milestone.summary}</p>
         <p className="history-here">
-          <SpeakerChip purpose="hold-the-square" />{" "}
+          <SpeakerChip />{" "}
           {milestone.whyItMattersHere}
         </p>
 

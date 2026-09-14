@@ -1,15 +1,20 @@
-import { chunkAt, firstSentence, positionalIdea } from "./helpers";
+import { SHORT_HOOKS, spokenHook } from "@/lib/dialogue/hooks";
+import { limitWords } from "@/lib/dialogue/short";
+import { chunkAt, positionalIdea } from "./helpers";
+import { historyAt } from "./history";
 import { isKeyPly } from "./key-ply";
-import { housePicture, pinSpeech } from "./memory";
+import { housePicture } from "./memory";
 import { professorAt } from "./professor";
 import type { Opening } from "./types";
 
 function shortLine(text: string | undefined, max = 15): string {
-  const compact = (text ?? "").replace(/\s+/g, " ").trim();
-  if (!compact) return "";
-  const sentence = firstSentence(compact);
-  const words = sentence.split(" ").filter(Boolean).slice(0, max);
-  return words.join(" ");
+  return limitWords(text ?? "", max);
+}
+
+function hookLine(opening: Opening, afterPly: number): string | undefined {
+  const row = SHORT_HOOKS[opening.id]?.find((h) => h.ply === afterPly);
+  if (!row) return undefined;
+  return spokenHook(row);
 }
 
 export type CoachKind =
@@ -39,15 +44,10 @@ function professorLine(opening: Opening, afterPly: number): string | undefined {
 
 export function coachAtStart(opening: Opening): CoachState {
   const house = opening.chunks[0];
-  const picture = housePicture(house);
+  const hook = hookLine(opening, -1);
+  const cast = shortLine(opening.story.cast, 12);
   return {
-    text: shortLine(opening.story.cast, 12),
-    detail: shortLine(
-      house?.name && picture !== house.name
-        ? `${house.name}: ${picture}`
-        : picture,
-      14,
-    ),
+    text: hook ?? cast,
     chunkName: house?.name,
     kind: "start",
   };
@@ -85,24 +85,31 @@ export function coachAfterPly(opening: Opening, afterPly: number): CoachState {
   }
 
   const pin = opening.pins.find((p) => p.afterPly === afterPly);
+  const hook = hookLine(opening, afterPly);
   const beat = opening.storyBeats.find((b) => b.afterPly === afterPly);
   const line = opening.coach.find((c) => c.afterPly === afterPly);
+  const mark = historyAt(opening, afterPly + 1)[0];
   const concept = professorLine(opening, afterPly);
   const picture = housePicture(chunk);
 
   if (pin) {
     return {
-      text: shortLine(`${pinSpeech(pin)} ${picture}`, 15),
-      detail: shortLine(chunk?.job ?? opening.story.plan, 12),
+      text: hook ?? shortLine(`${picture} That's the landmark.`, 15),
       chunkName: chunk?.name,
       kind: "pin",
       pinLabel: pin.label,
     };
   }
+  if (hook) {
+    return {
+      text: hook,
+      chunkName: chunk?.name,
+      kind: "ok",
+    };
+  }
   if (beat) {
     return {
       text: shortLine(concept ?? beat.beat ?? picture, 14),
-      detail: shortLine(chunk?.job ?? picture, 12),
       chunkName: chunk?.name,
       kind: "ok",
     };
@@ -110,14 +117,22 @@ export function coachAfterPly(opening: Opening, afterPly: number): CoachState {
   if (line) {
     return {
       text: shortLine(concept ?? line.text ?? picture, 14),
-      detail: shortLine(chunk?.job ?? picture, 12),
       chunkName: chunk?.name,
       kind: "ok",
     };
   }
+  if (mark) {
+    return {
+      text: shortLine(
+        mark.whyItMattersHere || `${mark.year}. ${mark.title} is the landmark.`,
+        14,
+      ),
+      chunkName: chunk?.name,
+      kind: "history",
+    };
+  }
   return {
     text: shortLine(concept ?? picture ?? opening.story.plan, 14),
-    detail: shortLine(chunk?.job ?? opening.story.conflict, 12),
     chunkName: chunk?.name,
     kind: "ok",
   };

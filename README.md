@@ -1,30 +1,32 @@
 # Opening Edge
 
-iPhone-first PWA dashboard (`100dvh`, no page scroll). **21 attacking systems** (11 White · 5 vs 1.e4 · 5 vs 1.d4) on one **White / Black** home. Each line is a **spine to move 21**, **traps**, and **six pillars** — then Plan mode. A single male coach (Aldric) teaches **why** on key moves — text in the strip, optional voice. No floating chat head.
+iPhone-first PWA dashboard (`100dvh`, no page scroll). **26 attacking systems** on one **Your Weapons** home in **four racks** (White Gambits, White Systems, Black vs 1.e4, Black vs 1.d4). Square widget tiles; full details live in Learn. Each line is a **spine to move 21**, **traps**, and **six pillars** — then Plan mode. A single male coach (Aldric) teaches **why** on key moves — text in the strip, optional voice. No floating chat head. Login is **Google only**.
 
 Production: [https://blitzbar.app](https://blitzbar.app) (Vercel project `ply-chess`, GitHub `EmmanuelXK/ply-chess`).
 
 ## Repertoire
 
-White: Scotch Gambit, Evans, Italian attacking, Vienna Gambit, King's Gambit, Grand Prix, Smith-Morra, French KIA, Caro-Kann Fantasy, London, Jobava London.
+Home is four racks on one page (not color pages). Rack membership lives in `src/lib/openings/racks.ts`; playable systems live in `src/lib/openings/specs.ts`. Tiles are square marks with the name in regular sans underneath; System / Semi stays a quiet caption. Phone vs iPad Air uses the auto size arranger.
 
-Black vs 1.e4: Black Lion, Pirc, Sicilian Dragon, Scandinavian, Alekhine.
+**White · Gambits:** Scotch Gambit, Evans, Vienna Gambit, King's Gambit, Smith-Morra, Grand Prix (semi-sharp).
 
-Black vs 1.d4: King's Indian, Modern Benoni, Benko, Dutch Leningrad, Budapest.
+**White · Systems:** London, Jobava, Italian attacking, French KIA, Caro-Kann Fantasy, **Alapin**, **English**, **Queen's Gambit**.
 
-Home modes: **Learn · Reps · Practice · Drill · Time Trial · Progress**. Systems sit in **White opening systems** and **Black opening systems**.
+**Black · vs 1.e4:** Black Lion, Pirc, Sicilian Dragon, Scandinavian, Alekhine, **Caro-Kann**.
+
+**Black · vs 1.d4:** King's Indian, Modern Benoni, Benko, Dutch Leningrad, Budapest, **Slav**.
+
+Home modes: **Learn · Reps · Practice · Drill · Time Trial · Progress**. Kind, vs-line, time, and traps live in Learn.
 
 ## Single coach
 
-Aldric speaks on **key plies** only. Teaching lives in the coach strip (purpose tag + short line) and optional TTS — there is no floating or draggable head on the board.
+Aldric speaks on **key plies** only — pins, story beats, authored Why, history milestones, and plans. Routine developing moves stay silent. Teaching lives in a short strip line plus optional TTS. There is no floating or draggable head on the board.
 
-Speech is **why this move** with a purpose tag: grab center, stabilize center, break center, attack weak square, notice the pin, free piece, stop opponent plan, and so on. Beats stay **6–15 words**. Consecutive plies do not repeat the same line. TTS clips for the next plies are prefetched so Forward / autoplay does not wait.
+Default speech is the **key point**, not a purpose-tag lecture on every ply. Beats stay **6–15 words**. Tap **Why** (strip) or **Explain** (dock) for the current move anytime. History opens from the strip mark when a milestone is on the ply. TTS clips for upcoming key plies are prefetched so Forward does not wait.
 
 Settings has **no coach picker, no duos, no Dual/Solo switch**.
 
 Lion and London have authored facts; other systems generate from the professor pack + History Gig Pack.
-
-The coach strip shows the **purpose tag**. Mid-line questions appear as tap chips.
 
 ### Voice
 Toggle **Voice** on the drill dock. Mute, Restart, Back/Forward, and navigation cancel in-flight audio.
@@ -65,16 +67,10 @@ Vercel: Project → Settings → Environment Variables. Server-only — never `N
 ### Why this still deploys without keys
 `/api/tts` uses the `ws` package only (no Python, no native binaries). Short clips finish under the function limit (`maxDuration` 15s). If Edge is down or you are offline, the client falls back to Web Speech.
 
-Every book move teaches:
-
-1. **Concept** of the move/square  
-2. **Why** it matters in this opening  
-3. **Next** attacking / positional plan  
-
-Soft-fail is rewritten. Lion coil is no longer `No. …Qc7 …h6 …Re8`. It's professor copy: one square, one job, then the sequence.
+The default path does **not** teach every book move. Key points fire on highlighted plies. Soft-fail is still professor copy: one square, one job.
 
 ### Why splash
-Tap **Why** on the coach strip (or dock). A fast splash opens with a mini board. The relevant **branch** auto-plays while the professor narrates. Colored arrows + Chess.com-style glyphs (`!!` `!` `!?` `?` `??`) land on key plies. **Back / Forward** and play/pause work inside the splash.
+Tap **Why** on the coach strip or **Explain** on the dock — available on every ply, including quiet developing moves. A splash opens with a mini board. The relevant **branch** auto-plays while the coach narrates. Colored arrows + Chess.com-style glyphs (`!!` `!` `!?` `?` `??`) land on those Why plies. **Back / Forward** and play/pause work inside the splash.
 
 Lion and London have authored Why lessons (Nd4-style “the knight should control these squares”). Other systems get generated lessons from the spine + coach.
 
@@ -122,7 +118,7 @@ npm run dev
 App: [http://127.0.0.1:43173](http://127.0.0.1:43173)
 
 ```bash
-npm run validate   # 21 spines legal, fingerprints, quizzes, professor, sourced history, legal Why branches
+npm run validate   # 26 spines legal, fingerprints, quizzes, professor, sourced history, legal Why branches
 npm run build
 ```
 
@@ -131,14 +127,15 @@ On an iPhone: open the URL, Share → Add to Home Screen.
 ## Add a system
 
 1. Add a spine in `src/lib/openings/spines.ts` (40–44 plies).
-2. Add a spec in `src/lib/openings/specs.ts` (`bookChunks`, traps, pillars, coach).
-3. Add a fingerprint in `src/lib/openings/fingerprints.ts`.
-4. Optional authored Why/quizzes in `src/lib/openings/authored.ts`.
-5. Add at least one sourced `HISTORY_PACK` row in `src/lib/openings/history.ts`.
-6. `makeOpening` compiles chunks + professor + history. Home and `/drill/[id]` pick it up.
+2. Add a spec in `src/lib/openings/specs.ts` (`bookChunks`, traps, pillars, coach). Spec `id` is the playable-system source of truth.
+3. Add that id to the right rack sequence in `src/lib/openings/racks.ts`. Home tiles come from racks, not from a second category list.
+4. Add a fingerprint in `src/lib/openings/fingerprints.ts`.
+5. Optional authored Why/quizzes in `src/lib/openings/authored.ts`.
+6. Add at least one sourced `HISTORY_PACK` row in `src/lib/openings/history.ts`.
+7. Add a square mark id in `src/lib/openings/mark-ids.ts`. `makeOpening` compiles chunks + professor + history. Home and `/drill/[id]` pick it up.
 
 Inspired by Lotus / Chessreps *ideas* — no copied code, assets, or branding.
 
 ## Sync note
 
-This repo is GitHub `EmmanuelXK/ply-chess` (what production `ply-chess` / blitzbar.app should track). If an Origin `grokmee/opening-edge` tree still exists, merge this branch there or point Vercel at this GitHub remote so the 21-system professor pack is what deploys.
+This repo is GitHub `EmmanuelXK/ply-chess` (what production `ply-chess` / blitzbar.app should track). If an Origin `grokmee/opening-edge` tree still exists, merge this branch there or point Vercel at this GitHub remote so the 26-system professor pack is what deploys.

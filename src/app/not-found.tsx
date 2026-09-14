@@ -11,8 +11,8 @@ export default function NotFound() {
         That line isn&apos;t in the book.
       </h1>
       <p className="mt-2 text-sm text-zinc-400">
-        Phase 1 is twenty-one attacking systems. Pick one from the home list —
-        London and Jobava are both in there.
+        Phase 1 is twenty-six attacking systems. Pick one from the home list —
+        Alapin, English, Caro, the Exchange package, and Slav are all in there.
       </p>
       <Button asChild className="mt-6">
         <Link href="/">Back to repertoire</Link>

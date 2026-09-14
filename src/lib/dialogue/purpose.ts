@@ -1,6 +1,6 @@
 import { COACH_SPEAKER, type SpeakerId } from "@/lib/tts/types";
 import { looksLikeMoveList } from "@/lib/openings/helpers";
-import { hookAt } from "./hooks";
+import { hookAt, spokenHook } from "./hooks";
 import { limitWords, nugget, wordCount } from "./short";
 import type { DialogueAsk, DialogueBeat, LessonFacts, PurposeTag } from "./types";
 
@@ -119,11 +119,8 @@ function askFromFacts(
   facts: LessonFacts,
   speaker: SpeakerId,
 ): DialogueAsk | undefined {
+  if (facts.kind !== "quiz") return undefined;
   if (!facts.quizPrompt || !facts.quizChoices?.length) return undefined;
-  if (facts.kind === "fail" || facts.kind === "hint" || facts.kind === "history") {
-    return undefined;
-  }
-  if (facts.kind !== "start" && facts.kind !== "quiz") return undefined;
   return {
     prompt: facts.quizPrompt,
     choices: facts.quizChoices,
@@ -171,21 +168,21 @@ function composeBody(facts: LessonFacts, purpose: PurposeTag, seed: number): str
     return `${facts.historyYear ?? "Here"}. ${nugget(facts.historyTitle, 5)}. ${tag}.`;
   }
   if (facts.kind === "start" || facts.ply < 0) {
-    const hook = authored ? limitWords(authored.hook, 9) : ideaOf(facts.concept, facts.chunkName);
+    if (authored) return spokenHook(authored);
+    const hook = ideaOf(facts.concept, facts.chunkName);
     return hook ? `${tag}. ${hook}` : tag;
   }
 
   if (authored && facts.ply === authored.ply) {
-    const line = seed % 2 === 0 ? authored.hook : authored.punch;
-    return `${tag}. ${limitWords(line, 9)}`;
+    return spokenHook(authored);
   }
 
   const variants = [
-    san ? `${san}. ${tag} — ${idea || "that's the job"}.` : `${tag}. ${idea}`,
+    `${tag}. ${idea || "that's the job"}`,
     authored
-      ? `${tag}. ${nugget(seed % 2 === 0 ? authored.hook : authored.punch, 8)}`
+      ? spokenHook(authored)
       : `${tag}. ${idea || facts.shortName}`,
-    san ? `${tag} with ${san}. ${idea || "One square, one job."}` : `${tag}. ${idea}`,
+    `${tag}. ${idea || "One square, one job."}`,
   ].filter((line) => line.trim() && !looksLikeMoveList(line));
   return variants[seed % variants.length] || `${tag}. ${idea || facts.shortName}`;
 }
@@ -201,23 +198,21 @@ export function purposeBeats(facts: LessonFacts, soloText?: string): DialogueBea
   const purpose = inferPurpose(facts);
   const speaker = pickSpeaker();
   let seed = hashSeed(facts);
-  let text = composeBody(facts, purpose, seed);
-
-  if (soloText?.trim() && facts.kind !== "ok" && facts.kind !== "start") {
-    text = `${phrase(purpose, seed)}. ${nugget(soloText, 8)}`;
-  }
+  const keyPoint = soloText?.trim();
+  let text = keyPoint ? limitWords(keyPoint) : composeBody(facts, purpose, seed);
 
   const prior = previousLine(facts);
   let guard = 0;
   while (prior && limitWords(text) === prior && guard < 4) {
     seed += 17;
+    if (keyPoint) break;
     text = composeBody(facts, purpose, seed);
     guard += 1;
   }
 
   const beat: DialogueBeat = {
     speaker,
-    text: withFloor(text, purpose),
+    text: keyPoint ? limitWords(text) : withFloor(text, purpose),
     kind:
       facts.kind === "fail"
         ? "fail"

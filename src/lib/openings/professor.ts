@@ -51,9 +51,10 @@ function autoBranch(opening: Opening, startPly: number, count = 6): WhyPly[] {
       opening.side === "white" ? ply % 2 === 0 : ply % 2 === 1;
     branch.push({
       san,
-      narrate:
-        script?.concept ??
-        `${san}. ${userMove ? "That's your move in this system." : "They play. Watch the squares it leaves."}`,
+      narrate: userMove
+        ? `${san}. ${script?.concept ?? "That's your move in this system."}`
+        : (script?.concept ??
+          `${san}. They play. Watch the squares it leaves.`),
       glyph: userMove ? "!" : undefined,
       arrows: [
         { orig: played.from, dest: played.to, brush: userMove ? "green" : "blue" },
@@ -75,12 +76,12 @@ function generateScripts(opening: Opening): ProfessorScript[] {
     const san = opening.moves[line.afterPly] ?? "";
     scripts.push({
       afterPly: line.afterPly,
-      concept: `${san} — ${line.text}`,
-      why: `${chunk?.job ?? opening.story.conflict} In this opening that square-job is the whole point.`,
+      concept: line.text,
+      why: `${san}. ${chunk?.job ?? opening.story.conflict} In this opening that square-job is the whole point.`,
       plan: opening.pillars.attackingPlan,
       whyLesson: {
         title: chunk?.name ?? san,
-        intro: `${san}. Here's why it belongs in ${opening.shortName}.`,
+        intro: `${san}. ${line.text}`,
         startPly: Math.min(line.afterPly + 1, opening.moves.length),
         branch: [],
       },
@@ -93,8 +94,8 @@ function generateScripts(opening: Opening): ProfessorScript[] {
     const san = opening.moves[ply] ?? "";
     scripts.push({
       afterPly: ply,
-      concept: `${san} — ${chunk.name}.`,
-      why: chunk.job,
+      concept: chunk.job || chunk.name,
+      why: `${san}. ${chunk.job}`,
       plan: opening.pillars.breaksAndStorms,
     });
   }
@@ -200,6 +201,43 @@ export function whyLessonAt(
   const upcoming = opening.professor.find((p) => p.afterPly === ply);
   if (upcoming?.whyLesson) return upcoming.whyLesson;
   return professorAt(opening, Math.max(0, ply - 1))?.whyLesson;
+}
+
+function withBranch(opening: Opening, lesson: WhyLesson): WhyLesson {
+  if (lesson.branch.length > 0) return lesson;
+  return { ...lesson, branch: autoBranch(opening, lesson.startPly, 4) };
+}
+
+function buildExplainLesson(opening: Opening, ply: number): WhyLesson {
+  const after = Math.max(0, ply > 0 ? ply - 1 : 0);
+  const script = professorAt(opening, after);
+  const chunk = chunkAt(opening, after);
+  const san = ply > 0 ? opening.moves[ply - 1] : (opening.moves[0] ?? "");
+  const startPly = Math.min(after, opening.moves.length);
+  return {
+    title: script?.whyLesson?.title ?? chunk?.name ?? "Why this move",
+    intro:
+      script?.why ??
+      script?.concept ??
+      chunk?.job ??
+      `${san ? `${san}. ` : ""}${opening.story.conflict}`,
+    startPly,
+    branch: autoBranch(opening, startPly, 4),
+  };
+}
+
+/** Always-on Why/Explain for the current position — authored first, generated fallback. */
+export function explainLessonAt(opening: Opening, ply: number): WhyLesson {
+  const lastPlayed = ply - 1;
+  if (lastPlayed >= 0) {
+    const exact = opening.professor.find((p) => p.afterPly === lastPlayed);
+    if (exact?.whyLesson) return withBranch(opening, exact.whyLesson);
+  }
+  const upcoming = opening.professor.find((p) => p.afterPly === ply);
+  if (upcoming?.whyLesson) return withBranch(opening, upcoming.whyLesson);
+  const nearby = whyLessonAt(opening, ply);
+  if (nearby) return withBranch(opening, nearby);
+  return buildExplainLesson(opening, ply);
 }
 
 export function quizForPly(

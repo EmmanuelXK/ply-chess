@@ -1,23 +1,28 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { TabBar } from "@/components/app/tab-bar";
 import { OpeningTile } from "@/components/home/opening-tile";
+import { useTileArranger } from "@/components/home/use-tile-arranger";
 import {
-  openingsForSide,
-  SIDE_META,
   STUDY_MODES,
+  openings,
+  weaponRacks,
   type Opening,
   type StudyMode,
+  type WeaponRack,
 } from "@/lib/openings";
+import type { TileLayout } from "@/lib/openings/arranger";
 import { useAuth } from "@/components/auth/auth-provider";
 import { dueCount, progressFor } from "@/lib/reps/schedule";
 
 export function RepertoireHome() {
   const [mode, setMode] = useState<StudyMode>("learn");
   const { profile } = useAuth();
-  const white = openingsForSide("white");
-  const black = openingsForSide("black");
+  const stageRef = useRef<HTMLDivElement>(null);
+  const layout = useTileArranger(stageRef);
+  const racks = weaponRacks(openings);
+  const trained = racks.reduce((sum, rack) => sum + rack.openings.length, 0);
 
   return (
     <div className="dash-shell dash-repertoire">
@@ -25,8 +30,8 @@ export function RepertoireHome() {
         <p className="dash-kicker">Your Weapons</p>
         <h1>Opening Edge</h1>
         <p className="dash-sub">
-          {white.length} White · {black.length} Black
-          {profile?.displayName ? ` · ${profile.displayName}` : " · systems you actually train"}
+          {trained} systems
+          {profile?.displayName ? ` · ${profile.displayName}` : ""}
         </p>
         <div className="mode-grid" role="tablist" aria-label="Study mode">
           {STUDY_MODES.map((m) => (
@@ -45,14 +50,17 @@ export function RepertoireHome() {
         </div>
         <p className="dash-mode-blurb">
           {mode === "progress"
-            ? "What stuck. Weak houses light up on the tiles."
+            ? "What stuck. Due counts sit on the mark."
             : STUDY_MODES.find((m) => m.id === mode)?.blurb}
         </p>
       </header>
 
-      <div className="dash-scroll dash-scroll-split">
-        <SidePane side="white" openings={white} mode={mode} />
-        <SidePane side="black" openings={black} mode={mode} />
+      <div className="dash-scroll dash-weapons-scroll">
+        <div ref={stageRef} className="weapons-stage">
+          {racks.map((rack) => (
+            <RackPane key={rack.id} rack={rack} mode={mode} layout={layout} />
+          ))}
+        </div>
       </div>
 
       <TabBar active="home" />
@@ -60,25 +68,40 @@ export function RepertoireHome() {
   );
 }
 
-function SidePane({
-  side,
-  openings,
+function RackPane({
+  rack,
   mode,
+  layout,
 }: {
-  side: "white" | "black";
-  openings: Opening[];
+  rack: WeaponRack<Opening>;
   mode: StudyMode;
+  layout: TileLayout | null;
 }) {
-  const meta = SIDE_META[side];
   return (
-    <section className={`dash-family dash-family-${side}`}>
+    <section
+      className={`dash-family dash-rack dash-rack-${rack.id}`}
+      data-rack={rack.id}
+      aria-label={rack.title}
+    >
       <header className="dash-family-head">
-        <h2>{meta.title}</h2>
-        <p>{openings.length}</p>
+        <h2>{rack.title}</h2>
+        <p>{rack.openings.length}</p>
       </header>
-      <p className="dash-family-blurb">{meta.blurb}</p>
-      <div className="dash-grid">
-        {openings.map((opening) => {
+      <p className="dash-family-blurb">{rack.blurb}</p>
+      <div
+        className="weapon-grid"
+        data-arranged={layout ? "true" : undefined}
+        style={
+          layout
+            ? {
+                ["--weapon-cols" as string]: String(layout.cols),
+                ["--weapon-tile" as string]: `${layout.tile}px`,
+                ["--weapon-gap" as string]: `${layout.gap}px`,
+              }
+            : undefined
+        }
+      >
+        {rack.openings.map((opening) => {
           const progress = progressFor(opening.id);
           const due = dueCount(opening.id);
           return (
