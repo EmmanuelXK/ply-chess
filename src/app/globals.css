@@ -249,7 +249,7 @@ body,
 }
 
 .dash-repertoire .dash-scroll {
-  padding: 0.15rem clamp(1.15rem, 4.2vw, 2.4rem) 0.7rem;
+  padding: 0.15rem clamp(1.15rem, 4.2vw, 2.4rem) 1.35rem;
 }
 
 .weapons-stage {
@@ -263,6 +263,10 @@ body,
 
 .dash-repertoire .dash-family {
   margin-bottom: 1.55rem;
+}
+
+.dash-repertoire .dash-family:last-child {
+  margin-bottom: 0.35rem;
 }
 
 .dash-family-head {
