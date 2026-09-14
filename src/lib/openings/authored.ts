@@ -328,6 +328,276 @@ export const authoredProfessor: Record<string, ProfessorScript[]> = {
       plan: "Hold e5. Reload Ndf3. If they hop …Ne4, take on your terms. Then chip c4 or park a knight on c5.",
     },
   ],
+  alapin: [
+    {
+      afterPly: 2,
+      concept:
+        "c3 — this pawn should support d4. It's the Alapin house, not a Morra gambit.",
+      why: "If you play d4 first you transposed to a Smith-Morra. c3 first means you recapture with a pawn and keep a classical centre.",
+      plan: "d4 next. If they take, recapture with the c-pawn. The queen on d5 is a target.",
+      whyLesson: {
+        title: "c3 house",
+        intro:
+          "c3. Why this pawn? Because d4 is coming, and you want a pawn recapture — not an Open Sicilian.",
+        startPly: 3,
+        branch: [
+          {
+            san: "d5",
+            narrate: "They hit the center. Fine. That's the main try.",
+            arrows: [{ orig: "d7", dest: "d5", brush: "blue" }],
+          },
+          {
+            san: "exd5",
+            narrate:
+              "Take. The queen will come to d5. That's a target, not a crisis.",
+            glyph: "!",
+            arrows: [
+              { orig: "e4", dest: "d5", brush: "green" },
+              { orig: "c3", dest: "d4", brush: "yellow" },
+            ],
+            circles: ["d4", "d5"],
+          },
+        ],
+      },
+    },
+    {
+      afterPly: 6,
+      concept:
+        "d4 — the classical centre. This pawn should be recaptured with a pawn, never gambited here.",
+      why: "The Alapin is the anti-Sicilian that still occupies the middle. If you recapture with a piece you donated the whole idea.",
+      plan: "Develop, castle, then tempo the queen with Nc3 and Nb5.",
+    },
+    {
+      afterPly: 18,
+      concept:
+        "Nb5 — the queen should not sit on d6. Kick her. Then the c5 hole is yours.",
+      why: "In this opening the queen came out early. Every tempo on her is development you didn't have to invent.",
+      plan: "Bf4, Bg3, castle already done. Then Nc5 and pile the c-file.",
+    },
+    {
+      afterPly: 30,
+      concept:
+        "Nc5 — the knight should sit here. Control d7, b7, e6, a6. Don't hop off.",
+      why: "The c-file is the Alapin's joke. A knight on c5 plus doubled rooks is how the IQP attacking game actually starts.",
+      plan: "Double rooks. Bd3 aims at h7. Don't donate the d-pawn for a cheap trick.",
+    },
+  ],
+  english: [
+    {
+      afterPly: 0,
+      concept:
+        "c4 — the flank pawn should own d5. Don't rush a queen-pawn centre.",
+      why: "The English is a Sicilian with an extra tempo. c4 fights for d5 from the side so you can clamp later with e4.",
+      plan: "Nc3, g3, Bg2. Then e4. Same house every game vs …e5.",
+    },
+    {
+      afterPly: 8,
+      concept:
+        "e4 — this pawn should clamp d5 with c4. That's the Botvinnik bind.",
+      why: "Together the c- and e-pawns make a hole on d5. If you play d4 too soon you hand that hole back.",
+      plan: "Knight to e2, not f3. Castle, then sit Nd5.",
+      whyLesson: {
+        title: "Botvinnik clamp",
+        intro:
+          "e4. Why both wing and centre pawns? Because d5 should be a hole they have to live on.",
+        startPly: 9,
+        branch: [
+          {
+            san: "d6",
+            narrate: "They build a King's Indian shell. Fine.",
+            arrows: [{ orig: "d7", dest: "d6", brush: "blue" }],
+          },
+          {
+            san: "Nge2",
+            narrate:
+              "Knight to e2. This piece should leave the f-pawn free to run. That's essential in this opening.",
+            glyph: "!",
+            arrows: [
+              { orig: "g1", dest: "e2", brush: "green" },
+              { orig: "f2", dest: "f4", brush: "yellow" },
+            ],
+            circles: ["e2", "d5", "f4"],
+          },
+        ],
+      },
+    },
+    {
+      afterPly: 10,
+      concept:
+        "Nge2 — the knight should sit here so the f-pawn can breathe. Not f3.",
+      why: "Nf3 is a legal developing move and a strategic own-goal. The Botvinnik plan is f4. You cannot play f4 with a knight on f3.",
+      plan: "Castle, Nd5, then b4. Open f when they chip …f5.",
+    },
+    {
+      afterPly: 16,
+      concept:
+        "Nd5 — the knight should sit on the hole. Control c7, e7, f6, b6, f4.",
+      why: "This is why you clamped. If you hop off, you donated the opening. Let them live with a bone in their throat.",
+      plan: "Be3, Qd2, Rac1. Hold …f5. Expand b4. Take on f4 later.",
+    },
+  ],
+  "caro-kann": [
+    {
+      afterPly: 1,
+      concept:
+        "…c6 — this pawn should support …d5 without jailing the bishop. That's the Caro wall.",
+      why: "A French plays …e6 first and the light bishop suffers. The Caro waits one ply so …Bf5 can breathe.",
+      plan: "…d5 next. If they push e5, bishop out immediately.",
+    },
+    {
+      afterPly: 5,
+      concept:
+        "…Bf5 — this bishop should breathe outside the chain. It's the soul of the Caro.",
+      why: "If you play …e6 first you have a French with extra tempo lost. Bishop out, then the wall is allowed to close.",
+      plan: "…e6, then …c5. Chip the head of their e5 pawn.",
+      whyLesson: {
+        title: "Bishop outside",
+        intro:
+          "…Bf5. Why this diagonal before …e6? Because once the chain closes, this bishop never gets this air again.",
+        startPly: 6,
+        branch: [
+          {
+            san: "Nf3",
+            narrate: "Short's quiet try. They don't storm h4 yet.",
+            arrows: [{ orig: "g1", dest: "f3", brush: "blue" }],
+          },
+          {
+            san: "e6",
+            narrate:
+              "…e6 now. The bishop already breathed. This pawn should support …c5 and free the other bishop.",
+            glyph: "!",
+            arrows: [
+              { orig: "e7", dest: "e6", brush: "green" },
+              { orig: "c6", dest: "c5", brush: "yellow" },
+            ],
+            circles: ["f5", "c5"],
+          },
+        ],
+      },
+    },
+    {
+      afterPly: 9,
+      concept:
+        "…c5 — this pawn should chip the head of e5. Don't let their wedge sit forever.",
+      why: "The Advance is a space grab. …c5 is how you ask d4 what it's doing, and how you open c for a knight later.",
+      plan: "Knights to c6 and e7-f5. Castle. Then …Nc4.",
+    },
+    {
+      afterPly: 19,
+      concept:
+        "…Nf5 — the knight should sit on this hole. Control d4, e3, g3, h4, d6.",
+      why: "They left f5 when the pawn went to e5. Sitting here pressures d4 and readies the c4 outpost.",
+      plan: "If they take, the e-file opens. If they don't, hop the other knight toward c4.",
+    },
+  ],
+  "queens-gambit": [
+    {
+      afterPly: 2,
+      concept:
+        "c4 — this pawn should pressure d5. You are offering a wing pawn to own the centre.",
+      why: "You don't cling to c4. The deal is a classical centre and, after the exchange, a minority attack.",
+      plan: "Nc3, then take on d5. One package. Not an encyclopedia.",
+    },
+    {
+      afterPly: 6,
+      concept:
+        "cxd5 — the exchange. This capture should create the minority: two pawns vs three on the queenside.",
+      why: "Without the exchange you have a giant Orthodox tree. With it you have one plan: b4-b5 vs c6.",
+      plan: "Bg5, e3, Bd3, Qc2, castle. Then Rab1.",
+      whyLesson: {
+        title: "The minority",
+        intro:
+          "cxd5. Why take? Because the queenside pawn count is now the story — not a thirty-line main.",
+        startPly: 7,
+        branch: [
+          {
+            san: "exd5",
+            narrate: "They recapture. The wall will be …c6.",
+            arrows: [{ orig: "e6", dest: "d5", brush: "blue" }],
+          },
+          {
+            san: "Bg5",
+            narrate:
+              "Pin. This bishop should freeze the knight that defends d5 and e4 ideas.",
+            glyph: "!",
+            arrows: [
+              { orig: "c1", dest: "g5", brush: "green" },
+              { orig: "g5", dest: "f6", brush: "yellow" },
+            ],
+            circles: ["f6", "d5"],
+          },
+        ],
+      },
+    },
+    {
+      afterPly: 20,
+      concept:
+        "Rab1 — the rook should sit behind the b-pawn. That's the minority tell.",
+      why: "If the rook stays on a1, b4 hangs or the a-file opens in their favour. b1 is the battery square for b4-b5.",
+      plan: "a3 if they play …a5. Then b4 anyway. Then b5 wrecks c6.",
+    },
+    {
+      afterPly: 24,
+      concept:
+        "b4 — this pawn should crack c6. Don't get talked out of it by …a5.",
+      why: "The minority attack is two pawns charging three. b4-b5 leaves a backward or isolated c-pawn. That's the whole opening.",
+      plan: "b5, then Ne5. Pile the c-file. Ending time.",
+    },
+  ],
+  slav: [
+    {
+      afterPly: 3,
+      concept:
+        "…c6 — this pawn should support …d5 without jailing the bishop. Slav wall, not Semi.",
+      why: "…e6 here is a Semi-Slav, a different house with a buried bishop. The Slav waits so …Bf5 can breathe.",
+      plan: "…Nf6, then …dxc4, then the bishop out. Don't mix the two systems.",
+    },
+    {
+      afterPly: 7,
+      concept:
+        "…dxc4 — take first. The pawn can wait. The bishop cannot.",
+      why: "If you close with …e6 now you never get …Bf5. Taking on c4 is how the Classical Slav frees the light bishop.",
+      plan: "They play a4 to stop …b5. You develop …Bf5 anyway.",
+    },
+    {
+      afterPly: 9,
+      concept:
+        "…Bf5 — this bishop should breathe outside the chain. It's the soul of the Slav.",
+      why: "Same joke as the Caro: bishop out, then …e6. If you reverse it you are playing a Semi without the Semi's theory.",
+      plan: "…e6, …Bb4, castle. Hop …Nd5 if they shove e5.",
+      whyLesson: {
+        title: "Bishop outside",
+        intro:
+          "…Bf5. Why this diagonal before …e6? Because the Slav is the wall that refused to jail its bishop.",
+        startPly: 10,
+        branch: [
+          {
+            san: "e3",
+            narrate: "They build a house to take c4 back.",
+            arrows: [{ orig: "e2", dest: "e3", brush: "blue" }],
+          },
+          {
+            san: "e6",
+            narrate:
+              "…e6 now. The bishop already breathed. This pawn should blunt e4 and free the other bishop.",
+            glyph: "!",
+            arrows: [
+              { orig: "e7", dest: "e6", brush: "green" },
+              { orig: "c8", dest: "f5", brush: "yellow" },
+            ],
+            circles: ["f5", "e4"],
+          },
+        ],
+      },
+    },
+    {
+      afterPly: 13,
+      concept:
+        "…Bb4 — this bishop should pin the knight so e4 costs them a story.",
+      why: "Without the pin they shove e4-e5 and hunt your light bishop. Bb4 makes the centre push a concession.",
+      plan: "Castle, tuck the bishop to g6-h5, hop …Nd5 when the e-pawn runs.",
+    },
+  ],
 };
 
 export const authoredQuizzes: Record<string, PositionalQuiz[]> = {
@@ -477,6 +747,161 @@ export const authoredQuizzes: Record<string, PositionalQuiz[]> = {
           correct: false,
           reaction:
             "No. You already kept your London bishop. This knight is an outpost, not a swap-meet.",
+        },
+      ],
+    },
+  ],
+  alapin: [
+    {
+      id: "alapin-c3",
+      fromPly: 0,
+      toPly: 6,
+      prompt: "What's the job of 2.c3 — the plan, not the move list?",
+      choices: [
+        {
+          id: "a",
+          text: "Gambit the c-pawn like a Smith-Morra and hunt f7.",
+          correct: false,
+          reaction:
+            "No. That's the other anti-Sicilian. The Alapin recaptures with a pawn.",
+        },
+        {
+          id: "b",
+          text: "Support d4, recapture with a pawn, and keep a classical centre.",
+          correct: true,
+          reaction:
+            "Yes. c3 is the house. d4 comes next. The queen on d5 is a target.",
+        },
+        {
+          id: "c",
+          text: "Play an Open Sicilian with an extra tempo.",
+          correct: false,
+          reaction:
+            "No. You refused the Open Sicilian on purpose. That's the whole tile.",
+        },
+      ],
+    },
+  ],
+  english: [
+    {
+      id: "english-clamp",
+      fromPly: 8,
+      toPly: 16,
+      prompt: "c4 and e4 are on. What should those pawns actually own?",
+      choices: [
+        {
+          id: "a",
+          text: "A hole on d5. Sit a knight there. Don't give it back with a bored d4.",
+          correct: true,
+          reaction:
+            "Yes. That's the Botvinnik clamp. Nd5 sits. The f-pawn still runs because the knight went to e2.",
+        },
+        {
+          id: "b",
+          text: "A kingside pawn storm starting with h4 this second.",
+          correct: false,
+          reaction:
+            "No. This is a squeeze. h4 is not the opening's soul.",
+        },
+        {
+          id: "c",
+          text: "A reversed Open Sicilian with Nf3 and d4 immediately.",
+          correct: false,
+          reaction:
+            "No. Nf3 blocks f4. d4 too soon hands the hole back.",
+        },
+      ],
+    },
+  ],
+  "caro-kann": [
+    {
+      id: "caro-bishop",
+      fromPly: 1,
+      toPly: 9,
+      prompt: "What's the Caro's first job — not the move list?",
+      choices: [
+        {
+          id: "a",
+          text: "Play …e6 first and attack like a French Winawer.",
+          correct: false,
+          reaction:
+            "No. That's a French jail. The Caro waits so the bishop can breathe.",
+        },
+        {
+          id: "b",
+          text: "Wall with …c6, get the bishop outside, then chip …c5.",
+          correct: true,
+          reaction:
+            "Yes. Bishop outside the chain. That's the whole opening. Then …c5 chips e5.",
+        },
+        {
+          id: "c",
+          text: "Castle long and storm the kingside on move eight.",
+          correct: false,
+          reaction:
+            "No. The Caro wins endings and files, not 12-move mates.",
+        },
+      ],
+    },
+  ],
+  "queens-gambit": [
+    {
+      id: "qg-minority",
+      fromPly: 6,
+      toPly: 24,
+      prompt: "You took on d5. What is the positional job of the minority?",
+      choices: [
+        {
+          id: "a",
+          text: "Storm h4-h5 and mate before move 20.",
+          correct: false,
+          reaction:
+            "No. This package is a queenside wreck, not a kingside fantasy.",
+        },
+        {
+          id: "b",
+          text: "Rook behind the b-pawn, b4-b5, leave them a backward c-pawn.",
+          correct: true,
+          reaction:
+            "Yes. Rab1, b4, b5. Wreck c6. That's the one plan you trained.",
+        },
+        {
+          id: "c",
+          text: "Gambit the d-pawn and hunt f7 with a bishop.",
+          correct: false,
+          reaction:
+            "No. You exchanged to create a pawn-count story, not a romantic sac.",
+        },
+      ],
+    },
+  ],
+  slav: [
+    {
+      id: "slav-bishop",
+      fromPly: 3,
+      toPly: 13,
+      prompt: "What's the Slav's job that the Semi-Slav doesn't share?",
+      choices: [
+        {
+          id: "a",
+          text: "Play …e6 first and bury the light bishop on c8.",
+          correct: false,
+          reaction:
+            "No. That's Semi. This tile is the wall that refused jail.",
+        },
+        {
+          id: "b",
+          text: "Take on c4, get …Bf5 out, only then …e6.",
+          correct: true,
+          reaction:
+            "Yes. Bishop outside. Then pin …Bb4. Don't mix a Semi into this spine.",
+        },
+        {
+          id: "c",
+          text: "Storm …g5 and castle long on move ten.",
+          correct: false,
+          reaction:
+            "No. The Slav is a wall. Don't invent a pawn storm on move eight.",
         },
       ],
     },

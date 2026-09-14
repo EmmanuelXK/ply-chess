@@ -85,7 +85,7 @@ describe("male-only coach", () => {
     assert.doesNotMatch(knight.beats[0]?.text ?? "", /Hide, then bite|Coil, then strike/);
   });
 
-  it("stays sparse across the repertoire", () => {
+    it("stays sparse across the repertoire", () => {
     for (const opening of openings) {
       const keys = opening.moves.filter((_, ply) => isKeyPly(opening, ply)).length;
       assert.ok(
@@ -93,5 +93,32 @@ describe("male-only coach", () => {
         `${opening.id} still teaches every ply`,
       );
     }
+  });
+
+  it("adds the five new weapons as sparse concept systems", () => {
+    const ids = ["alapin", "english", "caro-kann", "queens-gambit", "slav"];
+    for (const id of ids) {
+      const opening = getOpening(id);
+      assert.ok(opening, `missing ${id}`);
+      const keys = opening.moves
+        .map((_, ply) => ply)
+        .filter((ply) => isKeyPly(opening, ply));
+      assert.ok(keys.length >= 4, `${id} needs concept keys, got ${keys.length}`);
+      assert.ok(
+        keys.length <= Math.floor(opening.moves.length * 0.45),
+        `${id} too chatty: ${keys.length}/${opening.moves.length}`,
+      );
+      assert.ok(opening.traps.length >= 3, `${id} needs a trap pack`);
+    }
+    assert.equal(getOpening("alapin")?.side, "white");
+    assert.equal(getOpening("english")?.side, "white");
+    assert.equal(getOpening("queens-gambit")?.side, "white");
+    assert.equal(getOpening("caro-kann")?.side, "black");
+    assert.equal(getOpening("slav")?.side, "black");
+    assert.ok(isKeyPly(getOpening("alapin")!, 2), "c3 should be an Alapin key");
+    assert.ok(isKeyPly(getOpening("english")!, 8), "e4 clamp should be an English key");
+    assert.ok(isKeyPly(getOpening("caro-kann")!, 5), "…Bf5 should be a Caro key");
+    assert.ok(isKeyPly(getOpening("queens-gambit")!, 20), "Rab1 should be a minority key");
+    assert.ok(isKeyPly(getOpening("slav")!, 9), "…Bf5 should be a Slav key");
   });
 });
