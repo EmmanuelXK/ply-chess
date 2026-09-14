@@ -19,8 +19,8 @@ export function leadsWithSan(text: string): boolean {
  * Drop a leading move-label (`Bf4 —`, `…Nbd7.`, `d4.`) when the rest is the idea.
  * Leaves sentences that use a square as a noun (`This pawn is a rock`).
  */
-export function stripLeadingSanLabel(text: string): string {
-  const cleaned = stripProfessor(text.replace(/\s+/g, " ").trim());
+export function stripLeadingSanLabel(text: string | undefined): string {
+  const cleaned = stripProfessor((text ?? "").replace(/\s+/g, " ").trim());
   if (!cleaned) return "";
   const labeled = cleaned.match(SAN_LABEL);
   if (!labeled?.[1]) return cleaned;
