@@ -820,6 +820,11 @@ export const SHORT_HOOKS: Record<string, ShortHook[]> = {
     },
     {
       ply: 6,
+      they: "They parked the queen.",
+      we: "Stake the centre. Recapture later.",
+    },
+    {
+      ply: 14,
       they: "They opened the c-file.",
       we: "Recapture with a pawn.",
     },
@@ -879,7 +884,7 @@ export const SHORT_HOOKS: Record<string, ShortHook[]> = {
     },
     {
       ply: 1,
-      they: "They open the king file.",
+      they: "They plant the king pawn.",
       we: "Wall first. Bishop stays free.",
     },
     {
@@ -916,8 +921,8 @@ export const SHORT_HOOKS: Record<string, ShortHook[]> = {
     },
     {
       ply: 6,
-      they: "They recapture toward the wall.",
-      we: "Take it. Now the minority is legal.",
+      they: "They develop the knight.",
+      we: "Take the centre. Minority starts.",
     },
     {
       ply: 20,

@@ -921,6 +921,7 @@ export const spines: Record<string, string[]> = {
     "Rxc5",
     "Bc6",
     "Bd3",
+    "Qd7",
   ],
   english: [
     "c4",
@@ -964,6 +965,7 @@ export const spines: Record<string, string[]> = {
     "Kxg2",
     "cxd5",
     "cxd5",
+    "Nc6",
   ],
   "caro-kann": [
     "e4",
@@ -1007,6 +1009,7 @@ export const spines: Record<string, string[]> = {
     "b3",
     "Nb6",
     "Ba3",
+    "Bxa3",
   ],
   "queens-gambit": [
     "d4",

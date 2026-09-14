@@ -77,7 +77,7 @@ export function AnalyzeSplash({
       <div className="splash-card splash-in analyze-card">
         <header className="splash-head">
           <div className="min-w-0">
-            <p className="text-[11px] font-medium tracking-[0.16em] text-sky-200/80 uppercase">
+            <p className="text-[11px] font-medium tracking-[0.16em] text-[var(--ember)] uppercase">
               Analyze
             </p>
             <h2 className="truncate text-[17px] font-semibold tracking-tight">

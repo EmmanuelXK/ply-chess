@@ -37,3 +37,8 @@ export function needsPromotion(chess: Chess, from: Square, to: Square): boolean 
   const rank = to[1];
   return rank === "8" || rank === "1";
 }
+
+export function lastMoveFrom(chess: Chess): Key[] | null {
+  const last = chess.history({ verbose: true }).at(-1);
+  return last ? [last.from as Key, last.to as Key] : null;
+}

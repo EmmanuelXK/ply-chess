@@ -32,6 +32,7 @@ interface ChessBoardProps {
   check?: boolean;
   coordinates?: boolean;
   animationMs?: number;
+  resyncKey?: number;
   onMove: (from: Key, to: Key) => void;
   onLongPress?: () => void;
 }
@@ -43,7 +44,7 @@ const brushes: DrawBrushes = {
   yellow: { key: "y", color: "#e68f00", opacity: 1, lineWidth: 10 },
   purple: { key: "p", color: "#7e22ce", opacity: 0.92, lineWidth: 9 },
   last: { key: "last", color: "#d97706", opacity: 0.92, lineWidth: 7 },
-  hint: { key: "hint", color: "#7aa2ff", opacity: 0.88, lineWidth: 9 },
+  hint: { key: "hint", color: "#d97706", opacity: 0.88, lineWidth: 9 },
 };
 
 export function ChessBoard({
@@ -60,6 +61,7 @@ export function ChessBoard({
   check = false,
   coordinates = true,
   animationMs = 90,
+  resyncKey = 0,
   onMove,
   onLongPress,
 }: ChessBoardProps) {
@@ -79,6 +81,7 @@ export function ChessBoard({
     check,
     coordinates,
     animationMs,
+    resyncKey,
   });
   const [side, setSide] = useState(0);
   const [ready, setReady] = useState(false);
@@ -99,6 +102,7 @@ export function ChessBoard({
       check,
       coordinates,
       animationMs,
+      resyncKey,
     };
   });
 
@@ -232,6 +236,7 @@ export function ChessBoard({
     arrows,
     circles,
     animationMs,
+    resyncKey,
   ]);
 
   useEffect(() => {
@@ -239,20 +244,35 @@ export function ChessBoard({
     const host = hostRef.current;
     if (!host) return;
     let timer: number | null = null;
-    const start = () => {
+    let startX = 0;
+    let startY = 0;
+    const start = (event: PointerEvent) => {
+      startX = event.clientX;
+      startY = event.clientY;
       timer = window.setTimeout(() => onLongPress(), 420);
+    };
+    const moved = (event: PointerEvent) => {
+      if (timer === null) return;
+      const dx = event.clientX - startX;
+      const dy = event.clientY - startY;
+      if (dx * dx + dy * dy > 64) {
+        window.clearTimeout(timer);
+        timer = null;
+      }
     };
     const clear = () => {
       if (timer !== null) window.clearTimeout(timer);
       timer = null;
     };
     host.addEventListener("pointerdown", start);
+    host.addEventListener("pointermove", moved);
     host.addEventListener("pointerup", clear);
     host.addEventListener("pointercancel", clear);
     host.addEventListener("pointerleave", clear);
     return () => {
       clear();
       host.removeEventListener("pointerdown", start);
+      host.removeEventListener("pointermove", moved);
       host.removeEventListener("pointerup", clear);
       host.removeEventListener("pointercancel", clear);
       host.removeEventListener("pointerleave", clear);

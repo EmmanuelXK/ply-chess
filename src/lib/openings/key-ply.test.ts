@@ -5,6 +5,7 @@ import { COACH_SPEAKER } from "../tts/types";
 import { coachAfterPly, shouldSpeakCoach } from "./coach";
 import { explainLessonAt, getOpening, openings } from "./index";
 import { isKeyPly, keyPlyReasons } from "./key-ply";
+import { isUserPly } from "./helpers";
 
 describe("isKeyPly", () => {
   it("marks Lion pins, story, history, and authored Why — not every develop ply", () => {
@@ -120,5 +121,12 @@ describe("male-only coach", () => {
     assert.ok(isKeyPly(getOpening("caro-kann")!, 5), "…Bf5 should be a Caro key");
     assert.ok(isKeyPly(getOpening("queens-gambit")!, 20), "Rab1 should be a minority key");
     assert.ok(isKeyPly(getOpening("slav")!, 9), "…Bf5 should be a Slav key");
+    assert.equal(getOpening("alapin")?.moves.length, 42);
+    assert.equal(getOpening("english")?.moves.length, 42);
+    assert.equal(getOpening("caro-kann")?.moves.length, 42);
+    assert.equal(getOpening("alapin")?.moves.at(-1), "Qd7");
+    assert.equal(getOpening("english")?.moves.at(-1), "Nc6");
+    assert.equal(getOpening("caro-kann")?.moves.at(-1), "Bxa3");
+    assert.equal(isUserPly("black", (getOpening("caro-kann")?.moves.length ?? 0) - 1), true);
   });
 });

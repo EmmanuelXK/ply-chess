@@ -176,7 +176,8 @@ body,
   padding: 0;
 }
 
-.dash-shell.dash-repertoire {
+.dash-shell.dash-repertoire,
+.dash-shell.theory-shell {
   max-width: 72rem;
   width: 100%;
 }
@@ -186,7 +187,8 @@ body,
   padding: calc(env(safe-area-inset-top) + 0.45rem) 1rem 0.1rem;
 }
 
-.dash-repertoire .dash-head {
+.dash-repertoire .dash-head,
+.theory-shell .dash-head {
   padding: calc(env(safe-area-inset-top) + 0.7rem) clamp(1.15rem, 4.2vw, 2.4rem)
     0.35rem;
 }
@@ -231,9 +233,25 @@ body,
 }
 
 .dash-mode-blurb,
-.dash-lotus,
-.dash-family-blurb {
+.dash-lotus {
   display: none;
+}
+
+.dash-family-blurb {
+  display: block;
+  margin: 0 0 0.45rem;
+  font-size: 11px;
+  color: var(--mist);
+  line-height: 1.35;
+}
+
+.dash-repertoire .dash-mode-blurb,
+.dash-head .dash-mode-blurb {
+  display: block;
+  margin: 0.1rem 0 0.35rem;
+  font-size: 12px;
+  color: var(--mist);
+  line-height: 1.35;
 }
 
 .dash-lotus {
@@ -852,6 +870,12 @@ body,
   overflow: auto;
 }
 
+.coach-strip.coach-strip-ask {
+  max-height: none;
+  align-items: flex-start;
+  overflow: visible;
+}
+
 .coach-strip p {
   margin: 0;
   display: -webkit-box;
@@ -1293,16 +1317,20 @@ body,
 .drill-dock {
   flex: 0 0 auto;
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-around;
   gap: 0.1rem;
   padding: 0.2rem 0.15rem calc(env(safe-area-inset-bottom) + 0.45rem);
 }
 
 .dock-btn {
-  min-width: 3.15rem;
+  min-width: 0;
+  flex: 1 1 2.6rem;
+  max-width: 4.6rem;
   height: 2.85rem;
   color: #d4d4d8;
   flex-direction: column;
+  flex-shrink: 1;
   gap: 0.12rem;
   font-size: 10px;
   font-weight: 650;
@@ -2312,6 +2340,7 @@ body,
 
 .auth-google,
 .auth-phone,
+.set-save,
 .auth-signout {
   height: 2.85rem;
   border-radius: 0.85rem;
@@ -2346,7 +2375,8 @@ body,
   flex: none;
 }
 
-.auth-phone {
+.auth-phone,
+.set-save {
   margin-top: 0.45rem;
   color: var(--cream);
   background: var(--charcoal-2);

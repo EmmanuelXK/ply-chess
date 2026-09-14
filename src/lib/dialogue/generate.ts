@@ -195,9 +195,9 @@ export function dialogueForWhy(
     kind: "why",
     whyLesson: lesson,
   });
-  facts.concept = nugget(narrate, 10) || facts.concept;
-  facts.why = nugget(lesson.intro, 8);
-  return sceneFromFacts(facts, opts.duo, opts.mode, nugget(narrate, 12));
+  facts.concept = limitWords(narrate, 15) || facts.concept;
+  facts.why = limitWords(lesson.intro, 15);
+  return sceneFromFacts(facts, opts.duo, opts.mode, limitWords(narrate, 15));
 }
 
 export function dialogueForHistory(
