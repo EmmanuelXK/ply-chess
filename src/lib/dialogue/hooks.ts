@@ -809,6 +809,11 @@ export const SHORT_HOOKS: Record<string, ShortHook[]> = {
   ],
   alapin: [
     {
+      ply: -1,
+      they: "They want a street fight.",
+      we: "Same house. Recapture with a pawn.",
+    },
+    {
       ply: 2,
       they: "They want an Open Sicilian.",
       we: "Build a pawn center instead.",
@@ -835,6 +840,11 @@ export const SHORT_HOOKS: Record<string, ShortHook[]> = {
     },
   ],
   english: [
+    {
+      ply: -1,
+      they: "They expect a king's pawn game.",
+      we: "Own the hole from the flank.",
+    },
     {
       ply: 0,
       they: "They expect a king's pawn fight.",
@@ -863,6 +873,11 @@ export const SHORT_HOOKS: Record<string, ShortHook[]> = {
   ],
   "caro-kann": [
     {
+      ply: -1,
+      they: "They want a French jail.",
+      we: "Caro wall. Bishop breathes first.",
+    },
+    {
       ply: 1,
       they: "They open the king file.",
       we: "Wall first. Bishop stays free.",
@@ -890,6 +905,11 @@ export const SHORT_HOOKS: Record<string, ShortHook[]> = {
   ],
   "queens-gambit": [
     {
+      ply: -1,
+      they: "They want a solid queen-pawn wall.",
+      we: "Offer the wing. Then wreck it.",
+    },
+    {
       ply: 2,
       they: "They grab a stake in the center.",
       we: "Offer the wing. You want the middle.",
@@ -916,6 +936,11 @@ export const SHORT_HOOKS: Record<string, ShortHook[]> = {
     },
   ],
   slav: [
+    {
+      ply: -1,
+      they: "They hope you mix the systems.",
+      we: "Slav wall. Bishop out first.",
+    },
     {
       ply: 3,
       they: "They want a Semi mix.",
