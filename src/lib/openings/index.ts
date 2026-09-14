@@ -38,6 +38,19 @@ export {
   openingKind,
   positionalIdea,
 } from "./helpers";
+export { openingDossier, openingHouses, studyHref } from "./dossier";
+export {
+  RACK_META,
+  RACK_ORDER,
+  RESERVED_OPENING_IDS,
+  canonicalOpeningId,
+  openingsInRack,
+  rackForOpening,
+  rackForOpeningId,
+  weaponRacks,
+  type RackId,
+  type WeaponRack,
+} from "./racks";
 export {
   housePicture,
   housePictureAt,
