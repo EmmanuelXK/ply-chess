@@ -19,6 +19,9 @@ describe("isKeyPly", () => {
       `too chatty: ${keys.length}/${lion.moves.length} plies`,
     );
     assert.ok(isKeyPly(lion, 7), "…e5 should be a key Lion ply");
+    assert.equal(isKeyPly(lion, 2), false, "d4 is a developing move");
+    assert.equal(isKeyPly(lion, 3), false, "…Nf6 is a developing move");
+    assert.equal(isKeyPly(lion, 6), false, "Nf3 is a developing move, not a leaked history key");
     const quiet = lion.moves.findIndex((_, ply) => !isKeyPly(lion, ply));
     assert.ok(quiet >= 0, "Lion should have at least one silent develop ply");
     assert.ok(keyPlyReasons(lion, 7).length > 0);

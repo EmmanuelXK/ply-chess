@@ -26,10 +26,8 @@ export function keyPlyReasons(opening: Opening, afterPly: number): KeyPlyReason[
   if (opening.storyBeats.some((beat) => beat.afterPly === afterPly)) {
     reasons.push("story");
   }
-  if (
-    historyAt(opening, afterPly).length > 0 ||
-    historyAt(opening, afterPly + 1).length > 0
-  ) {
+  // plyOrFen is the drill ply (moves played). That is afterPly + 1.
+  if (historyAt(opening, afterPly + 1).length > 0) {
     reasons.push("history");
   }
   if (authoredProfessor[opening.id]?.some((row) => row.afterPly === afterPly)) {
@@ -45,7 +43,7 @@ export function keyPlyReasons(opening: Opening, afterPly: number): KeyPlyReason[
   return reasons;
 }
 
-/** True when this ply has a highlight / Why / history / authored purpose mark. */
+/** True when this ply has a highlight / Why / history / authored theory mark. */
 export function isKeyPly(opening: Opening, afterPly: number): boolean {
   return keyPlyReasons(opening, afterPly).length > 0;
 }

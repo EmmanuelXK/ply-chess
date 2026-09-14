@@ -1,4 +1,5 @@
 import { chunkAt, firstSentence, positionalIdea } from "./helpers";
+import { historyAt } from "./history";
 import { isKeyPly } from "./key-ply";
 import { housePicture, pinSpeech } from "./memory";
 import { professorAt } from "./professor";
@@ -80,6 +81,7 @@ export function coachAfterPly(opening: Opening, afterPly: number): CoachState {
   const pin = opening.pins.find((p) => p.afterPly === afterPly);
   const beat = opening.storyBeats.find((b) => b.afterPly === afterPly);
   const line = opening.coach.find((c) => c.afterPly === afterPly);
+  const mark = historyAt(opening, afterPly + 1)[0];
   const concept = professorLine(opening, afterPly);
   const picture = housePicture(chunk);
 
@@ -103,6 +105,16 @@ export function coachAfterPly(opening: Opening, afterPly: number): CoachState {
       text: shortLine(concept ?? line.text ?? picture, 14),
       chunkName: chunk?.name,
       kind: "ok",
+    };
+  }
+  if (mark) {
+    return {
+      text: shortLine(
+        mark.whyItMattersHere || `${mark.year}. ${mark.title} is the landmark.`,
+        14,
+      ),
+      chunkName: chunk?.name,
+      kind: "history",
     };
   }
   return {
