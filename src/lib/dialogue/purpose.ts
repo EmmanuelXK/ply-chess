@@ -178,11 +178,11 @@ function composeBody(facts: LessonFacts, purpose: PurposeTag, seed: number): str
   }
 
   const variants = [
-    san ? `${san}. ${tag} — ${idea || "that's the job"}.` : `${tag}. ${idea}`,
+    `${tag}. ${idea || "that's the job"}`,
     authored
       ? `${tag}. ${nugget(seed % 2 === 0 ? authored.hook : authored.punch, 8)}`
       : `${tag}. ${idea || facts.shortName}`,
-    san ? `${tag} with ${san}. ${idea || "One square, one job."}` : `${tag}. ${idea}`,
+    `${tag}. ${idea || "One square, one job."}`,
   ].filter((line) => line.trim() && !looksLikeMoveList(line));
   return variants[seed % variants.length] || `${tag}. ${idea || facts.shortName}`;
 }

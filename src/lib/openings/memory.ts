@@ -1,12 +1,30 @@
-import { chunkAt, firstSentence, looksLikeMoveList, positionalIdea } from "./helpers";
+import { chunkAt, firstSentence, looksLikeMoveList } from "./helpers";
 import type { Chunk, Opening, Pin } from "./types";
 
 /** One-image picture for a house. Never a dumped move list. */
 export function housePicture(chunk?: Chunk): string {
   if (!chunk) return "One house. One job.";
-  const idea = positionalIdea(chunk.job, "");
-  if (idea && !looksLikeMoveList(idea)) return firstSentence(idea);
-  if (!looksLikeMoveList(chunk.name)) return chunk.name;
+  const job = (chunk.job ?? "").replace(/\s+/g, " ").trim();
+  if (job && !looksLikeMoveList(job)) {
+    const sentence = firstSentence(job);
+    const sentenceWords = sentence.split(" ").filter(Boolean);
+    if (sentenceWords.length >= 6) return sentence;
+    const all = job.split(" ").filter(Boolean);
+    if (all.length >= 6) return all.slice(0, 15).join(" ");
+    if (sentenceWords.length >= 1) {
+      const extra = (chunk.name && !looksLikeMoveList(chunk.name) ? chunk.name : "")
+        .split(" ")
+        .filter(Boolean);
+      const mixed = [...sentenceWords, ...extra].slice(0, 15).join(" ");
+      if (mixed.split(" ").filter(Boolean).length >= 6) return mixed;
+    }
+  }
+  if (!looksLikeMoveList(chunk.name) && chunk.name.split(" ").filter(Boolean).length >= 6) {
+    return chunk.name;
+  }
+  if (!looksLikeMoveList(chunk.name)) {
+    return `${chunk.name}. One house, one job.`;
+  }
   return "Coil the pieces. Then strike.";
 }
 

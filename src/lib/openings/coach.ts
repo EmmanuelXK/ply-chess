@@ -1,13 +1,14 @@
 import { SHORT_HOOKS } from "@/lib/dialogue/hooks";
+import { stripLeadingSanLabel } from "@/lib/dialogue/short";
 import { chunkAt, firstSentence, positionalIdea } from "./helpers";
 import { historyAt } from "./history";
 import { isKeyPly } from "./key-ply";
-import { housePicture, pinSpeech } from "./memory";
+import { housePicture } from "./memory";
 import { professorAt } from "./professor";
 import type { Opening } from "./types";
 
 function shortLine(text: string | undefined, max = 15): string {
-  const compact = (text ?? "").replace(/\s+/g, " ").trim();
+  const compact = stripLeadingSanLabel(text ?? "");
   if (!compact) return "";
   const sentence = firstSentence(compact);
   const sentenceWords = sentence.split(" ").filter(Boolean);
@@ -50,8 +51,12 @@ function professorLine(opening: Opening, afterPly: number): string | undefined {
 
 export function coachAtStart(opening: Opening): CoachState {
   const house = opening.chunks[0];
+  const hook = hookLine(opening, -1);
+  const cast = shortLine(opening.story.cast, 12);
+  const spoken =
+    hook && hook.split(" ").filter(Boolean).length >= 6 ? hook : cast;
   return {
-    text: shortLine(opening.story.cast, 12),
+    text: shortLine(spoken, 12),
     chunkName: house?.name,
     kind: "start",
   };
@@ -97,8 +102,14 @@ export function coachAfterPly(opening: Opening, afterPly: number): CoachState {
   const picture = housePicture(chunk);
 
   if (pin) {
+    const spoken = hook ?? picture;
     return {
-      text: shortLine(hook ?? `${pinSpeech(pin)} ${picture}`, 15),
+      text: shortLine(
+        spoken.split(" ").filter(Boolean).length >= 6
+          ? spoken
+          : `${picture} That's the landmark.`,
+        15,
+      ),
       chunkName: chunk?.name,
       kind: "pin",
       pinLabel: pin.label,
