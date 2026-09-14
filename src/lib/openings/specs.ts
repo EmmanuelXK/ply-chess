@@ -1,6 +1,10 @@
 import type { OpeningSpec } from "./types";
 
-/** Production Opening Edge specs — 21 attacking systems. Compiled by makeOpening. */
+/**
+ * Production Opening Edge specs — 21 attacking systems. Compiled by makeOpening.
+ * Incoming repertoire ids (hooks in racks.ts / mark-ids.ts): alapin, english,
+ * queens-gambit, caro-kann, slav. Home places them the moment these ids exist.
+ */
 export const openingSpecs = [
   {
     id: "scotch-gambit",

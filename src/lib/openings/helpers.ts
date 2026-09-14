@@ -39,10 +39,26 @@ export function positionalIdea(
 const SYSTEM_OPENINGS = new Set([
   "london",
   "jobava-london",
+  "italian-attack",
   "french-kia",
+  "caro-fantasy",
+  "alapin",
+  "alapin-sicilian",
+  "sicilian-alapin",
+  "english",
+  "english-opening",
+  "queens-gambit",
+  "qg",
+  "qgd",
+  "queens-gambit-declined",
+  "queen-gambit",
   "black-lion",
-  "kings-indian",
   "pirc",
+  "kings-indian",
+  "caro-kann",
+  "caro",
+  "caro-kann-black",
+  "slav",
 ]);
 
 export function openingKind(id: string): "system" | "semi" {
