@@ -1,3 +1,4 @@
+import { SHORT_HOOKS } from "@/lib/dialogue/hooks";
 import { chunkAt, firstSentence, positionalIdea } from "./helpers";
 import { historyAt } from "./history";
 import { isKeyPly } from "./key-ply";
@@ -9,8 +10,17 @@ function shortLine(text: string | undefined, max = 15): string {
   const compact = (text ?? "").replace(/\s+/g, " ").trim();
   if (!compact) return "";
   const sentence = firstSentence(compact);
-  const words = sentence.split(" ").filter(Boolean).slice(0, max);
-  return words.join(" ");
+  const sentenceWords = sentence.split(" ").filter(Boolean);
+  const source = sentenceWords.length >= 6 ? sentence : compact;
+  return source.split(" ").filter(Boolean).slice(0, max).join(" ");
+}
+
+function hookLine(opening: Opening, afterPly: number): string | undefined {
+  const row = SHORT_HOOKS[opening.id]?.find((h) => h.ply === afterPly);
+  if (!row) return undefined;
+  const hook = shortLine(row.hook, 14);
+  if (hook.split(" ").filter(Boolean).length >= 6) return hook;
+  return shortLine(`${row.hook} ${row.punch}`, 14);
 }
 
 export type CoachKind =
@@ -79,6 +89,7 @@ export function coachAfterPly(opening: Opening, afterPly: number): CoachState {
   }
 
   const pin = opening.pins.find((p) => p.afterPly === afterPly);
+  const hook = hookLine(opening, afterPly);
   const beat = opening.storyBeats.find((b) => b.afterPly === afterPly);
   const line = opening.coach.find((c) => c.afterPly === afterPly);
   const mark = historyAt(opening, afterPly + 1)[0];
@@ -87,10 +98,17 @@ export function coachAfterPly(opening: Opening, afterPly: number): CoachState {
 
   if (pin) {
     return {
-      text: shortLine(`${pinSpeech(pin)} ${picture}`, 15),
+      text: shortLine(hook ?? `${pinSpeech(pin)} ${picture}`, 15),
       chunkName: chunk?.name,
       kind: "pin",
       pinLabel: pin.label,
+    };
+  }
+  if (hook) {
+    return {
+      text: shortLine(hook, 14),
+      chunkName: chunk?.name,
+      kind: "ok",
     };
   }
   if (beat) {

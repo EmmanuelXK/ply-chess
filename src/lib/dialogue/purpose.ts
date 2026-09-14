@@ -213,7 +213,7 @@ export function purposeBeats(facts: LessonFacts, soloText?: string): DialogueBea
 
   const beat: DialogueBeat = {
     speaker,
-    text: withFloor(text, purpose),
+    text: keyPoint ? limitWords(text) : withFloor(text, purpose),
     kind:
       facts.kind === "fail"
         ? "fail"

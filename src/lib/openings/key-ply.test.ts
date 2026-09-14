@@ -77,8 +77,12 @@ describe("male-only coach", () => {
     assert.match(wake.beats[0].text, /e5|Lion|wake|d4|house/i);
     assert.doesNotMatch(
       wake.beats[0].text,
-      /^(Grab the center|Coil, then strike|Develop with tempo|Wake the line up)\b/,
+      /Hide, then bite|Grab the center|Coil, then strike|Develop with tempo|Wake the line up/,
     );
+    const house = dialogueForPly(lion, 1, { duo: "voss-draven", mode: "solo" });
+    assert.doesNotMatch(house.beats[0]?.text ?? "", /Hide, then bite|Coil, then strike/);
+    const knight = dialogueForPly(lion, 5, { duo: "voss-draven", mode: "solo" });
+    assert.doesNotMatch(knight.beats[0]?.text ?? "", /Hide, then bite|Coil, then strike/);
   });
 
   it("stays sparse across the repertoire", () => {
