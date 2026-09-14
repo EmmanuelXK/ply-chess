@@ -1,4 +1,4 @@
-import { SHORT_HOOKS } from "./hooks";
+import { SHORT_HOOKS, spokenHook } from "./hooks";
 import type { LessonFacts } from "./types";
 
 /** Shared pedagogical facts — duo flavor is applied later. Never triple this. */
@@ -155,9 +155,9 @@ function fromHook(
   if (!row) return undefined;
   return {
     ply,
-    concept: row.hook,
-    why: row.punch,
-    plan: row.punch,
+    concept: spokenHook(row),
+    why: row.they,
+    plan: row.we,
   };
 }
 
