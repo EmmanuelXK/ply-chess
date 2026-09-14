@@ -1,16 +1,16 @@
 # Opening Edge
 
-iPhone-first PWA dashboard (`100dvh`, no page scroll). **21 attacking systems** (11 White · 5 vs 1.e4 · 5 vs 1.d4) on one **White / Black** home. Each line is a **spine to move 21**, **traps**, and **six pillars** — then Plan mode. A single male coach (Aldric) teaches **why** on key moves — text in the strip, optional voice. No floating chat head.
+iPhone-first PWA dashboard (`100dvh`, no page scroll). **26 attacking systems** (14 White · 6 vs 1.e4 · 6 vs 1.d4) on one **White / Black** home. Each line is a **spine to move 21**, **traps**, and **six pillars** — then Plan mode. A single male coach (Aldric) teaches **why** on key moves — text in the strip, optional voice. No floating chat head.
 
 Production: [https://blitzbar.app](https://blitzbar.app) (Vercel project `ply-chess`, GitHub `EmmanuelXK/ply-chess`).
 
 ## Repertoire
 
-White: Scotch Gambit, Evans, Italian attacking, Vienna Gambit, King's Gambit, Grand Prix, Smith-Morra, French KIA, Caro-Kann Fantasy, London, Jobava London.
+White: Scotch Gambit, Evans, Italian attacking, Vienna Gambit, King's Gambit, Grand Prix, Smith-Morra, French KIA, Caro-Kann Fantasy, London, Jobava London, Alapin, English, Queen's Gambit Exchange.
 
-Black vs 1.e4: Black Lion, Pirc, Sicilian Dragon, Scandinavian, Alekhine.
+Black vs 1.e4: Black Lion, Pirc, Sicilian Dragon, Scandinavian, Alekhine, Caro-Kann.
 
-Black vs 1.d4: King's Indian, Modern Benoni, Benko, Dutch Leningrad, Budapest.
+Black vs 1.d4: King's Indian, Modern Benoni, Benko, Dutch Leningrad, Budapest, Slav.
 
 Home modes: **Learn · Reps · Practice · Drill · Time Trial · Progress**. Systems sit in **White opening systems** and **Black opening systems**.
 
@@ -114,7 +114,7 @@ npm run dev
 App: [http://127.0.0.1:43173](http://127.0.0.1:43173)
 
 ```bash
-npm run validate   # 21 spines legal, fingerprints, quizzes, professor, sourced history, legal Why branches
+npm run validate   # 26 spines legal, fingerprints, quizzes, professor, sourced history, legal Why branches
 npm run build
 ```
 
@@ -133,4 +133,4 @@ Inspired by Lotus / Chessreps *ideas* — no copied code, assets, or branding.
 
 ## Sync note
 
-This repo is GitHub `EmmanuelXK/ply-chess` (what production `ply-chess` / blitzbar.app should track). If an Origin `grokmee/opening-edge` tree still exists, merge this branch there or point Vercel at this GitHub remote so the 21-system professor pack is what deploys.
+This repo is GitHub `EmmanuelXK/ply-chess` (what production `ply-chess` / blitzbar.app should track). If an Origin `grokmee/opening-edge` tree still exists, merge this branch there or point Vercel at this GitHub remote so the 26-system professor pack is what deploys.

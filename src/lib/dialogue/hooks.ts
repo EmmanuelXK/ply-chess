@@ -79,6 +79,116 @@ export const SHORT_HOOKS: Record<string, ShortHook[]> = {
       punch: "Don't hop off. Clamp with f4.",
     },
   ],
+  alapin: [
+    {
+      ply: 0,
+      hook: "e4 opens the door. c3 is the house.",
+      punch: "Don't Morra. Recapture with a pawn.",
+    },
+    {
+      ply: 2,
+      hook: "c3 is the Alapin house. d4 comes next.",
+      punch: "No Open Sicilian street fight today.",
+    },
+    {
+      ply: 6,
+      hook: "d4. Recapture with a pawn. Full center.",
+      punch: "The queen on d5 is a target.",
+    },
+    {
+      ply: 18,
+      hook: "Nb5 hunts the queen. She doesn't sit.",
+      punch: "Then park a knight on c5.",
+    },
+  ],
+  english: [
+    {
+      ply: 0,
+      hook: "c4 is the hero. Don't rush d4.",
+      punch: "Own d5 from the flank.",
+    },
+    {
+      ply: 8,
+      hook: "e4 clamps. You own the hole on d5.",
+      punch: "Don't give that hole back.",
+    },
+    {
+      ply: 10,
+      hook: "Knight to e2 so the f-pawn can breathe.",
+      punch: "Nf3 would kill your own break.",
+    },
+    {
+      ply: 16,
+      hook: "Nd5 sits. They have to live with it.",
+      punch: "Hold the clamp. Expand b4 later.",
+    },
+  ],
+  "caro-kann": [
+    {
+      ply: 1,
+      hook: "…c6 is the wall. Not a French jail.",
+      punch: "Bishop comes out before …e6.",
+    },
+    {
+      ply: 5,
+      hook: "Bishop outside the chain. That's the Caro.",
+      punch: "Now …e6 is legal. Then chip …c5.",
+    },
+    {
+      ply: 9,
+      hook: "…c5 chips the head of e5.",
+      punch: "Don't let that pawn sit forever.",
+    },
+    {
+      ply: 19,
+      hook: "…Nf5 sits on the hole they left.",
+      punch: "Then park a knight on c4.",
+    },
+  ],
+  "queens-gambit": [
+    {
+      ply: 2,
+      hook: "c4 is the offer. You want the center.",
+      punch: "Don't cling to the wing pawn.",
+    },
+    {
+      ply: 6,
+      hook: "Take on d5. Now the minority is legal.",
+      punch: "Rook will go behind the b-pawn.",
+    },
+    {
+      ply: 20,
+      hook: "Rook behind the b-pawn. That's the tell.",
+      punch: "b4 is coming. Wreck c6.",
+    },
+    {
+      ply: 24,
+      hook: "b4 anyway. Their wall is the target.",
+      punch: "b5 next. Leave them a patient on c6.",
+    },
+  ],
+  slav: [
+    {
+      ply: 3,
+      hook: "…c6 is the Slav wall. Not Semi.",
+      punch: "Don't jail the bishop with …e6 yet.",
+    },
+    {
+      ply: 7,
+      hook: "Take on c4. Then get the bishop out.",
+      punch: "The pawn can wait. The bishop cannot.",
+    },
+    {
+      ply: 9,
+      hook: "Bishop outside the chain. That's the Slav.",
+      punch: "Now …e6 is allowed. Then pin.",
+    },
+    {
+      ply: 13,
+      hook: "…Bb4 pins. e4 costs them a story.",
+      punch: "Castle, then hop Nd5 if they shove.",
+    },
+  ],
 };
 
 export function hookAt(facts: LessonFacts): ShortHook | undefined {
