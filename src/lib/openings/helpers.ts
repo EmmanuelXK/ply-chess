@@ -1,3 +1,4 @@
+import { canonicalOpeningId } from "./racks";
 import type { Opening } from "./types";
 
 export function chunkAt(opening: Opening, ply: number) {
@@ -36,17 +37,25 @@ export function positionalIdea(
   return firstSentence(compact);
 }
 
+/** Canonical ids whose home caption is System (not Semi). Aliases resolve via racks.ts. */
 const SYSTEM_OPENINGS = new Set([
   "london",
   "jobava-london",
+  "italian-attack",
   "french-kia",
+  "caro-fantasy",
+  "alapin",
+  "english",
+  "queens-gambit",
   "black-lion",
-  "kings-indian",
   "pirc",
+  "kings-indian",
+  "caro-kann",
+  "slav",
 ]);
 
 export function openingKind(id: string): "system" | "semi" {
-  return SYSTEM_OPENINGS.has(id) ? "system" : "semi";
+  return SYSTEM_OPENINGS.has(canonicalOpeningId(id)) ? "system" : "semi";
 }
 
 export const PILLAR_LABELS = [

@@ -249,7 +249,7 @@ body,
 }
 
 .dash-repertoire .dash-scroll {
-  padding: 0.15rem clamp(1.15rem, 4.2vw, 2.4rem) 0.7rem;
+  padding: 0.15rem clamp(1.15rem, 4.2vw, 2.4rem) 1.35rem;
 }
 
 .weapons-stage {
@@ -263,6 +263,10 @@ body,
 
 .dash-repertoire .dash-family {
   margin-bottom: 1.55rem;
+}
+
+.dash-repertoire .dash-family:last-child {
+  margin-bottom: 0.35rem;
 }
 
 .dash-family-head {
@@ -319,7 +323,7 @@ body,
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.42rem;
+  gap: 0.28rem;
   min-width: 0;
   width: 100%;
   color: inherit;
@@ -356,6 +360,17 @@ body,
   -webkit-box-orient: vertical;
   line-clamp: 2;
   overflow: hidden;
+}
+
+.weapon-kind {
+  margin: -0.06rem 0 0;
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  font-size: 9px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mist-2);
 }
 
 .weapon-due {
@@ -2259,7 +2274,7 @@ body,
   width: min(100%, 22rem);
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
+  gap: 0.45rem;
 }
 
 .auth-mark {
@@ -2298,7 +2313,7 @@ body,
 .auth-google,
 .auth-phone,
 .auth-signout {
-  height: 2.7rem;
+  height: 2.85rem;
   border-radius: 0.85rem;
   font-size: 14px;
   font-weight: 750;
@@ -2306,8 +2321,29 @@ body,
 }
 
 .auth-google {
+  margin-top: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  width: 100%;
   color: var(--ink);
   background: linear-gradient(180deg, var(--ember-soft), var(--ember));
+  box-shadow: 0 10px 28px var(--ember-glow);
+}
+
+.auth-google:hover:not(:disabled) {
+  filter: brightness(1.06);
+}
+
+.auth-google:disabled {
+  opacity: 0.72;
+}
+
+.auth-google-mark {
+  width: 1.15rem;
+  height: 1.15rem;
+  flex: none;
 }
 
 .auth-phone {
@@ -2323,15 +2359,6 @@ body,
   color: var(--mist);
   background: transparent;
   border: 1px solid var(--line);
-}
-
-.auth-or {
-  margin: 0.55rem 0 0.2rem;
-  text-align: center;
-  font-size: 11px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--mist-2);
 }
 
 .auth-label {
@@ -2352,43 +2379,8 @@ body,
   font-size: 16px;
 }
 
-.auth-phone-row {
-  display: flex;
-  gap: 0.45rem;
-}
-
-.auth-phone-row .auth-input {
-  flex: 1;
-  min-width: 0;
-}
-
-.auth-cc {
-  flex: none;
-  width: 6.8rem;
-  height: 2.6rem;
-  border-radius: 0.75rem;
-  background: var(--charcoal);
-  border: 1px solid var(--line);
-  color: var(--cream);
-  padding: 0 1.35rem 0 0.45rem;
-  font-size: 15px;
-  appearance: none;
-  background-image: linear-gradient(45deg, transparent 50%, var(--mist) 50%),
-    linear-gradient(135deg, var(--mist) 50%, transparent 50%);
-  background-position:
-    calc(100% - 14px) 50%,
-    calc(100% - 9px) 50%;
-  background-size: 5px 5px, 5px 5px;
-  background-repeat: no-repeat;
-}
-
-.auth-cc:disabled,
 .auth-input:disabled {
   opacity: 0.7;
-}
-
-.auth-input[aria-invalid="true"] {
-  border-color: var(--ember);
 }
 
 .profile-row {

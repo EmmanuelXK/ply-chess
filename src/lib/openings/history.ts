@@ -774,6 +774,197 @@ export const HISTORY_PACK: HistoryMilestone[] = [
       { label: "Wikipedia: Budapest Gambit", url: "https://en.wikipedia.org/wiki/Budapest_Gambit" },
     ],
   },
+
+  // --- Alapin ---
+  {
+    id: "alapin-c3",
+    openingId: "alapin",
+    plyOrFen: 3,
+    title: "Alapin's 2.c3",
+    year: 1898,
+    era: "Classical",
+    glyph: "debut",
+    summary:
+      "The Alapin Variation of the Sicilian (1.e4 c5 2.c3) is named for Semyon Alapin (1856–1923), a Russian master who analysed the idea of supporting d4 with a pawn instead of allowing an Open Sicilian. Wikipedia treats 2.c3 as a main alternative to 2.Nf3: White wants a classical centre and is willing to lose a tempo if Black later takes on d4.",
+    whyItMattersHere:
+      "c3 is the house. You are not gambiting a pawn like the Morra. You are building d4 and recapturing with a pawn.",
+    sources: [
+      { label: "Wikipedia: Sicilian Defence", url: "https://en.wikipedia.org/wiki/Sicilian_Defence" },
+    ],
+  },
+  {
+    id: "alapin-sveshnikov",
+    openingId: "alapin",
+    plyOrFen: 7,
+    title: "Sveshnikov's c3 Sicilian",
+    year: 2010,
+    era: "Modern",
+    glyph: "revival",
+    summary:
+      "Evgeny Sveshnikov made 2.c3 a serious modern weapon, publishing The Complete c3 Sicilian and using it as a way to skip Najdorf theory while still fighting for the centre. Club players copied the same deal: one setup vs …d5 and vs …Nf6, instead of twenty Open Sicilian trees.",
+    whyItMattersHere:
+      "4.d4 is Sveshnikov's point. Recapture with the c-pawn. The queen on d5 is a target, not a trophy.",
+    sources: [
+      { label: "Wikipedia: Sicilian Defence", url: "https://en.wikipedia.org/wiki/Sicilian_Defence" },
+      { label: "Wikipedia: Evgeny Sveshnikov", url: "https://en.wikipedia.org/wiki/Evgeny_Sveshnikov" },
+    ],
+  },
+
+  // --- English ---
+  {
+    id: "english-staunton",
+    openingId: "english",
+    plyOrFen: 1,
+    title: "Staunton's English",
+    year: 1843,
+    era: "Romantic",
+    glyph: "debut",
+    summary:
+      "The English Opening (1.c4) is named because Howard Staunton used it in his 1843 match against Pierre Saint-Amant and later at London 1851. Wikipedia notes that the flank pawn fights for d5 without occupying the centre on move one — a hypermodern idea before the word existed.",
+    whyItMattersHere:
+      "c4 is the hero pawn. You are not playing a delayed Queen's Gambit. Own d5 from the side.",
+    famousGame: {
+      white: "Howard Staunton",
+      black: "Pierre Saint-Amant",
+      year: 1843,
+      eco: "A20",
+    },
+    sources: [
+      { label: "Wikipedia: English Opening", url: "https://en.wikipedia.org/wiki/English_Opening" },
+    ],
+  },
+  {
+    id: "english-botvinnik",
+    openingId: "english",
+    plyOrFen: 9,
+    title: "Botvinnik's clamp",
+    year: 1958,
+    era: "Hypermodern",
+    glyph: "paper",
+    summary:
+      "Mikhail Botvinnik popularised the Closed English setup with pawns on c4 and e4, a knight on e2 (not f3), and a later f4 break. Wikipedia's English Opening pages describe this 'Botvinnik System' as a bind on d5: you sit on the hole and only open the centre when the pieces agree.",
+    whyItMattersHere:
+      "e4 completes the clamp. The knight will go to e2 so the f-pawn can still run. Don't play Nf3 and kill your own break.",
+    sources: [
+      { label: "Wikipedia: English Opening", url: "https://en.wikipedia.org/wiki/English_Opening" },
+      { label: "Wikipedia: Mikhail Botvinnik", url: "https://en.wikipedia.org/wiki/Mikhail_Botvinnik" },
+    ],
+  },
+
+  // --- Caro-Kann ---
+  {
+    id: "caro-1886",
+    openingId: "caro-kann",
+    plyOrFen: 2,
+    title: "Caro and Kann, 1886",
+    year: 1886,
+    era: "Classical",
+    glyph: "debut",
+    summary:
+      "The Caro–Kann Defence is named for Horatio Caro and Marcus Kann, who published analysis of 1.e4 c6 in the German magazine Brüderschaft in 1886. Wikipedia emphasises the idea: support …d5 with …c6 so the light-squared bishop can come out before …e6 — unlike the French, where that bishop is often jailed.",
+    whyItMattersHere:
+      "…c6 is the wall. You are not playing a French. The bishop is supposed to breathe on f5.",
+    sources: [
+      { label: "Wikipedia: Caro–Kann Defence", url: "https://en.wikipedia.org/wiki/Caro%E2%80%93Kann_Defence" },
+    ],
+  },
+  {
+    id: "caro-advance-short",
+    openingId: "caro-kann",
+    plyOrFen: 6,
+    title: "Bishop out vs the Advance",
+    year: 1990,
+    era: "Modern",
+    glyph: "paper",
+    summary:
+      "The Advance Variation 3.e5 is White's most common club try against the Caro–Kann. Wikipedia notes that Black's answer is 3…Bf5, keeping the bishop outside the pawn chain, after which Nigel Short's quiet 4.Nf3 and 5.Be2 became a main positional try in the 1990s instead of the old Tal Attack with h4-g4.",
+    whyItMattersHere:
+      "…Bf5 is the Caro. Bishop outside, then …c5 chips the head of e5. Don't jail it with an early …e6.",
+    sources: [
+      { label: "Wikipedia: Caro–Kann Defence", url: "https://en.wikipedia.org/wiki/Caro%E2%80%93Kann_Defence" },
+    ],
+  },
+
+  // --- Queen's Gambit Exchange ---
+  {
+    id: "qg-old",
+    openingId: "queens-gambit",
+    plyOrFen: 3,
+    title: "The old c-pawn offer",
+    year: 1497,
+    era: "Romantic",
+    glyph: "debut",
+    summary:
+      "Offering the c-pawn on move two is among the oldest recorded openings. Wikipedia places lines in the Göttingen manuscript and in Luis Ramírez de Lucena's 1497 book. The offer is not a true gambit most of the time: White wants the centre, not a lost pawn.",
+    whyItMattersHere:
+      "c4 is the offer. You don't cling to the wing pawn. You want d5 under pressure, then you decide whether to take.",
+    sources: [
+      { label: "Wikipedia: Queen's Gambit", url: "https://en.wikipedia.org/wiki/Queen%27s_Gambit" },
+    ],
+  },
+  {
+    id: "qg-exchange-minority",
+    openingId: "queens-gambit",
+    plyOrFen: 7,
+    title: "Exchange and the minority",
+    year: 1927,
+    era: "Classical",
+    glyph: "paper",
+    summary:
+      "The Exchange Variation of the Queen's Gambit Declined (cxd5) became a club and world-championship workhorse because it creates a clear plan: a minority attack with b4-b5 against Black's c6 pawn. Wikipedia's QGD pages and later Karpov–Kasparov practice treat Rab1 and b4 as the positional main idea, not an encyclopedia of Orthodox sidelines.",
+    whyItMattersHere:
+      "cxd5 is the tell. You chose one plan: rook behind the b-pawn, wreck c6. Don't wander into a thirty-line Orthodox tree.",
+    famousGame: {
+      white: "José Raúl Capablanca",
+      black: "Alexander Alekhine",
+      year: 1927,
+      eco: "D35",
+    },
+    sources: [
+      { label: "Wikipedia: Queen's Gambit Declined", url: "https://en.wikipedia.org/wiki/Queen%27s_Gambit_Declined" },
+      { label: "Wikipedia: Minority attack", url: "https://en.wikipedia.org/wiki/Minority_attack" },
+    ],
+  },
+
+  // --- Slav ---
+  {
+    id: "slav-name",
+    openingId: "slav",
+    plyOrFen: 4,
+    title: "The Slavic wall",
+    year: 1924,
+    era: "Classical",
+    glyph: "debut",
+    summary:
+      "The Slav Defence (1.d4 d5 2.c4 c6) is named after Slavic masters who analysed it in the 1920s, especially around the 1924 New York and Meran events. Wikipedia's definition is the wall plus a free light-squared bishop: …c6 supports …d5 without locking …Bc8 behind …e6.",
+    whyItMattersHere:
+      "…c6 is Slav. …e6 before the bishop is out is Semi-Slav — a different house. Keep them apart.",
+    sources: [
+      { label: "Wikipedia: Slav Defense", url: "https://en.wikipedia.org/wiki/Slav_Defense" },
+    ],
+  },
+  {
+    id: "slav-bishop",
+    openingId: "slav",
+    plyOrFen: 10,
+    title: "Bishop out, then …e6",
+    year: 1935,
+    era: "Classical",
+    glyph: "paper",
+    summary:
+      "The mainline Classical Slav after 3.Nf3 Nf6 4.Nc3 dxc4 5.a4 Bf5 is the old world-championship workhorse (Euwe, Alekhine, and later generations). Wikipedia stresses the order: take on c4, develop …Bf5, only then …e6. That is how the Slav refuses the French/Semi problem of a jailed bishop.",
+    whyItMattersHere:
+      "…Bf5 is the soul. Bishop outside the chain. …e6 can wait one ply. That's why this is not a Semi-Slav tile.",
+    famousGame: {
+      white: "Max Euwe",
+      black: "Alexander Alekhine",
+      year: 1935,
+      eco: "D18",
+    },
+    sources: [
+      { label: "Wikipedia: Slav Defense", url: "https://en.wikipedia.org/wiki/Slav_Defense" },
+    ],
+  },
 ];
 
 export function baseOpeningId(id: string): string {

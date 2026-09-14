@@ -11,6 +11,7 @@ import type {
   Trap,
   TrapSpec,
 } from "./types";
+import { applyConceptCopy } from "./concept-copy";
 import { enrichOpening } from "./professor";
 import { attachHistory } from "./history";
 
@@ -149,7 +150,7 @@ export function makeOpening(spec: OpeningSpec): Opening {
     history: [],
   };
 
-  return attachHistory(enrichOpening(opening));
+  return attachHistory(enrichOpening(applyConceptCopy(opening)));
 }
 
 export function openingFromTrap(
@@ -170,7 +171,7 @@ export function openingFromTrap(
     });
   }
 
-  return attachHistory(enrichOpening({
+  return attachHistory(enrichOpening(applyConceptCopy({
     ...opening,
     id: `${opening.id}--${trap.id}`,
     name: `${opening.shortName} · ${trap.name}`,
@@ -190,5 +191,5 @@ export function openingFromTrap(
     professor: [],
     quizzes: [],
     history: [],
-  }));
+  })));
 }
