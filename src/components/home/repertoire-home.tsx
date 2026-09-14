@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { TabBar } from "@/components/app/tab-bar";
 import { OpeningTile } from "@/components/home/opening-tile";
+import { useTileArranger } from "@/components/home/use-tile-arranger";
 import {
   openingsForSide,
   SIDE_META,
@@ -10,12 +11,15 @@ import {
   type Opening,
   type StudyMode,
 } from "@/lib/openings";
+import type { TileLayout } from "@/lib/openings/arranger";
 import { useAuth } from "@/components/auth/auth-provider";
 import { dueCount, progressFor } from "@/lib/reps/schedule";
 
 export function RepertoireHome() {
   const [mode, setMode] = useState<StudyMode>("learn");
   const { profile } = useAuth();
+  const stageRef = useRef<HTMLDivElement>(null);
+  const layout = useTileArranger(stageRef);
   const white = openingsForSide("white");
   const black = openingsForSide("black");
 
@@ -26,7 +30,7 @@ export function RepertoireHome() {
         <h1>Opening Edge</h1>
         <p className="dash-sub">
           {white.length} White · {black.length} Black
-          {profile?.displayName ? ` · ${profile.displayName}` : " · systems you actually train"}
+          {profile?.displayName ? ` · ${profile.displayName}` : ""}
         </p>
         <div className="mode-grid" role="tablist" aria-label="Study mode">
           {STUDY_MODES.map((m) => (
@@ -45,14 +49,16 @@ export function RepertoireHome() {
         </div>
         <p className="dash-mode-blurb">
           {mode === "progress"
-            ? "What stuck. Weak houses light up on the tiles."
+            ? "What stuck. Due counts sit on the mark."
             : STUDY_MODES.find((m) => m.id === mode)?.blurb}
         </p>
       </header>
 
-      <div className="dash-scroll dash-scroll-split">
-        <SidePane side="white" openings={white} mode={mode} />
-        <SidePane side="black" openings={black} mode={mode} />
+      <div className="dash-scroll dash-weapons-scroll">
+        <div ref={stageRef} className="weapons-stage">
+          <SidePane side="white" openings={white} mode={mode} layout={layout} />
+          <SidePane side="black" openings={black} mode={mode} layout={layout} />
+        </div>
       </div>
 
       <TabBar active="home" />
@@ -64,10 +70,12 @@ function SidePane({
   side,
   openings,
   mode,
+  layout,
 }: {
   side: "white" | "black";
   openings: Opening[];
   mode: StudyMode;
+  layout: TileLayout | null;
 }) {
   const meta = SIDE_META[side];
   return (
@@ -76,8 +84,19 @@ function SidePane({
         <h2>{meta.title}</h2>
         <p>{openings.length}</p>
       </header>
-      <p className="dash-family-blurb">{meta.blurb}</p>
-      <div className="dash-grid">
+      <div
+        className="weapon-grid"
+        data-arranged={layout ? "true" : undefined}
+        style={
+          layout
+            ? {
+                ["--weapon-cols" as string]: String(layout.cols),
+                ["--weapon-tile" as string]: `${layout.tile}px`,
+                ["--weapon-gap" as string]: `${layout.gap}px`,
+              }
+            : undefined
+        }
+      >
         {openings.map((opening) => {
           const progress = progressFor(opening.id);
           const due = dueCount(opening.id);

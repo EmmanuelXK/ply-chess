@@ -1,7 +1,13 @@
 "use client";
 
 import { useEffect } from "react";
-import { PILLAR_LABELS, type Opening, type Trap } from "@/lib/openings";
+import {
+  openingDossier,
+  openingHouses,
+  PILLAR_LABELS,
+  type Opening,
+  type Trap,
+} from "@/lib/openings";
 
 export function StudySheet({
   opening,
@@ -37,6 +43,8 @@ export function StudySheet({
           Close
         </button>
       </div>
+      <p className="study-dossier">{openingDossier(opening)}</p>
+      <p className="study-houses">{openingHouses(opening)}</p>
       <p className="study-note">{opening.story.plan}</p>
       <div className="pillar-list">
         {PILLAR_LABELS.map(([key, label]) => (
