@@ -6,8 +6,6 @@ export function SpeakerChip({
   purpose,
 }: {
   purpose?: PurposeTag;
-  speaker?: string;
-  duoId?: string;
 }) {
   return (
     <span className="speaker-chip speaker-amber">

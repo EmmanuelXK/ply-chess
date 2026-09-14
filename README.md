@@ -1,6 +1,6 @@
 # Opening Edge
 
-iPhone-first PWA dashboard (`100dvh`, no page scroll). **21 attacking systems** (11 White · 5 vs 1.e4 · 5 vs 1.d4) on one **White / Black** home. Each line is a **spine to move 21**, **traps**, and **six pillars** — then Plan mode. One coach head wanders, fidgets, and teaches **why** with purpose tags.
+iPhone-first PWA dashboard (`100dvh`, no page scroll). **21 attacking systems** (11 White · 5 vs 1.e4 · 5 vs 1.d4) on one **White / Black** home. Each line is a **spine to move 21**, **traps**, and **six pillars** — then Plan mode. A single male coach (Aldric) teaches **why** on key moves — text in the strip, optional voice. No floating chat head.
 
 Production: [https://blitzbar.app](https://blitzbar.app) (Vercel project `ply-chess`, GitHub `EmmanuelXK/ply-chess`).
 
@@ -16,11 +16,11 @@ Home modes: **Learn · Reps · Practice · Drill · Time Trial · Progress**. Sy
 
 ## Single coach
 
-One Grok-style head on the board. It bobs, dilly-dallies, points at named squares, and you can **drag it off the board** — it parks on the rim and keeps teaching.
+Aldric speaks on **key plies** only. Teaching lives in the coach strip (purpose tag + short line) and optional TTS — there is no floating or draggable head on the board.
 
 Speech is **why this move** with a purpose tag: grab center, stabilize center, break center, attack weak square, notice the pin, free piece, stop opponent plan, and so on. Beats stay **6–15 words**. Consecutive plies do not repeat the same line. TTS clips for the next plies are prefetched so Forward / autoplay does not wait.
 
-Aldric ♂ and Kael ♀ stay as internal voices. Settings has **no coach picker, no duos, no Dual/Solo switch**.
+Settings has **no coach picker, no duos, no Dual/Solo switch**.
 
 Lion and London have authored facts; other systems generate from the professor pack + History Gig Pack.
 
