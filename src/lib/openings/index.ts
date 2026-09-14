@@ -38,6 +38,7 @@ export {
   openingKind,
   positionalIdea,
 } from "./helpers";
+export { openingDossier, openingHouses, studyHref } from "./dossier";
 export {
   housePicture,
   housePictureAt,
