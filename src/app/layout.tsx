@@ -23,7 +23,7 @@ const prestigeSerif = Source_Serif_4({
 export const metadata: Metadata = {
   title: "Opening Edge",
   description:
-    "iPhone-first PWA. Noir repertoire, world openings atlas, one playful coach.",
+    "Dark repertoire trainer. Tablet-aware weapons grid, world openings atlas, one coach.",
   applicationName: "Opening Edge",
   appleWebApp: {
     capable: true,

@@ -1,6 +1,10 @@
 import type { OpeningSpec } from "./types";
 
-/** Production Opening Edge specs — 26 attacking systems. Compiled by makeOpening. */
+/**
+ * Production Opening Edge specs — 26 attacking systems. Compiled by makeOpening.
+ * Home racks (racks.ts): Alapin, English, Queen's Gambit → White · Systems;
+ * Caro-Kann → Black · vs 1.e4; Slav → Black · vs 1.d4.
+ */
 export const openingSpecs = [
   {
     id: "scotch-gambit",

@@ -1,0 +1,31 @@
+/** Widget mark ids — every production opening plus reserved incoming systems. */
+export const WEAPON_MARK_IDS = [
+  "scotch-gambit",
+  "evans-gambit",
+  "italian-attack",
+  "vienna-gambit",
+  "kings-gambit",
+  "grand-prix",
+  "smith-morra",
+  "french-kia",
+  "caro-fantasy",
+  "london",
+  "jobava-london",
+  "alapin",
+  "english",
+  "queens-gambit",
+  "black-lion",
+  "pirc",
+  "dragon",
+  "scandinavian",
+  "alekhine",
+  "caro-kann",
+  "kings-indian",
+  "modern-benoni",
+  "benko",
+  "dutch-leningrad",
+  "budapest",
+  "slav",
+] as const;
+
+export type WeaponMarkId = (typeof WEAPON_MARK_IDS)[number];

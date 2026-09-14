@@ -65,6 +65,7 @@ import {
 } from "@/lib/openings/coach";
 import {
   isUserPly,
+  openingDossier,
   openingFromTrap,
   quizForPly,
   STUDY_MODES,
@@ -653,7 +654,9 @@ export function DrillScreen({
               <p className="truncate text-[11px] text-[var(--mist)]">
                 Plan mode — free play
               </p>
-            ) : null}
+            ) : (
+              <p className="drill-dossier">{openingDossier(root)}</p>
+            )}
           </div>
           <Button
             variant="ghost"

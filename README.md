@@ -1,18 +1,22 @@
 # Opening Edge
 
-iPhone-first PWA dashboard (`100dvh`, no page scroll). **26 attacking systems** (14 White · 6 vs 1.e4 · 6 vs 1.d4) on one **White / Black** home. Each line is a **spine to move 21**, **traps**, and **six pillars** — then Plan mode. A single male coach (Aldric) teaches **why** on key moves — text in the strip, optional voice. No floating chat head.
+iPhone-first PWA dashboard (`100dvh`, no page scroll). **26 attacking systems** on one **Your Weapons** home in **four racks** (White Gambits, White Systems, Black vs 1.e4, Black vs 1.d4). Square widget tiles; full details live in Learn. Each line is a **spine to move 21**, **traps**, and **six pillars** — then Plan mode. A single male coach (Aldric) teaches **why** on key moves — text in the strip, optional voice. No floating chat head.
 
 Production: [https://blitzbar.app](https://blitzbar.app) (Vercel project `ply-chess`, GitHub `EmmanuelXK/ply-chess`).
 
 ## Repertoire
 
-White: Scotch Gambit, Evans, Italian attacking, Vienna Gambit, King's Gambit, Grand Prix, Smith-Morra, French KIA, Caro-Kann Fantasy, London, Jobava London, Alapin, English, Queen's Gambit Exchange.
+Home is four racks on one page (not color pages). Tiles are square marks with the name in regular sans underneath; System / Semi stays a quiet caption. Phone vs iPad Air uses the auto size arranger.
 
-Black vs 1.e4: Black Lion, Pirc, Sicilian Dragon, Scandinavian, Alekhine, Caro-Kann.
+**White · Gambits:** Scotch Gambit, Evans, Vienna Gambit, King's Gambit, Smith-Morra, Grand Prix (semi-sharp).
 
-Black vs 1.d4: King's Indian, Modern Benoni, Benko, Dutch Leningrad, Budapest, Slav.
+**White · Systems:** London, Jobava, Italian attacking, French KIA, Caro-Kann Fantasy, **Alapin**, **English**, **Queen's Gambit**.
 
-Home modes: **Learn · Reps · Practice · Drill · Time Trial · Progress**. Systems sit in **White opening systems** and **Black opening systems**.
+**Black · vs 1.e4:** Black Lion, Pirc, Sicilian Dragon, Scandinavian, Alekhine, **Caro-Kann**.
+
+**Black · vs 1.d4:** King's Indian, Modern Benoni, Benko, Dutch Leningrad, Budapest, **Slav**.
+
+Home modes: **Learn · Reps · Practice · Drill · Time Trial · Progress**. Kind, vs-line, time, and traps live in Learn.
 
 ## Single coach
 
