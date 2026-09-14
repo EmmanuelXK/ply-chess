@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { openings } from "./index";
+import { studyHref } from "./dossier";
 import {
   OPENING_ID_ALIASES,
   RACK_ORDER,
@@ -13,45 +14,32 @@ import {
   weaponRacks,
 } from "./racks";
 
-const EXPECTED_NOW: Record<string, string[]> = {
-  "white-gambits": [
-    "scotch-gambit",
-    "evans-gambit",
-    "vienna-gambit",
-    "kings-gambit",
-    "smith-morra",
-    "grand-prix",
-  ],
-  "white-systems": [
-    "london",
-    "jobava-london",
-    "italian-attack",
-    "french-kia",
-    "caro-fantasy",
-  ],
-  "black-e4": ["black-lion", "pirc", "dragon", "scandinavian", "alekhine"],
-  "black-d4": [
-    "kings-indian",
-    "modern-benoni",
-    "benko",
-    "dutch-leningrad",
-    "budapest",
-  ],
-};
-
 describe("weapon racks", () => {
-  it("places every current opening in exactly one locked rack, in IA order", () => {
+  it("uses RACK_SEQUENCE as the only membership list — 26 specs, no duplicate tiles", () => {
+    const specIds = openings.map((o) => o.id);
+    assert.equal(openings.length, 26);
+
+    const sequence = RACK_ORDER.flatMap((rack) => [...RACK_SEQUENCE[rack]]);
+    assert.equal(new Set(sequence).size, sequence.length, "duplicate id in RACK_SEQUENCE");
+    assert.deepEqual([...sequence].sort(), [...specIds].sort());
+
     const seen = new Set<string>();
     for (const rack of RACK_ORDER) {
+      const expected = RACK_SEQUENCE[rack].filter((id) => specIds.includes(id));
       const ids = openingsInRack(rack, openings).map((o) => o.id);
-      assert.deepEqual(ids, EXPECTED_NOW[rack], rack);
+      assert.deepEqual(ids, expected, rack);
       for (const id of ids) {
-        assert.equal(seen.has(id), false, `duplicate ${id}`);
+        assert.equal(seen.has(id), false, `duplicate tile ${id}`);
         seen.add(id);
       }
     }
     assert.equal(seen.size, openings.length);
-    assert.equal(openings.length, 21);
+
+    const racks = weaponRacks(openings);
+    assert.equal(
+      racks.reduce((sum, rack) => sum + rack.openings.length, 0),
+      openings.length,
+    );
   });
 
   it("keeps the four Home racks — no color pages", () => {
@@ -62,17 +50,9 @@ describe("weapon racks", () => {
     );
   });
 
-  it("slots reserved ids into the right racks when specs exist", () => {
-    const stubs = [
-      ...openings,
-      { id: "alapin", side: "white" as const, family: "white" as const },
-      { id: "english", side: "white" as const, family: "white" as const },
-      { id: "queens-gambit", side: "white" as const, family: "white" as const },
-      { id: "caro-kann", side: "black" as const, family: "black-e4" as const },
-      { id: "slav", side: "black" as const, family: "black-d4" as const },
-    ];
+  it("slots the five new systems into the locked racks", () => {
     assert.deepEqual(
-      openingsInRack("white-systems", stubs).map((o) => o.id),
+      openingsInRack("white-systems", openings).map((o) => o.id),
       [
         "london",
         "jobava-london",
@@ -84,11 +64,8 @@ describe("weapon racks", () => {
         "queens-gambit",
       ],
     );
-    assert.equal(
-      openingsInRack("black-e4", stubs).at(-1)?.id,
-      "caro-kann",
-    );
-    assert.equal(openingsInRack("black-d4", stubs).at(-1)?.id, "slav");
+    assert.equal(openingsInRack("black-e4", openings).at(-1)?.id, "caro-kann");
+    assert.equal(openingsInRack("black-d4", openings).at(-1)?.id, "slav");
   });
 
   it("accepts likely aliases from a parallel spec PR", () => {
@@ -114,7 +91,7 @@ describe("weapon racks", () => {
     );
   });
 
-  it("documents the five reserved hooks in White Systems / Black racks", () => {
+  it("documents the five systems in White Systems / Black racks", () => {
     assert.deepEqual([...RESERVED_OPENING_IDS], [
       "alapin",
       "english",
@@ -132,11 +109,18 @@ describe("weapon racks", () => {
         RACK_SEQUENCE[rackForOpeningId(id)].includes(id),
         `${id} missing from its sequence`,
       );
+      assert.ok(openings.some((o) => o.id === id), `${id} missing from specs`);
     }
   });
 
   it("puts Grand Prix in Gambits as the locked semi-sharp, not Systems", () => {
     assert.equal(rackForOpeningId("grand-prix"), "white-gambits");
     assert.equal(rackForOpeningId("italian-attack"), "white-systems");
+  });
+
+  it("wires Learn routes for every spec id", () => {
+    for (const opening of openings) {
+      assert.equal(studyHref(opening.id, "learn"), `/drill/${opening.id}`);
+    }
   });
 });

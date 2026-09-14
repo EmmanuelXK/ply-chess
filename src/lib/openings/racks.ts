@@ -2,12 +2,13 @@ import type { Family, Opening, Side } from "./types";
 
 /**
  * Home information architecture — four racks on one page.
- * Mapping is by opening id so parallel spec PRs do not have to set a new field.
+ * This file is the only source of truth for rack membership and tile order.
+ * Playable systems themselves live in specs.ts (ids must match).
  *
- * Reserved ids (specs may land later; tiles appear when present):
  *   alapin, english, queens-gambit  → White · Systems
  *   caro-kann                       → Black · vs 1.e4
  *   slav                            → Black · vs 1.d4
+ *   grand-prix                      → White · Gambits (semi-sharp)
  */
 export type RackId =
   | "white-gambits"
@@ -52,7 +53,7 @@ export const RACK_META: Record<
   },
 };
 
-/** Canonical ids for the five systems being authored in parallel. */
+/** Canonical ids for the five systems added on this cut. */
 export const RESERVED_OPENING_IDS = [
   "alapin",
   "english",
@@ -80,10 +81,7 @@ export function canonicalOpeningId(id: string): string {
   return OPENING_ID_ALIASES[id] ?? id;
 }
 
-/**
- * Display order per rack. Reserved ids stay in the list so they slot in
- * the moment their specs exist — no Home rewrite required.
- */
+/** Display order per rack. Home tiles follow this sequence when the spec exists. */
 export const RACK_SEQUENCE: Record<RackId, readonly string[]> = {
   "white-gambits": [
     "scotch-gambit",

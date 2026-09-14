@@ -1,4 +1,4 @@
-/** Widget mark ids — every production opening plus reserved incoming systems. */
+/** Widget mark ids — one square logo per production opening id. */
 export const WEAPON_MARK_IDS = [
   "scotch-gambit",
   "evans-gambit",
