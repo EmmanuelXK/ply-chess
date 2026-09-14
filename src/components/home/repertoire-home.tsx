@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { TabBar } from "@/components/app/tab-bar";
 import { OpeningTile } from "@/components/home/opening-tile";
 import {
@@ -10,25 +10,23 @@ import {
   type Opening,
   type StudyMode,
 } from "@/lib/openings";
+import { useAuth } from "@/components/auth/auth-provider";
 import { dueCount, progressFor } from "@/lib/reps/schedule";
 
 export function RepertoireHome() {
   const [mode, setMode] = useState<StudyMode>("learn");
+  const { profile } = useAuth();
   const white = openingsForSide("white");
   const black = openingsForSide("black");
-
-  const lotusHint = useMemo(() => {
-    if (mode !== "progress") return "Link games later — we'll rank these by your practical win rate.";
-    return "Progress is local for now. Lotus-style import from your games is next.";
-  }, [mode]);
 
   return (
     <div className="dash-shell dash-repertoire">
       <header className="dash-head">
-        <p className="dash-kicker">Repertoire</p>
+        <p className="dash-kicker">Your Weapons</p>
         <h1>Opening Edge</h1>
         <p className="dash-sub">
-          {white.length} White · {black.length} Black · one coach
+          {white.length} White · {black.length} Black
+          {profile?.displayName ? ` · ${profile.displayName}` : " · systems you actually train"}
         </p>
         <div className="mode-grid" role="tablist" aria-label="Study mode">
           {STUDY_MODES.map((m) => (
@@ -46,7 +44,9 @@ export function RepertoireHome() {
           ))}
         </div>
         <p className="dash-mode-blurb">
-          {STUDY_MODES.find((m) => m.id === mode)?.blurb} {mode === "progress" ? lotusHint : ""}
+          {mode === "progress"
+            ? "What stuck. Weak houses light up on the tiles."
+            : STUDY_MODES.find((m) => m.id === mode)?.blurb}
         </p>
       </header>
 

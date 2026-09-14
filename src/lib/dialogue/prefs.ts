@@ -36,7 +36,7 @@ export function writeStoredDuo(id: DuoId): void {
 export function readStoredMode(): DialogueMode {
   const raw = read(MODE_KEY);
   if (raw === "solo" || raw === "dual") return raw;
-  return "dual";
+  return "solo";
 }
 
 export function writeStoredMode(mode: DialogueMode): void {

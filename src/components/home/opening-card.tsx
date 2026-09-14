@@ -4,9 +4,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { fullMoveCount, parseStudyMode, type Opening, type RepsMode } from "@/lib/openings";
 
 const accents: Record<string, string> = {
-  white: "from-amber-500/20 to-transparent",
-  "black-e4": "from-emerald-500/20 to-transparent",
-  "black-d4": "from-sky-500/20 to-transparent",
+  white: "from-orange-500/20 to-transparent",
+  "black-e4": "from-amber-500/16 to-transparent",
+  "black-d4": "from-orange-700/16 to-transparent",
 };
 
 export function OpeningCard({

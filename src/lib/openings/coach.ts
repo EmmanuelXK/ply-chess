@@ -1,4 +1,5 @@
 import { chunkAt, firstSentence, positionalIdea } from "./helpers";
+import { housePicture, pinSpeech } from "./memory";
 import { professorAt } from "./professor";
 import type { Opening } from "./types";
 
@@ -36,10 +37,17 @@ function professorLine(opening: Opening, afterPly: number): string | undefined {
 }
 
 export function coachAtStart(opening: Opening): CoachState {
+  const house = opening.chunks[0];
+  const picture = housePicture(house);
   return {
-    text: shortLine(opening.chunks[0]?.name ?? opening.story.cast, 12),
-    detail: shortLine(opening.story.plan, 12),
-    chunkName: opening.chunks[0]?.name,
+    text: shortLine(opening.story.cast, 12),
+    detail: shortLine(
+      house?.name && picture !== house.name
+        ? `${house.name}: ${picture}`
+        : picture,
+      14,
+    ),
+    chunkName: house?.name,
     kind: "start",
   };
 }
@@ -53,10 +61,12 @@ export function coachAfterPly(opening: Opening, afterPly: number): CoachState {
   const enteredChunk =
     chunk && (afterPly === chunk.fromPly || afterPly === chunk.fromPly + 1);
 
+  const picture = housePicture(chunk);
+
   if (pin) {
     return {
-      text: concept ?? pin.label,
-      detail: chunk?.job,
+      text: shortLine(`${pinSpeech(pin)} ${picture}`, 15),
+      detail: shortLine(chunk?.job ?? opening.story.plan, 12),
       chunkName: chunk?.name,
       kind: "pin",
       pinLabel: pin.label,
@@ -64,31 +74,31 @@ export function coachAfterPly(opening: Opening, afterPly: number): CoachState {
   }
   if (beat) {
     return {
-      text: concept ?? beat.beat,
-      detail: chunk?.job,
+      text: shortLine(concept ?? beat.beat ?? picture, 14),
+      detail: shortLine(chunk?.job ?? picture, 12),
       chunkName: chunk?.name,
       kind: "ok",
     };
   }
   if (enteredChunk && chunk) {
     return {
-      text: concept ?? line?.text ?? chunk.name,
-      detail: chunk.job,
+      text: shortLine(picture, 12),
+      detail: shortLine(chunk.job, 12),
       chunkName: chunk.name,
       kind: "ok",
     };
   }
   if (line) {
     return {
-      text: concept ?? line.text,
-      detail: chunk?.job,
+      text: shortLine(concept ?? line.text ?? picture, 14),
+      detail: shortLine(chunk?.job ?? picture, 12),
       chunkName: chunk?.name,
       kind: "ok",
     };
   }
   return {
-    text: concept ?? chunk?.name ?? opening.story.plan,
-    detail: chunk?.job,
+    text: shortLine(concept ?? picture ?? opening.story.plan, 14),
+    detail: shortLine(chunk?.job ?? opening.story.conflict, 12),
     chunkName: chunk?.name,
     kind: "ok",
   };

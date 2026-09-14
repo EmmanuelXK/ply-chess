@@ -35,8 +35,17 @@ export {
   fullMoveCount,
   PILLAR_LABELS,
   looksLikeMoveList,
+  openingKind,
   positionalIdea,
 } from "./helpers";
+export {
+  housePicture,
+  housePictureAt,
+  pinSpeech,
+  storyLine,
+  chunkIndexAt,
+  visualLine,
+} from "./memory";
 export { openingFromTrap } from "./make-opening";
 export { quizForPly, whyLessonAt, professorAt } from "./professor";
 export {
@@ -66,8 +75,8 @@ export const FAMILY_META: Record<
 };
 
 export const SIDE_META = {
-  white: { title: "White opening systems", blurb: "You move first. Practical attacking systems." },
-  black: { title: "Black opening systems", blurb: "Answer 1.e4 and 1.d4 with human lines." },
+  white: { title: "White", blurb: "You move first." },
+  black: { title: "Black", blurb: "Answer 1.e4 and 1.d4." },
 } as const;
 
 export { STUDY_MODES, parseStudyMode };

@@ -5,12 +5,12 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "Opening Edge",
     short_name: "Opening Edge",
     description:
-      "iPhone-first chess opening trainer. 21 attacking systems, professor Why, hybrid practice.",
+      "iPhone-first chess opening trainer. Noir repertoire, theory atlas, one coach.",
     start_url: "/",
     display: "standalone",
     orientation: "portrait",
-    background_color: "#0c0c0e",
-    theme_color: "#0c0c0e",
+    background_color: "#070708",
+    theme_color: "#070708",
     icons: [
       {
         src: "/icon.svg",
@@ -27,6 +27,12 @@ export default function manifest(): MetadataRoute.Manifest {
       {
         src: "/icon-512.png",
         sizes: "512x512",
+        type: "image/png",
+        purpose: "any",
+      },
+      {
+        src: "/apple-touch-icon.png",
+        sizes: "180x180",
         type: "image/png",
         purpose: "any",
       },

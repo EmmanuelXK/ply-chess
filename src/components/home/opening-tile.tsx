@@ -1,5 +1,12 @@
 import Link from "next/link";
-import { fullMoveCount, parseStudyMode, type Opening, type RepsMode } from "@/lib/openings";
+import {
+  fullMoveCount,
+  openingKind,
+  parseStudyMode,
+  type Opening,
+  type RepsMode,
+} from "@/lib/openings";
+import { weakHouseName } from "@/lib/reps/schedule";
 
 export function OpeningTile({
   opening,
@@ -15,7 +22,10 @@ export function OpeningTile({
   showProgress?: boolean;
 }) {
   const moves = fullMoveCount(opening);
+  const kind = openingKind(opening.id);
   const mode = parseStudyMode(typeof reps === "string" ? reps : "learn");
+  const reviewHouse =
+    showProgress && due > 0 ? weakHouseName(opening) : null;
   const href =
     mode === "learn"
       ? `/drill/${opening.id}`
@@ -37,7 +47,14 @@ export function OpeningTile({
         {showProgress && best > 0 ? ` · ply ${best}` : ""}
         {showProgress && due > 0 ? ` · ${due} due` : ""}
       </p>
-      <p className="dash-tile-chunk">{opening.chunks[0]?.name}</p>
+      <p className="dash-tile-chunk">
+        <span className="dash-tile-kind">{kind === "system" ? "System" : "Semi"}</span>
+        {reviewHouse
+          ? ` · Review ${reviewHouse}`
+          : opening.chunks[0]?.name
+            ? ` · ${opening.chunks[0].name}`
+            : ""}
+      </p>
     </Link>
   );
 }

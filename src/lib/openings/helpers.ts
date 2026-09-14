@@ -36,6 +36,19 @@ export function positionalIdea(
   return firstSentence(compact);
 }
 
+const SYSTEM_OPENINGS = new Set([
+  "london",
+  "jobava-london",
+  "french-kia",
+  "black-lion",
+  "kings-indian",
+  "pirc",
+]);
+
+export function openingKind(id: string): "system" | "semi" {
+  return SYSTEM_OPENINGS.has(id) ? "system" : "semi";
+}
+
 export const PILLAR_LABELS = [
   ["pawnStructure", "Pawn structure"],
   ["pieceCoordination", "Piece coordination"],
