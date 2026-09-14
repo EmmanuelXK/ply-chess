@@ -1,6 +1,6 @@
-import { SHORT_HOOKS } from "@/lib/dialogue/hooks";
-import { stripLeadingSanLabel } from "@/lib/dialogue/short";
-import { chunkAt, firstSentence, positionalIdea } from "./helpers";
+import { SHORT_HOOKS, spokenHook } from "@/lib/dialogue/hooks";
+import { limitWords } from "@/lib/dialogue/short";
+import { chunkAt, positionalIdea } from "./helpers";
 import { historyAt } from "./history";
 import { isKeyPly } from "./key-ply";
 import { housePicture } from "./memory";
@@ -8,20 +8,13 @@ import { professorAt } from "./professor";
 import type { Opening } from "./types";
 
 function shortLine(text: string | undefined, max = 15): string {
-  const compact = stripLeadingSanLabel(text ?? "");
-  if (!compact) return "";
-  const sentence = firstSentence(compact);
-  const sentenceWords = sentence.split(" ").filter(Boolean);
-  const source = sentenceWords.length >= 6 ? sentence : compact;
-  return source.split(" ").filter(Boolean).slice(0, max).join(" ");
+  return limitWords(text ?? "", max);
 }
 
 function hookLine(opening: Opening, afterPly: number): string | undefined {
   const row = SHORT_HOOKS[opening.id]?.find((h) => h.ply === afterPly);
   if (!row) return undefined;
-  const hook = shortLine(row.hook, 14);
-  if (hook.split(" ").filter(Boolean).length >= 6) return hook;
-  return shortLine(`${row.hook} ${row.punch}`, 14);
+  return spokenHook(row);
 }
 
 export type CoachKind =
@@ -53,10 +46,8 @@ export function coachAtStart(opening: Opening): CoachState {
   const house = opening.chunks[0];
   const hook = hookLine(opening, -1);
   const cast = shortLine(opening.story.cast, 12);
-  const spoken =
-    hook && hook.split(" ").filter(Boolean).length >= 6 ? hook : cast;
   return {
-    text: shortLine(spoken, 12),
+    text: hook ?? cast,
     chunkName: house?.name,
     kind: "start",
   };
@@ -102,14 +93,8 @@ export function coachAfterPly(opening: Opening, afterPly: number): CoachState {
   const picture = housePicture(chunk);
 
   if (pin) {
-    const spoken = hook ?? picture;
     return {
-      text: shortLine(
-        spoken.split(" ").filter(Boolean).length >= 6
-          ? spoken
-          : `${picture} That's the landmark.`,
-        15,
-      ),
+      text: hook ?? shortLine(`${picture} That's the landmark.`, 15),
       chunkName: chunk?.name,
       kind: "pin",
       pinLabel: pin.label,
@@ -117,7 +102,7 @@ export function coachAfterPly(opening: Opening, afterPly: number): CoachState {
   }
   if (hook) {
     return {
-      text: shortLine(hook, 14),
+      text: hook,
       chunkName: chunk?.name,
       kind: "ok",
     };

@@ -1,4 +1,4 @@
-import { SHORT_HOOKS } from "@/lib/dialogue/hooks";
+import { SHORT_HOOKS, spokenHook } from "@/lib/dialogue/hooks";
 import type { Chunk, CoachLine, Opening, StoryBeat } from "./types";
 
 /** Chunk jobs and names — house pictures, never a dumped move list. */
@@ -215,13 +215,13 @@ function overlayChunks(chunks: Chunk[], openingId: string): Chunk[] {
 function coachFromHooks(openingId: string): CoachLine[] | undefined {
   const hooks = SHORT_HOOKS[openingId];
   if (!hooks?.length) return undefined;
-  return hooks.map((row) => ({ afterPly: row.ply, text: row.hook }));
+  return hooks.map((row) => ({ afterPly: row.ply, text: spokenHook(row) }));
 }
 
 function beatsFromHooks(opening: Opening): StoryBeat[] {
   return opening.storyBeats.map((beat) => {
     const hook = SHORT_HOOKS[opening.id]?.find((row) => row.ply === beat.afterPly);
-    return hook ? { ...beat, beat: hook.hook } : beat;
+    return hook ? { ...beat, beat: spokenHook(hook) } : beat;
   });
 }
 

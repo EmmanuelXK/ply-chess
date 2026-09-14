@@ -1,12 +1,20 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { dialogueForPly, dialogueForStart, leadsWithSan } from "../dialogue";
+import {
+  dialogueForPly,
+  dialogueForStart,
+  leadsWithSan,
+  spokenHook,
+  twoBeatLine,
+  wordCount,
+} from "../dialogue";
 import { SHORT_HOOKS } from "../dialogue/hooks";
 import { looksLikeMoveList } from "./helpers";
 import { coachAfterPly } from "./coach";
 import { getOpening, openings, isKeyPly, explainLessonAt } from "./index";
 
 const THIN = 6;
+const THEY = /\b(they|their|them)\b/i;
 
 describe("concept-first Memory OS", () => {
   it("authors a hook pack for every system", () => {
@@ -21,6 +29,54 @@ describe("concept-first Memory OS", () => {
     }
   });
 
+  it("plants why-they and how-we on every authored hook", () => {
+    for (const opening of openings) {
+      for (const row of SHORT_HOOKS[opening.id]) {
+        assert.match(
+          row.they,
+          THEY,
+          `${opening.id} ply ${row.ply} they-line is not opponent-aware: "${row.they}"`,
+        );
+        assert.ok(row.we.trim(), `${opening.id} ply ${row.ply} missing our answer`);
+        assert.equal(
+          leadsWithSan(row.they),
+          false,
+          `${opening.id} ply ${row.ply} they SAN-led: "${row.they}"`,
+        );
+        assert.equal(
+          leadsWithSan(row.we),
+          false,
+          `${opening.id} ply ${row.ply} we SAN-led: "${row.we}"`,
+        );
+        const spoken = spokenHook(row);
+        const n = wordCount(spoken);
+        assert.ok(
+          n >= THIN && n <= 15,
+          `${opening.id} ply ${row.ply} is ${n} words: "${spoken}"`,
+        );
+        assert.match(
+          spoken,
+          THEY,
+          `${opening.id} ply ${row.ply} strip dropped their idea: "${spoken}"`,
+        );
+        assert.ok(
+          spoken.includes(".") || spoken.includes("—"),
+          `${opening.id} ply ${row.ply} should keep two pictures: "${spoken}"`,
+        );
+      }
+    }
+  });
+
+  it("keeps both pictures when the they-line is already six words", () => {
+    const line = twoBeatLine(
+      "They want the bishop dead now.",
+      "Keep its air. You said no.",
+    );
+    assert.match(line, /bishop dead/i);
+    assert.match(line, /air/i);
+    assert.ok(wordCount(line) <= 15);
+  });
+
   it("keeps default strip as a picture, not a SAN lead or move dump", () => {
     for (const opening of openings) {
       const start = dialogueForStart(opening, { duo: "voss-draven", mode: "solo" });
@@ -31,6 +87,7 @@ describe("concept-first Memory OS", () => {
       );
       assert.equal(leadsWithSan(startLine), false, `${opening.id} start: ${startLine}`);
       assert.equal(looksLikeMoveList(startLine), false, `${opening.id} start: ${startLine}`);
+      assert.match(startLine, THEY, `${opening.id} start not opponent-aware: "${startLine}"`);
 
       for (let ply = 0; ply < opening.moves.length; ply++) {
         if (!isKeyPly(opening, ply)) continue;
@@ -54,6 +111,36 @@ describe("concept-first Memory OS", () => {
           false,
           `${opening.id} ply ${ply} move dump: "${line}"`,
         );
+        const row = SHORT_HOOKS[opening.id]?.find((h) => h.ply === ply);
+        if (!row) continue;
+        assert.match(
+          line,
+          THEY,
+          `${opening.id} ply ${ply} key strip is not opponent-aware: "${line}"`,
+        );
+      }
+    }
+  });
+
+  it("makes highlighted pins opponent-aware — why they moved, how we treat it", () => {
+    for (const opening of openings) {
+      for (const pin of opening.pins) {
+        const row = SHORT_HOOKS[opening.id]?.find((h) => h.ply === pin.afterPly);
+        assert.ok(
+          row,
+          `${opening.id} pin ${pin.afterPly} (${pin.label}) missing they/we`,
+        );
+        const line =
+          dialogueForPly(opening, pin.afterPly, {
+            duo: "voss-draven",
+            mode: "solo",
+          }).beats[0]?.text ?? "";
+        assert.match(
+          line,
+          THEY,
+          `${opening.id} pin ${pin.afterPly} not opponent-aware: "${line}"`,
+        );
+        assert.equal(leadsWithSan(line), false, `${opening.id} pin: ${line}`);
       }
     }
   });
@@ -66,8 +153,18 @@ describe("concept-first Memory OS", () => {
       mode: "solo",
     }).beats[0]?.text ?? "";
     assert.match(strip, /breathe/i);
+    assert.match(strip, /they|wall|stake/i);
     assert.doesNotMatch(strip, /\bBf4\b/);
     assert.doesNotMatch(strip, /d4 Bf4 e3/);
+
+    const challenged =
+      dialogueForPly(london, 12, {
+        duo: "voss-draven",
+        mode: "solo",
+      }).beats[0]?.text ?? "";
+    assert.match(challenged, THEY);
+    assert.match(challenged, /air|bishop|keep/i);
+    assert.doesNotMatch(challenged, /\bBf4\b/);
   });
 
   it("teaches Lion as house and coil, not a knight-move dump", () => {
