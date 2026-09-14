@@ -72,15 +72,16 @@ function SidePane({
   const meta = SIDE_META[side];
   return (
     <section className={`dash-family dash-family-${side}`}>
-      <header className="dash-family-head">
+      <header className="dash-family-head dash-family-bar">
         <h2>{meta.title}</h2>
         <p>{openings.length}</p>
       </header>
       <p className="dash-family-blurb">{meta.blurb}</p>
       <div className="dash-grid">
-        {openings.map((opening) => {
+        {openings.map((opening, index) => {
           const progress = progressFor(opening.id);
           const due = dueCount(opening.id);
+          const span = openings.length % 2 === 1 && index === openings.length - 1;
           return (
             <OpeningTile
               key={opening.id}
@@ -89,6 +90,7 @@ function SidePane({
               due={due}
               best={progress.best}
               showProgress={mode === "progress" || mode === "reps"}
+              span={span}
             />
           );
         })}

@@ -14,12 +14,14 @@ export function OpeningTile({
   due = 0,
   best = 0,
   showProgress = false,
+  span = false,
 }: {
   opening: Opening;
   reps?: RepsMode;
   due?: number;
   best?: number;
   showProgress?: boolean;
+  span?: boolean;
 }) {
   const moves = fullMoveCount(opening);
   const kind = openingKind(opening.id);
@@ -34,7 +36,7 @@ export function OpeningTile({
   return (
     <Link
       href={href}
-      className={`dash-tile dash-tile-${opening.family}`}
+      className={`dash-tile dash-tile-${opening.family}${span ? " dash-tile-span" : ""}`}
       aria-label={`${opening.name}. You play ${opening.side === "white" ? "White" : "Black"}. ${moves} moves.`}
     >
       <p className="dash-tile-kicker">
