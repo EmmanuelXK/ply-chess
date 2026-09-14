@@ -319,7 +319,7 @@ body,
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.42rem;
+  gap: 0.28rem;
   min-width: 0;
   width: 100%;
   color: inherit;
@@ -356,6 +356,17 @@ body,
   -webkit-box-orient: vertical;
   line-clamp: 2;
   overflow: hidden;
+}
+
+.weapon-kind {
+  margin: -0.06rem 0 0;
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  font-size: 9px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mist-2);
 }
 
 .weapon-due {

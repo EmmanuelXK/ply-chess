@@ -23,15 +23,23 @@ describe("openingDossier", () => {
     const london = openings.find((o) => o.id === "london");
     assert.ok(london);
     assert.match(openingDossier(london), /^System · White/);
+    const italian = openings.find((o) => o.id === "italian-attack");
+    assert.ok(italian);
+    assert.match(openingDossier(italian), /^System · White/);
+    const prix = openings.find((o) => o.id === "grand-prix");
+    assert.ok(prix);
+    assert.match(openingDossier(prix), /^Semi · White/);
   });
 });
 
 describe("weapon marks", () => {
-  it("covers every production opening", () => {
+  it("covers every production opening plus reserved incoming systems", () => {
     const ids = new Set<string>(WEAPON_MARK_IDS);
     for (const opening of openings) {
       assert.ok(ids.has(opening.id), `missing widget mark for ${opening.id}`);
     }
-    assert.equal(ids.size, openings.length);
+    for (const id of ["alapin", "english", "queens-gambit", "caro-kann", "slav"]) {
+      assert.ok(ids.has(id), `missing widget mark for reserved ${id}`);
+    }
   });
 });
