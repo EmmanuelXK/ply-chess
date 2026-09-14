@@ -24,7 +24,7 @@ export {
   writeStoredMode,
 } from "./prefs";
 export { squaresInSpeech } from "./points";
-export { limitWords, nugget, wordCount } from "./short";
+export { limitWords, nugget, wordCount, leadsWithSan, stripLeadingSanLabel } from "./short";
 export {
   inferPurpose,
   PURPOSE_LABELS,

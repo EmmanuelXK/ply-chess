@@ -5,13 +5,13 @@ export const authoredProfessor: Record<string, ProfessorScript[]> = {
     {
       afterPly: 1,
       concept:
-        "…d6 — this is the Lion house, not a Pirc yet. The pawn holds e5 and keeps the dark bishop's door closed until you're ready.",
+        "This is the Lion house, not a Pirc yet. The pawn holds the break and keeps the dark bishop's door closed until you're ready.",
       why: "In the Lion you want a Philidor center, not a fianchetto. …d6 lets …e5 come in one breath and stops White's e5 wedge from landing cheap.",
       plan: "Next is …Nf6 and …Nbd7. Don't rush …g6. The long bishop is not this system's soul.",
       whyLesson: {
         title: "Lion house",
         intro:
-          "…d6. Same first move as a Pirc — different teeth. Watch the squares this pawn owns.",
+          "Same first move as a Pirc — different teeth. Watch the squares this pawn owns.",
         startPly: 2,
         branch: [
           {
@@ -36,13 +36,13 @@ export const authoredProfessor: Record<string, ProfessorScript[]> = {
     {
       afterPly: 5,
       concept:
-        "…Nbd7 — the other knight. This is the tell. Not …Nc6, not …g6. The Lion develops behind the e-pawn.",
+        "The knight hides behind the pawn. Not the other hop, not a fianchetto. The Lion develops in the coil.",
       why: "…Nbd7 supports …e5 and keeps c6 free for the spine pawn. If you develop the queen's knight to c6 you lose the Lion's c6-c5 ideas.",
       plan: "Now …e5. That's the break. After that, …Be7 covers f7 so their Italian bishop looks silly.",
       whyLesson: {
         title: "Not a Pirc",
         intro:
-          "…Nbd7. This hop is how you tell a Lion from a Pirc. Let me show the e5 break it prepares.",
+          "This hop is how you tell a Lion from a Pirc. Let me show the break it prepares.",
         startPly: 6,
         branch: [
           {
@@ -68,13 +68,13 @@ export const authoredProfessor: Record<string, ProfessorScript[]> = {
     {
       afterPly: 7,
       concept:
-        "…e5 — the knight and pawns should own these central squares. It's essential in this opening.",
+        "That's the Lion waking. The knight and pawns should own the dark squares.",
       why: "Without …e5 you're a passive Philidor. With it you have a stake in d4, a later …e4 wedge, and you blunt Bc4's stare at f7.",
       plan: "Cover f7 with …Be7, then …c6 — the Lion's spine — then castle. Don't hunt ghosts on the queenside yet.",
       whyLesson: {
         title: "The e5 pin",
         intro:
-          "…e5. Why this square? Because the Lion's whole attack later — …e4, …Nf8-g6 — is built on this stake.",
+          "Why this square? The Lion's whole attack later — the wedge, the hop — is built on this stake.",
         startPly: 8,
         branch: [
           {
@@ -104,7 +104,7 @@ export const authoredProfessor: Record<string, ProfessorScript[]> = {
     {
       afterPly: 11,
       concept:
-        "…c6 — the Lion's spine. This pawn should blunt d5 and give the queen a path to c7.",
+        "The spine pawn. It should blunt their hops and give the queen a path.",
       why: "c6 is how the Lion stays compact. It stops Nb5 and Nd5 cheap shots, and it prepares the queenside yawn …b5 if they sit.",
       plan: "Castle. Then coil: …Qc7, …h6, …Re8. Queen first — not the whole list at once.",
     },
@@ -118,7 +118,7 @@ export const authoredProfessor: Record<string, ProfessorScript[]> = {
     {
       afterPly: 15,
       concept:
-        "…Qc7 — the queen should sit on c7. Coil square, not a raid. It eyes e5 and the c-file, and it unblocks the rook.",
+        "Coil the queen. Not a raid. It eyes the break and the file, and it unblocks the rook.",
       why: "If the queen stays on d8, the rook can't reach e8 without a traffic jam. c7 is the Lion's battery square for later …c7-bishop and …e4.",
       plan: "…h6 next — air, and no Bg5. Then …Re8. That's the coil. Then the hop …Nf8-g6.",
       whyLesson: {
@@ -165,7 +165,7 @@ export const authoredProfessor: Record<string, ProfessorScript[]> = {
     {
       afterPly: 21,
       concept:
-        "…Nf8 — this hop is the Lion. The knight should reroute to g6, covering e5 and looking at f4/h4.",
+        "Ugly hop, right square. The knight should reroute onto the attack, covering the break.",
       why: "The d7 knight did its job (supporting …e5). Now it must not sit in the way of the c-pawn and the c8 rook. f8-g6 is the classic Lion maneuver.",
       plan: "If they jump Nf5, take it. Then shove …e4. That's the bite.",
       whyLesson: {
@@ -215,7 +215,7 @@ export const authoredProfessor: Record<string, ProfessorScript[]> = {
     {
       afterPly: 25,
       concept:
-        "…e4 — the wedge. This pawn should cramp their pieces and hand you e5 as an outpost.",
+        "Shove the wedge. This pawn should cramp their pieces and hand you the outpost.",
       why: "The Lion isn't a slow squeeze like the London. Once Nf5 is gone, …e4 is how you take the center on your terms.",
       plan: "Close with …c5 if they push d5. Queen tucks. Then the yawn: rooks, bishop to c7, knights back to e5.",
     },
@@ -224,20 +224,20 @@ export const authoredProfessor: Record<string, ProfessorScript[]> = {
     {
       afterPly: 0,
       concept:
-        "d4 — you own the dark squares. This pawn should be a rock, not a battering ram.",
+        "You own the dark squares. This pawn should be a rock, not a battering ram.",
       why: "The London is a system, not a one-move attack. d4 plus Bf4 plus e3 is the triangle that lets you play the same house against almost anything.",
       plan: "Bf4 next. Don't play Nc3 here — that's Jobava, a different hunt.",
     },
     {
       afterPly: 2,
       concept:
-        "Bf4 — this bishop should breathe on the h2-b8 diagonal. It's the soul of the London.",
+        "London bishop needs room to breathe on that diagonal. It's the soul of the house.",
       why: "If you lose this bishop cheaply, you have a boring Queen's Pawn Game. Keep it. Recapture toward the center if they take.",
       plan: "e3, Nf3, c3. Triangle. Meet …c5 by guarding d4, not by panicking.",
       whyLesson: {
         title: "London bishop",
         intro:
-          "Bf4. Why this diagonal? Because Ne5 later sits in front of it, and h7 is a long-term target.",
+          "Why this diagonal? The later outpost sits in front of it, and h7 is a long-term target.",
         startPly: 3,
         branch: [
           {
@@ -262,27 +262,27 @@ export const authoredProfessor: Record<string, ProfessorScript[]> = {
     {
       afterPly: 8,
       concept:
-        "c3 — d4 is a rock. This pawn should overprotect the center so the knights can hop.",
+        "Same house every game. This pawn overprotects the rock so the knights can hop.",
       why: "c3 is how you refuse Jobava. It blunts …Nb4 and …Bb4, and it lets you recapture on d4 with a pawn.",
       plan: "Both knights, then Bg3 if they hit Bd6. Keep the bishop.",
     },
     {
       afterPly: 12,
       concept:
-        "Bg3 — they wanted the London bishop. You said no. It should sit on g3, still biting.",
+        "They wanted the London bishop. You said no. It still bites.",
       why: "…Bd6 is the amateur's attempt to kill your opening. Retreating to g3 keeps the diagonal and dares them to wreck their own kingside with …Bxg3 hxg3.",
       plan: "Ne5. Sit on their throat. Then f4 clamps.",
     },
     {
       afterPly: 16,
       concept:
-        "Ne5 — the knight should sit here. Control f7, d7, c6, g6. Don't hop off.",
+        "The knight sits. Control the holes. Don't hop off.",
       why: "Ne5 is the London's attacking outpost. It frees f4, eyes h7 with the bishop battery, and makes …c5 less comfortable.",
       plan: "f4 next — space, that's the squeeze. Queen lifts. Castle. Don't donate the outpost.",
       whyLesson: {
         title: "Ne5 outpost",
         intro:
-          "Ne5. Why this square? Watch the squares the knight should control. Then the f4 clamp.",
+          "Why this square? Watch the holes the knight should control. Then the clamp.",
         startPly: 17,
         branch: [
           {
@@ -426,7 +426,7 @@ export const authoredQuizzes: Record<string, PositionalQuiz[]> = {
       id: "london-triangle",
       fromPly: 0,
       toPly: 8,
-      prompt: "What's the job of the London triangle (d4-Bf4-e3 / c3)?",
+      prompt: "What's the job of the London triangle?",
       choices: [
         {
           id: "a",
