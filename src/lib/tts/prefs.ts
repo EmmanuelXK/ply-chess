@@ -1,44 +1,26 @@
-import type { SpeakerId } from "./types";
+import { COACH_SPEAKER, type SpeakerId } from "./types";
 import type { TtsRatePref } from "./prosody";
 
 const RATE_KEY = "opening-edge.tts-rate";
 const MAP_KEY = "opening-edge.voice-map";
 const VOICE_ON_KEY = "opening-edge.voice-on";
 
+const MALE_PRESETS = [
+  { id: "default", label: "Warm UK", edge: "en-GB-RyanNeural" },
+  { id: "deep", label: "Deep US", edge: "en-US-AndrewNeural" },
+  { id: "soft", label: "Soft UK", edge: "en-GB-ThomasNeural" },
+] as const;
+
 export const VOICE_PRESETS: Record<
   SpeakerId,
   { id: string; label: string; edge: string }[]
 > = {
-  aldric: [
-    { id: "default", label: "Warm UK", edge: "en-GB-RyanNeural" },
-    { id: "deep", label: "Deep US", edge: "en-US-AndrewNeural" },
-    { id: "soft", label: "Soft UK", edge: "en-GB-ThomasNeural" },
-  ],
-  kael: [
-    { id: "default", label: "Warm US", edge: "en-US-AvaNeural" },
-    { id: "bright", label: "Bright", edge: "en-US-JennyNeural" },
-    { id: "soft", label: "Soft", edge: "en-US-EmmaNeural" },
-  ],
-  soren: [
-    { id: "default", label: "Calm UK", edge: "en-GB-ThomasNeural" },
-    { id: "warm", label: "Warm UK", edge: "en-GB-RyanNeural" },
-    { id: "low", label: "Low US", edge: "en-US-ChristopherNeural" },
-  ],
-  rhea: [
-    { id: "default", label: "Warm", edge: "en-US-JennyNeural" },
-    { id: "bright", label: "Bright", edge: "en-US-AvaNeural" },
-    { id: "story", label: "Story", edge: "en-US-AriaNeural" },
-  ],
-  silas: [
-    { id: "default", label: "Clear US", edge: "en-US-AndrewNeural" },
-    { id: "warm", label: "Warm", edge: "en-US-ChristopherNeural" },
-    { id: "uk", label: "UK", edge: "en-GB-RyanNeural" },
-  ],
-  lena: [
-    { id: "default", label: "Warm", edge: "en-US-EmmaNeural" },
-    { id: "bright", label: "Bright", edge: "en-US-JennyNeural" },
-    { id: "soft", label: "Soft", edge: "en-US-AvaNeural" },
-  ],
+  aldric: [...MALE_PRESETS],
+  kael: [...MALE_PRESETS],
+  soren: [...MALE_PRESETS],
+  rhea: [...MALE_PRESETS],
+  silas: [...MALE_PRESETS],
+  lena: [...MALE_PRESETS],
 };
 
 function read(key: string): string | null {
@@ -85,10 +67,11 @@ export function writeVoicePreset(speaker: SpeakerId, presetId: string): void {
   write(MAP_KEY, JSON.stringify(next));
 }
 
-export function edgeVoiceFor(speaker: SpeakerId): string {
-  const presetId = readVoiceMap()[speaker] ?? "default";
-  const row = VOICE_PRESETS[speaker].find((p) => p.id === presetId);
-  return row?.edge ?? VOICE_PRESETS[speaker][0].edge;
+export function edgeVoiceFor(speaker: SpeakerId = COACH_SPEAKER): string {
+  void speaker;
+  const presetId = readVoiceMap()[COACH_SPEAKER] ?? "default";
+  const row = VOICE_PRESETS[COACH_SPEAKER].find((p) => p.id === presetId);
+  return row?.edge ?? VOICE_PRESETS[COACH_SPEAKER][0].edge;
 }
 
 export function readVoiceOnDefault(): boolean {
@@ -100,5 +83,6 @@ export function writeVoiceOnDefault(on: boolean): void {
 }
 
 export function isWhitelistedEdgeVoice(speaker: SpeakerId, voice: string): boolean {
-  return VOICE_PRESETS[speaker].some((p) => p.edge === voice);
+  void speaker;
+  return VOICE_PRESETS[COACH_SPEAKER].some((p) => p.edge === voice);
 }

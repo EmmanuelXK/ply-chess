@@ -745,6 +745,15 @@ body,
   overflow: hidden;
 }
 
+.coach-strip.coach-quiet {
+  opacity: 0.78;
+}
+
+.coach-strip.coach-quiet .coach-line {
+  font-weight: 550;
+  color: var(--mist);
+}
+
 .coach-detail {
   margin-top: 0.18rem !important;
   font-size: 12px;

@@ -1,4 +1,6 @@
+import { isKeyPly } from "@/lib/openings/key-ply";
 import type { Opening } from "@/lib/openings/types";
+import { COACH_SPEAKER } from "@/lib/tts/types";
 import { ACTIVE_COACH } from "./coach";
 import { dialogueForPly, dialogueForStart } from "./generate";
 import { PURPOSE_LABELS } from "./purpose";
@@ -36,12 +38,16 @@ export function validateDialogue(openings: Opening[]): void {
           ? start
           : dialogueForPly(opening, ply, { duo: ACTIVE_COACH, mode: "solo" });
       if (!scene.beats.length) {
+        if (ply >= 0 && !isKeyPly(opening, ply)) continue;
         throw new Error(`[${opening.id}] empty scene at ply ${ply}`);
       }
       if (scene.beats.length > 2) {
         throw new Error(`[${opening.id}] ply ${ply} has duo-length beats`);
       }
       for (const beat of scene.beats) {
+        if (beat.speaker !== COACH_SPEAKER) {
+          throw new Error(`[${opening.id}] ply ${ply} used ${beat.speaker}, not the man`);
+        }
         const n = wordCount(beat.text);
         if (n > MAX_BEAT_WORDS) {
           throw new Error(
@@ -90,6 +96,7 @@ export function validateDialogue(openings: Opening[]): void {
       mode: "solo",
     });
     if (!scene.beats.length) {
+      if (!isKeyPly(opening, 0)) continue;
       throw new Error(`[${opening.id}] coach scene empty at ply 0`);
     }
     for (const beat of scene.beats) {

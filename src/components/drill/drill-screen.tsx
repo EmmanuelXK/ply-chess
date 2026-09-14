@@ -292,7 +292,7 @@ export function DrillScreen({
     askWaitRef.current = null;
     speechRef.current?.stop();
     speechRef.current = null;
-    if (!tts) {
+    if (!tts || scene.beats.length === 0) {
       silence();
       return;
     }
@@ -634,6 +634,8 @@ export function DrillScreen({
     () => [...played, ...opening.moves.slice(ply)],
     [played, opening.moves, ply],
   );
+  const coachLine = (scene.beats[beatIndex]?.text ?? coach.text).trim();
+  const coachPurpose = scene.beats[beatIndex]?.purpose ?? scene.purpose;
 
   return (
     <div className="drill-shell">
@@ -718,26 +720,24 @@ export function DrillScreen({
         </div>
 
         <div
-          className={`coach-strip coach-${coach.kind} strip-speaker-${scene.beats[beatIndex]?.speaker ?? scene.speaker}`}
+          className={`coach-strip coach-${coach.kind} strip-speaker-aldric${
+            coachLine ? "" : " coach-quiet"
+          }`}
           role="status"
           aria-live="polite"
         >
           {coach.kind === "pin" ? <span className="pin-dot" aria-hidden /> : null}
           <div className="min-w-0 flex-1">
             <div className="coach-who">
-              <SpeakerChip
-                purpose={
-                  scene.beats[beatIndex]?.purpose ?? scene.purpose
-                }
-              />
+              <SpeakerChip purpose={coachLine ? coachPurpose : undefined} />
               {reps === "trial" ? (
                 <span className="coach-mode-tag">{trialLeft}s</span>
               ) : null}
             </div>
             <p className="coach-line">
-              {scene.beats[beatIndex]?.text ?? coach.text}
+              {coachLine || "Play the book. He’ll talk on the key move."}
             </p>
-            {coach.detail ? (
+            {coach.detail && coachLine ? (
               <p className="coach-detail">{coach.detail}</p>
             ) : null}
             {ask ? (
@@ -927,6 +927,7 @@ export function DrillScreen({
           opening={opening}
           lesson={why}
           orientation={orientation}
+          voiceOn={tts}
           onClose={() => setWhyOpen(false)}
         />
       ) : null}
@@ -936,6 +937,7 @@ export function DrillScreen({
           opening={opening}
           milestones={historyNow}
           orientation={orientation}
+          voiceOn={tts}
           onClose={() => setHistoryOpen(false)}
         />
       ) : null}
@@ -953,6 +955,7 @@ export function DrillScreen({
         <QuizSheet
           quiz={quiz}
           opening={opening}
+          voiceOn={tts}
           onClose={() => setQuizOpen(false)}
         />
       ) : null}
@@ -972,13 +975,13 @@ export function DrillScreen({
 
 function prefetchAround(opening: Opening, afterPly: number) {
   const start = Math.max(-1, afterPly);
-  for (const ply of [start + 1, start + 2]) {
+  for (const ply of [start + 1, start + 2, start + 3, start + 4]) {
     if (ply >= opening.moves.length) continue;
     const scene = dialogueForPly(opening, ply, {
       duo: ACTIVE_COACH,
       mode: "solo",
     });
-    prefetchDialogue(scene.beats);
+    if (scene.beats.length) prefetchDialogue(scene.beats);
   }
 }
 

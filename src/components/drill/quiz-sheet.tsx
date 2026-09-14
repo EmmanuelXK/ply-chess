@@ -9,10 +9,12 @@ import type { Opening, PositionalQuiz } from "@/lib/openings";
 export function QuizSheet({
   quiz,
   opening,
+  voiceOn = true,
   onClose,
 }: {
   quiz: PositionalQuiz;
   opening: Opening;
+  voiceOn?: boolean;
   onClose: () => void;
 }) {
   const [picked, setPicked] = useState<string | null>(null);
@@ -64,13 +66,15 @@ export function QuizSheet({
                 onClick={() => {
                   if (picked) return;
                   setPicked(choice.id);
-                  const scene = dialogueForQuizReaction(
-                    opening,
-                    choice.reaction,
-                    choice.correct,
-                    { duo: ACTIVE_COACH, mode: "solo" },
-                  );
-                  speakDialogue(scene.beats);
+                  if (voiceOn) {
+                    const scene = dialogueForQuizReaction(
+                      opening,
+                      choice.reaction,
+                      choice.correct,
+                      { duo: ACTIVE_COACH, mode: "solo" },
+                    );
+                    speakDialogue(scene.beats);
+                  }
                 }}
               >
                 {choice.text}

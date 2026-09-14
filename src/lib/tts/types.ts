@@ -17,6 +17,14 @@ export const SPEAKER_IDS: SpeakerId[] = [
   "lena",
 ];
 
+/** The only voice that may speak. Dual / female speakers remap here. */
+export const COACH_SPEAKER: SpeakerId = "aldric";
+
+export function toCoachSpeaker(speaker?: SpeakerId | string | null): SpeakerId {
+  void speaker;
+  return COACH_SPEAKER;
+}
+
 export interface TtsRequest {
   text: string;
   speaker: SpeakerId;

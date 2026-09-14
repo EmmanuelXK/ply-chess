@@ -13,7 +13,7 @@ import { synthesizeEdgeTts } from "./edge";
 import { synthesizeElevenLabs } from "./elevenlabs";
 import { synthesizeGoogleTts } from "./google";
 import { clipHash } from "./hash";
-import type { SpeakerId, TtsClip, TtsRequest } from "./types";
+import { COACH_SPEAKER, type SpeakerId, type TtsClip, type TtsRequest } from "./types";
 
 const serverCache = new ClipCache<TtsClip>(96);
 
@@ -24,17 +24,8 @@ export function normalizeTtsText(text: string): string | null {
 }
 
 export function parseSpeaker(value: unknown): SpeakerId {
-  if (
-    value === "aldric" ||
-    value === "kael" ||
-    value === "soren" ||
-    value === "rhea" ||
-    value === "silas" ||
-    value === "lena"
-  ) {
-    return value;
-  }
-  return "aldric";
+  void value;
+  return COACH_SPEAKER;
 }
 
 /**
@@ -47,7 +38,7 @@ export function parseSpeaker(value: unknown): SpeakerId {
  */
 export async function synthesizeSpeech(request: TtsRequest): Promise<TtsClip> {
   const text = request.text;
-  const speaker = request.speaker;
+  const speaker = COACH_SPEAKER;
 
   if (request.premium) {
     const key = elevenLabsKey();

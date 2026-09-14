@@ -27,11 +27,13 @@ export function HistorySplash({
   opening,
   milestones,
   orientation,
+  voiceOn = true,
   onClose,
 }: {
   opening: Opening;
   milestones: HistoryMilestone[];
   orientation: "white" | "black";
+  voiceOn?: boolean;
   onClose: () => void;
 }) {
   const [idx, setIdx] = useState(0);
@@ -52,14 +54,14 @@ export function HistorySplash({
   }, [milestone, opening]);
 
   useEffect(() => {
-    if (!milestone) return;
+    if (!milestone || !voiceOn) return;
     const scene = dialogueForHistory(opening, milestone, {
       duo: ACTIVE_COACH,
       mode: "solo",
     });
     const handle = speakDialogue(scene.beats);
     return () => handle.stop();
-  }, [milestone, opening]);
+  }, [milestone, opening, voiceOn]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {

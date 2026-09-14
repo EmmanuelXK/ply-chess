@@ -1,7 +1,7 @@
 import { DEFAULT_DUO, getDuo } from "./duos";
 import type { Teacher } from "./types";
 
-/** Single active coach pack. Aldric♂ + Kael♀ stay internal for TTS. */
+/** Single male coach pack. TTS always speaks Aldric — Kael is unused. */
 export const ACTIVE_COACH = DEFAULT_DUO;
 
 export function activeTeachers(): { left: Teacher; right: Teacher } {
