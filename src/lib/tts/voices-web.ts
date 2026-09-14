@@ -33,7 +33,6 @@ export function pickWebVoice(
   const english = voices.filter((v) => /^en/i.test(v.lang));
   return (
     english.find((v) => /male|daniel|alex|fred|ryan|andrew|george|david/i.test(v.name)) ??
-    english.find((v) => !/female|ava|jenny|emma|samantha|zira|aria|sara/i.test(v.name)) ??
-    english[0]
+    english.find((v) => !/female|ava|jenny|emma|samantha|zira|aria|sara/i.test(v.name))
   );
 }

@@ -10,7 +10,7 @@ import {
 } from "../dialogue";
 import { SHORT_HOOKS } from "../dialogue/hooks";
 import { looksLikeMoveList } from "./helpers";
-import { coachAfterPly } from "./coach";
+import { coachAfterPly, coachOnHint } from "./coach";
 import { getOpening, openings, isKeyPly, explainLessonAt } from "./index";
 
 const THIN = 6;
@@ -182,6 +182,38 @@ describe("concept-first Memory OS", () => {
     }).beats[0]?.text ?? "";
     assert.match(wake, /Lion|wake|dark/i);
     assert.doesNotMatch(wake, /^…e5/);
+  });
+
+  it("teaches Alapin d4 as a queen-in-the-middle stake, not a c-file recapture", () => {
+    const alapin = getOpening("alapin");
+    assert.ok(alapin);
+    const d4 =
+      dialogueForPly(alapin, 6, { duo: "voss-draven", mode: "solo" }).beats[0]
+        ?.text ?? "";
+    assert.match(d4, /queen|centre|center|stake/i);
+    assert.doesNotMatch(d4, /c-file/);
+    const recapture =
+      dialogueForPly(alapin, 14, { duo: "voss-draven", mode: "solo" }).beats[0]
+        ?.text ?? "";
+    assert.match(recapture, /c-file|recapture|pawn/i);
+  });
+
+  it("teaches the Queen's Gambit exchange as our take, not their recapture", () => {
+    const qg = getOpening("queens-gambit");
+    assert.ok(qg);
+    const take =
+      dialogueForPly(qg, 6, { duo: "voss-draven", mode: "solo" }).beats[0]
+        ?.text ?? "";
+    assert.match(take, /knight|centre|center|minority/i);
+    assert.doesNotMatch(take, /they recapture/i);
+  });
+
+  it("keeps hints concept-first — SAN lives in the detail, not the strip", () => {
+    const london = getOpening("london");
+    assert.ok(london);
+    const hint = coachOnHint(london, 2);
+    assert.equal(leadsWithSan(hint.text), false, hint.text);
+    assert.match(hint.detail ?? "", /Bf4|Play/);
   });
 
   it("keeps Why/Explain able to name the move", () => {

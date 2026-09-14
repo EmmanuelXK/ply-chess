@@ -5,11 +5,13 @@ export function playLine(moves: string[], ply: number) {
   const chess = new Chess();
   let lastMove: Key[] | null = null;
   const capped = Math.max(0, Math.min(ply, moves.length));
+  let appliedPly = 0;
   for (let i = 0; i < capped; i++) {
     try {
       const move = chess.move(moves[i]);
       if (!move) break;
       lastMove = [move.from as Key, move.to as Key];
+      appliedPly += 1;
     } catch {
       break;
     }
@@ -20,6 +22,7 @@ export function playLine(moves: string[], ply: number) {
     check: chess.inCheck(),
     turnColor: (chess.turn() === "w" ? "white" : "black") as "white" | "black",
     chess,
+    appliedPly,
   };
 }
 

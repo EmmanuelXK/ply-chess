@@ -7,7 +7,17 @@ export const metadata = {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div className="auth-shell" />}>
+    <Suspense
+      fallback={
+        <div className="auth-shell">
+          <div className="auth-card">
+            <p className="dash-kicker">Club login</p>
+            <h1>Opening Edge</h1>
+            <p className="auth-lead">Loading Google sign-in…</p>
+          </div>
+        </div>
+      }
+    >
       <LoginScreen />
     </Suspense>
   );

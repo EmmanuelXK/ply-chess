@@ -122,6 +122,13 @@ export function parseStudyMode(value?: string | null): StudyMode {
   return "learn";
 }
 
+/** Home Progress is a dashboard filter — drill has no Progress chip. */
+export function drillStudyMode(
+  mode: StudyMode,
+): Exclude<StudyMode, "progress"> {
+  return mode === "progress" ? "reps" : mode;
+}
+
 export function markReviewed(openingId: string, ply: number, ok: boolean): void {
   const rows = readJson<RepEntry[]>(repsKey(), []);
   const now = Date.now();

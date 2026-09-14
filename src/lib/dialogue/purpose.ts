@@ -162,7 +162,7 @@ function composeBody(facts: LessonFacts, purpose: PurposeTag, seed: number): str
     return variants[seed % variants.length];
   }
   if (facts.kind === "hint") {
-    return `Play ${san ?? "the book move"}. ${tag} — ${idea || "that's the idea"}.`;
+    return `${tag}. ${idea || "That's the square."}`;
   }
   if (facts.kind === "history") {
     return `${facts.historyYear ?? "Here"}. ${nugget(facts.historyTitle, 5)}. ${tag}.`;

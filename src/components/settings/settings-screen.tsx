@@ -11,10 +11,11 @@ import {
 } from "@/lib/tts/prefs";
 import type { TtsRatePref } from "@/lib/tts/prosody";
 import type { SidePref } from "@/lib/auth/sanitize";
+import { profileSeed } from "@/lib/auth/profile";
 import { APP_MILESTONE, APP_VERSION } from "@/lib/version";
 
 export function SettingsScreen() {
-  const { configured, user, profile, save } = useAuth();
+  const { configured, ready, user, profile, save } = useAuth();
   const [rate, setRate] = useState<TtsRatePref>(() => readTtsRate());
   const [voiceOn, setVoiceOn] = useState(() => readVoiceOnDefault());
   const [displayName, setDisplayName] = useState("");
@@ -24,12 +25,21 @@ export function SettingsScreen() {
   const [saved, setSaved] = useState("");
 
   useEffect(() => {
-    if (!profile) return;
-    setDisplayName(profile.displayName);
-    setInitials(profile.initials);
-    setSidePref(profile.sidePref);
-    setClubTag(profile.clubTag);
-  }, [profile]);
+    if (profile) {
+      setDisplayName(profile.displayName);
+      setInitials(profile.initials);
+      setSidePref(profile.sidePref);
+      setClubTag(profile.clubTag);
+      return;
+    }
+    if (user) {
+      const seed = profileSeed(user);
+      setDisplayName(seed.displayName);
+      setInitials(seed.initials);
+      setSidePref(seed.sidePref);
+      setClubTag(seed.clubTag);
+    }
+  }, [profile, user]);
 
   return (
     <div className="dash-shell">
@@ -99,8 +109,8 @@ export function SettingsScreen() {
           />
           <button
             type="button"
-            className="auth-phone"
-            disabled={!user}
+            className="set-save"
+            disabled={!user || !ready}
             onClick={() => {
               void save({ displayName, initials, sidePref, clubTag }).then(
                 () => setSaved("Saved."),
@@ -119,7 +129,7 @@ export function SettingsScreen() {
             </form>
           ) : (
             <p className="set-help">
-              Sign in with Google or Phone to keep this profile on your account.
+              Sign in with Google to keep this profile on your account.
             </p>
           )}
         </section>

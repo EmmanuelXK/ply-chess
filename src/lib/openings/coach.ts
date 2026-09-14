@@ -161,8 +161,8 @@ export function coachOnHint(opening: Opening, ply: number): CoachState {
   const san = opening.moves[ply] ?? "";
   const script = professorAt(opening, ply);
   return {
-    text: shortLine(`Play ${san}. ${script?.concept ?? chunk?.job ?? ""}`, 14),
-    detail: shortLine(script?.why, 12),
+    text: shortLine(script?.concept ?? chunk?.job ?? "That's the square.", 14),
+    detail: san ? `Play ${san}.` : shortLine(script?.why, 12),
     chunkName: chunk?.name,
     kind: "hint",
   };

@@ -92,7 +92,7 @@ export function LoginScreen() {
           type="button"
           className="auth-google"
           onClick={() => void google()}
-          disabled={busy}
+          disabled={busy || !configured}
         >
           <GoogleMark />
           {busy ? "Opening Google…" : "Continue with Google"}

@@ -7,7 +7,16 @@ export const metadata = {
 
 export default function SettingsPage() {
   return (
-    <Suspense fallback={<div className="dash-shell" />}>
+    <Suspense
+      fallback={
+        <div className="dash-shell">
+          <header className="dash-head">
+            <p className="dash-kicker">Opening Edge</p>
+            <h1>Settings</h1>
+          </header>
+        </div>
+      }
+    >
       <SettingsScreen />
     </Suspense>
   );
