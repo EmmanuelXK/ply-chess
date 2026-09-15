@@ -76,64 +76,44 @@ function SpeakWave({ motion }: { motion: Exclude<CoachHeadPresence, "hidden"> })
   );
 }
 
-/** Original EDGE gentleman mark — Lupin noir, not a likeness. */
+/** Original EDGE gentleman mark — Lupin noir, not a likeness. Drawn for 44px. */
 function AldricMark() {
   const uid = useId().replace(/:/g, "");
   const clip = `coach-head-clip-${uid}`;
-  const skin = `coach-head-skin-${uid}`;
-  const coat = `coach-head-coat-${uid}`;
   return (
-    <svg viewBox="0 0 80 80" width="44" height="44">
+    <svg viewBox="0 0 80 80" width="48" height="48">
       <defs>
         <clipPath id={clip}>
           <circle cx="40" cy="40" r="38" />
         </clipPath>
-        <linearGradient id={skin} x1="30" y1="22" x2="58" y2="70">
-          <stop offset="0%" stopColor="#e6c7a4" />
-          <stop offset="100%" stopColor="#c4966c" />
-        </linearGradient>
-        <linearGradient id={coat} x1="40" y1="52" x2="40" y2="80">
-          <stop offset="0%" stopColor="#2a241c" />
-          <stop offset="100%" stopColor="#12100c" />
-        </linearGradient>
       </defs>
       <circle cx="40" cy="40" r="40" fill="#0c0b0a" />
       <g clipPath={`url(#${clip})`}>
-        <rect width="80" height="80" fill="#161310" />
-        <ellipse cx="40" cy="86" rx="28" ry="18" fill={`url(#${coat})`} />
+        <rect width="80" height="80" fill="#14110e" />
+        <path d="M8 80 L18 54 Q40 46 62 54 L72 80 Z" fill="#1a1612" />
+        <path d="M22 58 L30 80 L40 68 L50 80 L58 58 Q40 52 22 58 Z" fill="#2c241c" />
+        <path d="M30 62 L40 80 L50 62 Q40 58 30 62 Z" fill="#d9c4a4" opacity="0.4" />
+        <ellipse cx="40" cy="42" rx="15" ry="17" fill="#d7b48a" />
         <path
-          d="M18 80 L26 58 Q40 50 54 58 L62 80 Z"
-          fill={`url(#${coat})`}
+          d="M20 40 Q22 12 40 10 Q58 12 60 40 L58 28 Q40 18 22 28 Z"
+          fill="#1a1410"
         />
+        <path d="M24 36 Q28 24 40 22 Q44 30 40 38 Q30 40 24 36 Z" fill="#241c16" />
         <path
-          d="M32 62 L40 80 L48 62 Q40 58 32 62 Z"
-          fill="#d8c4a0"
-          opacity="0.35"
-        />
-        <ellipse cx="40" cy="40" rx="16.5" ry="19" fill={`url(#${skin})`} />
-        <path
-          d="M22 38 Q24 16 40 14 Q56 16 58 38 Q57 22 40 20 Q23 22 22 38 Z"
+          d="M25 54 Q40 70 55 54 Q52 76 40 78 Q28 76 25 54 Z"
           fill="#1a1410"
         />
         <path
-          d="M24 36 Q28 28 34 26 L32 38 Q26 40 24 36 Z"
-          fill="#241c16"
+          d="M27 49 Q40 57 53 49 Q51 54 40 55.5 Q29 54 27 49 Z"
+          fill="#120e0c"
         />
+        <circle cx="33" cy="40" r="1.7" fill="#120e0c" />
+        <circle cx="47" cy="40" r="1.7" fill="#120e0c" />
         <path
-          d="M23 52 Q40 64 57 52 Q54 72 40 74 Q26 72 23 52 Z"
-          fill="#2a2118"
-        />
-        <path
-          d="M28 48 Q40 54 52 48 Q50 52 40 53.5 Q30 52 28 48 Z"
-          fill="#1c1612"
-        />
-        <circle cx="33.5" cy="38.5" r="1.35" fill="#1a1410" />
-        <circle cx="46.5" cy="38.5" r="1.35" fill="#1a1410" />
-        <path
-          d="M36 43.5 Q40 45.5 44 43.5"
+          d="M36 44.5 Q40 46 44 44.5"
           fill="none"
           stroke="#a56b48"
-          strokeWidth="1.1"
+          strokeWidth="1.2"
           strokeLinecap="round"
         />
       </g>
@@ -143,13 +123,13 @@ function AldricMark() {
         r="38"
         fill="none"
         stroke="#3d3428"
-        strokeWidth="1.5"
+        strokeWidth="1.6"
       />
       <path
-        d="M12 58 L22 48"
+        d="M11 57 L22 46"
         fill="none"
         stroke="#ea7a14"
-        strokeWidth="2.2"
+        strokeWidth="2.4"
         strokeLinecap="round"
       />
     </svg>
