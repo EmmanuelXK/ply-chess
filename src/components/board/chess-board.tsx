@@ -2,6 +2,7 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Chessground } from "@lichess-org/chessground";
+import "@/app/chessground.css";
 import type { Api } from "@lichess-org/chessground/api";
 import type { Key } from "@lichess-org/chessground/types";
 import type { DrawBrushes, DrawShape } from "@lichess-org/chessground/draw";

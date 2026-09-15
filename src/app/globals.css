@@ -2359,13 +2359,17 @@ body,
   color: var(--ink);
   background: linear-gradient(180deg, var(--ember-soft), var(--ember));
   box-shadow: 0 10px 28px var(--ember-glow);
+  text-decoration: none;
+  box-sizing: border-box;
+  border: 0;
 }
 
 .auth-google:hover:not(:disabled) {
   filter: brightness(1.06);
 }
 
-.auth-google:disabled {
+.auth-google:disabled,
+.auth-google[aria-disabled="true"] {
   opacity: 0.72;
 }
 
