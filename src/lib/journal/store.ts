@@ -1,24 +1,52 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import {
+  buildGamePgn,
+  isGameResult,
+  type GameResult,
+} from "@/lib/chess/game";
+import { START_FEN } from "@/lib/chess/line";
 
 export const NOTE_MAX = 180;
 export const JOURNAL_CAP = 48;
 export const JOURNAL_BASE = "opening-edge.journal.v1";
 
+export type JournalKind = "game" | "moment";
+
 export interface JournalPin {
   id: string;
+  kind: JournalKind;
   createdAt: number;
   openingId: string;
   openingName: string;
   trapId: string | null;
   ply: number;
   fen: string;
+  startFen: string;
   pgn: string;
+  moves: string[];
+  result: GameResult;
   mode: string;
   coachKind: string;
   coachText: string;
   note: string;
 }
 
+export interface JournalGameDraft {
+  openingId: string;
+  openingName: string;
+  trapId?: string | null;
+  startPly: number;
+  startFen: string;
+  moves: string[];
+  pgn?: string;
+  result: GameResult;
+  mode: string;
+  note?: string;
+  white?: string;
+  black?: string;
+}
+
+/** @deprecated moment-pins are hidden. Prefer JournalGameDraft. */
 export interface JournalDraft {
   openingId: string;
   openingName: string;
@@ -51,6 +79,23 @@ function storageKey(): string {
   return journalUser ? `${JOURNAL_BASE}.${journalUser}` : JOURNAL_BASE;
 }
 
+function parseMoves(raw: unknown): string[] {
+  if (Array.isArray(raw)) return raw.map((item) => String(item)).filter(Boolean);
+  if (typeof raw === "string") {
+    const trimmed = raw.trim();
+    if (!trimmed) return [];
+    try {
+      const parsed = JSON.parse(trimmed) as unknown;
+      if (Array.isArray(parsed)) {
+        return parsed.map((item) => String(item)).filter(Boolean);
+      }
+    } catch {
+      return trimmed.split(/\s+/).filter(Boolean);
+    }
+  }
+  return [];
+}
+
 function readPins(): JournalPin[] {
   if (typeof window === "undefined") return [];
   try {
@@ -81,38 +126,84 @@ export function pgnSnippet(moves: string[], cap = 10): string {
   return moves.slice(Math.max(0, moves.length - cap)).join(" ");
 }
 
-export function makePin(draft: JournalDraft, now = Date.now()): JournalPin {
+export function isJournalGame(pin: JournalPin): boolean {
+  return pin.kind === "game";
+}
+
+export function makeGame(draft: JournalGameDraft, now = Date.now()): JournalPin {
   const id =
     typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
       ? crypto.randomUUID()
-      : `pin-${now}`;
+      : `game-${now}`;
+  const startFen = draft.startFen || START_FEN;
+  const pgn =
+    draft.pgn?.trim() ||
+    buildGamePgn({
+      startFen,
+      moves: draft.moves,
+      white: draft.white ?? "You",
+      black: draft.black ?? "Coach",
+      result: draft.result,
+      event: `${draft.openingName} spar`,
+      date: new Date(now),
+    });
   return normalizePin({
     id,
+    kind: "game",
     createdAt: now,
     openingId: draft.openingId,
     openingName: draft.openingName,
     trapId: draft.trapId ?? null,
-    ply: draft.ply,
-    fen: draft.fen,
-    pgn: draft.pgn,
+    ply: draft.startPly,
+    fen: startFen,
+    startFen,
+    pgn,
+    moves: draft.moves,
+    result: draft.result,
     mode: draft.mode,
-    coachKind: draft.coachKind ?? "",
-    coachText: draft.coachText ?? "",
     note: clipNote(draft.note ?? ""),
   });
 }
 
-export function normalizePin(row: Partial<JournalPin>): JournalPin {
+export function makePin(draft: JournalDraft, now = Date.now()): JournalPin {
+  return makeGame(
+    {
+      openingId: draft.openingId,
+      openingName: draft.openingName,
+      trapId: draft.trapId,
+      startPly: draft.ply,
+      startFen: draft.fen,
+      moves: parseMoves(draft.pgn),
+      pgn: draft.pgn,
+      result: "*",
+      mode: draft.mode,
+      note: draft.note,
+    },
+    now,
+  );
+}
+
+export function normalizePin(row: Partial<JournalPin> & Record<string, unknown>): JournalPin {
   const ply = Math.max(0, Math.floor(Number(row.ply) || 0));
+  const fen = String(row.fen ?? row.startFen ?? "");
+  const startFen = String(row.startFen ?? fen);
+  const moves = parseMoves(row.moves);
+  const resultRaw = String(row.result ?? "*");
+  const result: GameResult = isGameResult(resultRaw) ? resultRaw : "*";
+  const kind: JournalKind = row.kind === "game" || moves.length > 0 ? "game" : "moment";
   return {
     id: String(row.id ?? ""),
+    kind,
     createdAt: Number(row.createdAt) || Date.now(),
     openingId: String(row.openingId ?? ""),
     openingName: String(row.openingName ?? ""),
     trapId: row.trapId ? String(row.trapId) : null,
     ply,
-    fen: String(row.fen ?? ""),
+    fen: startFen || fen,
+    startFen: startFen || fen,
     pgn: String(row.pgn ?? ""),
+    moves,
+    result,
     mode: String(row.mode ?? "learn"),
     coachKind: String(row.coachKind ?? ""),
     coachText: String(row.coachText ?? "").replace(/\s+/g, " ").trim(),
@@ -123,12 +214,16 @@ export function normalizePin(row: Partial<JournalPin>): JournalPin {
 export function pinHref(pin: JournalPin): string {
   const params = new URLSearchParams();
   const reps =
-    pin.mode === "plan" || pin.mode === "analyze" || pin.mode === "progress"
+    pin.mode === "plan" ||
+    pin.mode === "analyze" ||
+    pin.mode === "progress" ||
+    pin.mode === "spar"
       ? "learn"
       : pin.mode;
   if (reps && reps !== "learn") params.set("reps", reps);
   if (pin.ply > 0) params.set("ply", String(pin.ply));
   if (pin.trapId) params.set("trap", pin.trapId);
+  if (isJournalGame(pin)) params.set("memory", pin.id);
   const query = params.toString();
   return query ? `/drill/${pin.openingId}?${query}` : `/drill/${pin.openingId}`;
 }
@@ -137,14 +232,40 @@ export function listPins(): JournalPin[] {
   return [...readPins()].sort((a, b) => b.createdAt - a.createdAt);
 }
 
-export function addPin(draft: JournalDraft): JournalPin {
-  const pin = makePin(draft);
+export function listGames(): JournalPin[] {
+  return listPins().filter(isJournalGame);
+}
+
+export function listGamesForLine(openingId: string, trapId: string | null): JournalPin[] {
+  const trap = trapId ?? null;
+  return listGames().filter(
+    (row) => row.openingId === openingId && (row.trapId ?? null) === trap,
+  );
+}
+
+export function addGame(draft: JournalGameDraft): JournalPin {
+  const pin = makeGame(draft);
   const next = [pin, ...readPins().filter((row) => row.id !== pin.id)].slice(
     0,
     JOURNAL_CAP,
   );
   writePins(next);
   return pin;
+}
+
+export function addPin(draft: JournalDraft): JournalPin {
+  return addGame({
+    openingId: draft.openingId,
+    openingName: draft.openingName,
+    trapId: draft.trapId,
+    startPly: draft.ply,
+    startFen: draft.fen,
+    moves: parseMoves(draft.pgn),
+    pgn: draft.pgn,
+    result: "*",
+    mode: draft.mode,
+    note: draft.note,
+  });
 }
 
 export function updatePinNote(id: string, note: string): void {
@@ -178,27 +299,32 @@ export async function pullRemoteJournal(
   const { data, error } = await supabase
     .from("journal_pins")
     .select(
-      "id, opening_id, opening_name, trap_id, ply, fen, pgn, mode, coach_kind, coach_text, note, created_at",
+      "id, opening_id, opening_name, trap_id, ply, fen, pgn, mode, coach_kind, coach_text, note, created_at, kind, start_fen, result, moves",
     )
     .eq("user_id", userId)
     .order("created_at", { ascending: false });
   if (error || !Array.isArray(data) || data.length === 0) return;
-  const rows = data.map((row) =>
-    normalizePin({
+  const rows = data.map((row) => {
+    const resultRaw = String(row.result ?? "*");
+    return normalizePin({
       id: String(row.id),
+      kind: row.kind === "game" ? "game" : "moment",
       createdAt: Date.parse(String(row.created_at)) || Date.now(),
       openingId: String(row.opening_id),
       openingName: String(row.opening_name ?? ""),
       trapId: row.trap_id ? String(row.trap_id) : null,
       ply: Number(row.ply) || 0,
-      fen: String(row.fen ?? ""),
+      fen: String(row.start_fen || row.fen || ""),
+      startFen: String(row.start_fen || row.fen || ""),
       pgn: String(row.pgn ?? ""),
+      moves: parseMoves(row.moves),
+      result: isGameResult(resultRaw) ? resultRaw : "*",
       mode: String(row.mode ?? "learn"),
       coachKind: String(row.coach_kind ?? ""),
       coachText: String(row.coach_text ?? ""),
       note: String(row.note ?? ""),
-    }),
-  );
+    });
+  });
   if (typeof window === "undefined") return;
   try {
     window.localStorage.setItem(`${JOURNAL_BASE}.${userId}`, JSON.stringify(rows));
@@ -235,12 +361,16 @@ export async function pushRemoteJournal(
       opening_name: row.openingName,
       trap_id: row.trapId,
       ply: row.ply,
-      fen: row.fen,
+      fen: row.startFen || row.fen,
       pgn: row.pgn,
       mode: row.mode,
       coach_kind: row.coachKind,
       coach_text: row.coachText,
       note: row.note,
+      kind: row.kind,
+      start_fen: row.startFen || row.fen,
+      result: row.result,
+      moves: row.moves,
       created_at: new Date(row.createdAt).toISOString(),
       updated_at: new Date().toISOString(),
     })),
@@ -256,6 +386,13 @@ export async function deleteRemotePin(
 }
 
 export function pinLabel(pin: JournalPin): string {
+  if (isJournalGame(pin)) {
+    const when = new Date(pin.createdAt);
+    const date = Number.isNaN(when.getTime())
+      ? ""
+      : when.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+    return `${pin.openingName} · ${pin.result}${date ? ` · ${date}` : ""}`;
+  }
   const move = pin.ply <= 0 ? "Start" : String(Math.max(1, Math.ceil(pin.ply / 2)));
   const mode =
     pin.mode === "trial"

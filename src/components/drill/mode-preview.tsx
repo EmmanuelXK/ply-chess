@@ -5,7 +5,7 @@ import { X } from "lucide-react";
 
 import { PlyNav } from "@/components/drill/ply-nav";
 import { SplashBoard } from "@/components/drill/splash-board";
-import { playLine } from "@/lib/chess/line";
+import { playLineFromFen, START_FEN } from "@/lib/chess/line";
 import {
   modeSwitchCopy,
   type ModeSwitchKind,
@@ -15,6 +15,7 @@ export function ModePreview({
   kind,
   line,
   startPly,
+  startFen,
   orientation,
   onConfirm,
   onCancel,
@@ -22,22 +23,24 @@ export function ModePreview({
   kind: ModeSwitchKind;
   line: string[];
   startPly: number;
+  startFen?: string;
   orientation: "white" | "black";
   onConfirm: () => void;
   onCancel: () => void;
 }) {
   const copy = modeSwitchCopy(kind);
+  const fen0 = startFen || START_FEN;
   const [ply, setPly] = useState(() =>
     Math.max(0, Math.min(startPly, line.length)),
   );
   const [playing, setPlaying] = useState(false);
-  const pos = useMemo(() => playLine(line, ply), [line, ply]);
+  const pos = useMemo(() => playLineFromFen(fen0, line, ply), [fen0, line, ply]);
   const autoplaying = playing && ply < line.length;
 
   useEffect(() => {
     setPly(Math.max(0, Math.min(startPly, line.length)));
     setPlaying(false);
-  }, [startPly, line.length, kind]);
+  }, [startPly, line.length, kind, fen0]);
 
   useEffect(() => {
     if (!autoplaying) return;

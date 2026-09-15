@@ -34,6 +34,13 @@ function parsePly(
   return Math.max(0, Math.min(Math.floor(n), max));
 }
 
+function parseMemory(value: string | string[] | undefined): string | null {
+  const v = Array.isArray(value) ? value[0] : value;
+  if (!v) return null;
+  const id = v.trim();
+  return id ? id : null;
+}
+
 export default async function DrillPage({
   params,
   searchParams,
@@ -49,13 +56,15 @@ export default async function DrillPage({
   const trap = Array.isArray(trapRaw) ? trapRaw[0] : trapRaw;
   const reps = parseReps(query.reps);
   const ply = parsePly(query.ply, opening.moves.length);
+  const memory = parseMemory(query.memory);
   return (
     <DrillScreen
-      key={`${id}-${trap ?? ""}-${reps}-${ply ?? ""}`}
+      key={`${id}-${trap ?? ""}-${reps}-${ply ?? ""}-${memory ?? ""}`}
       opening={opening}
       initialReps={reps}
       initialTrap={trap ?? null}
       initialPly={ply}
+      initialMemory={memory}
     />
   );
 }

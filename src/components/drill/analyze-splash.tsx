@@ -9,7 +9,7 @@ import { TeachLayer } from "@/components/drill/teach-layer";
 import { PlyNav } from "@/components/drill/ply-nav";
 import { SplashBoard } from "@/components/drill/splash-board";
 import { useEngineTick } from "@/components/drill/use-engine-tick";
-import { playLine } from "@/lib/chess/line";
+import { playLineFromFen, START_FEN } from "@/lib/chess/line";
 import { isCoachBrainV2Enabled } from "@/lib/coach-brain";
 import { uciToSan } from "@/lib/engines/stockfish";
 import type { Opening } from "@/lib/openings";
@@ -18,21 +18,31 @@ export function AnalyzeSplash({
   opening,
   line,
   startPly,
+  startFen,
+  note,
+  heading,
   orientation,
   onClose,
 }: {
   opening?: Opening;
   line: string[];
   startPly: number;
+  startFen?: string;
+  note?: string;
+  heading?: string;
   orientation: "white" | "black";
   onClose: () => void;
 }) {
+  const fen0 = startFen || START_FEN;
   const [ply, setPly] = useState(() =>
     Math.max(0, Math.min(startPly, line.length)),
   );
   const [playing, setPlaying] = useState(false);
 
-  const pos = useMemo(() => playLine(line, ply), [line, ply]);
+  const pos = useMemo(
+    () => playLineFromFen(fen0, line, ply),
+    [fen0, line, ply],
+  );
   const { tick, advice } = useEngineTick(pos.fen);
   const autoplaying = playing && ply < line.length;
 
@@ -86,7 +96,7 @@ export function AnalyzeSplash({
               Analyze
             </p>
             <h2 className="truncate text-[17px] font-semibold tracking-tight">
-              From this position
+              {heading ?? "From this position"}
             </h2>
           </div>
           <button type="button" className="study-close" onClick={onClose} aria-label="Close">
@@ -94,6 +104,8 @@ export function AnalyzeSplash({
             Close
           </button>
         </header>
+
+        {note ? <p className="splash-copy journal-summary">{note}</p> : null}
 
         <div className="analyze-stage">
           <EvalBar tick={tick} orientation={orientation} layout="vertical" />

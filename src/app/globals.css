@@ -2224,6 +2224,79 @@ body,
   text-decoration: none;
 }
 
+.memory-games {
+  margin: 0.35rem 0 0.1rem;
+  padding: 0 0.1rem;
+}
+
+.memory-games-kicker {
+  margin: 0 0 0.28rem;
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ember-soft);
+}
+
+.memory-games-all {
+  appearance: none;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+}
+
+.memory-games-row {
+  display: flex;
+  gap: 0.4rem;
+  overflow-x: auto;
+  padding: 0 0 0.15rem;
+  scrollbar-width: none;
+}
+
+.memory-games-row::-webkit-scrollbar {
+  display: none;
+}
+
+.memory-game {
+  flex: 0 0 auto;
+  max-width: 11.5rem;
+  text-align: left;
+  padding: 0.42rem 0.55rem;
+  border-radius: 0.7rem;
+  border: 1px solid var(--line);
+  background: var(--charcoal-2);
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  gap: 0.08rem;
+}
+
+.memory-game strong {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--cream);
+}
+
+.memory-game span {
+  font-size: 10px;
+  color: var(--mist);
+}
+
+.memory-game em {
+  font-style: normal;
+  font-size: 11px;
+  line-height: 1.3;
+  color: var(--mist);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 .splash-board {
   width: 100%;
   height: auto;

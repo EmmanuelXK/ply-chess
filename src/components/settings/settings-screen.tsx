@@ -185,9 +185,9 @@ export function SettingsScreen() {
         <section className="set-block" id="journal">
           <h2>Journal</h2>
           <p className="set-help">
-            Pin a position from any study board. Add a short note. Open a pin to
-            return to that ply. Saved on this device, and on your profile when
-            signed in.
+            Pin a finished spar with the coach — the game plus a short note —
+            and it comes back as a memory on that line. Saved on this device,
+            and on your profile when signed in.
           </p>
           <Link href="/journal" className="journal-home-link">
             Open journal

@@ -5,7 +5,8 @@ import Link from "next/link";
 import { X } from "lucide-react";
 
 import {
-  listPins,
+  isJournalGame,
+  listGames,
   pinHref,
   pinLabel,
   removePin,
@@ -13,23 +14,24 @@ import {
 } from "@/lib/journal/store";
 
 export function JournalList({
-  onOpen,
+  onReplay,
   onChange,
 }: {
-  onOpen?: (pin: JournalPin) => void;
+  onReplay?: (pin: JournalPin) => void;
   onChange?: () => void;
 }) {
-  const [pins, setPins] = useState<JournalPin[]>(() => listPins());
+  const [pins, setPins] = useState<JournalPin[]>(() => listGames());
 
   const refresh = () => {
-    setPins(listPins());
+    setPins(listGames());
     onChange?.();
   };
 
   if (!pins.length) {
     return (
       <p className="journal-empty">
-        Pin a position from the board. A line for later — not a feed.
+        Spar the coach from a line. When the game ends, pin it with a short note.
+        It comes back as a memory the next time you study that line.
       </p>
     );
   }
@@ -41,16 +43,20 @@ export function JournalList({
           <Link
             href={pinHref(pin)}
             className="journal-open"
-            onClick={() => onOpen?.(pin)}
+            onClick={(event) => {
+              if (!onReplay || !isJournalGame(pin)) return;
+              event.preventDefault();
+              onReplay(pin);
+            }}
           >
             <strong>{pinLabel(pin)}</strong>
-            {pin.note ? <span>{pin.note}</span> : pin.coachText ? <span>{pin.coachText}</span> : null}
-            {pin.pgn ? <em>{pin.pgn}</em> : null}
+            {pin.note ? <span>{pin.note}</span> : null}
+            {pin.pgn ? <em>{pin.pgn.split("\n").at(-1)}</em> : null}
           </Link>
           <button
             type="button"
             className="journal-drop"
-            aria-label="Remove pin"
+            aria-label="Remove game"
             onClick={() => {
               removePin(pin.id);
               refresh();
@@ -66,8 +72,12 @@ export function JournalList({
 
 export function JournalSheet({
   onClose,
+  onReplay,
+  onChange,
 }: {
   onClose: () => void;
+  onReplay?: (pin: JournalPin) => void;
+  onChange?: () => void;
 }) {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -93,7 +103,7 @@ export function JournalSheet({
               Journal
             </p>
             <h2 className="truncate text-[17px] font-semibold tracking-tight">
-              Pinned moments
+              Pinned games
             </h2>
           </div>
           <button type="button" className="study-close" onClick={onClose} aria-label="Close">
@@ -101,7 +111,13 @@ export function JournalSheet({
             Close
           </button>
         </header>
-        <JournalList onOpen={onClose} />
+        <JournalList
+          onReplay={(pin) => {
+            onReplay?.(pin);
+            onClose();
+          }}
+          onChange={onChange}
+        />
       </div>
     </div>
   );

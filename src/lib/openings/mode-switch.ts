@@ -1,6 +1,6 @@
 import { STUDY_MODES, type StudyMode } from "@/lib/reps/schedule";
 
-export type ModeSwitchKind = StudyMode | "analyze" | "plan";
+export type ModeSwitchKind = StudyMode | "analyze" | "plan" | "spar";
 
 export interface ModeSwitchCopy {
   id: ModeSwitchKind;
@@ -9,7 +9,10 @@ export interface ModeSwitchCopy {
   confirm: string;
 }
 
-const EXTRA: Record<"analyze" | "plan", { title: string; blurb: string; confirm: string }> = {
+const EXTRA: Record<
+  "analyze" | "plan" | "spar",
+  { title: string; blurb: string; confirm: string }
+> = {
   analyze: {
     title: "Analyze",
     blurb: "Engine plus the human plan from this position. You stay in the same study mode when you close.",
@@ -20,10 +23,15 @@ const EXTRA: Record<"analyze" | "plan", { title: string; blurb: string; confirm:
     blurb: "Book line is done. Free play with a plan voice. Analyze stays a separate tap.",
     confirm: "Enter Plan",
   },
+  spar: {
+    title: "Spar",
+    blurb: "Keep this position. The coach plays the other side like a club human. When the game ends, pin it to this line with a short note.",
+    confirm: "Spar from here",
+  },
 };
 
 export function modeSwitchCopy(kind: ModeSwitchKind): ModeSwitchCopy {
-  if (kind === "analyze" || kind === "plan") {
+  if (kind === "analyze" || kind === "plan" || kind === "spar") {
     return { id: kind, ...EXTRA[kind] };
   }
   const row = STUDY_MODES.find((item) => item.id === kind);

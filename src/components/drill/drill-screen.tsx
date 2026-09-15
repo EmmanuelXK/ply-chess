@@ -7,12 +7,13 @@ import type { Key } from "@lichess-org/chessground/types";
 import {
   ChevronLeft,
   FlipVertical2,
-  Bookmark,
+  Check,
   Lightbulb,
   Menu,
   Music2,
   RotateCcw,
   ScanSearch,
+  Swords,
   Volume2,
   VolumeX,
 } from "lucide-react";
@@ -23,6 +24,7 @@ import { AnalyzeSplash } from "@/components/drill/analyze-splash";
 import { CoachExplain } from "@/components/drill/coach-explain";
 import { CoachHead } from "@/components/drill/coach-head";
 import { JournalSheet } from "@/components/drill/journal-sheet";
+import { MemoryGames } from "@/components/drill/memory-games";
 import { PinSheet } from "@/components/drill/pin-sheet";
 import { ModePreview } from "@/components/drill/mode-preview";
 import { HistoryMark } from "@/components/drill/history-mark";
@@ -35,6 +37,7 @@ import { QuizSheet } from "@/components/drill/quiz-sheet";
 import { StudySheet } from "@/components/drill/study-sheet";
 import { WhySplash } from "@/components/drill/why-splash";
 import { lastMoveFrom, needsPromotion, toDests } from "@/lib/chess/dests";
+import { buildGamePgn, gameResult, type GameResult } from "@/lib/chess/game";
 import { playLine } from "@/lib/chess/line";
 import {
   prefetchDialogue,
@@ -88,7 +91,8 @@ import {
   shouldPromptModeSwitch,
   type ModeSwitchKind,
 } from "@/lib/openings/mode-switch";
-import { addPin, pgnSnippet } from "@/lib/journal/store";
+import { addGame, isJournalGame, listGamesForLine, listPins, type JournalPin } from "@/lib/journal/store";
+import { coachSparSan } from "@/lib/engines/spar";
 import {
   isUserPly,
   openingFromTrap,
@@ -105,18 +109,36 @@ import type { Square } from "chess.js";
 const MOVE_MS = 90;
 const OPPONENT_MS = 140;
 const AUTO_WAIT_MS = 720;
+const SPAR_MS = 180;
 const PLAN_VOICES = ["steady", "creative", "aggressive"] as const;
+
+type BoardMode = "drill" | "plan" | "spar";
+
+interface SparOrigin {
+  startFen: string;
+  startPly: number;
+}
+
+interface SaveGameDraft {
+  result: GameResult;
+  moves: string[];
+  pgn: string;
+  startFen: string;
+  startPly: number;
+}
 
 export function DrillScreen({
   opening: root,
   initialReps = "learn",
   initialTrap = null,
   initialPly = null,
+  initialMemory = null,
 }: {
   opening: Opening;
   initialReps?: StudyMode;
   initialTrap?: string | null;
   initialPly?: number | null;
+  initialMemory?: string | null;
 }) {
   const [lineId, setLineId] = useState<string | null>(initialTrap);
   const trap = root.traps.find((t) => t.id === lineId) ?? null;
@@ -127,7 +149,7 @@ export function DrillScreen({
 
   const gameRef = useRef(new Chess());
   const plyRef = useRef(0);
-  const modeRef = useRef<"drill" | "plan">("drill");
+  const modeRef = useRef<BoardMode>("drill");
   const lockRef = useRef(false);
   const timerRef = useRef<number | null>(null);
   const [session, setSession] = useState(0);
@@ -136,7 +158,7 @@ export function DrillScreen({
   const [played, setPlayed] = useState<string[]>([]);
   const [lastMove, setLastMove] = useState<Key[] | null>(null);
   const [orientation, setOrientation] = useState<"white" | "black">(root.side);
-  const [mode, setMode] = useState<"drill" | "plan">("drill");
+  const [mode, setMode] = useState<BoardMode>("drill");
   const [coach, setCoach] = useState<CoachState>(() => coachAtStart(opening));
   const [hintKeys, setHintKeys] = useState<Key[] | null>(null);
   const [hintUsed, setHintUsed] = useState(false);
@@ -157,8 +179,14 @@ export function DrillScreen({
   const [explainLine, setExplainLine] = useState(false);
   const [deviation, setDeviation] = useState<CoachExplainState | null>(null);
   const [modeSwitch, setModeSwitch] = useState<ModeSwitchKind | null>(null);
-  const [pinOpen, setPinOpen] = useState(false);
+  const [saveGame, setSaveGame] = useState<SaveGameDraft | null>(null);
   const [journalOpen, setJournalOpen] = useState(false);
+  const [replay, setReplay] = useState<JournalPin | null>(null);
+  const [journalEpoch, setJournalEpoch] = useState(0);
+  const memories = useMemo(
+    () => listGamesForLine(root.id, lineId),
+    [root.id, lineId, journalEpoch],
+  );
   const [historyOpen, setHistoryOpen] = useState(false);
   const [analyzeOpen, setAnalyzeOpen] = useState(false);
   const [quizOpen, setQuizOpen] = useState(initialReps === "drill");
@@ -181,6 +209,8 @@ export function DrillScreen({
   const lastPlayedSanRef = useRef<string | null>(null);
   const resumePlyRef = useRef<number | null>(null);
   const autoAnalyzeRef = useRef(false);
+  const sparOriginRef = useRef<SparOrigin | null>(null);
+  const sparGenRef = useRef(0);
 
   useFocusBed(opening.id, musicOn);
 
@@ -309,6 +339,9 @@ export function DrillScreen({
   );
 
   useEffect(() => {
+    sparOriginRef.current = null;
+    sparGenRef.current += 1;
+    setSaveGame(null);
     const startPly =
       resumePlyRef.current ??
       (initialPly != null
@@ -393,6 +426,15 @@ export function DrillScreen({
   }, [opening, playSan, session, initialReps, initialPly, pushScene, finishBook, endCoachSession]);
 
   useEffect(() => {
+    if (!initialMemory) return;
+    const game = listPins().find((row) => row.id === initialMemory);
+    if (game && isJournalGame(game)) {
+      setReplay(game);
+      setAnalyzeOpen(true);
+    }
+  }, [initialMemory]);
+
+  useEffect(() => {
     askWaitRef.current?.(null);
     askWaitRef.current = null;
     speechRef.current?.stop();
@@ -448,17 +490,20 @@ export function DrillScreen({
 
   const dests = useMemo(() => {
     const g = new Chess(fen);
-    if (mode === "drill" && (busy || lessonStyle === "podcast")) {
+    if (
+      (mode === "drill" || mode === "spar") &&
+      (busy || lessonStyle === "podcast" || saveGame)
+    ) {
       return new Map<Key, Key[]>();
     }
     return toDests(g);
-  }, [fen, mode, busy, lessonStyle]);
+  }, [fen, mode, busy, lessonStyle, saveGame]);
 
   const turnColor = fen.includes(" w ") ? "white" : "black";
   const movableColor =
     mode === "plan"
       ? "both"
-      : busy || lessonStyle === "podcast"
+      : busy || lessonStyle === "podcast" || saveGame
         ? undefined
         : opening.side;
 
@@ -488,10 +533,175 @@ export function DrillScreen({
     setBusy(false);
   };
 
+  const leaveSpar = useCallback(() => {
+    sparGenRef.current += 1;
+    if (timerRef.current !== null) {
+      window.clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+    lockRef.current = false;
+    setBusy(false);
+    const origin = sparOriginRef.current;
+    sparOriginRef.current = null;
+    setSaveGame(null);
+    if (origin) {
+      modeRef.current =
+        origin.startPly >= opening.moves.length ? "plan" : "drill";
+      applyPly(origin.startPly);
+      if (
+        modeRef.current === "drill" &&
+        plyRef.current < opening.moves.length &&
+        !isUserPly(opening.side, plyRef.current)
+      ) {
+        const san = opening.moves[plyRef.current];
+        if (san) {
+          const move = playSan(san);
+          if (move) {
+            pushScene(
+              coachAfterPly(opening, plyRef.current - 1),
+              plyRef.current - 1,
+            );
+          }
+        }
+      }
+    } else {
+      modeRef.current = "drill";
+      setMode("drill");
+    }
+  }, [applyPly, opening, playSan, pushScene]);
+
+  const offerSave = useCallback(
+    (forced?: GameResult) => {
+      const origin = sparOriginRef.current;
+      const g = gameRef.current;
+      const resolved = forced ?? gameResult(g);
+      const moves = g.history();
+      if (resolved === "*" && moves.length === 0) {
+        leaveSpar();
+        return;
+      }
+      const startFen = origin?.startFen ?? g.fen();
+      const startPly = origin?.startPly ?? plyRef.current;
+      const pgn = buildGamePgn({
+        startFen,
+        moves,
+        white: opening.side === "white" ? "You" : "Coach",
+        black: opening.side === "black" ? "You" : "Coach",
+        result: resolved,
+        event: `${root.shortName} spar`,
+      });
+      lockRef.current = true;
+      setBusy(true);
+      setSaveGame({ result: resolved, moves, pgn, startFen, startPly });
+    },
+    [leaveSpar, opening.side, root.shortName],
+  );
+
+  const replySpar = useCallback(async () => {
+    const gen = ++sparGenRef.current;
+    lockRef.current = true;
+    setBusy(true);
+    try {
+      await sleep(SPAR_MS);
+      if (sparGenRef.current !== gen || modeRef.current !== "spar") return;
+      const san = await coachSparSan(gameRef.current.fen());
+      if (sparGenRef.current !== gen || modeRef.current !== "spar") return;
+      if (!san) {
+        offerSave();
+        return;
+      }
+      let move;
+      try {
+        move = gameRef.current.move(san);
+      } catch {
+        move = null;
+      }
+      if (!move) {
+        offerSave();
+        return;
+      }
+      lastPlayedSanRef.current = move.san;
+      setLastMove([move.from as Key, move.to as Key]);
+      sync();
+      if (gameResult(gameRef.current) !== "*") offerSave();
+    } finally {
+      if (
+        sparGenRef.current === gen &&
+        modeRef.current === "spar" &&
+        gameResult(gameRef.current) === "*"
+      ) {
+        lockRef.current = false;
+        setBusy(false);
+      }
+    }
+  }, [offerSave, sync]);
+
+  const enterSpar = useCallback(() => {
+    endCoachSession();
+    if (timerRef.current !== null) {
+      window.clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+    lockRef.current = false;
+    setBusy(false);
+    setPodcastPlaying(false);
+    setSaveGame(null);
+    const startFen = gameRef.current.fen();
+    const startPly = plyRef.current;
+    sparOriginRef.current = { startFen, startPly };
+    const g = new Chess(startFen);
+    gameRef.current = g;
+    modeRef.current = "spar";
+    setMode("spar");
+    setPlayed([]);
+    setLastMove(null);
+    setHintKeys(null);
+    setFen(g.fen());
+    setCheck(g.inCheck());
+    setPly(startPly);
+    pushScene(
+      {
+        text: "Spar. I play the other side like a club human. Pin the game when it ends.",
+        chunkName: "Spar",
+        kind: "ok",
+      },
+      startPly <= 0 ? -1 : startPly - 1,
+      "ok",
+    );
+    const turn = g.turn() === "w" ? "white" : "black";
+    if (turn !== opening.side) void replySpar();
+  }, [endCoachSession, opening.side, pushScene, replySpar]);
+
   const onMove = useCallback(
     (from: Key, to: Key) => {
       if (lessonRef.current === "podcast") {
         snapBoard();
+        return;
+      }
+      if (modeRef.current === "spar") {
+        if (lockRef.current) {
+          snapBoard();
+          return;
+        }
+        const g = gameRef.current;
+        const side = g.turn() === "w" ? "white" : "black";
+        if (side !== opening.side) {
+          snapBoard();
+          return;
+        }
+        const promotion = needsPromotion(g, from as Square, to as Square)
+          ? "q"
+          : undefined;
+        const move = g.move({ from, to, promotion });
+        if (!move) {
+          snapBoard();
+          return;
+        }
+        lastPlayedSanRef.current = move.san;
+        setHintKeys(null);
+        sync();
+        if (gameResult(g) !== "*") offerSave();
+        else void replySpar();
         return;
       }
       if (lockRef.current && modeRef.current === "drill") {
@@ -615,7 +825,7 @@ export function DrillScreen({
         }, OPPONENT_MS);
       }
     },
-    [opening, playSan, pushScene, snapBoard, sync, finishBook, endCoachSession],
+    [opening, playSan, pushScene, snapBoard, sync, finishBook, endCoachSession, offerSave, replySpar],
   );
 
   const hint = () => {
@@ -652,9 +862,10 @@ export function DrillScreen({
   };
 
   const currentSwitchKind = (): ModeSwitchKind =>
-    modeRef.current === "plan" ? "plan" : reps;
+    modeRef.current === "plan" ? "plan" : modeRef.current === "spar" ? "spar" : reps;
 
   const applyStudyMode = (id: StudyMode) => {
+    if (modeRef.current === "spar") leaveSpar();
     const next = drillStudyMode(id);
     setReps(next);
     setWhyOpen(false);
@@ -689,10 +900,16 @@ export function DrillScreen({
     setModeSwitch(null);
     if (!next) return;
     if (next === "analyze") {
+      setReplay(null);
       setAnalyzeOpen(true);
       return;
     }
+    if (next === "spar") {
+      enterSpar();
+      return;
+    }
     if (next === "plan") {
+      if (modeRef.current === "spar") leaveSpar();
       finishBook(false);
       return;
     }
@@ -700,12 +917,14 @@ export function DrillScreen({
   };
 
   const stepBack = useCallback(() => {
+    if (modeRef.current === "spar") return;
     cancelTimer();
     if (lessonStyle === "podcast") setPodcastPlaying(false);
     applyPly(plyRef.current - 1);
   }, [applyPly, lessonStyle]);
 
   const stepForward = useCallback(() => {
+    if (modeRef.current === "spar") return;
     cancelTimer();
     if (lessonStyle === "podcast") setPodcastPlaying(false);
     if (plyRef.current >= opening.moves.length) return;
@@ -719,7 +938,7 @@ export function DrillScreen({
       whyOpen ||
       explainOpen ||
       Boolean(modeSwitch) ||
-      pinOpen ||
+      Boolean(saveGame) ||
       journalOpen ||
       historyOpen ||
       analyzeOpen ||
@@ -754,7 +973,7 @@ export function DrillScreen({
     historyOpen,
     lineMenuOpen,
     modeSwitch,
-    pinOpen,
+    saveGame,
     journalOpen,
     quizOpen,
     stepBack,
@@ -811,10 +1030,13 @@ export function DrillScreen({
     });
   }, [coach.kind, tts, deviation, opening]);
 
-  const analyzeLine = useMemo(
-    () => [...played, ...opening.moves.slice(ply)],
-    [played, opening.moves, ply],
-  );
+  const analyzeLine = useMemo(() => {
+    if (replay) return replay.moves;
+    if (mode === "spar") return played;
+    return [...played, ...opening.moves.slice(ply)];
+  }, [played, opening.moves, ply, mode, replay]);
+  const analyzeStartFen = replay?.startFen ?? (mode === "spar" ? sparOriginRef.current?.startFen : undefined);
+  const analyzeStartPly = replay ? replay.moves.length : played.length;
   const coachLine = (scene.beats[beatIndex]?.text ?? coach.text).trim();
   const overlayOpen =
     bookOpen ||
@@ -822,7 +1044,7 @@ export function DrillScreen({
     whyOpen ||
     explainOpen ||
     Boolean(modeSwitch) ||
-    pinOpen ||
+    Boolean(saveGame) ||
     journalOpen ||
     historyOpen ||
     analyzeOpen ||
@@ -858,7 +1080,11 @@ export function DrillScreen({
                 {shownMove}/{fullMoves}
               </p>
             </div>
-            {mode === "plan" ? (
+            {mode === "spar" ? (
+              <p className="truncate text-[11px] text-[var(--mist)]">
+                Spar — coach plays {opening.side === "white" ? "Black" : "White"}
+              </p>
+            ) : mode === "plan" ? (
               <p className="truncate text-[11px] text-[var(--mist)]">
                 Plan mode — free play
               </p>
@@ -882,12 +1108,13 @@ export function DrillScreen({
             variant="ghost"
             size="icon-sm"
             className="text-zinc-300 hover:text-white"
-            onClick={() => setPinOpen(true)}
-            aria-label="Pin this moment"
-            title="Pin this moment"
-            data-testid="pin-moment"
+            onClick={() => requestModeSwitch("spar")}
+            aria-label="Spar the coach from here"
+            title="Spar the coach from here"
+            data-testid="spar-coach"
+            data-on={mode === "spar" ? "on" : "off"}
           >
-            <Bookmark />
+            <Swords />
           </Button>
           <Button
             variant="ghost"
@@ -935,7 +1162,12 @@ export function DrillScreen({
               </div>
             ) : null}
             <p className="coach-line">
-              {coachLine || (mode === "plan" ? "Pick a plan" : "Your move")}
+              {coachLine ||
+                (mode === "spar"
+                  ? "Your move"
+                  : mode === "plan"
+                    ? "Pick a plan"
+                    : "Your move")}
             </p>
             {coach.kind === "fail" ? (
               <p className="coach-detail">Off book. Tap Coach.</p>
@@ -1002,6 +1234,16 @@ export function DrillScreen({
         <p className="sr-only" role="status" aria-live="polite">
           {coachLine}
         </p>
+        {memories.length ? (
+          <MemoryGames
+            games={memories}
+            onOpen={(game) => {
+              setReplay(game);
+              setAnalyzeOpen(true);
+            }}
+            onBrowse={() => setJournalOpen(true)}
+          />
+        ) : null}
       </header>
 
       <div className="board-stage">
@@ -1014,7 +1256,11 @@ export function DrillScreen({
               arrows={arrows}
               orientation={orientation}
               turnColor={turnColor}
-              viewOnly={(busy && mode === "drill") || lessonStyle === "podcast"}
+              viewOnly={
+                (busy && (mode === "drill" || mode === "spar")) ||
+                lessonStyle === "podcast" ||
+                Boolean(saveGame)
+              }
               movableColor={movableColor}
               check={check}
               animationMs={MOVE_MS}
@@ -1026,8 +1272,8 @@ export function DrillScreen({
           <PlyNav
             onBack={stepBack}
             onForward={stepForward}
-            canBack={ply > 0}
-            canForward={ply < opening.moves.length}
+            canBack={mode !== "spar" && ply > 0}
+            canForward={mode !== "spar" && ply < opening.moves.length}
             lastSan={played.at(-1) ?? "Start"}
             playing={lessonStyle === "podcast" ? podcastPlaying : undefined}
             onPlay={
@@ -1051,21 +1297,35 @@ export function DrillScreen({
         aria-hidden={overlayOpen}
         inert={overlayOpen}
       >
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={hint}
-          disabled={
-            mode !== "drill" ||
-            hintUsed ||
-            busy ||
-            !isUserPly(opening.side, ply)
-          }
-          className="dock-btn"
-        >
-          <Lightbulb />
-          Hint
-        </Button>
+        {mode === "spar" ? (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => offerSave()}
+            className="dock-btn"
+            data-testid="spar-done"
+            disabled={Boolean(saveGame)}
+          >
+            <Check />
+            Done
+          </Button>
+        ) : (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={hint}
+            disabled={
+              mode !== "drill" ||
+              hintUsed ||
+              busy ||
+              !isUserPly(opening.side, ply)
+            }
+            className="dock-btn"
+          >
+            <Lightbulb />
+            Hint
+          </Button>
+        )}
         <Button
           variant="ghost"
           size="sm"
@@ -1170,42 +1430,50 @@ export function DrillScreen({
       {modeSwitch ? (
         <ModePreview
           kind={modeSwitch}
-          line={opening.moves}
-          startPly={ply}
+          line={mode === "spar" ? played : opening.moves}
+          startPly={mode === "spar" ? played.length : ply}
+          startFen={mode === "spar" ? sparOriginRef.current?.startFen : undefined}
           orientation={orientation}
           onConfirm={confirmModeSwitch}
           onCancel={() => setModeSwitch(null)}
         />
       ) : null}
 
-      {pinOpen ? (
+      {saveGame ? (
         <PinSheet
-          summary={`${root.shortName} · ${mode === "plan" ? "Plan" : reps === "trial" ? "Time Trial" : reps[0].toUpperCase() + reps.slice(1)} · ${ply <= 0 ? "Start" : `${shownMove}/${fullMoves}`}`}
+          result={saveGame.result}
+          summary={`${root.shortName} · ${lineId ? (trap?.name ?? "line") : "spine"} · from ${saveGame.startPly <= 0 ? "Start" : `move ${Math.ceil(saveGame.startPly / 2)}`}`}
           onPin={(note) => {
-            addPin({
+            addGame({
               openingId: root.id,
               openingName: root.shortName,
               trapId: lineId,
-              ply,
-              fen,
-              pgn: pgnSnippet(played.length ? played : opening.moves.slice(0, ply)),
-              mode: mode === "plan" ? "plan" : reps,
-              coachKind: coach.kind,
-              coachText: coachLine,
+              startPly: saveGame.startPly,
+              startFen: saveGame.startFen,
+              moves: saveGame.moves,
+              pgn: saveGame.pgn,
+              result: saveGame.result,
+              mode: reps,
               note,
+              white: opening.side === "white" ? "You" : "Coach",
+              black: opening.side === "black" ? "You" : "Coach",
             });
-            setPinOpen(false);
+            setJournalEpoch((n) => n + 1);
+            leaveSpar();
           }}
-          onClose={() => setPinOpen(false)}
-          onOpenJournal={() => {
-            setPinOpen(false);
-            setJournalOpen(true);
-          }}
+          onSkip={() => leaveSpar()}
         />
       ) : null}
 
       {journalOpen ? (
-        <JournalSheet onClose={() => setJournalOpen(false)} />
+        <JournalSheet
+          onClose={() => setJournalOpen(false)}
+          onChange={() => setJournalEpoch((n) => n + 1)}
+          onReplay={(pin) => {
+            setReplay(pin);
+            setAnalyzeOpen(true);
+          }}
+        />
       ) : null}
 
       {historyOpen && historyNow.length ? (
@@ -1222,9 +1490,15 @@ export function DrillScreen({
         <AnalyzeSplash
           opening={opening}
           line={analyzeLine}
-          startPly={played.length}
+          startPly={analyzeStartPly}
+          startFen={analyzeStartFen}
+          note={replay?.note}
+          heading={replay ? "Pinned game" : undefined}
           orientation={orientation}
-          onClose={() => setAnalyzeOpen(false)}
+          onClose={() => {
+            setAnalyzeOpen(false);
+            setReplay(null);
+          }}
         />
       ) : null}
 
