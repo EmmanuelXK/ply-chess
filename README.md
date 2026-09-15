@@ -22,8 +22,6 @@ Home modes: **Learn · Reps · Practice · Drill · Time Trial · Progress**. Ki
 
 The strip shows the key point (they/we pictures, 6–15 words, no SAN dumps). Routine developing moves stay silent. Tap **Ask Coach** to hear Aldric — the board is quiet until then. **Why** opens the move board (SAN allowed). History opens from the strip mark when a milestone is on the ply. There is no floating or draggable head.
 
-Each system plays a distinct lyric-free **focus bed** (Web Audio, no fat MP3s) so the memory palace has a sound. Music ducks under Ask Coach / TTS and mutes separately from Voice.
-
 Spine, houses, and trap branches live in the drill **sandwich menu** (a tree), not as noisy labels above the board.
 
 Coach Brain v2 is flagged (`COACH_BRAIN_V2`, off by default). Settings has **no coach picker, no duos, no Dual/Solo switch**.
@@ -31,7 +29,7 @@ Coach Brain v2 is flagged (`COACH_BRAIN_V2`, off by default). Settings has **no 
 Lion and London have authored facts; other systems generate from the professor pack + History Gig Pack.
 
 ### Voice
-Voice is **on by default** for new players (and when the preference is unset), but it does **not** auto-speak moves. Toggle **Voice** on the drill dock to mute Ask Coach. Toggle **Music** to mute the system bed. Ask Coach, Restart, Back/Forward, and navigation cancel in-flight coach audio.
+Voice is **on by default** for new players (and when the preference is unset), but it does **not** auto-speak moves. Toggle **Voice** on the drill dock to mute Ask Coach. Ask Coach, Restart, Back/Forward, and navigation cancel in-flight coach audio.
 
 **Priority when speaking**
 
