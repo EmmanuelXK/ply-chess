@@ -104,6 +104,29 @@ describe("handleGoogleStart", () => {
     assert.equal(location.pathname, "/login");
     assert.equal(location.searchParams.get("error"), "google");
   });
+
+  it("fails closed when Auth is unreachable before building the IdP URL", async () => {
+    const createClient: CreateGoogleStartClient = () => ({
+      auth: {
+        async signInWithOAuth() {
+          return {
+            data: { url: "https://accounts.google.com/o/oauth2/v2/auth" },
+            error: null,
+          };
+        },
+      },
+    });
+
+    const res = await handleGoogleStart(
+      request("/auth/google"),
+      createClient,
+      20,
+      () => new Promise(() => {}),
+    );
+    const location = new URL(res.headers.get("location") ?? "");
+    assert.equal(location.pathname, "/login");
+    assert.equal(location.searchParams.get("error"), "google");
+  });
 });
 
 describe("handleGoogleStart cookie copy", () => {
