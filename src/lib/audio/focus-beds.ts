@@ -24,6 +24,14 @@ export interface FocusBed {
 
 export const FOCUS_DUCK_RATIO = 0.14;
 
+/** Mix: loud enough for phone speakers, still a calm room (not a blast). */
+export const FOCUS_MASTER_GAIN = 0.28;
+export const FOCUS_DRONE_GAIN = 0.14;
+export const FOCUS_FIFTH_GAIN = 0.048;
+export const FOCUS_PULSE_DEPTH = 0.036;
+export const FOCUS_NOISE_SCALE = 0.42;
+export const FOCUS_FADE_IN_SEC = 0.55;
+
 export const FOCUS_BEDS: Record<string, FocusBed> = {
   "scotch-gambit": {
     id: "scotch-gambit",

@@ -3,7 +3,13 @@ import { describe, it } from "node:test";
 import { openings } from "../openings";
 import {
   FOCUS_BEDS,
+  FOCUS_DRONE_GAIN,
   FOCUS_DUCK_RATIO,
+  FOCUS_FADE_IN_SEC,
+  FOCUS_FIFTH_GAIN,
+  FOCUS_MASTER_GAIN,
+  FOCUS_NOISE_SCALE,
+  FOCUS_PULSE_DEPTH,
   focusBedFor,
   focusBedSignature,
 } from "./focus-beds";
@@ -27,6 +33,15 @@ describe("focus beds", () => {
 
   it("ducks under coach speech instead of competing", () => {
     assert.ok(FOCUS_DUCK_RATIO > 0 && FOCUS_DUCK_RATIO < 0.3);
+  });
+
+  it("is mixed loud enough for phones, still a calm room", () => {
+    assert.ok(FOCUS_MASTER_GAIN > 0.18 && FOCUS_MASTER_GAIN < 0.4);
+    assert.ok(FOCUS_DRONE_GAIN > 0.08 && FOCUS_DRONE_GAIN < 0.22);
+    assert.ok(FOCUS_FIFTH_GAIN > 0.02 && FOCUS_FIFTH_GAIN < 0.1);
+    assert.ok(FOCUS_NOISE_SCALE > 0.28 && FOCUS_NOISE_SCALE < 0.55);
+    assert.ok(FOCUS_PULSE_DEPTH > 0.02 && FOCUS_PULSE_DEPTH < 0.08);
+    assert.ok(FOCUS_FADE_IN_SEC > 0.2 && FOCUS_FADE_IN_SEC < 1.2);
   });
 });
 
