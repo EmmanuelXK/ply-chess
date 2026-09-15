@@ -3,6 +3,7 @@ import { describe, it } from "node:test";
 import {
   dialogueForPly,
   dialogueForStart,
+  leadsWithCoordinateDump,
   leadsWithSan,
   spokenHook,
   twoBeatLine,
@@ -10,7 +11,7 @@ import {
 } from "../dialogue";
 import { SHORT_HOOKS } from "../dialogue/hooks";
 import { looksLikeMoveList } from "./helpers";
-import { coachAfterPly, coachOnHint } from "./coach";
+import { coachAfterPly, coachOnHint, coachOnPlan } from "./coach";
 import { getOpening, openings, isKeyPly, explainLessonAt } from "./index";
 
 const THIN = 6;
@@ -222,5 +223,42 @@ describe("concept-first Memory OS", () => {
     const lesson = explainLessonAt(london, 3);
     assert.match(`${lesson.intro} ${lesson.branch.map((b) => b.san).join(" ")}`, /e3|Nf6|Bf4|bishop/i);
     assert.ok(lesson.branch.length >= 1);
+  });
+
+  it("keeps Plan / Aggressive as they-we pictures — SAN stays in detail", () => {
+    const evans = getOpening("evans-gambit");
+    assert.ok(evans);
+    const strip = coachOnPlan("aggressive", evans);
+    assert.equal(leadsWithSan(strip.text), false, strip.text);
+    assert.equal(looksLikeMoveList(strip.text), false, strip.text);
+    assert.doesNotMatch(strip.text, /e5-d5/i);
+    assert.doesNotMatch(strip.text, /Open f7/i);
+    assert.match(strip.text, THEY);
+    assert.match(strip.detail ?? "", /e5|d5|f7|pawn/i);
+
+    for (const opening of openings) {
+      for (const voice of ["steady", "creative", "aggressive"] as const) {
+        const line = coachOnPlan(voice, opening).text;
+        assert.equal(
+          leadsWithSan(line),
+          false,
+          `${opening.id} ${voice} SAN-led: "${line}"`,
+        );
+        assert.equal(
+          leadsWithCoordinateDump(line),
+          false,
+          `${opening.id} ${voice} square dump: "${line}"`,
+        );
+        assert.equal(
+          looksLikeMoveList(line),
+          false,
+          `${opening.id} ${voice} move dump: "${line}"`,
+        );
+        assert.ok(
+          line.split(" ").filter(Boolean).length >= THIN,
+          `${opening.id} ${voice} thin: "${line}"`,
+        );
+      }
+    }
   });
 });

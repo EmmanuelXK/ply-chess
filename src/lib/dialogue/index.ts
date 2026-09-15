@@ -24,7 +24,7 @@ export {
   writeStoredMode,
 } from "./prefs";
 export { squaresInSpeech } from "./points";
-export { limitWords, nugget, wordCount, leadsWithSan, stripLeadingSanLabel, twoBeatLine } from "./short";
+export { limitWords, nugget, wordCount, leadsWithSan, leadsWithCoordinateDump, stripLeadingSanLabel, stripMoveDumpLead, twoBeatLine } from "./short";
 export { SHORT_HOOKS, spokenHook, hookAt } from "./hooks";
 export type { ShortHook } from "./hooks";
 export {

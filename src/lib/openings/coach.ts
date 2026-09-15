@@ -1,6 +1,12 @@
 import { SHORT_HOOKS, spokenHook } from "@/lib/dialogue/hooks";
-import { limitWords } from "@/lib/dialogue/short";
-import { chunkAt, positionalIdea } from "./helpers";
+import {
+  leadsWithCoordinateDump,
+  leadsWithSan,
+  limitWords,
+  stripMoveDumpLead,
+  twoBeatLine,
+} from "@/lib/dialogue/short";
+import { chunkAt, looksLikeMoveList, positionalIdea } from "./helpers";
 import { historyAt } from "./history";
 import { isKeyPly } from "./key-ply";
 import { housePicture } from "./memory";
@@ -72,6 +78,20 @@ export function shouldSpeakCoach(
 ): boolean {
   if (ALWAYS_SPEAK.has(kind)) return true;
   return isKeyPly(opening, afterPly);
+}
+
+/**
+ * Strip tap is an explicit request to hear — ignore shouldSpeakCoach.
+ * Quiet plies replay the last spoken beat instead of "Your move".
+ */
+export function textForCoachTap(
+  currentLine: string,
+  lastSpoken: string,
+): string | null {
+  const current = currentLine.replace(/\s+/g, " ").trim();
+  if (current) return current;
+  const last = lastSpoken.replace(/\s+/g, " ").trim();
+  return last || null;
 }
 
 export function coachAfterPly(opening: Opening, afterPly: number): CoachState {
@@ -168,13 +188,39 @@ export function coachOnHint(opening: Opening, ply: number): CoachState {
   };
 }
 
+function lastHook(opening: Opening) {
+  const rows = SHORT_HOOKS[opening.id];
+  if (!rows?.length) return undefined;
+  return [...rows].sort((a, b) => b.ply - a.ply)[0];
+}
+
+/**
+ * Plan chips change the idea, not a move dump.
+ * Strip = they/we pictures. Raw plan (may name moves) stays in detail/Why.
+ */
+export function planStripText(
+  opening: Opening,
+  voice: "steady" | "creative" | "aggressive",
+): string {
+  const hook = lastHook(opening);
+  const peeled = stripMoveDumpLead(opening.plans[voice]);
+  const dump =
+    !peeled ||
+    leadsWithSan(peeled) ||
+    leadsWithCoordinateDump(peeled) ||
+    looksLikeMoveList(peeled);
+  const we = dump ? (hook?.we ?? opening.story.plan) : peeled;
+  if (hook?.they) return twoBeatLine(hook.they, we);
+  return limitWords(we);
+}
+
 export function coachOnPlan(
   voice: "steady" | "creative" | "aggressive",
   opening: Opening,
 ): CoachState {
   return {
-    text: opening.plans[voice],
-    detail: opening.pillars.attackingPlan,
+    text: planStripText(opening, voice),
+    detail: opening.plans[voice],
     chunkName: "Plan mode",
     kind: "plan",
   };
