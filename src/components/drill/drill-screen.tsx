@@ -9,7 +9,6 @@ import {
   FlipVertical2,
   Lightbulb,
   Menu,
-  Music2,
   RotateCcw,
   ScanSearch,
   Volume2,
@@ -49,16 +48,6 @@ import {
 } from "@/lib/dialogue";
 import { readVoiceOnDefault, writeVoiceOnDefault } from "@/lib/tts/prefs";
 import { shouldAutoSpeakOnScene } from "@/lib/tts/ask-coach";
-import {
-  readFocusMusicOn,
-  writeFocusMusicOn,
-} from "@/lib/audio/prefs";
-import {
-  useFocusBed,
-  useFocusBedStatus,
-  unlockFocusBed,
-} from "@/components/drill/use-focus-bed";
-import { startFocusBed, stopFocusBed } from "@/lib/audio/focus-player";
 import {
   drillStudyMode,
   markProgress,
@@ -128,7 +117,6 @@ export function DrillScreen({
   const [hintUsed, setHintUsed] = useState(false);
   const [voice, setVoice] = useState<PlanVoice>("aggressive");
   const [tts, setTts] = useState(() => readVoiceOnDefault());
-  const [musicOn, setMusicOn] = useState(() => readFocusMusicOn());
   const [lessonStyle, setLessonStyle] = useState<LessonStyle>(
     initialReps === "trial" ? "podcast" : "teach",
   );
@@ -160,10 +148,6 @@ export function DrillScreen({
   const lastSpokenRef = useRef("");
   const resumePlyRef = useRef<number | null>(null);
   const autoAnalyzeRef = useRef(false);
-
-  const systemId = root.id;
-  useFocusBed(systemId, musicOn);
-  const bedStatus = useFocusBedStatus();
 
   useEffect(() => {
     lessonRef.current = lessonStyle;
@@ -448,7 +432,6 @@ export function DrillScreen({
 
   const onMove = useCallback(
     (from: Key, to: Key) => {
-      unlockFocusBed(root.id, musicOn);
       if (lessonRef.current === "podcast") {
         snapBoard();
         return;
@@ -560,7 +543,7 @@ export function DrillScreen({
         }, OPPONENT_MS);
       }
     },
-    [opening, playSan, pushScene, snapBoard, sync, finishBook, root.id, musicOn],
+    [opening, playSan, pushScene, snapBoard, sync, finishBook],
   );
 
   const hint = () => {
@@ -670,7 +653,6 @@ export function DrillScreen({
 
   const askCoach = useCallback(() => {
     unlockSpeech();
-    unlockFocusBed(root.id, musicOn);
     const beat = scene.beats[beatIndex] ?? scene.beats[0];
     const authored = (beat?.text ?? coach.text).trim();
     const text = textForCoachTap(authored, lastSpokenRef.current);
@@ -711,7 +693,7 @@ export function DrillScreen({
     void handle.done.then(() => {
       if (speechRef.current === handle) setCoachSpeaking(false);
     });
-  }, [scene.beats, beatIndex, coach.text, tts, root.id, musicOn]);
+  }, [scene.beats, beatIndex, coach.text, tts]);
 
   const analyzeLine = useMemo(
     () => [...played, ...opening.moves.slice(ply)],
@@ -724,7 +706,6 @@ export function DrillScreen({
       className="drill-shell"
       onPointerDown={() => {
         unlockSpeech();
-        unlockFocusBed(root.id, musicOn);
       }}
     >
       <header className="drill-top">
@@ -960,33 +941,6 @@ export function DrillScreen({
         <Button variant="ghost" size="sm" onClick={restart} className="dock-btn">
           <RotateCcw />
           Restart
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onPointerDown={() => {
-            if (!musicOn) startFocusBed(root.id);
-          }}
-          onClick={() => {
-            const next = !musicOn;
-            writeFocusMusicOn(next);
-            setMusicOn(next);
-            if (next) startFocusBed(root.id);
-            else stopFocusBed();
-          }}
-          className="dock-btn"
-          aria-pressed={musicOn}
-          data-playing={bedStatus.running ? "1" : "0"}
-          title={
-            musicOn
-              ? bedStatus.running
-                ? "Mute focus music"
-                : "Focus music on — tap the board if silent"
-              : "Play focus music"
-          }
-        >
-          <Music2 />
-          {musicOn ? "Music" : "Quiet"}
         </Button>
         <Button
           variant="ghost"
