@@ -9,7 +9,6 @@ import {
   FlipVertical2,
   Lightbulb,
   Menu,
-  Music2,
   RotateCcw,
   ScanSearch,
   Volume2,
@@ -49,11 +48,6 @@ import {
 } from "@/lib/dialogue";
 import { readVoiceOnDefault, writeVoiceOnDefault } from "@/lib/tts/prefs";
 import { shouldAutoSpeakOnScene } from "@/lib/tts/ask-coach";
-import {
-  readFocusMusicOn,
-  writeFocusMusicOn,
-} from "@/lib/audio/prefs";
-import { useFocusBed, unlockFocusBed } from "@/components/drill/use-focus-bed";
 import {
   drillStudyMode,
   markProgress,
@@ -123,7 +117,6 @@ export function DrillScreen({
   const [hintUsed, setHintUsed] = useState(false);
   const [voice, setVoice] = useState<PlanVoice>("aggressive");
   const [tts, setTts] = useState(() => readVoiceOnDefault());
-  const [musicOn, setMusicOn] = useState(() => readFocusMusicOn());
   const [lessonStyle, setLessonStyle] = useState<LessonStyle>(
     initialReps === "trial" ? "podcast" : "teach",
   );
@@ -155,8 +148,6 @@ export function DrillScreen({
   const lastSpokenRef = useRef("");
   const resumePlyRef = useRef<number | null>(null);
   const autoAnalyzeRef = useRef(false);
-
-  useFocusBed(opening.id, musicOn);
 
   useEffect(() => {
     lessonRef.current = lessonStyle;
@@ -662,7 +653,6 @@ export function DrillScreen({
 
   const askCoach = useCallback(() => {
     unlockSpeech();
-    unlockFocusBed();
     const beat = scene.beats[beatIndex] ?? scene.beats[0];
     const authored = (beat?.text ?? coach.text).trim();
     const text = textForCoachTap(authored, lastSpokenRef.current);
@@ -716,7 +706,6 @@ export function DrillScreen({
       className="drill-shell"
       onPointerDown={() => {
         unlockSpeech();
-        unlockFocusBed();
       }}
     >
       <header className="drill-top">
@@ -952,24 +941,6 @@ export function DrillScreen({
         <Button variant="ghost" size="sm" onClick={restart} className="dock-btn">
           <RotateCcw />
           Restart
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => {
-            setMusicOn((v) => {
-              const next = !v;
-              writeFocusMusicOn(next);
-              if (next) unlockFocusBed();
-              return next;
-            });
-          }}
-          className="dock-btn"
-          aria-pressed={musicOn}
-          title={musicOn ? "Mute focus music" : "Play focus music"}
-        >
-          <Music2 />
-          {musicOn ? "Music" : "Quiet"}
         </Button>
         <Button
           variant="ghost"
