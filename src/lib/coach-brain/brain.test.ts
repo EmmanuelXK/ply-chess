@@ -19,6 +19,7 @@ import {
   stubAnalyzer,
   analysisFromStockfishMoves,
   shouldAutoOpenAnalyze,
+  shouldPromptPlanHandoff,
   teachingLookahead,
 } from "./index";
 import type { CandidateMove, EngineAnalysis } from "./types";
@@ -406,11 +407,14 @@ describe("strip + plan handoff", () => {
     assert.equal(player.failCount("evans:gift"), 3);
   });
 
-  it("opens Analyze once when the book first ends", () => {
-    assert.equal(shouldAutoOpenAnalyze(false, true, false), true);
+  it("never auto-opens Analyze — Plan at the end of the book is a confirmed handoff", () => {
+    assert.equal(shouldAutoOpenAnalyze(false, true, false), false);
     assert.equal(shouldAutoOpenAnalyze(true, true, false), false);
     assert.equal(shouldAutoOpenAnalyze(false, true, true), false);
     assert.equal(shouldAutoOpenAnalyze(false, false, false), false);
+    assert.equal(shouldPromptPlanHandoff(false, true), true);
+    assert.equal(shouldPromptPlanHandoff(true, true), false);
+    assert.equal(shouldPromptPlanHandoff(false, false), false);
   });
 
   it("asks the problem, then two candidates, after a repeat miss", () => {

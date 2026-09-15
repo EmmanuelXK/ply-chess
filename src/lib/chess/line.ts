@@ -1,8 +1,20 @@
 import { Chess } from "chess.js";
 import type { Key } from "@lichess-org/chessground/types";
 
+export const START_FEN =
+  "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+
 export function playLine(moves: string[], ply: number) {
-  const chess = new Chess();
+  return playLineFromFen(START_FEN, moves, ply);
+}
+
+export function playLineFromFen(fen: string, moves: string[], ply: number) {
+  let chess: Chess;
+  try {
+    chess = new Chess(fen || START_FEN);
+  } catch {
+    chess = new Chess();
+  }
   let lastMove: Key[] | null = null;
   const capped = Math.max(0, Math.min(ply, moves.length));
   let appliedPly = 0;

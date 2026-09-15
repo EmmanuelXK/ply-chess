@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import Link from "next/link";
 import { TabBar } from "@/components/app/tab-bar";
 import { OpeningTile } from "@/components/home/opening-tile";
 import { useTileArranger } from "@/components/home/use-tile-arranger";
@@ -32,6 +33,10 @@ export function RepertoireHome() {
         <p className="dash-sub">
           {trained} systems
           {profile?.displayName ? ` · ${profile.displayName}` : ""}
+          {" · "}
+          <Link href="/journal" className="journal-home-link">
+            Journal
+          </Link>
         </p>
         <div className="mode-grid" role="tablist" aria-label="Study mode">
           {STUDY_MODES.map((m) => (

@@ -23,7 +23,7 @@ describe("session gate paths", () => {
   });
 
   it("still gates the club app surfaces", () => {
-    for (const path of ["/", "/theory", "/settings", "/drill/sicilian"]) {
+    for (const path of ["/", "/theory", "/settings", "/journal", "/drill/sicilian"]) {
       assert.equal(isPublicPath(path), false, path);
       assert.equal(shouldSkipAuthSession(path), false, path);
     }
