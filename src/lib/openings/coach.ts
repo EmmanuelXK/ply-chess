@@ -74,6 +74,20 @@ export function shouldSpeakCoach(
   return isKeyPly(opening, afterPly);
 }
 
+/**
+ * Strip tap is an explicit request to hear — ignore shouldSpeakCoach.
+ * Quiet plies replay the last spoken beat instead of "Your move".
+ */
+export function textForCoachTap(
+  currentLine: string,
+  lastSpoken: string,
+): string | null {
+  const current = currentLine.replace(/\s+/g, " ").trim();
+  if (current) return current;
+  const last = lastSpoken.replace(/\s+/g, " ").trim();
+  return last || null;
+}
+
 export function coachAfterPly(opening: Opening, afterPly: number): CoachState {
   const chunk = chunkAt(opening, afterPly);
   if (!isKeyPly(opening, afterPly)) {

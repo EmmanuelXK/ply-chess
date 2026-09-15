@@ -20,7 +20,11 @@ Home modes: **Learn · Reps · Practice · Drill · Time Trial · Progress**. Ki
 
 ## Single coach
 
-Aldric speaks on **key plies** only — pins, story beats, authored Why, history milestones, and plans. Routine developing moves stay silent. Teaching lives in a short strip line plus optional TTS. There is no floating or draggable head on the board.
+Aldric speaks on **key plies** only — pins, story beats, authored Why, history milestones, and plans. Routine developing moves stay silent. Teaching lives in a short strip line plus optional TTS. There is no floating or draggable head on the board. Tap the coach strip anytime to hear the current line (or replay the last spoken beat). Auto-speak stays sparse.
+
+Spine, houses, and trap branches live in the drill **sandwich menu** (a tree), not as noisy labels above the board.
+
+Coach Brain 2.0 (multi-engine / player model) is a later PR — not this UI.
 
 Default speech is the **key point**, not a purpose-tag lecture on every ply. Beats stay **6–15 words**. Tap **Why** (strip) or **Explain** (dock) for the current move anytime. History opens from the strip mark when a milestone is on the ply. TTS clips for upcoming key plies are prefetched so Forward does not wait.
 
@@ -29,7 +33,7 @@ Settings has **no coach picker, no duos, no Dual/Solo switch**.
 Lion and London have authored facts; other systems generate from the professor pack + History Gig Pack.
 
 ### Voice
-Toggle **Voice** on the drill dock. Mute, Restart, Back/Forward, and navigation cancel in-flight audio.
+Voice is **on by default** for new players (and when the preference is unset). Toggle **Voice** on the drill dock to mute auto-speak. Tap the coach strip to hear the current line even on quiet plies. Mute, Restart, Back/Forward, and navigation cancel in-flight audio.
 
 **Priority when speaking**
 

@@ -137,7 +137,8 @@ export function SettingsScreen() {
         <section className="set-block" id="voices">
           <h2>Voice</h2>
           <p className="set-help">
-            One man. He talks on key moves and theory — pins, story, history.
+            One man. Voice starts on for new players. He talks on key moves —
+            pins, story, history. Tap the coach strip anytime to hear the line.
             Why / Explain is on tap for any move.
           </p>
           <div className="mode-row" role="tablist" aria-label="Speech rate">

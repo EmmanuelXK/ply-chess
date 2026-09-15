@@ -59,7 +59,8 @@ export {
 export { openingFromTrap } from "./make-opening";
 export { quizForPly, whyLessonAt, explainLessonAt, professorAt } from "./professor";
 export { isKeyPly, keyPlyReasons, type KeyPlyReason } from "./key-ply";
-export { shouldSpeakCoach } from "./coach";
+export { shouldSpeakCoach, textForCoachTap } from "./coach";
+export { repertoireLineTree, type LineBranch, type LineLeaf } from "./line-tree";
 export {
   historyAt,
   historyFen,
