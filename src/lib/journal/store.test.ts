@@ -53,6 +53,15 @@ describe("player journal", () => {
       "/drill/london?reps=reps&ply=6&trap=qb6",
     );
     assert.match(pinLabel(pin), /London · Reps · 3/);
+    const start = makePin({
+      openingId: "london",
+      openingName: "London",
+      ply: 0,
+      fen: "8/8/8/8/8/8/8/8 w - - 0 1",
+      pgn: "",
+      mode: "learn",
+    });
+    assert.match(pinLabel(start), /London · Learn · Start/);
   });
 
   it("maps plan / analyze pins onto Learn without a silent mode jump in the href", () => {

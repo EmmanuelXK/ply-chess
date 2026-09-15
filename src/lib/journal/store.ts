@@ -256,7 +256,7 @@ export async function deleteRemotePin(
 }
 
 export function pinLabel(pin: JournalPin): string {
-  const move = Math.max(1, Math.ceil(pin.ply / 2));
+  const move = pin.ply <= 0 ? "Start" : String(Math.max(1, Math.ceil(pin.ply / 2)));
   const mode =
     pin.mode === "trial"
       ? "Time Trial"

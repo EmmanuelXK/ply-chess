@@ -1180,7 +1180,7 @@ export function DrillScreen({
 
       {pinOpen ? (
         <PinSheet
-          summary={`${root.shortName} · ${mode === "plan" ? "Plan" : reps} · ${shownMove}/${fullMoves}`}
+          summary={`${root.shortName} · ${mode === "plan" ? "Plan" : reps === "trial" ? "Time Trial" : reps[0].toUpperCase() + reps.slice(1)} · ${ply <= 0 ? "Start" : `${shownMove}/${fullMoves}`}`}
           onPin={(note) => {
             addPin({
               openingId: root.id,
