@@ -863,23 +863,108 @@ body,
 
 .coach-strip {
   margin-top: 0.45rem;
-  min-height: 2.1rem;
+  min-height: 4.4rem;
   display: flex;
-  align-items: center;
-  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: stretch;
   gap: 0.45rem;
-  padding: 0.42rem 0.5rem 0.42rem 0.55rem;
-  border-radius: 0.85rem;
+  padding: 0.55rem 0.6rem 0.55rem 0.65rem;
+  border-radius: 0.95rem;
   background: linear-gradient(180deg, var(--charcoal-2) 0%, var(--ink-2) 100%);
   border: 1px solid var(--line);
   box-shadow:
     inset 0 1px 0 rgb(255 255 255 / 4%),
     0 0 0 1px rgb(245 158 11 / 6%);
   color: var(--cream);
-  font-size: 0.98rem;
+  font-size: 1.02rem;
   font-weight: 650;
   letter-spacing: -0.02em;
-  line-height: 1.25;
+  line-height: 1.35;
+}
+
+.coach-copy {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.coach-line {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  font-size: 1.05rem;
+  font-weight: 650;
+  letter-spacing: -0.025em;
+  line-height: 1.38;
+  color: var(--cream);
+}
+
+.coach-ask-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.ask-coach {
+  appearance: none;
+  flex: 1 1 auto;
+  min-height: 2.15rem;
+  padding: 0 0.85rem;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: linear-gradient(180deg, var(--ember-soft) 0%, var(--ember) 100%);
+  border: 0;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 28%);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ask-coach svg {
+  width: 14px;
+  height: 14px;
+}
+
+.ask-coach:focus-visible {
+  outline: 2px solid var(--ember);
+  outline-offset: 2px;
+}
+
+.ask-coach[data-speaking="on"] {
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 28%),
+    0 0 0 2px rgb(245 158 11 / 35%);
+}
+
+.plan-cycle {
+  appearance: none;
+  flex: none;
+  height: 1.9rem;
+  padding: 0 0.7rem;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: capitalize;
+  color: var(--mist);
+  background: var(--charcoal-2);
+  border: 1px solid var(--line);
+  cursor: pointer;
 }
 
 .coach-speak {
@@ -943,14 +1028,10 @@ body,
 
 .coach-strip p {
   margin: 0;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
 }
 
 .coach-strip.coach-quiet {
-  opacity: 0.7;
+  opacity: 0.88;
   box-shadow: none;
 }
 
@@ -970,16 +1051,16 @@ body,
 
 .why-chip {
   flex: none;
-  height: 1.9rem;
-  padding: 0 0.75rem;
+  height: 2.15rem;
+  padding: 0 0.8rem;
   border-radius: 999px;
   font-size: 11px;
   font-weight: 750;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--ink);
-  background: linear-gradient(180deg, var(--ember-soft) 0%, var(--ember) 100%);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 28%);
+  color: var(--cream);
+  background: transparent;
+  border: 1px solid var(--line-strong);
 }
 
 .why-chip:disabled {
@@ -1354,10 +1435,7 @@ body,
 }
 
 .plan-bar {
-  flex: 0 0 auto;
-  display: flex;
-  gap: 0.4rem;
-  padding: 0.4rem 0.75rem 0;
+  display: none;
 }
 
 .plan-chip {
@@ -2024,6 +2102,13 @@ body,
   font-weight: 700;
 }
 
+.engine-votes em {
+  font-size: 11px;
+  font-style: normal;
+  color: #a1a1aa;
+  line-height: 1.3;
+}
+
 .quiz-choices {
   display: flex;
   flex-direction: column;
@@ -2178,7 +2263,8 @@ body,
 
   .coach-strip {
     margin-top: 0.3rem;
-    padding: 0.4rem 0.5rem 0.4rem 0.55rem;
+    padding: 0.48rem 0.55rem 0.5rem 0.6rem;
+    min-height: 4.1rem;
   }
 
   .mem-rail {

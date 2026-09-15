@@ -6,26 +6,61 @@ const PROFESSOR_LEAK =
 
 const SAN_TOKEN =
   "(?:…)?(?:[NBRQK](?:[a-h])?(?:[1-8])?x?[a-h][1-8](?:[+#])?|[a-h][1-8](?:[+#])?|O-O-O|O-O)";
+const SAN_CHUNK = `(?:${SAN_TOKEN})(?:-(?:${SAN_TOKEN}))?`;
 const SAN_LEAD = new RegExp(`^${SAN_TOKEN}\\s*[—–-]\\s*`);
 const SAN_LABEL = new RegExp(`^${SAN_TOKEN}\\s*[.—–,-]+\\s+(.+)$`);
+const MOVE_DUMP_LEAD = new RegExp(
+  `^${SAN_CHUNK}(?:\\s*[,;/]+\\s*|\\s*[.—–]+\\s*|\\s+then\\s+|\\s+)`,
+  "i",
+);
+/** `Open f7.` / `Open g.` / `Sac on e6.` — coordinate dumps, not pictures. */
+const SQUARE_DUMP_LEAD =
+  /^(?:open|hit|take|seize|occupy|crack|sacks?\s+on|sac\s+on)\s+[a-h](?:[1-8])?\.\s+/i;
 
 /** True when a default strip line opens as a move name, not a picture. */
 export function leadsWithSan(text: string): boolean {
   const compact = text.replace(/\s+/g, " ").trim();
-  return new RegExp(`^${SAN_TOKEN}\\b`).test(compact);
+  return new RegExp(`^${SAN_CHUNK}\\b`).test(compact);
+}
+
+/** True when the line opens as a square/file dump (`Open f7`, `Sac on e6`). */
+export function leadsWithCoordinateDump(text: string): boolean {
+  const compact = text.replace(/\s+/g, " ").trim();
+  return /^(?:open|hit|take|seize|occupy|crack|sacks?\s+on|sac\s+on)\s+[a-h](?:[1-8])?\b/i.test(
+    compact,
+  );
 }
 
 /**
- * Drop a leading move-label (`Bf4 —`, `…Nbd7.`, `d4.`) when the rest is the idea.
+ * Peel leading move dumps (`e5-d5.`, `Nd5, Qh5,`, `Bf4 —`, `Open f7.`) so the
+ * strip can keep the picture. SAN belongs in Why / detail / Analyze.
+ */
+export function stripMoveDumpLead(text: string | undefined): string {
+  let cleaned = stripProfessor((text ?? "").replace(/\s+/g, " ").trim());
+  let guard = 0;
+  while (cleaned && guard < 10) {
+    let next = cleaned.replace(MOVE_DUMP_LEAD, "");
+    if (next === cleaned) next = cleaned.replace(SQUARE_DUMP_LEAD, "");
+    if (next === cleaned) break;
+    cleaned = next.replace(/^[.,;:\s]+/, "").trim();
+    guard += 1;
+  }
+  if (!cleaned) return "";
+  return cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
+}
+
+/**
+ * Drop a leading move-label (`Bf4 —`, `…Nbd7.`, `d4.`, `e5-d5.`) when the rest is the idea.
  * Leaves sentences that use a square as a noun (`This pawn is a rock`).
  */
 export function stripLeadingSanLabel(text: string | undefined): string {
-  const cleaned = stripProfessor((text ?? "").replace(/\s+/g, " ").trim());
-  if (!cleaned) return "";
-  const labeled = cleaned.match(SAN_LABEL);
-  if (!labeled?.[1]) return cleaned;
+  const dumped = stripMoveDumpLead(text);
+  if (!dumped) return "";
+  if (!leadsWithSan(dumped)) return dumped;
+  const labeled = dumped.match(SAN_LABEL);
+  if (!labeled?.[1]) return dumped;
   const rest = labeled[1].trim();
-  if (wordCount(rest) < 5) return cleaned;
+  if (wordCount(rest) < 5) return dumped;
   return rest.charAt(0).toUpperCase() + rest.slice(1);
 }
 
