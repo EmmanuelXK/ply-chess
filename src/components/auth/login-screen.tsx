@@ -1,12 +1,20 @@
-"use client";
-
-import { useState } from "react";
-import { useSearchParams } from "next/navigation";
-import { createBrowserSupabase } from "@/lib/supabase/client";
-import { supabasePublicConfig } from "@/lib/supabase/env";
-import { friendlyAuthMessage, noteFromSearchParams } from "@/lib/auth/errors";
-import { safeInternalPath } from "@/lib/auth/redirect";
 import { APP_MARK } from "@/lib/version";
+import { LoginHomeRedirect } from "@/components/auth/login-home-redirect";
+
+/** Paints the login card before globals.css / JS. Hardcoded Lupin noir colors. */
+const CRITICAL_LOGIN_CSS = `
+.auth-shell{min-height:100dvh;min-height:100svh;display:flex;align-items:center;justify-content:center;padding:1.25rem 1rem calc(env(safe-area-inset-bottom,0px) + 1.25rem);background:#070708;color:#f3ebe0}
+.auth-card{width:min(100%,22rem);display:flex;flex-direction:column;gap:.45rem}
+.auth-mark{width:4.5rem;height:4.5rem;border-radius:1rem;margin-bottom:.4rem}
+.auth-card .dash-kicker{letter-spacing:.2em;text-transform:uppercase;color:#f59e0b;font-size:10px;font-weight:650;margin:0}
+.auth-card h1{margin:.1rem 0 0;font-size:1.7rem;color:#f3ebe0}
+.auth-lead,.auth-note,.auth-foot{margin:.2rem 0 .45rem;font-size:13px;line-height:1.4;color:#a39484}
+.auth-note-warn{color:#fb923c}
+.auth-foot{margin-top:1rem;font-size:11px;letter-spacing:.02em}
+.auth-google{margin-top:.85rem;display:inline-flex;align-items:center;justify-content:center;gap:.65rem;width:100%;height:2.85rem;border-radius:.85rem;font-size:14px;font-weight:750;letter-spacing:.02em;color:#070708;background:linear-gradient(180deg,#fb923c,#f59e0b);text-decoration:none;box-sizing:border-box;border:0}
+.auth-google[aria-disabled="true"]{opacity:.72;pointer-events:none}
+.auth-google-mark{width:1.15rem;height:1.15rem;flex:none}
+`;
 
 function GoogleMark() {
   return (
@@ -31,76 +39,59 @@ function GoogleMark() {
   );
 }
 
-export function LoginScreen() {
-  const params = useSearchParams();
-  const configured = supabasePublicConfig().configured;
-  const [busy, setBusy] = useState(false);
-  const [note, setNote] = useState(() => noteFromSearchParams(params));
-
-  const safeNext = safeInternalPath(params.get("next"));
-
-  const google = async () => {
-    const supabase = createBrowserSupabase();
-    if (!supabase) {
-      setNote(friendlyAuthMessage("config"));
-      return;
-    }
-    setBusy(true);
-    setNote("");
-    try {
-      const probe = await fetch("/auth/google/status", { cache: "no-store" });
-      const status = (await probe.json()) as { enabled?: boolean | null };
-      if (status.enabled === false) {
-        setNote(friendlyAuthMessage("provider"));
-        setBusy(false);
-        return;
-      }
-    } catch {
-      /* Probe is best-effort. Still try OAuth so a flaky check cannot block a working provider. */
-    }
-    const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(safeNext)}`;
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo, skipBrowserRedirect: true },
-    });
-    if (error || !data.url) {
-      setNote(friendlyAuthMessage(error?.message ?? "google"));
-      setBusy(false);
-      return;
-    }
-    window.location.assign(data.url);
-  };
+export function LoginScreen({
+  next,
+  note,
+  configured,
+}: {
+  next: string;
+  note: string;
+  configured: boolean;
+}) {
+  const href = `/auth/google?next=${encodeURIComponent(next)}`;
 
   return (
-    <div className="auth-shell">
-      <div className="auth-card">
-        <img src="/icon-192.png" alt="" width={72} height={72} className="auth-mark" />
-        <p className="dash-kicker">Club login</p>
-        <h1>Opening Edge</h1>
-        <p className="auth-lead">
-          Sign in with Google to train. Every signed-in friend gets the full board.
-        </p>
-
-        {!configured ? (
-          <p className="auth-note">
-            Google sign-in is ready in the app. Add the public Supabase URL and
-            publishable key on Vercel to turn the wall on. See LAUNCH.md.
+    <>
+      <style dangerouslySetInnerHTML={{ __html: CRITICAL_LOGIN_CSS }} />
+      <LoginHomeRedirect next={next} />
+      <div className="auth-shell" style={{ background: "#070708", color: "#f3ebe0" }}>
+        <div className="auth-card">
+          <img
+            src="/icon-192.png"
+            alt=""
+            width={72}
+            height={72}
+            className="auth-mark"
+          />
+          <p className="dash-kicker">Club login</p>
+          <h1>Opening Edge</h1>
+          <p className="auth-lead">
+            Sign in with Google to train. Every signed-in friend gets the full board.
           </p>
-        ) : null}
 
-        <button
-          type="button"
-          className="auth-google"
-          onClick={() => void google()}
-          disabled={busy || !configured}
-        >
-          <GoogleMark />
-          {busy ? "Opening Google…" : "Continue with Google"}
-        </button>
+          {!configured ? (
+            <p className="auth-note">
+              Google sign-in is ready in the app. Add the public Supabase URL and
+              publishable key on Vercel to turn the wall on. See LAUNCH.md.
+            </p>
+          ) : null}
 
-        {note ? <p className="auth-note auth-note-warn">{note}</p> : null}
-        <p className="auth-foot">{APP_MARK}</p>
+          {configured ? (
+            <a href={href} className="auth-google">
+              <GoogleMark />
+              Continue with Google
+            </a>
+          ) : (
+            <span className="auth-google" aria-disabled="true">
+              <GoogleMark />
+              Continue with Google
+            </span>
+          )}
+
+          {note ? <p className="auth-note auth-note-warn">{note}</p> : null}
+          <p className="auth-foot">{APP_MARK}</p>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
