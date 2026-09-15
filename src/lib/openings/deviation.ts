@@ -1,10 +1,9 @@
 import { collectFacts } from "@/lib/dialogue/generate";
-import { SHORT_HOOKS, spokenHook } from "@/lib/dialogue/hooks";
+import { SHORT_HOOKS } from "@/lib/dialogue/hooks";
 import {
   leadsWithCoordinateDump,
   leadsWithSan,
   stripMoveDumpLead,
-  twoBeatLine,
 } from "@/lib/dialogue/short";
 import {
   candidateMoves,
@@ -12,7 +11,7 @@ import {
   compressCandidates,
 } from "@/lib/coach-brain/compress";
 import type { CandidateMove } from "@/lib/coach-brain/types";
-import { chunkAt, positionalIdea } from "./helpers";
+import { chunkAt, firstSentence, positionalIdea } from "./helpers";
 import { professorAt } from "./professor";
 import type { Opening } from "./types";
 import type { CoachKind } from "./coach";
@@ -52,6 +51,22 @@ function hookAt(opening: Opening, ply: number) {
     .sort((a, b) => b.ply - a.ply)[0];
 }
 
+function ideaOf(opening: Opening, ply: number): string {
+  const chunk = chunkAt(opening, ply);
+  const script = professorAt(opening, ply);
+  return positionalIdea(
+    firstSentence(script?.concept ?? "") ||
+      chunk?.job ||
+      firstSentence(script?.why ?? "") ||
+      "",
+    chunk?.name ?? "one square, one job",
+  );
+}
+
+function sameCopy(a: string, b: string): boolean {
+  return a.replace(/\s+/g, " ").trim() === b.replace(/\s+/g, " ").trim();
+}
+
 /**
  * Authored house + Coach Brain candidates. Never LLM chess "truth".
  * Strip stays quiet/concept-first; this payload is the Ask Coach sheet.
@@ -78,31 +93,43 @@ export function explainDeviation(input: {
     facts,
     fen,
   });
-  const job = positionalIdea(
-    script?.why ?? script?.concept ?? chunk?.job ?? "",
-    chunk?.name ?? "one square, one job",
-  );
+  const hook = hookAt(opening, ply);
+  const job = ideaOf(opening, ply);
   const problem = picture(
-    `That doesn't do the house job. ${job}`,
+    hook?.they
+      ? `That misses the job. ${hook.they}`
+      : `That doesn't do the house job. ${job}`,
     "That doesn't do the house job.",
   );
-  const hook = hookAt(opening, ply);
   const bookIdea = picture(
-    compress.human.ideaToRemember ||
-      compress.human.what ||
-      (hook ? spokenHook(hook) : "") ||
-      script?.concept ||
-      job,
+    hook?.we || script?.concept || compress.human.what || job,
     "Stay with the idea. One move.",
   );
-  const contrast = hook
-    ? twoBeatLine(hook.they, hook.we)
+  const contrastRaw = hook
+    ? undefined
     : picture(compress.human.why, "");
-  const candidates = compressCandidates(
+  const contrast =
+    contrastRaw && !sameCopy(contrastRaw, bookIdea) && !sameCopy(contrastRaw, problem)
+      ? contrastRaw
+      : undefined;
+
+  const raw = compressCandidates(
     compress.compressed.length
       ? compress.compressed
       : candidateMoves({ opening, afterPly: ply, facts, fen }),
   );
+  const filtered = raw
+    .filter((row) => row.book || row.san !== playedSan)
+    .filter(
+      (row) =>
+        row.book ||
+        row.classification === "Critical" ||
+        row.classification === "Strong" ||
+        row.classification === "Interesting",
+    )
+    .map((row) =>
+      row.book ? { ...row, reason: picture(row.reason, bookIdea) } : row,
+    );
 
   return {
     ply,
@@ -111,8 +138,8 @@ export function explainDeviation(input: {
     houseName: chunk?.name,
     problem,
     bookIdea,
-    contrast: contrast || undefined,
-    candidates,
+    contrast,
+    candidates: filtered.length ? filtered : raw.filter((row) => row.book).slice(0, 1),
     bookLine: opening.moves,
     startPly: Math.max(0, Math.min(ply, opening.moves.length)),
   };

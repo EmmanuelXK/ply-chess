@@ -1398,6 +1398,11 @@ body,
   padding: 0.5rem 0.75rem 0.25rem;
 }
 
+.drill-shell:has(.splash-root) .board-stack > .ply-nav {
+  visibility: hidden;
+  pointer-events: none;
+}
+
 .splash-card .ply-nav {
   position: sticky;
   bottom: 0;
@@ -1491,6 +1496,13 @@ body,
   justify-content: space-around;
   gap: 0.1rem;
   padding: 0.2rem 0.15rem calc(env(safe-area-inset-bottom) + 0.45rem);
+  position: relative;
+  z-index: 1;
+}
+
+.drill-dock-hidden {
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .dock-btn {
@@ -1881,9 +1893,9 @@ body,
 }
 
 .splash-root {
-  position: absolute;
+  position: fixed;
   inset: 0;
-  z-index: 40;
+  z-index: 80;
   background: rgb(0 0 0 / 55%);
   display: flex;
   align-items: flex-end;
@@ -2021,6 +2033,10 @@ body,
   margin: 0.4rem 0 0;
   font-size: 12px;
   color: #a1a1aa;
+}
+
+.coach-explain-card {
+  padding-bottom: calc(env(safe-area-inset-bottom) + 1.4rem);
 }
 
 .coach-explain-toggle {

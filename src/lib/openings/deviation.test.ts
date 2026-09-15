@@ -27,7 +27,7 @@ describe("Lotus-style deviation coaching", () => {
     assert.equal(fail.kind, "fail");
     assert.equal(leadsWithSan(fail.text), false, fail.text);
     assert.equal(looksLikeMoveList(fail.text), false, fail.text);
-    assert.match(fail.text, /house|job|square|bishop|rock|triangle/i);
+    assert.match(fail.text, /house|job|square|bishop|rock|dark|triangle/i);
     assert.match(fail.detail ?? "", /d4|Play/);
   });
 
@@ -49,8 +49,10 @@ describe("Lotus-style deviation coaching", () => {
     assert.match(explain.problem, /job|house|square/i);
     assert.equal(leadsWithSan(explain.bookIdea), false, explain.bookIdea);
     assert.ok(explain.bookIdea.trim());
-    assert.ok(explain.contrast?.trim());
-    assert.match(explain.contrast ?? "", /\b(they|their|them)\b/i);
+    assert.ok(
+      !explain.contrast || explain.contrast !== explain.bookIdea,
+      "contrast should not clone the book idea",
+    );
     assert.ok(explain.candidates.length >= 1);
     assert.ok(
       explain.candidates.some((row) => row.book && row.san === london.moves[0]),
@@ -75,7 +77,7 @@ describe("Lotus-style deviation coaching", () => {
     assert.equal(leadsWithSan(explain.bookIdea), false, explain.bookIdea);
     assert.match(
       `${explain.problem} ${explain.bookIdea} ${explain.contrast ?? ""}`,
-      /coil|house|lion|philidor|pawn|break|dark/i,
+      /coil|house|lion|philidor|pawn|break|dark|hide/i,
     );
     assert.doesNotMatch(explain.problem, /engine|stockfish|eval|best move/i);
     assert.ok(explain.candidates.every((row) => row.reason.trim()));

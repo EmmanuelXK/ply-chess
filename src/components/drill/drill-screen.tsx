@@ -752,6 +752,15 @@ export function DrillScreen({
     [played, opening.moves, ply],
   );
   const coachLine = (scene.beats[beatIndex]?.text ?? coach.text).trim();
+  const overlayOpen =
+    bookOpen ||
+    lineMenuOpen ||
+    whyOpen ||
+    explainOpen ||
+    historyOpen ||
+    analyzeOpen ||
+    quizOpen ||
+    thinkOpen;
 
   return (
     <div
@@ -974,7 +983,11 @@ export function DrillScreen({
         </div>
       </div>
 
-      <footer className="drill-dock">
+      <footer
+        className={`drill-dock${overlayOpen ? " drill-dock-hidden" : ""}`}
+        aria-hidden={overlayOpen}
+        inert={overlayOpen}
+      >
         <Button
           variant="ghost"
           size="sm"

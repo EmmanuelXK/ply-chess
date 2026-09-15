@@ -161,9 +161,9 @@ export function coachAfterPly(opening: Opening, afterPly: number): CoachState {
 export function coachOnFail(opening: Opening, ply: number): CoachState {
   const chunk = chunkAt(opening, ply);
   const expected = opening.moves[ply] ?? "";
-  const script = professorAt(opening, Math.max(0, ply - 1));
+  const script = professorAt(opening, ply);
   const idea = positionalIdea(
-    script?.why ?? chunk?.job ?? "",
+    script?.concept ?? chunk?.job ?? script?.why ?? "",
     chunk?.name ?? "one square, one job",
   );
   return {
