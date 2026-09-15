@@ -13,6 +13,10 @@ import {
   writeTtsRate,
   writeVoiceOnDefault,
 } from "@/lib/tts/prefs";
+import {
+  readFocusMusicOn,
+  writeFocusMusicOn,
+} from "@/lib/audio/prefs";
 import type { TtsRatePref } from "@/lib/tts/prosody";
 import type { SidePref } from "@/lib/auth/sanitize";
 import { profileSeed } from "@/lib/auth/profile";
@@ -22,6 +26,7 @@ export function SettingsScreen() {
   const { configured, ready, user, profile, save } = useAuth();
   const [rate, setRate] = useState<TtsRatePref>(() => readTtsRate());
   const [voiceOn, setVoiceOn] = useState(() => readVoiceOnDefault());
+  const [musicOn, setMusicOn] = useState(() => readFocusMusicOn());
   const [coachBrain, setCoachBrain] = useState(() => readCoachBrainV2Stored());
   const [displayName, setDisplayName] = useState("");
   const [initials, setInitials] = useState("");
@@ -142,9 +147,9 @@ export function SettingsScreen() {
         <section className="set-block" id="voices">
           <h2>Voice</h2>
           <p className="set-help">
-            One man. Voice starts on for new players. He talks on key moves —
-            pins, story, history. Tap the coach strip anytime to hear the line.
-            Why / Explain is on tap for any move.
+            One man. Voice starts on for new players, but the board stays quiet
+            until you tap <strong>Ask Coach</strong>. Mute still silences him.
+            Why is the move board with SAN allowed.
           </p>
           <div className="mode-row" role="tablist" aria-label="Speech rate">
             {(["slow", "clear", "brisk"] as const).map((id) => (
@@ -172,7 +177,27 @@ export function SettingsScreen() {
                 writeVoiceOnDefault(e.target.checked);
               }}
             />
-            Start drills with Voice on
+            Start drills with Voice on (Ask Coach still required)
+          </label>
+        </section>
+
+        <section className="set-block" id="focus-music">
+          <h2>Focus music</h2>
+          <p className="set-help">
+            Each of the 26 systems has its own quiet instrumental bed — a memory
+            palace room. No lyrics. It ducks when Aldric speaks. Mute music
+            separately from Voice on the drill dock.
+          </p>
+          <label className="set-toggle">
+            <input
+              type="checkbox"
+              checked={musicOn}
+              onChange={(e) => {
+                setMusicOn(e.target.checked);
+                writeFocusMusicOn(e.target.checked);
+              }}
+            />
+            Start drills with focus music
           </label>
         </section>
 

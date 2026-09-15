@@ -7,9 +7,9 @@ import type { Key } from "@lichess-org/chessground/types";
 import {
   ChevronLeft,
   FlipVertical2,
-  HelpCircle,
   Lightbulb,
   Menu,
+  Music2,
   RotateCcw,
   ScanSearch,
   Volume2,
@@ -48,6 +48,12 @@ import {
   type MissMemory,
 } from "@/lib/dialogue";
 import { readVoiceOnDefault, writeVoiceOnDefault } from "@/lib/tts/prefs";
+import { shouldAutoSpeakOnScene } from "@/lib/tts/ask-coach";
+import {
+  readFocusMusicOn,
+  writeFocusMusicOn,
+} from "@/lib/audio/prefs";
+import { useFocusBed, unlockFocusBed } from "@/components/drill/use-focus-bed";
 import {
   drillStudyMode,
   markProgress,
@@ -82,6 +88,7 @@ import type { Square } from "chess.js";
 const MOVE_MS = 90;
 const OPPONENT_MS = 140;
 const AUTO_WAIT_MS = 720;
+const PLAN_VOICES = ["steady", "creative", "aggressive"] as const;
 
 export function DrillScreen({
   opening: root,
@@ -116,6 +123,7 @@ export function DrillScreen({
   const [hintUsed, setHintUsed] = useState(false);
   const [voice, setVoice] = useState<PlanVoice>("aggressive");
   const [tts, setTts] = useState(() => readVoiceOnDefault());
+  const [musicOn, setMusicOn] = useState(() => readFocusMusicOn());
   const [lessonStyle, setLessonStyle] = useState<LessonStyle>(
     initialReps === "trial" ? "podcast" : "teach",
   );
@@ -147,6 +155,8 @@ export function DrillScreen({
   const lastSpokenRef = useRef("");
   const resumePlyRef = useRef<number | null>(null);
   const autoAnalyzeRef = useRef(false);
+
+  useFocusBed(opening.id, musicOn);
 
   useEffect(() => {
     lessonRef.current = lessonStyle;
@@ -339,42 +349,13 @@ export function DrillScreen({
     speechRef.current?.stop();
     speechRef.current = null;
     setCoachSpeaking(false);
-    if (!tts || scene.beats.length === 0) {
-      silence();
-      return;
-    }
-    const handle = speakDialogue(scene.beats, {
-      premium: false,
-      onBeat: (index, beat) => {
-        setBeatIndex(index);
-        setAsk(beat.ask ?? null);
-        setAskPicked(null);
-        const spoken = beat.text.replace(/\s+/g, " ").trim();
-        if (spoken) lastSpokenRef.current = spoken;
-      },
-      waitForAsk: () =>
-        new Promise((resolve) => {
-          askWaitRef.current = (id) => {
-            askWaitRef.current = null;
-            resolve(id);
-          };
-          window.setTimeout(() => {
-            if (askWaitRef.current) {
-              askWaitRef.current(null);
-            }
-          }, 14_000);
-        }),
-    });
-    speechRef.current = handle;
-    setCoachSpeaking(true);
-    void handle.done.then(() => {
-      if (speechRef.current === handle) setCoachSpeaking(false);
-    });
-    return () => {
-      handle.stop();
-      if (speechRef.current === handle) speechRef.current = null;
-    };
-  }, [scene, tts]);
+    silence();
+    const beat = scene.beats[0];
+    setBeatIndex(0);
+    setAsk(beat?.ask ?? null);
+    setAskPicked(null);
+    void shouldAutoSpeakOnScene();
+  }, [scene]);
 
   useEffect(() => {
     if (lessonStyle !== "podcast" || !podcastPlaying) return;
@@ -384,10 +365,10 @@ export function DrillScreen({
       if (handle) {
         await Promise.race([
           handle.done,
-          new Promise((r) => window.setTimeout(r, tts ? AUTO_WAIT_MS + 2200 : AUTO_WAIT_MS)),
+          new Promise((r) => window.setTimeout(r, AUTO_WAIT_MS + 2200)),
         ]);
       } else {
-        await new Promise((r) => window.setTimeout(r, tts ? AUTO_WAIT_MS + 400 : 420));
+        await new Promise((r) => window.setTimeout(r, AUTO_WAIT_MS));
       }
       if (cancelled) return;
       if (plyRef.current < opening.moves.length) {
@@ -400,7 +381,7 @@ export function DrillScreen({
     return () => {
       cancelled = true;
     };
-  }, [scene, lessonStyle, podcastPlaying, tts, opening.moves.length, applyPly]);
+  }, [scene, lessonStyle, podcastPlaying, opening.moves.length, applyPly]);
 
   useEffect(() => {
     if (reps !== "trial" || !podcastPlaying) return;
@@ -602,6 +583,11 @@ export function DrillScreen({
     pushScene(coachOnPlan(next, opening), opening.moves.length - 1, "plan");
   };
 
+  const cyclePlan = () => {
+    const i = PLAN_VOICES.indexOf(voice);
+    pickVoice(PLAN_VOICES[(i + 1) % PLAN_VOICES.length]);
+  };
+
   const stepBack = useCallback(() => {
     cancelTimer();
     if (lessonStyle === "podcast") setPodcastPlaying(false);
@@ -674,20 +660,50 @@ export function DrillScreen({
     setSession((n) => n + 1);
   };
 
-  const playCoachLine = useCallback(() => {
-    const authored = (scene.beats[beatIndex]?.text ?? coach.text).trim();
-    const text = textForCoachTap(authored, lastSpokenRef.current);
-    if (!text) return;
+  const askCoach = useCallback(() => {
     unlockSpeech();
-    lastSpokenRef.current = text;
+    unlockFocusBed();
+    const beat = scene.beats[beatIndex] ?? scene.beats[0];
+    const authored = (beat?.text ?? coach.text).trim();
+    const text = textForCoachTap(authored, lastSpokenRef.current);
+    if (!tts) {
+      setWhyOpen(true);
+      return;
+    }
+    if (!text && scene.beats.length === 0) {
+      setWhyOpen(true);
+      return;
+    }
     speechRef.current?.stop();
-    const handle = speak(text);
+    const handle =
+      scene.beats.length > 0
+        ? speakDialogue(scene.beats, {
+            premium: false,
+            onBeat: (index, next) => {
+              setBeatIndex(index);
+              setAsk(next.ask ?? null);
+              setAskPicked(null);
+              const spoken = next.text.replace(/\s+/g, " ").trim();
+              if (spoken) lastSpokenRef.current = spoken;
+            },
+            waitForAsk: () =>
+              new Promise((resolve) => {
+                askWaitRef.current = (id) => {
+                  askWaitRef.current = null;
+                  resolve(id);
+                };
+                window.setTimeout(() => {
+                  if (askWaitRef.current) askWaitRef.current(null);
+                }, 14_000);
+              }),
+          })
+        : speak(text ?? "");
     speechRef.current = handle;
     setCoachSpeaking(true);
     void handle.done.then(() => {
       if (speechRef.current === handle) setCoachSpeaking(false);
     });
-  }, [scene.beats, beatIndex, coach.text]);
+  }, [scene.beats, beatIndex, coach.text, tts]);
 
   const analyzeLine = useMemo(
     () => [...played, ...opening.moves.slice(ply)],
@@ -696,7 +712,13 @@ export function DrillScreen({
   const coachLine = (scene.beats[beatIndex]?.text ?? coach.text).trim();
 
   return (
-    <div className="drill-shell">
+    <div
+      className="drill-shell"
+      onPointerDown={() => {
+        unlockSpeech();
+        unlockFocusBed();
+      }}
+    >
       <header className="drill-top">
         <div className="drill-nav">
           <Button
@@ -726,6 +748,18 @@ export function DrillScreen({
               <p className="drill-branch">{trap.name}</p>
             ) : null}
           </div>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            className="text-zinc-300 hover:text-white"
+            onClick={() =>
+              setOrientation((o) => (o === "white" ? "black" : "white"))
+            }
+            aria-label="Flip board"
+            title="Flip board"
+          >
+            <FlipVertical2 />
+          </Button>
           <Button
             variant="ghost"
             size="icon-sm"
@@ -777,33 +811,21 @@ export function DrillScreen({
           }`}
           data-speaking={coachSpeaking ? "on" : "off"}
         >
-          <button
-            type="button"
-            className="coach-speak"
-            onClick={playCoachLine}
-            aria-label="Play coach line"
-            title="Tap to hear Aldric"
-            data-testid="coach-speak"
-          >
+          <div className="coach-copy">
             {coach.kind === "pin" ? <span className="pin-dot" aria-hidden /> : null}
-            <div className="min-w-0 flex-1">
-              {reps === "trial" ? (
-                <div className="coach-who">
-                  <span className="coach-mode-tag">{trialLeft}s</span>
-                </div>
-              ) : null}
-              <p className="coach-line">
-                {coachLine || (mode === "plan" ? "Pick a plan" : "Your move")}
-              </p>
-              {coach.detail &&
-              (coach.kind === "fail" || coach.kind === "hint") ? (
-                <p className="coach-detail">{coach.detail}</p>
-              ) : null}
-            </div>
-            <span className="coach-speak-icon" aria-hidden>
-              <Volume2 />
-            </span>
-          </button>
+            {reps === "trial" ? (
+              <div className="coach-who">
+                <span className="coach-mode-tag">{trialLeft}s</span>
+              </div>
+            ) : null}
+            <p className="coach-line">
+              {coachLine || (mode === "plan" ? "Pick a plan" : "Your move")}
+            </p>
+            {coach.detail &&
+            (coach.kind === "fail" || coach.kind === "hint") ? (
+              <p className="coach-detail">{coach.detail}</p>
+            ) : null}
+          </div>
           {ask ? (
             <InlineAsk
               ask={ask}
@@ -814,22 +836,46 @@ export function DrillScreen({
               }}
             />
           ) : null}
-          <button
-            type="button"
-            className="why-chip"
-            onClick={() => setWhyOpen(true)}
-            title="Explain this move"
-            aria-label="Explain this move"
-          >
-            Why
-          </button>
-          {historyNow.length ? (
-            <HistoryMark
-              glyph={historyNow[0].glyph}
-              label={`${historyNow[0].title} (${historyNow[0].year})`}
-              onClick={() => setHistoryOpen(true)}
-            />
-          ) : null}
+          <div className="coach-ask-row">
+            <button
+              type="button"
+              className="ask-coach"
+              onClick={askCoach}
+              aria-label="Ask Coach"
+              title="Ask Aldric to explain this position"
+              data-testid="ask-coach"
+              data-speaking={coachSpeaking ? "on" : "off"}
+            >
+              <Volume2 />
+              Ask Coach
+            </button>
+            <button
+              type="button"
+              className="why-chip"
+              onClick={() => setWhyOpen(true)}
+              title="Open the Why board"
+              aria-label="Open the Why board"
+            >
+              Why
+            </button>
+            {mode === "plan" ? (
+              <button
+                type="button"
+                className="plan-cycle"
+                onClick={cyclePlan}
+                aria-label={`Plan voice ${voice}. Tap to cycle.`}
+              >
+                {voice}
+              </button>
+            ) : null}
+            {historyNow.length ? (
+              <HistoryMark
+                glyph={historyNow[0].glyph}
+                label={`${historyNow[0].title} (${historyNow[0].year})`}
+                onClick={() => setHistoryOpen(true)}
+              />
+            ) : null}
+          </div>
         </div>
         <p className="sr-only" role="status" aria-live="polite">
           {coachLine}
@@ -878,33 +924,7 @@ export function DrillScreen({
         </div>
       </div>
 
-      {mode === "plan" ? (
-        <div className="plan-bar">
-          {(["steady", "creative", "aggressive"] as const).map((v) => (
-            <button
-              key={v}
-              type="button"
-              onClick={() => pickVoice(v)}
-              className={voice === v ? "plan-chip plan-chip-on" : "plan-chip"}
-            >
-              {v}
-            </button>
-          ))}
-        </div>
-      ) : null}
-
       <footer className="drill-dock">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setWhyOpen(true)}
-          className="dock-btn"
-          title="Explain this move"
-          aria-label="Explain this move"
-        >
-          <HelpCircle />
-          Explain
-        </Button>
         <Button
           variant="ghost"
           size="sm"
@@ -936,13 +956,20 @@ export function DrillScreen({
         <Button
           variant="ghost"
           size="sm"
-          onClick={() =>
-            setOrientation((o) => (o === "white" ? "black" : "white"))
-          }
+          onClick={() => {
+            setMusicOn((v) => {
+              const next = !v;
+              writeFocusMusicOn(next);
+              if (next) unlockFocusBed();
+              return next;
+            });
+          }}
           className="dock-btn"
+          aria-pressed={musicOn}
+          title={musicOn ? "Mute focus music" : "Play focus music"}
         >
-          <FlipVertical2 />
-          Flip
+          <Music2 />
+          {musicOn ? "Music" : "Quiet"}
         </Button>
         <Button
           variant="ghost"
@@ -957,6 +984,7 @@ export function DrillScreen({
           }}
           className="dock-btn"
           aria-pressed={tts}
+          title={tts ? "Mute coach voice" : "Coach voice on when you Ask Coach"}
         >
           {tts ? <Volume2 /> : <VolumeX />}
           {tts ? "Voice" : "Mute"}

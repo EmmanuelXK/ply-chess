@@ -16,6 +16,22 @@ let playGen = 0;
 let currentAudio: HTMLAudioElement | null = null;
 let objectUrl: string | null = null;
 let inflight: AbortController | null = null;
+let speaking = false;
+const speakingListeners = new Set<(on: boolean) => void>();
+
+export function subscribeCoachSpeaking(listener: (on: boolean) => void): () => void {
+  speakingListeners.add(listener);
+  listener(speaking);
+  return () => {
+    speakingListeners.delete(listener);
+  };
+}
+
+function setSpeaking(on: boolean) {
+  if (speaking === on) return;
+  speaking = on;
+  for (const fn of speakingListeners) fn(on);
+}
 
 const sessionClips = new ClipCache<Blob>(64);
 
@@ -225,12 +241,16 @@ export function speak(
   }
   const gen = opts?.interrupt === false ? playGen : ++playGen;
   if (opts?.interrupt !== false) stopPlayback();
-  const done = speakNeural(trimmed, speaker, premium, gen);
+  setSpeaking(true);
+  const done = speakNeural(trimmed, speaker, premium, gen).finally(() => {
+    if (gen === playGen) setSpeaking(false);
+  });
   return {
     stop() {
       if (playGen === gen) {
         playGen += 1;
         stopPlayback();
+        setSpeaking(false);
       }
     },
     done,
@@ -254,6 +274,7 @@ export function speakDialogue(
 ): SpeakHandle {
   const gen = ++playGen;
   stopPlayback();
+  setSpeaking(true);
   let stopped = false;
 
   const done = (async () => {
@@ -285,13 +306,16 @@ export function speakDialogue(
         );
       }
     }
-  })();
+  })().finally(() => {
+    if (gen === playGen) setSpeaking(false);
+  });
 
   return {
     stop() {
       stopped = true;
       playGen += 1;
       stopPlayback();
+      setSpeaking(false);
     },
     done,
   };
@@ -300,4 +324,5 @@ export function speakDialogue(
 export function silence(): void {
   playGen += 1;
   stopPlayback();
+  setSpeaking(false);
 }
