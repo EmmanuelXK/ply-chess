@@ -16,7 +16,7 @@ Home is four racks on one page (not color pages). Rack membership lives in `src/
 
 **Black · vs 1.d4:** King's Indian, Modern Benoni, Benko, Dutch Leningrad, Budapest, **Slav**.
 
-Home modes: **Learn · Reps · Practice · Drill · Time Trial · Progress**. Kind, vs-line, time, and traps live in Learn.
+Home modes: **Learn · Reps · Practice · Drill · Time Trial · Progress**. Kind, vs-line, time, and traps live in Learn. **Journal** pins a position (opening, ply, mode, FEN/PGN, coach context, a short note) from any study board — local first, profile/progress when signed in.
 
 ## Single coach
 

@@ -2101,6 +2101,129 @@ body,
   overflow: auto;
 }
 
+.journal-home-link {
+  color: var(--ember-soft);
+  text-decoration: none;
+}
+
+.journal-card .splash-copy {
+  max-height: none;
+}
+
+.journal-summary {
+  color: var(--mist);
+  font-size: 13px;
+}
+
+.journal-note-label {
+  display: block;
+  margin: 0.15rem 0 0.35rem;
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mist);
+}
+
+.journal-note {
+  width: 100%;
+  min-height: 4.4rem;
+  resize: none;
+  padding: 0.65rem 0.7rem;
+  border-radius: 0.7rem;
+  border: 1px solid var(--line-strong);
+  background: var(--charcoal-2);
+  color: var(--cream);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.journal-note:focus {
+  outline: 2px solid var(--ember);
+  outline-offset: 1px;
+}
+
+.journal-list {
+  list-style: none;
+  margin: 0.2rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.journal-row {
+  display: flex;
+  align-items: stretch;
+  gap: 0.35rem;
+  border: 1px solid var(--line);
+  border-radius: 0.75rem;
+  background: var(--charcoal-2);
+}
+
+.journal-open {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 0.65rem 0.7rem;
+  color: inherit;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.18rem;
+}
+
+.journal-open strong {
+  font-size: 13px;
+  font-weight: 650;
+  color: var(--cream);
+}
+
+.journal-open span {
+  font-size: 13px;
+  color: var(--mist);
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.journal-open em {
+  font-style: normal;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 11px;
+  color: var(--ember-soft);
+}
+
+.journal-drop {
+  flex: none;
+  width: 2.4rem;
+  border: 0;
+  background: transparent;
+  color: var(--mist);
+}
+
+.journal-empty {
+  margin: 0.6rem 0 0;
+  color: var(--mist);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.journal-page {
+  padding: 0 1rem 1.25rem;
+}
+
+.journal-foot {
+  margin: 1.1rem 0 0;
+  font-size: 13px;
+}
+
+.journal-foot a {
+  color: var(--ember-soft);
+  text-decoration: none;
+}
+
 .splash-board {
   width: 100%;
   height: auto;

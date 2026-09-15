@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { TabBar } from "@/components/app/tab-bar";
 import { useAuth } from "@/components/auth/auth-provider";
 import {
@@ -179,6 +180,18 @@ export function SettingsScreen() {
             />
             Start drills with Voice on (Ask Coach still required)
           </label>
+        </section>
+
+        <section className="set-block" id="journal">
+          <h2>Journal</h2>
+          <p className="set-help">
+            Pin a position from any study board. Add a short note. Open a pin to
+            return to that ply. Saved on this device, and on your profile when
+            signed in.
+          </p>
+          <Link href="/journal" className="journal-home-link">
+            Open journal
+          </Link>
         </section>
 
         <section className="set-block" id="focus-music">

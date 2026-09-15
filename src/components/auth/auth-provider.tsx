@@ -23,6 +23,14 @@ import {
   setProgressDirtyHandler,
   setProgressUser,
 } from "@/lib/reps/schedule";
+import {
+  adoptAnonJournalIfNeeded,
+  getJournalUser,
+  pullRemoteJournal,
+  pushRemoteJournal,
+  setJournalDirtyHandler,
+  setJournalUser,
+} from "@/lib/journal/store";
 
 interface AuthValue {
   configured: boolean;
@@ -53,11 +61,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const hydrate = useCallback(async (next: User | null) => {
     setUser(next);
     setProgressUser(next?.id ?? null);
+    setJournalUser(next?.id ?? null);
     if (!next) {
       setProfile(null);
       return;
     }
     adoptAnonIfNeeded(next.id);
+    adoptAnonJournalIfNeeded(next.id);
     const supabase = createBrowserSupabase();
     if (!supabase) return;
     try {
@@ -66,6 +76,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           const row = await loadProfile(supabase, next);
           setProfile(row);
           await pullRemoteProgress(supabase, next.id);
+          await pullRemoteJournal(supabase, next.id);
+          await pushRemoteJournal(supabase, next.id);
         })(),
         AUTH_HYDRATE_TIMEOUT_MS,
       );
@@ -77,6 +89,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!configured) {
       setProgressUser(null);
+      setJournalUser(null);
       setReady(true);
       return;
     }
@@ -113,11 +126,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const id = getProgressUser();
       if (client && id) void pushRemoteProgress(client, id);
     });
+    setJournalDirtyHandler(() => {
+      const client = createBrowserSupabase();
+      const id = getJournalUser();
+      if (client && id) void pushRemoteJournal(client, id);
+    });
     return () => {
       cancelled = true;
       window.clearTimeout(timer);
       data.subscription.unsubscribe();
       setProgressDirtyHandler(null);
+      setJournalDirtyHandler(null);
     };
   }, [configured, hydrate]);
 

@@ -23,6 +23,17 @@ function parseReps(value: string | string[] | undefined): StudyMode {
   return parseStudyMode(v);
 }
 
+function parsePly(
+  value: string | string[] | undefined,
+  max: number,
+): number | null {
+  const v = Array.isArray(value) ? value[0] : value;
+  if (v == null || v === "") return null;
+  const n = Number(v);
+  if (!Number.isFinite(n)) return null;
+  return Math.max(0, Math.min(Math.floor(n), max));
+}
+
 export default async function DrillPage({
   params,
   searchParams,
@@ -36,11 +47,15 @@ export default async function DrillPage({
   if (!opening) notFound();
   const trapRaw = query.trap;
   const trap = Array.isArray(trapRaw) ? trapRaw[0] : trapRaw;
+  const reps = parseReps(query.reps);
+  const ply = parsePly(query.ply, opening.moves.length);
   return (
     <DrillScreen
+      key={`${id}-${trap ?? ""}-${reps}-${ply ?? ""}`}
       opening={opening}
-      initialReps={parseReps(query.reps)}
+      initialReps={reps}
       initialTrap={trap ?? null}
+      initialPly={ply}
     />
   );
 }

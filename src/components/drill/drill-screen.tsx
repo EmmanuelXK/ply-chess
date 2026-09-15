@@ -7,6 +7,7 @@ import type { Key } from "@lichess-org/chessground/types";
 import {
   ChevronLeft,
   FlipVertical2,
+  Bookmark,
   Lightbulb,
   Menu,
   Music2,
@@ -21,6 +22,8 @@ import { Button } from "@/components/ui/button";
 import { AnalyzeSplash } from "@/components/drill/analyze-splash";
 import { CoachExplain } from "@/components/drill/coach-explain";
 import { CoachHead } from "@/components/drill/coach-head";
+import { JournalSheet } from "@/components/drill/journal-sheet";
+import { PinSheet } from "@/components/drill/pin-sheet";
 import { ModePreview } from "@/components/drill/mode-preview";
 import { HistoryMark } from "@/components/drill/history-mark";
 import { LineTreeMenu } from "@/components/drill/line-tree-menu";
@@ -85,6 +88,7 @@ import {
   shouldPromptModeSwitch,
   type ModeSwitchKind,
 } from "@/lib/openings/mode-switch";
+import { addPin, pgnSnippet } from "@/lib/journal/store";
 import {
   isUserPly,
   openingFromTrap,
@@ -107,10 +111,12 @@ export function DrillScreen({
   opening: root,
   initialReps = "learn",
   initialTrap = null,
+  initialPly = null,
 }: {
   opening: Opening;
   initialReps?: StudyMode;
   initialTrap?: string | null;
+  initialPly?: number | null;
 }) {
   const [lineId, setLineId] = useState<string | null>(initialTrap);
   const trap = root.traps.find((t) => t.id === lineId) ?? null;
@@ -151,6 +157,8 @@ export function DrillScreen({
   const [explainLine, setExplainLine] = useState(false);
   const [deviation, setDeviation] = useState<CoachExplainState | null>(null);
   const [modeSwitch, setModeSwitch] = useState<ModeSwitchKind | null>(null);
+  const [pinOpen, setPinOpen] = useState(false);
+  const [journalOpen, setJournalOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [analyzeOpen, setAnalyzeOpen] = useState(false);
   const [quizOpen, setQuizOpen] = useState(initialReps === "drill");
@@ -303,7 +311,11 @@ export function DrillScreen({
   useEffect(() => {
     const startPly =
       resumePlyRef.current ??
-      (drillStudyMode(initialReps) === "reps" ? reviewStartPly(opening) : 0);
+      (initialPly != null
+        ? initialPly
+        : drillStudyMode(initialReps) === "reps"
+          ? reviewStartPly(opening)
+          : 0);
     resumePlyRef.current = null;
     const pos = playLine(opening.moves, startPly);
     gameRef.current = pos.chess;
@@ -378,7 +390,7 @@ export function DrillScreen({
         timerRef.current = null;
       }
     };
-  }, [opening, playSan, session, initialReps, pushScene, finishBook, endCoachSession]);
+  }, [opening, playSan, session, initialReps, initialPly, pushScene, finishBook, endCoachSession]);
 
   useEffect(() => {
     askWaitRef.current?.(null);
@@ -707,6 +719,8 @@ export function DrillScreen({
       whyOpen ||
       explainOpen ||
       Boolean(modeSwitch) ||
+      pinOpen ||
+      journalOpen ||
       historyOpen ||
       analyzeOpen ||
       quizOpen ||
@@ -740,6 +754,8 @@ export function DrillScreen({
     historyOpen,
     lineMenuOpen,
     modeSwitch,
+    pinOpen,
+    journalOpen,
     quizOpen,
     stepBack,
     stepForward,
@@ -806,6 +822,8 @@ export function DrillScreen({
     whyOpen ||
     explainOpen ||
     Boolean(modeSwitch) ||
+    pinOpen ||
+    journalOpen ||
     historyOpen ||
     analyzeOpen ||
     quizOpen ||
@@ -859,6 +877,17 @@ export function DrillScreen({
             title="Flip board"
           >
             <FlipVertical2 />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            className="text-zinc-300 hover:text-white"
+            onClick={() => setPinOpen(true)}
+            aria-label="Pin this moment"
+            title="Pin this moment"
+            data-testid="pin-moment"
+          >
+            <Bookmark />
           </Button>
           <Button
             variant="ghost"
@@ -1147,6 +1176,36 @@ export function DrillScreen({
           onConfirm={confirmModeSwitch}
           onCancel={() => setModeSwitch(null)}
         />
+      ) : null}
+
+      {pinOpen ? (
+        <PinSheet
+          summary={`${root.shortName} · ${mode === "plan" ? "Plan" : reps} · ${shownMove}/${fullMoves}`}
+          onPin={(note) => {
+            addPin({
+              openingId: root.id,
+              openingName: root.shortName,
+              trapId: lineId,
+              ply,
+              fen,
+              pgn: pgnSnippet(played.length ? played : opening.moves.slice(0, ply)),
+              mode: mode === "plan" ? "plan" : reps,
+              coachKind: coach.kind,
+              coachText: coachLine,
+              note,
+            });
+            setPinOpen(false);
+          }}
+          onClose={() => setPinOpen(false)}
+          onOpenJournal={() => {
+            setPinOpen(false);
+            setJournalOpen(true);
+          }}
+        />
+      ) : null}
+
+      {journalOpen ? (
+        <JournalSheet onClose={() => setJournalOpen(false)} />
       ) : null}
 
       {historyOpen && historyNow.length ? (
