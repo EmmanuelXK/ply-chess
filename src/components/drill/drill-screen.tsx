@@ -19,6 +19,7 @@ import {
 import { ChessBoard, type BoardArrow } from "@/components/board/chess-board";
 import { Button } from "@/components/ui/button";
 import { AnalyzeSplash } from "@/components/drill/analyze-splash";
+import { CoachExplain } from "@/components/drill/coach-explain";
 import { HistoryMark } from "@/components/drill/history-mark";
 import { LineTreeMenu } from "@/components/drill/line-tree-menu";
 import { HistorySplash } from "@/components/drill/history-splash";
@@ -48,7 +49,10 @@ import {
   type MissMemory,
 } from "@/lib/dialogue";
 import { readVoiceOnDefault, writeVoiceOnDefault } from "@/lib/tts/prefs";
-import { shouldAutoSpeakOnScene } from "@/lib/tts/ask-coach";
+import {
+  shouldAutoSpeakOnScene,
+  shouldOpenExplainOnCoachTap,
+} from "@/lib/tts/ask-coach";
 import {
   readFocusMusicOn,
   writeFocusMusicOn,
@@ -72,6 +76,10 @@ import {
   type CoachKind,
   type CoachState,
 } from "@/lib/openings/coach";
+import {
+  explainDeviation,
+  type DeviationExplain,
+} from "@/lib/openings/deviation";
 import {
   isUserPly,
   openingFromTrap,
@@ -134,6 +142,9 @@ export function DrillScreen({
   const [bookOpen, setBookOpen] = useState(false);
   const [lineMenuOpen, setLineMenuOpen] = useState(false);
   const [whyOpen, setWhyOpen] = useState(false);
+  const [explainOpen, setExplainOpen] = useState(false);
+  const [explainLine, setExplainLine] = useState(false);
+  const [deviation, setDeviation] = useState<DeviationExplain | null>(null);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [analyzeOpen, setAnalyzeOpen] = useState(false);
   const [quizOpen, setQuizOpen] = useState(initialReps === "drill");
@@ -240,6 +251,8 @@ export function DrillScreen({
       setLastMove(pos.lastMove);
       setHintKeys(null);
       setHintUsed(false);
+      setDeviation(null);
+      setExplainOpen(false);
       if (pos.appliedPly === 0) pushScene(coachAtStart(opening), -1, "start");
       else if (pos.appliedPly >= opening.moves.length) {
         finishBook(wasPlan);
@@ -302,6 +315,9 @@ export function DrillScreen({
     setCheck(pos.check);
     setMisses([]);
     missesRef.current = [];
+    setDeviation(null);
+    setExplainOpen(false);
+    setExplainLine(false);
     setBookOpen(initialReps === "drill");
     setLineMenuOpen(false);
     setQuizOpen(false);
@@ -496,6 +512,7 @@ export function DrillScreen({
         (expected.promotion ?? undefined) === (move.promotion ?? undefined);
 
       if (!ok) {
+        const playedSan = move.san;
         g.undo();
         const fail = coachOnFail(opening, plyNow);
         const miss: MissMemory = {
@@ -508,6 +525,14 @@ export function DrillScreen({
           missesRef.current = next;
           return next;
         });
+        setDeviation(
+          explainDeviation({
+            opening,
+            ply: plyNow,
+            playedSan,
+            fen: g.fen(),
+          }),
+        );
         pushScene(fail, plyNow, "fail");
         markReviewed(opening.id, plyNow, false);
         setHintKeys(null);
@@ -518,6 +543,8 @@ export function DrillScreen({
       plyRef.current += 1;
       setHintKeys(null);
       setHintUsed(false);
+      setDeviation(null);
+      setExplainOpen(false);
 
       if (plyRef.current >= opening.moves.length) {
         finishBook(false);
@@ -606,6 +633,7 @@ export function DrillScreen({
       bookOpen ||
       lineMenuOpen ||
       whyOpen ||
+      explainOpen ||
       historyOpen ||
       analyzeOpen ||
       quizOpen ||
@@ -635,6 +663,7 @@ export function DrillScreen({
   }, [
     analyzeOpen,
     bookOpen,
+    explainOpen,
     historyOpen,
     lineMenuOpen,
     quizOpen,
@@ -663,6 +692,19 @@ export function DrillScreen({
   const askCoach = useCallback(() => {
     unlockSpeech();
     unlockFocusBed();
+    if (shouldOpenExplainOnCoachTap(coach.kind)) {
+      const payload =
+        deviation ??
+        explainDeviation({
+          opening,
+          ply: plyRef.current,
+          fen: gameRef.current.fen(),
+        });
+      if (!deviation) setDeviation(payload);
+      setWhyOpen(false);
+      setExplainOpen(true);
+      if (!tts) return;
+    }
     const beat = scene.beats[beatIndex] ?? scene.beats[0];
     const authored = (beat?.text ?? coach.text).trim();
     const text = textForCoachTap(authored, lastSpokenRef.current);
@@ -703,7 +745,7 @@ export function DrillScreen({
     void handle.done.then(() => {
       if (speechRef.current === handle) setCoachSpeaking(false);
     });
-  }, [scene.beats, beatIndex, coach.text, tts]);
+  }, [scene.beats, beatIndex, coach.text, coach.kind, tts, deviation, opening]);
 
   const analyzeLine = useMemo(
     () => [...played, ...opening.moves.slice(ply)],
@@ -810,6 +852,8 @@ export function DrillScreen({
             coachSpeaking ? " coach-speaking" : ""
           }`}
           data-speaking={coachSpeaking ? "on" : "off"}
+          data-deviation={coach.kind === "fail" ? "on" : "off"}
+          data-testid="coach-strip"
         >
           <div className="coach-copy">
             {coach.kind === "pin" ? <span className="pin-dot" aria-hidden /> : null}
@@ -821,8 +865,9 @@ export function DrillScreen({
             <p className="coach-line">
               {coachLine || (mode === "plan" ? "Pick a plan" : "Your move")}
             </p>
-            {coach.detail &&
-            (coach.kind === "fail" || coach.kind === "hint") ? (
+            {coach.kind === "fail" ? (
+              <p className="coach-detail">Off book. Tap Coach.</p>
+            ) : coach.detail && coach.kind === "hint" ? (
               <p className="coach-detail">{coach.detail}</p>
             ) : null}
           </div>
@@ -839,11 +884,16 @@ export function DrillScreen({
           <div className="coach-ask-row">
             <button
               type="button"
-              className="ask-coach"
+              className={`ask-coach${coach.kind === "fail" ? " ask-coach-needed" : ""}`}
               onClick={askCoach}
               aria-label="Ask Coach"
-              title="Ask Aldric to explain this position"
+              title={
+                coach.kind === "fail"
+                  ? "Off the book — ask Aldric why"
+                  : "Ask Aldric to explain this position"
+              }
               data-testid="ask-coach"
+              data-needed={coach.kind === "fail" ? "on" : "off"}
               data-speaking={coachSpeaking ? "on" : "off"}
             >
               <Volume2 />
@@ -1026,6 +1076,16 @@ export function DrillScreen({
           orientation={orientation}
           voiceOn={tts}
           onClose={() => setWhyOpen(false)}
+        />
+      ) : null}
+
+      {explainOpen && deviation ? (
+        <CoachExplain
+          explain={deviation}
+          orientation={orientation}
+          showLine={explainLine}
+          onShowLineChange={setExplainLine}
+          onClose={() => setExplainOpen(false)}
         />
       ) : null}
 
