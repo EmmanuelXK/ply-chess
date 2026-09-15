@@ -1,6 +1,6 @@
 # Opening Edge
 
-iPhone-first PWA dashboard (`100dvh`, no page scroll). **26 attacking systems** on one **Your Weapons** home in **four racks** (White Gambits, White Systems, Black vs 1.e4, Black vs 1.d4). Square widget tiles; full details live in Learn. Each line is a **spine to move 21**, **traps**, and **six pillars** — then Plan mode. Aldric speaks when you tap **Ask Coach** — not on every key move. The strip stays concept-first; Why may name the move. No floating chat head. Login is **Google only**.
+iPhone-first PWA dashboard (`100dvh`, no page scroll). **26 attacking systems** on one **Your Weapons** home in **four racks** (White Gambits, White Systems, Black vs 1.e4, Black vs 1.d4). Square widget tiles; full details live in Learn. Each line is a **spine to move 21**, **traps**, and **six pillars** — then Plan mode. Aldric speaks when you tap **Ask Coach** — not on every key move. The strip stays concept-first; Why may name the move. Ask Coach may show a small anchored coach mark on the board — not a draggable dual-coach chat head. Login is **Google only**.
 
 Production: [https://blitzbar.app](https://blitzbar.app) (Vercel project `ply-chess`, GitHub `EmmanuelXK/ply-chess`).
 
@@ -20,7 +20,7 @@ Home modes: **Learn · Reps · Practice · Drill · Time Trial · Progress**. Ki
 
 ## Single coach
 
-The strip shows the key point (they/we pictures, 6–15 words, no SAN dumps). Routine developing moves stay silent. Tap **Ask Coach** to hear Aldric — the board is quiet until then. **Why** opens the move board (SAN allowed). History opens from the strip mark when a milestone is on the ply. There is no floating or draggable head.
+The strip shows the key point (they/we pictures, 6–15 words, no SAN dumps). Routine developing moves stay silent. Tap **Ask Coach** to hear Aldric — the board is quiet until then. **Why** opens the move board (SAN allowed). History opens from the strip mark when a milestone is on the ply. Ask Coach places a small original EDGE gentleman mark on the board with a speak-wave while TTS is live; it idles or hides when the session ends. It is not a floating or draggable dual-coach head.
 
 Each system plays a distinct lyric-free **focus bed** (Web Audio, no fat MP3s) so the memory palace has a sound. Music ducks under Ask Coach / TTS and mutes separately from Voice.
 

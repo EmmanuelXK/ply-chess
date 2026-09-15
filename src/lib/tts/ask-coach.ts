@@ -13,3 +13,8 @@ export function shouldAutoSpeakOnScene(): boolean {
 export function shouldOpenExplainOnCoachTap(_kind?: CoachKind): boolean {
   return shouldOpenCoachExplain(_kind);
 }
+
+export {
+  coachHeadPresence,
+  type CoachHeadPresence,
+} from "./coach-head";

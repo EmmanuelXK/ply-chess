@@ -20,6 +20,7 @@ import { ChessBoard, type BoardArrow } from "@/components/board/chess-board";
 import { Button } from "@/components/ui/button";
 import { AnalyzeSplash } from "@/components/drill/analyze-splash";
 import { CoachExplain } from "@/components/drill/coach-explain";
+import { CoachHead } from "@/components/drill/coach-head";
 import { ModePreview } from "@/components/drill/mode-preview";
 import { HistoryMark } from "@/components/drill/history-mark";
 import { LineTreeMenu } from "@/components/drill/line-tree-menu";
@@ -197,6 +198,13 @@ export function DrillScreen({
     sync();
   }, [sync]);
 
+  const endCoachSession = useCallback(() => {
+    speechRef.current?.stop();
+    speechRef.current = null;
+    setCoachSpeaking(false);
+    setExplainOpen(false);
+  }, []);
+
   const pushScene = useCallback(
     (next: CoachState, afterPly: number, kind?: CoachKind) => {
       setCoach(next);
@@ -258,7 +266,7 @@ export function DrillScreen({
       setHintKeys(null);
       setHintUsed(false);
       setDeviation(null);
-      setExplainOpen(false);
+      endCoachSession();
       lastPlayedSanRef.current = pos.chess.history().at(-1) ?? null;
       if (pos.appliedPly === 0) pushScene(coachAtStart(opening), -1, "start");
       else if (atEnd && wasPlan) {
@@ -276,7 +284,7 @@ export function DrillScreen({
       }
       sync();
     },
-    [opening, pushScene, sync, finishBook],
+    [opening, pushScene, sync, finishBook, endCoachSession],
   );
 
   const playSan = useCallback(
@@ -329,7 +337,7 @@ export function DrillScreen({
     setMisses([]);
     missesRef.current = [];
     setDeviation(null);
-    setExplainOpen(false);
+    endCoachSession();
     setExplainLine(false);
     setBookOpen(initialReps === "drill");
     setLineMenuOpen(false);
@@ -370,7 +378,7 @@ export function DrillScreen({
         timerRef.current = null;
       }
     };
-  }, [opening, playSan, session, initialReps, pushScene, finishBook]);
+  }, [opening, playSan, session, initialReps, pushScene, finishBook, endCoachSession]);
 
   useEffect(() => {
     askWaitRef.current?.(null);
@@ -560,7 +568,7 @@ export function DrillScreen({
       setHintKeys(null);
       setHintUsed(false);
       setDeviation(null);
-      setExplainOpen(false);
+      endCoachSession();
 
       pushScene(coachAfterPly(opening, plyRef.current - 1), plyRef.current - 1);
       markReviewed(opening.id, plyNow, true);
@@ -595,7 +603,7 @@ export function DrillScreen({
         }, OPPONENT_MS);
       }
     },
-    [opening, playSan, pushScene, snapBoard, sync, finishBook],
+    [opening, playSan, pushScene, snapBoard, sync, finishBook, endCoachSession],
   );
 
   const hint = () => {
@@ -638,7 +646,7 @@ export function DrillScreen({
     const next = drillStudyMode(id);
     setReps(next);
     setWhyOpen(false);
-    setExplainOpen(false);
+    endCoachSession();
     if (modeRef.current === "plan") {
       modeRef.current = "drill";
       setMode("drill");
@@ -1124,9 +1132,11 @@ export function DrillScreen({
           orientation={orientation}
           showLine={explainLine}
           onShowLineChange={setExplainLine}
-          onClose={() => setExplainOpen(false)}
+          onClose={endCoachSession}
         />
       ) : null}
+
+      <CoachHead sessionOpen={explainOpen} speaking={coachSpeaking} />
 
       {modeSwitch ? (
         <ModePreview

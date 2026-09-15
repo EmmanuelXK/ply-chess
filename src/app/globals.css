@@ -1169,6 +1169,135 @@ body,
   z-index: 6;
 }
 
+.coach-head {
+  position: fixed;
+  z-index: 82;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  gap: 0.38rem;
+  animation: coach-head-in 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.coach-head-disc {
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: #0c0b0a;
+  box-shadow:
+    0 0 0 1px #3d3428,
+    0 8px 20px rgb(0 0 0 / 45%);
+  overflow: hidden;
+}
+
+.coach-head-disc svg {
+  display: block;
+}
+
+.coach-head[data-motion="idle"] .coach-head-disc {
+  box-shadow:
+    0 0 0 1px #3d3428,
+    0 8px 18px rgb(0 0 0 / 40%);
+}
+
+.coach-head[data-motion="speak"] .coach-head-disc {
+  box-shadow:
+    0 0 0 1.5px var(--ember),
+    0 0 0 5px rgb(245 158 11 / 18%),
+    0 10px 22px rgb(0 0 0 / 48%);
+  animation: coach-head-ring 1.15s ease-in-out infinite;
+}
+
+.coach-head-wave {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 1.15rem;
+  padding: 0.12rem 0.28rem 0.12rem 0.1rem;
+}
+
+.coach-head-wave i {
+  display: block;
+  width: 2px;
+  height: 28%;
+  border-radius: 99px;
+  background: var(--mist);
+  opacity: 0.55;
+  transform-origin: center bottom;
+}
+
+.coach-head-wave[data-motion="speak"] i {
+  background: var(--ember-soft);
+  opacity: 1;
+  animation: coach-head-bar 0.72s ease-in-out infinite;
+}
+
+.coach-head-wave[data-motion="speak"] i:nth-child(1) {
+  animation-delay: 0ms;
+}
+
+.coach-head-wave[data-motion="speak"] i:nth-child(2) {
+  animation-delay: 90ms;
+  height: 42%;
+}
+
+.coach-head-wave[data-motion="speak"] i:nth-child(3) {
+  animation-delay: 180ms;
+  height: 62%;
+}
+
+.coach-head-wave[data-motion="speak"] i:nth-child(4) {
+  animation-delay: 40ms;
+  height: 36%;
+}
+
+@keyframes coach-head-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes coach-head-ring {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 1.5px var(--ember),
+      0 0 0 5px rgb(245 158 11 / 16%),
+      0 10px 22px rgb(0 0 0 / 48%);
+  }
+  50% {
+    box-shadow:
+      0 0 0 2px var(--ember-soft),
+      0 0 0 8px rgb(245 158 11 / 8%),
+      0 10px 22px rgb(0 0 0 / 48%);
+  }
+}
+
+@keyframes coach-head-bar {
+  0%,
+  100% {
+    transform: scaleY(0.45);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .coach-head,
+  .coach-head[data-motion="speak"] .coach-head-disc,
+  .coach-head-wave[data-motion="speak"] i {
+    animation: none;
+  }
+}
+
 .history-mark {
   width: 1.75rem;
   height: 1.9rem;
