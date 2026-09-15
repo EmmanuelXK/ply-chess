@@ -1,5 +1,6 @@
 import { SHORT_HOOKS, spokenHook } from "@/lib/dialogue/hooks";
 import {
+  leadsWithCoordinateDump,
   leadsWithSan,
   limitWords,
   stripMoveDumpLead,
@@ -203,10 +204,12 @@ export function planStripText(
 ): string {
   const hook = lastHook(opening);
   const peeled = stripMoveDumpLead(opening.plans[voice]);
-  const we =
-    peeled && !leadsWithSan(peeled) && !looksLikeMoveList(peeled)
-      ? peeled
-      : (hook?.we ?? opening.story.plan);
+  const dump =
+    !peeled ||
+    leadsWithSan(peeled) ||
+    leadsWithCoordinateDump(peeled) ||
+    looksLikeMoveList(peeled);
+  const we = dump ? (hook?.we ?? opening.story.plan) : peeled;
   if (hook?.they) return twoBeatLine(hook.they, we);
   return limitWords(we);
 }

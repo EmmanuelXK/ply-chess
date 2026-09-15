@@ -10,13 +10,17 @@ function methodFromFails(n: number): TeachMethod {
 export function createPlayerModel(): PlayerModel {
   const fails = new Map<string, number>();
   let last: string | undefined;
+
+  function escalate(conceptId: string): TeachMethod {
+    const n = (fails.get(conceptId) ?? 0) + 1;
+    fails.set(conceptId, n);
+    last = conceptId;
+    return methodFromFails(n);
+  }
+
   return {
-    recordFail(conceptId) {
-      const n = (fails.get(conceptId) ?? 0) + 1;
-      fails.set(conceptId, n);
-      last = conceptId;
-      return methodFromFails(n);
-    },
+    escalate,
+    recordFail: escalate,
     recordSuccess(conceptId) {
       fails.delete(conceptId);
       last = conceptId;

@@ -210,17 +210,22 @@ export function dialogueForPly(
   if (!decision.speak) return silentScene(kind);
 
   const scene = sceneFromFacts(facts, opts.duo, opts.mode, decision.content.text);
-  const asks = [decision.content.ask, decision.content.nextAsk].filter(
-    (row): row is NonNullable<typeof row> => Boolean(row),
-  );
-  for (const ask of asks) {
-    scene.beats.push({
-      speaker: COACH_SPEAKER,
-      text: limitWords(ask.prompt),
-      kind: "quiz",
-      ask,
-      purpose: scene.purpose,
-    });
+  if (decision.content.ask) {
+    const lead = scene.beats[0];
+    if (lead) {
+      lead.ask = decision.content.ask;
+      lead.kind = "quiz";
+      if (!lead.text.trim()) lead.text = limitWords(decision.content.ask.prompt);
+    }
+    if (decision.content.nextAsk) {
+      scene.beats.push({
+        speaker: COACH_SPEAKER,
+        text: limitWords(decision.content.nextAsk.prompt),
+        kind: "quiz",
+        ask: decision.content.nextAsk,
+        purpose: scene.purpose,
+      });
+    }
   }
   return scene;
 }

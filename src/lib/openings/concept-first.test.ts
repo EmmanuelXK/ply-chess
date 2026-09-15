@@ -3,6 +3,7 @@ import { describe, it } from "node:test";
 import {
   dialogueForPly,
   dialogueForStart,
+  leadsWithCoordinateDump,
   leadsWithSan,
   spokenHook,
   twoBeatLine,
@@ -231,6 +232,7 @@ describe("concept-first Memory OS", () => {
     assert.equal(leadsWithSan(strip.text), false, strip.text);
     assert.equal(looksLikeMoveList(strip.text), false, strip.text);
     assert.doesNotMatch(strip.text, /e5-d5/i);
+    assert.doesNotMatch(strip.text, /Open f7/i);
     assert.match(strip.text, THEY);
     assert.match(strip.detail ?? "", /e5|d5|f7|pawn/i);
 
@@ -241,6 +243,11 @@ describe("concept-first Memory OS", () => {
           leadsWithSan(line),
           false,
           `${opening.id} ${voice} SAN-led: "${line}"`,
+        );
+        assert.equal(
+          leadsWithCoordinateDump(line),
+          false,
+          `${opening.id} ${voice} square dump: "${line}"`,
         );
         assert.equal(
           looksLikeMoveList(line),

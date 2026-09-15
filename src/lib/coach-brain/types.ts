@@ -152,6 +152,8 @@ export interface CoachBrainDecision {
 
 export interface PlayerModel {
   recordFail(conceptId: string): TeachMethod;
+  /** Same as recordFail — rotate explain → question → contrast. */
+  escalate(conceptId: string): TeachMethod;
   recordSuccess(conceptId: string): void;
   methodFor(conceptId: string): TeachMethod;
   failCount(conceptId: string): number;

@@ -13,6 +13,9 @@ const MOVE_DUMP_LEAD = new RegExp(
   `^${SAN_CHUNK}(?:\\s*[,;/]+\\s*|\\s*[.—–]+\\s*|\\s+then\\s+|\\s+)`,
   "i",
 );
+/** `Open f7.` / `Open g.` / `Sac on e6.` — coordinate dumps, not pictures. */
+const SQUARE_DUMP_LEAD =
+  /^(?:open|hit|take|seize|occupy|crack|sacks?\s+on|sac\s+on)\s+[a-h](?:[1-8])?\.\s+/i;
 
 /** True when a default strip line opens as a move name, not a picture. */
 export function leadsWithSan(text: string): boolean {
@@ -20,15 +23,24 @@ export function leadsWithSan(text: string): boolean {
   return new RegExp(`^${SAN_CHUNK}\\b`).test(compact);
 }
 
+/** True when the line opens as a square/file dump (`Open f7`, `Sac on e6`). */
+export function leadsWithCoordinateDump(text: string): boolean {
+  const compact = text.replace(/\s+/g, " ").trim();
+  return /^(?:open|hit|take|seize|occupy|crack|sacks?\s+on|sac\s+on)\s+[a-h](?:[1-8])?\b/i.test(
+    compact,
+  );
+}
+
 /**
- * Peel leading move dumps (`e5-d5.`, `Nd5, Qh5,`, `Bf4 —`) so the strip
- * can keep the picture. SAN belongs in Why / detail / Analyze.
+ * Peel leading move dumps (`e5-d5.`, `Nd5, Qh5,`, `Bf4 —`, `Open f7.`) so the
+ * strip can keep the picture. SAN belongs in Why / detail / Analyze.
  */
 export function stripMoveDumpLead(text: string | undefined): string {
   let cleaned = stripProfessor((text ?? "").replace(/\s+/g, " ").trim());
   let guard = 0;
   while (cleaned && guard < 10) {
-    const next = cleaned.replace(MOVE_DUMP_LEAD, "");
+    let next = cleaned.replace(MOVE_DUMP_LEAD, "");
+    if (next === cleaned) next = cleaned.replace(SQUARE_DUMP_LEAD, "");
     if (next === cleaned) break;
     cleaned = next.replace(/^[.,;:\s]+/, "").trim();
     guard += 1;

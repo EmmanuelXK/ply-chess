@@ -6,7 +6,12 @@ import { professorAt } from "@/lib/openings/professor";
 import type { Opening } from "@/lib/openings/types";
 import type { DialogueAsk, LessonFacts } from "@/lib/dialogue/types";
 import { COACH_SPEAKER } from "@/lib/tts/types";
-import { leadsWithSan, limitWords } from "@/lib/dialogue/short";
+import {
+  leadsWithCoordinateDump,
+  leadsWithSan,
+  limitWords,
+  stripMoveDumpLead,
+} from "@/lib/dialogue/short";
 import { planStripText } from "@/lib/openings/coach";
 import type {
   CandidateMove,
@@ -51,10 +56,14 @@ function authoredLine(
 
   if (soloText?.trim()) {
     const hook = nearestHook(opening, afterPly);
+    const peeled = stripMoveDumpLead(soloText);
     const usable =
-      !leadsWithSan(soloText) && !looksLikeMoveList(soloText);
+      Boolean(peeled) &&
+      !leadsWithSan(peeled) &&
+      !leadsWithCoordinateDump(peeled) &&
+      !looksLikeMoveList(peeled);
     if (usable) {
-      return { text: soloText, source: hook ? "hook" : "story" };
+      return { text: peeled, source: hook ? "hook" : "story" };
     }
   }
 
@@ -186,7 +195,9 @@ export function selectContent(input: {
       return {
         intent,
         text: limitWords(
-          line && !leadsWithSan(line) ? line : ask.prompt,
+          line && !leadsWithSan(line) && !leadsWithCoordinateDump(line)
+            ? line
+            : ask.prompt,
         ),
         ask,
         nextAsk: candidateAsk(compress.compressed, compress.human, facts),
@@ -211,10 +222,13 @@ export function selectContent(input: {
   }
 
   if (facts.kind === "plan") {
-    const line =
-      soloText && !leadsWithSan(soloText) && !looksLikeMoveList(soloText)
-        ? soloText
-        : planStripText(opening, "aggressive");
+    const peeled = stripMoveDumpLead(soloText);
+    const usable =
+      peeled &&
+      !leadsWithSan(peeled) &&
+      !leadsWithCoordinateDump(peeled) &&
+      !looksLikeMoveList(peeled);
+    const line = usable ? peeled : planStripText(opening, "steady");
     return { intent, text: limitWords(line), source: "hook", method };
   }
 

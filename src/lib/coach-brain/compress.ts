@@ -1,12 +1,18 @@
 import { Chess, type Move, type Square } from "chess.js";
 import { SHORT_HOOKS, spokenHook } from "@/lib/dialogue/hooks";
+import { stripMoveDumpLead } from "@/lib/dialogue/short";
 import { materialCp } from "@/lib/engines/heuristic";
 import { chunkAt } from "@/lib/openings/helpers";
 import { isKeyPly } from "@/lib/openings/key-ply";
 import { professorAt } from "@/lib/openings/professor";
 import type { Opening } from "@/lib/openings/types";
 import type { LessonFacts } from "@/lib/dialogue/types";
-import { engineConsensus, stubAnalyzer, teachingPv } from "./engine";
+import {
+  engineConsensus,
+  singlePathAnalyzer,
+  stubAnalyzer,
+  teachingPv,
+} from "./engine";
 import type {
   CandidateMove,
   CompressDecision,
@@ -436,8 +442,8 @@ export function humanLayer(input: {
   const hook = hookFor(input.opening, input.afterPly) ?? nearestHook(input.opening, input.afterPly);
   const chunk = chunkAt(input.opening, Math.max(0, input.afterPly));
   return {
-    what: hook?.we ?? input.facts.concept,
-    why: hook?.they ?? input.facts.why,
+    what: stripMoveDumpLead(hook?.we ?? input.facts.concept),
+    why: stripMoveDumpLead(hook?.they ?? input.facts.why),
     criticalCandidates: input.compressed.filter(
       (row) => row.classification === "Critical" || row.classification === "Strong" || row.book,
     ),
@@ -456,13 +462,15 @@ export function compressBeforeCalculate(input: {
   const understanding = understandPosition(input);
   const candidates = candidateMoves(input);
   const compressed = compressCandidates(candidates);
-  const analysis = stubAnalyzer.analyze({
+  const request = {
     fen: input.fen,
     candidates: compressed,
     depth: 4,
     lookaheadSans: input.opening.moves.slice(Math.max(0, input.afterPly + 1)),
-  });
-  const consensus = engineConsensus([analysis]);
+  };
+  const stub = stubAnalyzer.analyze(request);
+  const heuristic = singlePathAnalyzer.analyze(request);
+  const consensus = engineConsensus([stub, heuristic]);
   const { depth, escalate } = adaptiveDepth({
     understanding,
     compressed,
@@ -473,7 +481,8 @@ export function compressBeforeCalculate(input: {
     lookahead.map((row) => row.san),
     depth,
   );
-  analysis.pv = pv;
+  stub.pv = pv;
+  heuristic.pv = pv.slice(0, Math.min(pv.length, 8));
 
   return {
     understanding,

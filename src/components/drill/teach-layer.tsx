@@ -52,6 +52,7 @@ export function TeachLayer({
           <li key={`${row.san}-${row.classification}`}>
             <span>{row.classification}</span>
             <strong>{row.san}</strong>
+            {row.reason ? <em>{row.reason}</em> : null}
           </li>
         ))}
       </ul>

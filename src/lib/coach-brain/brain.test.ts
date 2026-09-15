@@ -254,6 +254,13 @@ describe("compress before calculate", () => {
     assert.ok(decision.depth >= 4 && decision.depth <= 8);
     assert.ok(decision.lookahead.length <= 8);
     assert.ok((decision.consensus.analyses[0]?.pv?.length ?? 0) <= 8);
+    assert.ok(
+      decision.consensus.analyses.some((row) => row.engineId === "heuristic"),
+      "compress must run the in-process heuristic analyzer",
+    );
+    assert.ok(
+      decision.consensus.analyses.some((row) => row.engineId === "stub"),
+    );
   });
 
   it("caps teaching lookahead at 4–8 meaningful ply", () => {
@@ -382,12 +389,21 @@ describe("engine interfaces", () => {
 });
 
 describe("strip + plan handoff", () => {
-  it("peels e5-d5 SAN dumps off the strip", () => {
+  it("peels e5-d5 and Open f7 dumps off the strip", () => {
     assert.equal(
       stripMoveDumpLead("e5-d5. Open f7. Don't count the pawn."),
-      "Open f7. Don't count the pawn.",
+      "Don't count the pawn.",
     );
-    assert.equal(leadsWithSan("Open f7. Don't count the pawn."), false);
+    assert.equal(leadsWithSan("Don't count the pawn."), false);
+  });
+
+  it("escalates explain → question → contrast on the PlayerModel", () => {
+    const player = createPlayerModel();
+    assert.equal(player.methodFor("evans:gift"), "explain");
+    assert.equal(player.escalate("evans:gift"), "explain");
+    assert.equal(player.escalate("evans:gift"), "question");
+    assert.equal(player.escalate("evans:gift"), "contrast");
+    assert.equal(player.failCount("evans:gift"), 3);
   });
 
   it("opens Analyze once when the book first ends", () => {
@@ -443,5 +459,6 @@ describe("strip + plan handoff", () => {
     const line = scene.beats[0]?.text ?? plan.text;
     assert.equal(leadsWithSan(line), false, line);
     assert.doesNotMatch(line, /e5-d5/i);
+    assert.doesNotMatch(line, /Open f7/i);
   });
 });
