@@ -1469,6 +1469,8 @@ body,
   background: var(--ink-2);
   border: 1px solid var(--line-strong);
   box-shadow: 0 22px 48px rgb(0 0 0 / 58%);
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
 }
 
 .line-menu-top {
