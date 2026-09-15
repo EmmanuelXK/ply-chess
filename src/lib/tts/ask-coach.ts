@@ -9,7 +9,7 @@ export function shouldAutoSpeakOnScene(): boolean {
   return false;
 }
 
-/** A miss opens the richer Coach explain view. Ordinary taps still speak the strip. */
-export function shouldOpenExplainOnCoachTap(kind: CoachKind): boolean {
-  return shouldOpenCoachExplain(kind);
+/** Any movement can be explained — but only when the player taps Ask Coach. */
+export function shouldOpenExplainOnCoachTap(_kind?: CoachKind): boolean {
+  return shouldOpenCoachExplain(_kind);
 }

@@ -101,7 +101,7 @@ export function CoachExplain({
               Coach{explain.houseName ? ` · ${explain.houseName}` : ""}
             </p>
             <h2 className="truncate text-[17px] font-semibold tracking-tight">
-              Off the book
+              {explain.headline}
             </h2>
           </div>
           <button type="button" className="study-close" onClick={onClose} aria-label="Close">
@@ -134,7 +134,7 @@ export function CoachExplain({
         <p className="splash-copy">
           <SpeakerChip /> {explain.problem}
         </p>
-        {explain.playedSan ? (
+        {explain.kind === "fail" && explain.playedSan ? (
           <p className="coach-explain-san">Your {explain.playedSan}</p>
         ) : null}
 

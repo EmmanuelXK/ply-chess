@@ -16,17 +16,19 @@ import { professorAt } from "./professor";
 import type { Opening } from "./types";
 import type { CoachKind } from "./coach";
 
-/** Ask Coach on a miss opens the Lotus-style explain view. Other taps still speak. */
-export function shouldOpenCoachExplain(kind: CoachKind): boolean {
-  return kind === "fail";
+/** Any Ask Coach tap opens the explain view. The board stays quiet until then. */
+export function shouldOpenCoachExplain(_kind?: CoachKind): boolean {
+  return true;
 }
 
-export interface DeviationExplain {
+export interface CoachExplainState {
+  kind: CoachKind;
   ply: number;
   playedSan?: string;
   bookSan?: string;
   houseName?: string;
-  /** Concept-first: what their move fails to solve. */
+  headline: string;
+  /** Concept-first: the problem / their idea. */
   problem: string;
   /** Concept-first book idea — SAN lives in candidates / line. */
   bookIdea: string;
@@ -35,6 +37,9 @@ export interface DeviationExplain {
   bookLine: string[];
   startPly: number;
 }
+
+/** @deprecated use CoachExplainState */
+export type DeviationExplain = CoachExplainState;
 
 function picture(text: string, fallback: string): string {
   const peeled = stripMoveDumpLead(text) || fallback;
@@ -52,8 +57,8 @@ function hookAt(opening: Opening, ply: number) {
 }
 
 function ideaOf(opening: Opening, ply: number): string {
-  const chunk = chunkAt(opening, ply);
-  const script = professorAt(opening, ply);
+  const chunk = chunkAt(opening, Math.max(0, ply));
+  const script = professorAt(opening, Math.max(0, ply));
   return positionalIdea(
     firstSentence(script?.concept ?? "") ||
       chunk?.job ||
@@ -71,52 +76,61 @@ function sameCopy(a: string, b: string): boolean {
  * Authored house + Coach Brain candidates. Never LLM chess "truth".
  * Strip stays quiet/concept-first; this payload is the Ask Coach sheet.
  */
-export function explainDeviation(input: {
+export function explainCoach(input: {
   opening: Opening;
   ply: number;
+  kind?: CoachKind;
   playedSan?: string;
   fen?: string;
-}): DeviationExplain {
-  const { opening, ply, playedSan, fen } = input;
-  const chunk = chunkAt(opening, ply);
-  const script = professorAt(opening, ply);
+}): CoachExplainState {
+  const { opening, playedSan, fen } = input;
+  const kind = input.kind ?? "ok";
+  const miss = kind === "fail";
+  const ply = Math.max(0, input.ply);
+  const ideaPly = miss ? ply : Math.max(0, ply > 0 ? ply - 1 : 0);
+  const chunk = chunkAt(opening, ideaPly);
+  const script = professorAt(opening, ideaPly);
   const facts = collectFacts({
     opening,
-    ply,
-    kind: "fail",
+    ply: ideaPly,
+    kind,
     fen,
     san: playedSan,
   });
   const compress = compressBeforeCalculate({
     opening,
-    afterPly: ply,
+    afterPly: ideaPly,
     facts,
     fen,
   });
-  const hook = hookAt(opening, ply);
-  const job = ideaOf(opening, ply);
+  const hook = hookAt(opening, ideaPly);
+  const job = ideaOf(opening, ideaPly);
   const problem = picture(
-    hook?.they
-      ? `That misses the job. ${hook.they}`
-      : `That doesn't do the house job. ${job}`,
-    "That doesn't do the house job.",
+    miss
+      ? hook?.they
+        ? `That misses the job. ${hook.they}`
+        : `That doesn't do the house job. ${job}`
+      : hook?.they || script?.why || job,
+    miss ? "That doesn't do the house job." : "Watch their idea.",
   );
   const bookIdea = picture(
     hook?.we || script?.concept || compress.human.what || job,
     "Stay with the idea. One move.",
   );
-  const contrastRaw = hook
+  const contrastRaw = miss
     ? undefined
-    : picture(compress.human.why, "");
+    : picture(compress.human.why || hook?.they || "", "");
   const contrast =
-    contrastRaw && !sameCopy(contrastRaw, bookIdea) && !sameCopy(contrastRaw, problem)
+    contrastRaw &&
+    !sameCopy(contrastRaw, bookIdea) &&
+    !sameCopy(contrastRaw, problem)
       ? contrastRaw
       : undefined;
 
   const raw = compressCandidates(
     compress.compressed.length
       ? compress.compressed
-      : candidateMoves({ opening, afterPly: ply, facts, fen }),
+      : candidateMoves({ opening, afterPly: ideaPly, facts, fen }),
   );
   const filtered = raw
     .filter((row) => row.book || row.san !== playedSan)
@@ -132,10 +146,12 @@ export function explainDeviation(input: {
     );
 
   return {
+    kind,
     ply,
     playedSan,
-    bookSan: opening.moves[ply],
+    bookSan: opening.moves[miss ? ply : ideaPly],
     houseName: chunk?.name,
+    headline: miss ? "Off the book" : (chunk?.name ?? "This position"),
     problem,
     bookIdea,
     contrast,
@@ -143,4 +159,13 @@ export function explainDeviation(input: {
     bookLine: opening.moves,
     startPly: Math.max(0, Math.min(ply, opening.moves.length)),
   };
+}
+
+export function explainDeviation(input: {
+  opening: Opening;
+  ply: number;
+  playedSan?: string;
+  fen?: string;
+}): CoachExplainState {
+  return explainCoach({ ...input, kind: "fail" });
 }

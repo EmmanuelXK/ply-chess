@@ -4,7 +4,7 @@ import { playLine } from "../chess/line";
 import { leadsWithCoordinateDump, leadsWithSan } from "../dialogue";
 import { shouldAutoSpeakOnScene, shouldOpenExplainOnCoachTap } from "../tts/ask-coach";
 import { coachOnFail } from "./coach";
-import { explainDeviation, shouldOpenCoachExplain } from "./deviation";
+import { explainCoach, explainDeviation, shouldOpenCoachExplain } from "./deviation";
 import { looksLikeMoveList } from "./helpers";
 import { getOpening } from "./index";
 
@@ -13,11 +13,11 @@ describe("Lotus-style deviation coaching", () => {
     assert.equal(shouldAutoSpeakOnScene(), false);
     assert.equal(shouldOpenCoachExplain("fail"), true);
     assert.equal(shouldOpenExplainOnCoachTap("fail"), true);
-    assert.equal(shouldOpenCoachExplain("ok"), false);
-    assert.equal(shouldOpenExplainOnCoachTap("ok"), false);
-    assert.equal(shouldOpenExplainOnCoachTap("hint"), false);
-    assert.equal(shouldOpenExplainOnCoachTap("start"), false);
-    assert.equal(shouldOpenExplainOnCoachTap("plan"), false);
+    assert.equal(shouldOpenCoachExplain("ok"), true);
+    assert.equal(shouldOpenExplainOnCoachTap("ok"), true);
+    assert.equal(shouldOpenExplainOnCoachTap("hint"), true);
+    assert.equal(shouldOpenExplainOnCoachTap("start"), true);
+    assert.equal(shouldOpenExplainOnCoachTap("plan"), true);
   });
 
   it("keeps the fail strip concept-first — SAN belongs in the explain layer", () => {
@@ -81,5 +81,25 @@ describe("Lotus-style deviation coaching", () => {
     );
     assert.doesNotMatch(explain.problem, /engine|stockfish|eval|best move/i);
     assert.ok(explain.candidates.every((row) => row.reason.trim()));
+  });
+
+  it("explains a book ply without miss copy — Ask Coach, not a fail", () => {
+    const london = getOpening("london");
+    assert.ok(london);
+    const pos = playLine(london.moves, 1);
+    const explain = explainCoach({
+      opening: london,
+      ply: 1,
+      kind: "ok",
+      playedSan: london.moves[0],
+      fen: pos.fen,
+    });
+    assert.equal(explain.kind, "ok");
+    assert.notEqual(explain.headline, "Off the book");
+    assert.doesNotMatch(explain.problem, /misses the job/i);
+    assert.doesNotMatch(explain.bookIdea, /misses the job/i);
+    assert.equal(leadsWithSan(explain.problem), false, explain.problem);
+    assert.equal(leadsWithSan(explain.bookIdea), false, explain.bookIdea);
+    assert.ok(explain.bookLine.length === london.moves.length);
   });
 });

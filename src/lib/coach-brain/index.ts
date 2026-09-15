@@ -47,7 +47,7 @@ export {
   stockfishAnalyze,
   verifyWithEngines,
 } from "./engine";
-export { shouldAutoOpenAnalyze } from "./handoff";
+export { shouldAutoOpenAnalyze, shouldPromptPlanHandoff } from "./handoff";
 export {
   conceptIdFor,
   createPlayerModel,

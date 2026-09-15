@@ -20,6 +20,7 @@ import { ChessBoard, type BoardArrow } from "@/components/board/chess-board";
 import { Button } from "@/components/ui/button";
 import { AnalyzeSplash } from "@/components/drill/analyze-splash";
 import { CoachExplain } from "@/components/drill/coach-explain";
+import { ModePreview } from "@/components/drill/mode-preview";
 import { HistoryMark } from "@/components/drill/history-mark";
 import { LineTreeMenu } from "@/components/drill/line-tree-menu";
 import { HistorySplash } from "@/components/drill/history-splash";
@@ -35,7 +36,6 @@ import {
   prefetchDialogue,
   silence,
   speak,
-  speakDialogue,
   unlockSpeech,
   type SpeakHandle,
 } from "@/lib/chess/speak";
@@ -65,21 +65,25 @@ import {
   reviewStartPly,
   type StudyMode,
 } from "@/lib/reps/schedule";
-import { shouldAutoOpenAnalyze } from "@/lib/coach-brain/handoff";
+import { shouldPromptPlanHandoff } from "@/lib/coach-brain/handoff";
 import {
   coachAfterPly,
   coachAtStart,
   coachOnFail,
   coachOnHint,
   coachOnPlan,
-  textForCoachTap,
   type CoachKind,
   type CoachState,
 } from "@/lib/openings/coach";
 import {
+  explainCoach,
   explainDeviation,
-  type DeviationExplain,
+  type CoachExplainState,
 } from "@/lib/openings/deviation";
+import {
+  shouldPromptModeSwitch,
+  type ModeSwitchKind,
+} from "@/lib/openings/mode-switch";
 import {
   isUserPly,
   openingFromTrap,
@@ -144,7 +148,8 @@ export function DrillScreen({
   const [whyOpen, setWhyOpen] = useState(false);
   const [explainOpen, setExplainOpen] = useState(false);
   const [explainLine, setExplainLine] = useState(false);
-  const [deviation, setDeviation] = useState<DeviationExplain | null>(null);
+  const [deviation, setDeviation] = useState<CoachExplainState | null>(null);
+  const [modeSwitch, setModeSwitch] = useState<ModeSwitchKind | null>(null);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [analyzeOpen, setAnalyzeOpen] = useState(false);
   const [quizOpen, setQuizOpen] = useState(initialReps === "drill");
@@ -164,6 +169,7 @@ export function DrillScreen({
   const askWaitRef = useRef<((id: string | null) => void) | null>(null);
   const speechRef = useRef<SpeakHandle | null>(null);
   const lastSpokenRef = useRef("");
+  const lastPlayedSanRef = useRef<string | null>(null);
   const resumePlyRef = useRef<number | null>(null);
   const autoAnalyzeRef = useRef(false);
 
@@ -231,10 +237,7 @@ export function DrillScreen({
         opening.moves.length - 1,
         "plan",
       );
-      if (shouldAutoOpenAnalyze(wasPlan, true, autoAnalyzeRef.current)) {
-        autoAnalyzeRef.current = true;
-        setAnalyzeOpen(true);
-      }
+      void wasPlan;
     },
     [opening.moves.length, pushScene],
   );
@@ -246,15 +249,27 @@ export function DrillScreen({
       const wasPlan = modeRef.current === "plan";
       gameRef.current = pos.chess;
       plyRef.current = pos.appliedPly;
-      modeRef.current =
-        pos.appliedPly >= opening.moves.length ? "plan" : "drill";
+      const atEnd = pos.appliedPly >= opening.moves.length;
+      modeRef.current = wasPlan && atEnd ? "plan" : atEnd ? modeRef.current : "drill";
+      if (atEnd && !wasPlan && modeRef.current !== "plan") {
+        modeRef.current = "drill";
+      }
       setLastMove(pos.lastMove);
       setHintKeys(null);
       setHintUsed(false);
       setDeviation(null);
       setExplainOpen(false);
+      lastPlayedSanRef.current = pos.chess.history().at(-1) ?? null;
       if (pos.appliedPly === 0) pushScene(coachAtStart(opening), -1, "start");
-      else if (pos.appliedPly >= opening.moves.length) {
+      else if (atEnd && wasPlan) {
+        finishBook(true);
+      } else if (atEnd && shouldPromptPlanHandoff(wasPlan, true)) {
+        pushScene(
+          coachAfterPly(opening, pos.appliedPly - 1),
+          pos.appliedPly - 1,
+        );
+        setModeSwitch("plan");
+      } else if (atEnd) {
         finishBook(wasPlan);
       } else {
         pushScene(coachAfterPly(opening, pos.appliedPly - 1), pos.appliedPly - 1);
@@ -270,9 +285,7 @@ export function DrillScreen({
       if (!move) return null;
       plyRef.current += 1;
       setLastMove([move.from as Key, move.to as Key]);
-      if (plyRef.current >= opening.moves.length) {
-        modeRef.current = "plan";
-      }
+      lastPlayedSanRef.current = move.san;
       sync();
       return move;
     },
@@ -476,6 +489,7 @@ export function DrillScreen({
           snapBoard();
           return;
         }
+        lastPlayedSanRef.current = move.san;
         setHintKeys(null);
         sync();
         return;
@@ -514,6 +528,7 @@ export function DrillScreen({
       if (!ok) {
         const playedSan = move.san;
         g.undo();
+        lastPlayedSanRef.current = playedSan;
         const fail = coachOnFail(opening, plyNow);
         const miss: MissMemory = {
           ply: plyNow,
@@ -541,21 +556,22 @@ export function DrillScreen({
       }
 
       plyRef.current += 1;
+      lastPlayedSanRef.current = move.san;
       setHintKeys(null);
       setHintUsed(false);
       setDeviation(null);
       setExplainOpen(false);
 
-      if (plyRef.current >= opening.moves.length) {
-        finishBook(false);
-        sync();
-        return;
-      }
-
       pushScene(coachAfterPly(opening, plyRef.current - 1), plyRef.current - 1);
       markReviewed(opening.id, plyNow, true);
       markProgress(opening.id, plyRef.current);
       sync();
+
+      if (plyRef.current >= opening.moves.length) {
+        if (shouldPromptPlanHandoff(false, true)) setModeSwitch("plan");
+        else finishBook(false);
+        return;
+      }
 
       if (!isUserPly(opening.side, plyRef.current)) {
         lockRef.current = true;
@@ -565,13 +581,13 @@ export function DrillScreen({
           timerRef.current = null;
           const reply = playSan(opening.moves[plyRef.current]);
           if (reply) {
-            if (modeRef.current === "plan") {
-              finishBook(false);
-            } else {
-              pushScene(
-                coachAfterPly(opening, plyRef.current - 1),
-                plyRef.current - 1,
-              );
+            pushScene(
+              coachAfterPly(opening, plyRef.current - 1),
+              plyRef.current - 1,
+            );
+            if (plyRef.current >= opening.moves.length) {
+              if (shouldPromptPlanHandoff(false, true)) setModeSwitch("plan");
+              else finishBook(false);
             }
           }
           lockRef.current = false;
@@ -615,6 +631,54 @@ export function DrillScreen({
     pickVoice(PLAN_VOICES[(i + 1) % PLAN_VOICES.length]);
   };
 
+  const currentSwitchKind = (): ModeSwitchKind =>
+    modeRef.current === "plan" ? "plan" : reps;
+
+  const applyStudyMode = (id: StudyMode) => {
+    const next = drillStudyMode(id);
+    setReps(next);
+    setWhyOpen(false);
+    setExplainOpen(false);
+    if (modeRef.current === "plan") {
+      modeRef.current = "drill";
+      setMode("drill");
+    }
+    const auto = next === "trial";
+    setLessonStyle(auto ? "podcast" : "teach");
+    setPodcastPlaying(auto);
+    if (next === "drill") setBookOpen(true);
+    if (next === "practice") setThinkOpen(true);
+    if (next === "learn") {
+      setLineId(null);
+      if (lineId) setSession((n) => n + 1);
+    }
+    if (next === "reps") {
+      cancelTimer();
+      applyPly(reviewStartPly(opening));
+    }
+  };
+
+  const requestModeSwitch = (next: ModeSwitchKind) => {
+    if (next === "analyze" && analyzeOpen) return;
+    if (!shouldPromptModeSwitch(currentSwitchKind(), next)) return;
+    setModeSwitch(next);
+  };
+
+  const confirmModeSwitch = () => {
+    const next = modeSwitch;
+    setModeSwitch(null);
+    if (!next) return;
+    if (next === "analyze") {
+      setAnalyzeOpen(true);
+      return;
+    }
+    if (next === "plan") {
+      finishBook(false);
+      return;
+    }
+    applyStudyMode(next);
+  };
+
   const stepBack = useCallback(() => {
     cancelTimer();
     if (lessonStyle === "podcast") setPodcastPlaying(false);
@@ -634,6 +698,7 @@ export function DrillScreen({
       lineMenuOpen ||
       whyOpen ||
       explainOpen ||
+      Boolean(modeSwitch) ||
       historyOpen ||
       analyzeOpen ||
       quizOpen ||
@@ -666,6 +731,7 @@ export function DrillScreen({
     explainOpen,
     historyOpen,
     lineMenuOpen,
+    modeSwitch,
     quizOpen,
     stepBack,
     stepForward,
@@ -692,60 +758,34 @@ export function DrillScreen({
   const askCoach = useCallback(() => {
     unlockSpeech();
     unlockFocusBed();
-    if (shouldOpenExplainOnCoachTap(coach.kind)) {
-      const payload =
-        deviation ??
-        explainDeviation({
-          opening,
-          ply: plyRef.current,
-          fen: gameRef.current.fen(),
-        });
-      if (!deviation) setDeviation(payload);
-      setWhyOpen(false);
-      setExplainOpen(true);
-      if (!tts) return;
-    }
-    const beat = scene.beats[beatIndex] ?? scene.beats[0];
-    const authored = (beat?.text ?? coach.text).trim();
-    const text = textForCoachTap(authored, lastSpokenRef.current);
-    if (!tts) {
-      setWhyOpen(true);
-      return;
-    }
-    if (!text && scene.beats.length === 0) {
-      setWhyOpen(true);
-      return;
-    }
+    const playedSan =
+      lastPlayedSanRef.current ?? gameRef.current.history().at(-1) ?? undefined;
+    const payload =
+      coach.kind === "fail" && deviation
+        ? deviation
+        : explainCoach({
+            opening,
+            ply: plyRef.current,
+            kind: coach.kind,
+            playedSan,
+            fen: gameRef.current.fen(),
+          });
+    if (!shouldOpenExplainOnCoachTap(coach.kind)) return;
+    setDeviation(payload);
+    setWhyOpen(false);
+    setExplainOpen(true);
+    if (!tts) return;
+    const spoken = payload.bookIdea.replace(/\s+/g, " ").trim();
+    if (!spoken) return;
     speechRef.current?.stop();
-    const handle =
-      scene.beats.length > 0
-        ? speakDialogue(scene.beats, {
-            premium: false,
-            onBeat: (index, next) => {
-              setBeatIndex(index);
-              setAsk(next.ask ?? null);
-              setAskPicked(null);
-              const spoken = next.text.replace(/\s+/g, " ").trim();
-              if (spoken) lastSpokenRef.current = spoken;
-            },
-            waitForAsk: () =>
-              new Promise((resolve) => {
-                askWaitRef.current = (id) => {
-                  askWaitRef.current = null;
-                  resolve(id);
-                };
-                window.setTimeout(() => {
-                  if (askWaitRef.current) askWaitRef.current(null);
-                }, 14_000);
-              }),
-          })
-        : speak(text ?? "");
+    lastSpokenRef.current = spoken;
+    const handle = speak(spoken);
     speechRef.current = handle;
     setCoachSpeaking(true);
     void handle.done.then(() => {
       if (speechRef.current === handle) setCoachSpeaking(false);
     });
-  }, [scene.beats, beatIndex, coach.text, coach.kind, tts, deviation, opening]);
+  }, [coach.kind, tts, deviation, opening]);
 
   const analyzeLine = useMemo(
     () => [...played, ...opening.moves.slice(ply)],
@@ -757,6 +797,7 @@ export function DrillScreen({
     lineMenuOpen ||
     whyOpen ||
     explainOpen ||
+    Boolean(modeSwitch) ||
     historyOpen ||
     analyzeOpen ||
     quizOpen ||
@@ -832,22 +873,7 @@ export function DrillScreen({
               role="tab"
               aria-selected={reps === m.id}
               className={reps === m.id ? "reps-chip reps-chip-on" : "reps-chip"}
-              onClick={() => {
-                setReps(drillStudyMode(m.id));
-                const auto = m.id === "trial";
-                setLessonStyle(auto ? "podcast" : "teach");
-                setPodcastPlaying(auto);
-                if (m.id === "drill") setBookOpen(true);
-                if (m.id === "practice") setThinkOpen(true);
-                if (m.id === "learn") {
-                  setLineId(null);
-                  if (lineId) setSession((n) => n + 1);
-                }
-                if (m.id === "reps") {
-                  cancelTimer();
-                  applyPly(reviewStartPly(opening));
-                }
-              }}
+              onClick={() => requestModeSwitch(drillStudyMode(m.id))}
             >
               {m.label}
             </button>
@@ -957,7 +983,7 @@ export function DrillScreen({
               animationMs={MOVE_MS}
               resyncKey={boardEpoch}
               onMove={onMove}
-              onLongPress={() => setAnalyzeOpen(true)}
+              onLongPress={() => requestModeSwitch("analyze")}
             />
           </div>
           <PlyNav
@@ -1006,7 +1032,7 @@ export function DrillScreen({
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => setAnalyzeOpen(true)}
+          onClick={() => requestModeSwitch("analyze")}
           className="dock-btn"
         >
           <ScanSearch />
@@ -1099,6 +1125,17 @@ export function DrillScreen({
           showLine={explainLine}
           onShowLineChange={setExplainLine}
           onClose={() => setExplainOpen(false)}
+        />
+      ) : null}
+
+      {modeSwitch ? (
+        <ModePreview
+          kind={modeSwitch}
+          line={opening.moves}
+          startPly={ply}
+          orientation={orientation}
+          onConfirm={confirmModeSwitch}
+          onCancel={() => setModeSwitch(null)}
         />
       ) : null}
 
