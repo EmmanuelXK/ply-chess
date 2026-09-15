@@ -4,6 +4,10 @@ import { useEffect, useState } from "react";
 import { TabBar } from "@/components/app/tab-bar";
 import { useAuth } from "@/components/auth/auth-provider";
 import {
+  readCoachBrainV2Stored,
+  writeCoachBrainV2Stored,
+} from "@/lib/coach-brain/flag";
+import {
   readTtsRate,
   readVoiceOnDefault,
   writeTtsRate,
@@ -18,6 +22,7 @@ export function SettingsScreen() {
   const { configured, ready, user, profile, save } = useAuth();
   const [rate, setRate] = useState<TtsRatePref>(() => readTtsRate());
   const [voiceOn, setVoiceOn] = useState(() => readVoiceOnDefault());
+  const [coachBrain, setCoachBrain] = useState(() => readCoachBrainV2Stored());
   const [displayName, setDisplayName] = useState("");
   const [initials, setInitials] = useState("");
   const [sidePref, setSidePref] = useState<SidePref>("both");
@@ -168,6 +173,26 @@ export function SettingsScreen() {
               }}
             />
             Start drills with Voice on
+          </label>
+        </section>
+
+        <section className="set-block" id="coach-brain">
+          <h2>Experimental</h2>
+          <p className="set-help">
+            Coach Brain v2 decides when to introduce, reinforce, correct, or
+            stay silent — still from authored hooks, never invented book moves.
+            Off by default. The current coach stays until you turn this on.
+          </p>
+          <label className="set-toggle">
+            <input
+              type="checkbox"
+              checked={coachBrain}
+              onChange={(e) => {
+                setCoachBrain(e.target.checked);
+                writeCoachBrainV2Stored(e.target.checked);
+              }}
+            />
+            Use Coach Brain v2
           </label>
         </section>
 
