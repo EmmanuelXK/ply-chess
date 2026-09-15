@@ -1,6 +1,11 @@
 import { SHORT_HOOKS, spokenHook } from "@/lib/dialogue/hooks";
-import { limitWords } from "@/lib/dialogue/short";
-import { chunkAt, positionalIdea } from "./helpers";
+import {
+  leadsWithSan,
+  limitWords,
+  stripMoveDumpLead,
+  twoBeatLine,
+} from "@/lib/dialogue/short";
+import { chunkAt, looksLikeMoveList, positionalIdea } from "./helpers";
 import { historyAt } from "./history";
 import { isKeyPly } from "./key-ply";
 import { housePicture } from "./memory";
@@ -182,13 +187,37 @@ export function coachOnHint(opening: Opening, ply: number): CoachState {
   };
 }
 
+function lastHook(opening: Opening) {
+  const rows = SHORT_HOOKS[opening.id];
+  if (!rows?.length) return undefined;
+  return [...rows].sort((a, b) => b.ply - a.ply)[0];
+}
+
+/**
+ * Plan chips change the idea, not a move dump.
+ * Strip = they/we pictures. Raw plan (may name moves) stays in detail/Why.
+ */
+export function planStripText(
+  opening: Opening,
+  voice: "steady" | "creative" | "aggressive",
+): string {
+  const hook = lastHook(opening);
+  const peeled = stripMoveDumpLead(opening.plans[voice]);
+  const we =
+    peeled && !leadsWithSan(peeled) && !looksLikeMoveList(peeled)
+      ? peeled
+      : (hook?.we ?? opening.story.plan);
+  if (hook?.they) return twoBeatLine(hook.they, we);
+  return limitWords(we);
+}
+
 export function coachOnPlan(
   voice: "steady" | "creative" | "aggressive",
   opening: Opening,
 ): CoachState {
   return {
-    text: opening.plans[voice],
-    detail: opening.pillars.attackingPlan,
+    text: planStripText(opening, voice),
+    detail: opening.plans[voice],
     chunkName: "Plan mode",
     kind: "plan",
   };

@@ -43,7 +43,11 @@ export {
   singlePathAnalyzer,
   stubAnalyzer,
   teachingPv,
+  analysisFromStockfishMoves,
+  stockfishAnalyze,
+  verifyWithEngines,
 } from "./engine";
+export { shouldAutoOpenAnalyze } from "./handoff";
 export {
   conceptIdFor,
   createPlayerModel,

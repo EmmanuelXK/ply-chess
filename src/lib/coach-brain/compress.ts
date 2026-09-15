@@ -364,17 +364,6 @@ export function candidateMoves(input: {
     picked.push(trap);
   }
 
-  if (picked.length < 2) {
-    const hook = nearestHook(opening, afterPly);
-    picked.push({
-      san: "idea",
-      classification: "Practical",
-      reason: hook?.we ?? facts.concept ?? "Stay with the house job.",
-      book: false,
-      changesPlan: false,
-    });
-  }
-
   return picked.slice(0, 5);
 }
 

@@ -210,12 +210,15 @@ export function dialogueForPly(
   if (!decision.speak) return silentScene(kind);
 
   const scene = sceneFromFacts(facts, opts.duo, opts.mode, decision.content.text);
-  if (decision.content.ask) {
+  const asks = [decision.content.ask, decision.content.nextAsk].filter(
+    (row): row is NonNullable<typeof row> => Boolean(row),
+  );
+  for (const ask of asks) {
     scene.beats.push({
       speaker: COACH_SPEAKER,
-      text: limitWords(decision.content.ask.prompt),
+      text: limitWords(ask.prompt),
       kind: "quiz",
-      ask: decision.content.ask,
+      ask,
       purpose: scene.purpose,
     });
   }

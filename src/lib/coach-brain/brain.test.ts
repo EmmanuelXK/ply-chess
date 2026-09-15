@@ -1,9 +1,9 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { playLine } from "../chess/line";
-import { collectFacts, dialogueForPly, leadsWithSan, spokenHook } from "../dialogue";
+import { collectFacts, dialogueForPly, leadsWithSan, spokenHook, stripMoveDumpLead } from "../dialogue";
 import { SHORT_HOOKS } from "../dialogue/hooks";
-import { coachAfterPly, coachOnFail } from "../openings/coach";
+import { coachAfterPly, coachOnFail, coachOnPlan } from "../openings/coach";
 import { getOpening, isKeyPly } from "../openings";
 import {
   adaptiveDepth,
@@ -17,6 +17,8 @@ import {
   isCoachBrainV2Enabled,
   singlePathAnalyzer,
   stubAnalyzer,
+  analysisFromStockfishMoves,
+  shouldAutoOpenAnalyze,
   teachingLookahead,
 } from "./index";
 import type { CandidateMove, EngineAnalysis } from "./types";
@@ -361,5 +363,85 @@ describe("engine interfaces", () => {
       "Qh4",
     );
     assert.notEqual(consensus.verdict, "stable");
+  });
+
+  it("maps Stockfish onto compressed candidates and truncates teaching PV", () => {
+    const start = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+    const longPv = ["d2d4", "d7d5", "c2c4", "e7e6", "b1c3", "g8f6", "c1g5", "f8e7", "e2e3", "e8g8"];
+    const analysis = analysisFromStockfishMoves(
+      [dummyCandidate("e4", { book: true, classification: "Strong" })],
+      [{ san: "d4", uci: "d2d4", scoreCp: 55, pv: longPv }],
+      start,
+      6,
+    );
+    assert.equal(analysis.engineId, "stockfish");
+    assert.equal(analysis.candidates[0]?.san, "d4");
+    assert.ok((analysis.pv?.length ?? 0) <= 6);
+    assert.match(analysis.note, /investigate/i);
+  });
+});
+
+describe("strip + plan handoff", () => {
+  it("peels e5-d5 SAN dumps off the strip", () => {
+    assert.equal(
+      stripMoveDumpLead("e5-d5. Open f7. Don't count the pawn."),
+      "Open f7. Don't count the pawn.",
+    );
+    assert.equal(leadsWithSan("Open f7. Don't count the pawn."), false);
+  });
+
+  it("opens Analyze once when the book first ends", () => {
+    assert.equal(shouldAutoOpenAnalyze(false, true, false), true);
+    assert.equal(shouldAutoOpenAnalyze(true, true, false), false);
+    assert.equal(shouldAutoOpenAnalyze(false, true, true), false);
+    assert.equal(shouldAutoOpenAnalyze(false, false, false), false);
+  });
+
+  it("asks the problem, then two candidates, after a repeat miss", () => {
+    const opening = lion();
+    const player = createPlayerModel();
+    const budget = createSpeechBudget();
+    const fail = coachOnFail(opening, 5);
+    decideCoachBrain({
+      opening,
+      afterPly: 5,
+      kind: "fail",
+      facts: factsFor(opening, 5, "fail"),
+      soloText: fail.text,
+      player,
+      budget,
+    });
+    const second = decideCoachBrain({
+      opening,
+      afterPly: 5,
+      kind: "fail",
+      facts: factsFor(opening, 5, "fail"),
+      soloText: fail.text,
+      player,
+      budget,
+    });
+    assert.equal(second.method, "question");
+    assert.ok(second.content.ask);
+    assert.ok(second.content.nextAsk);
+    assert.match(second.content.ask?.prompt ?? "", /problem|job|idea|why/i);
+    assert.match(second.content.nextAsk?.prompt ?? "", /candidate/i);
+  });
+
+  it("does not put Evans Aggressive SAN on the strip when the brain is on", () => {
+    const evans = getOpening("evans-gambit");
+    assert.ok(evans);
+    const plan = coachOnPlan("aggressive", evans);
+    const scene = dialogueForPly(evans, evans.moves.length - 1, {
+      duo: "voss-draven",
+      mode: "solo",
+      kind: "plan",
+      soloText: plan.text,
+      brain: true,
+      player: createPlayerModel(),
+      budget: createSpeechBudget(),
+    });
+    const line = scene.beats[0]?.text ?? plan.text;
+    assert.equal(leadsWithSan(line), false, line);
+    assert.doesNotMatch(line, /e5-d5/i);
   });
 });

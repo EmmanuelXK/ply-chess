@@ -55,6 +55,7 @@ import {
   reviewStartPly,
   type StudyMode,
 } from "@/lib/reps/schedule";
+import { shouldAutoOpenAnalyze } from "@/lib/coach-brain/handoff";
 import {
   coachAfterPly,
   coachAtStart,
@@ -145,6 +146,7 @@ export function DrillScreen({
   const speechRef = useRef<SpeakHandle | null>(null);
   const lastSpokenRef = useRef("");
   const resumePlyRef = useRef<number | null>(null);
+  const autoAnalyzeRef = useRef(false);
 
   useEffect(() => {
     lessonRef.current = lessonStyle;
@@ -196,10 +198,31 @@ export function DrillScreen({
     [opening],
   );
 
+  const finishBook = useCallback(
+    (wasPlan: boolean) => {
+      modeRef.current = "plan";
+      pushScene(
+        {
+          text: "Book done. Pick a plan.",
+          chunkName: "Plan mode",
+          kind: "plan",
+        },
+        opening.moves.length - 1,
+        "plan",
+      );
+      if (shouldAutoOpenAnalyze(wasPlan, true, autoAnalyzeRef.current)) {
+        autoAnalyzeRef.current = true;
+        setAnalyzeOpen(true);
+      }
+    },
+    [opening.moves.length, pushScene],
+  );
+
   const applyPly = useCallback(
     (nextPly: number) => {
       const capped = Math.max(0, Math.min(nextPly, opening.moves.length));
       const pos = playLine(opening.moves, capped);
+      const wasPlan = modeRef.current === "plan";
       gameRef.current = pos.chess;
       plyRef.current = pos.appliedPly;
       modeRef.current =
@@ -209,21 +232,13 @@ export function DrillScreen({
       setHintUsed(false);
       if (pos.appliedPly === 0) pushScene(coachAtStart(opening), -1, "start");
       else if (pos.appliedPly >= opening.moves.length) {
-        pushScene(
-          {
-            text: "Book done. Pick a plan.",
-            chunkName: "Plan mode",
-            kind: "plan",
-          },
-          opening.moves.length - 1,
-          "plan",
-        );
+        finishBook(wasPlan);
       } else {
         pushScene(coachAfterPly(opening, pos.appliedPly - 1), pos.appliedPly - 1);
       }
       sync();
     },
-    [opening, pushScene, sync],
+    [opening, pushScene, sync, finishBook],
   );
 
   const playSan = useCallback(
@@ -249,9 +264,12 @@ export function DrillScreen({
     const pos = playLine(opening.moves, startPly);
     gameRef.current = pos.chess;
     plyRef.current = pos.appliedPly;
+    const wasPlan = false;
     modeRef.current =
       pos.appliedPly >= opening.moves.length ? "plan" : "drill";
     lockRef.current = false;
+    autoAnalyzeRef.current = false;
+    setAnalyzeOpen(false);
     setFen(pos.fen);
     setPly(pos.appliedPly);
     setPlayed(pos.chess.history());
@@ -260,15 +278,7 @@ export function DrillScreen({
     setMode(modeRef.current);
     if (pos.appliedPly === 0) pushScene(coachAtStart(opening), -1, "start");
     else if (pos.appliedPly >= opening.moves.length) {
-      pushScene(
-        {
-          text: "Book done. Pick a plan.",
-          chunkName: "Plan mode",
-          kind: "plan",
-        },
-        opening.moves.length - 1,
-        "plan",
-      );
+      finishBook(wasPlan);
     } else {
       pushScene(
         coachAfterPly(opening, pos.appliedPly - 1),
@@ -321,7 +331,7 @@ export function DrillScreen({
         timerRef.current = null;
       }
     };
-  }, [opening, playSan, session, initialReps, pushScene]);
+  }, [opening, playSan, session, initialReps, pushScene, finishBook]);
 
   useEffect(() => {
     askWaitRef.current?.(null);
@@ -529,16 +539,7 @@ export function DrillScreen({
       setHintUsed(false);
 
       if (plyRef.current >= opening.moves.length) {
-        modeRef.current = "plan";
-        pushScene(
-          {
-            text: "Book done. Pick a plan.",
-            chunkName: "Plan mode",
-            kind: "plan",
-          },
-          opening.moves.length - 1,
-          "plan",
-        );
+        finishBook(false);
         sync();
         return;
       }
@@ -557,15 +558,7 @@ export function DrillScreen({
           const reply = playSan(opening.moves[plyRef.current]);
           if (reply) {
             if (modeRef.current === "plan") {
-              pushScene(
-                {
-                  text: "Book done. Pick a plan.",
-                  chunkName: "Plan mode",
-                  kind: "plan",
-                },
-                opening.moves.length - 1,
-                "plan",
-              );
+              finishBook(false);
             } else {
               pushScene(
                 coachAfterPly(opening, plyRef.current - 1),
@@ -578,7 +571,7 @@ export function DrillScreen({
         }, OPPONENT_MS);
       }
     },
-    [opening, playSan, pushScene, snapBoard, sync],
+    [opening, playSan, pushScene, snapBoard, sync, finishBook],
   );
 
   const hint = () => {
@@ -1020,6 +1013,7 @@ export function DrillScreen({
 
       {analyzeOpen ? (
         <AnalyzeSplash
+          opening={opening}
           line={analyzeLine}
           startPly={played.length}
           orientation={orientation}

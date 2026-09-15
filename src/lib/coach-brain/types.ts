@@ -125,6 +125,8 @@ export interface SelectedContent {
   text: string;
   detail?: string;
   ask?: DialogueAsk;
+  /** Training mode: after "what's the problem?", ask for two candidates. */
+  nextAsk?: DialogueAsk;
   source: ContentSource;
   method: TeachMethod;
 }

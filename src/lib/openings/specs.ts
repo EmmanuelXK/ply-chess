@@ -361,9 +361,9 @@ export const openingSpecs = [
       attackingPlan: "Aggressive: open everything, sack if f7 cracks. Steady: a4-Ba3 bind. Creative: Nxb6 and the a-file.",
     },
     plans: {
-      steady: "a4, Ba3, keep the bishop pair. Recoup b6 slowly.",
+      steady: "Keep the bishop pair. Recoup slowly.",
       creative: "If they castle long, lift a rook and throw the a-pawn.",
-      aggressive: "e5-d5. Open f7. Don't count the pawn.",
+      aggressive: "Open the king. Don't count the pawn.",
     },
     depthNote: "21 moves. Normal Position Evans (…d6, cxd4 Bb6) is the spine. Compromised Defense and Qb3 shots are the trap pack. Sidelines after 7…Nge7 are Phase-2 trees.",
   },

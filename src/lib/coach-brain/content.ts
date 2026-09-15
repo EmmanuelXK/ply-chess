@@ -1,12 +1,13 @@
 import { SHORT_HOOKS, spokenHook } from "@/lib/dialogue/hooks";
 import { quizForPly } from "@/lib/openings/professor";
 import { housePicture } from "@/lib/openings/memory";
-import { chunkAt } from "@/lib/openings/helpers";
+import { chunkAt, looksLikeMoveList } from "@/lib/openings/helpers";
 import { professorAt } from "@/lib/openings/professor";
 import type { Opening } from "@/lib/openings/types";
 import type { DialogueAsk, LessonFacts } from "@/lib/dialogue/types";
 import { COACH_SPEAKER } from "@/lib/tts/types";
-import { limitWords } from "@/lib/dialogue/short";
+import { leadsWithSan, limitWords } from "@/lib/dialogue/short";
+import { planStripText } from "@/lib/openings/coach";
 import type {
   CandidateMove,
   CompressDecision,
@@ -50,7 +51,11 @@ function authoredLine(
 
   if (soloText?.trim()) {
     const hook = nearestHook(opening, afterPly);
-    return { text: soloText, source: hook ? "hook" : "story" };
+    const usable =
+      !leadsWithSan(soloText) && !looksLikeMoveList(soloText);
+    if (usable) {
+      return { text: soloText, source: hook ? "hook" : "story" };
+    }
   }
 
   const hook = nearestHook(opening, afterPly);
@@ -146,6 +151,7 @@ export function selectContent(input: {
       intent,
       text: limitWords(quiz?.prompt ?? ask.prompt),
       ask,
+      nextAsk: candidateAsk(compress.compressed, compress.human, facts),
       source: facts.quizPrompt ? "quiz" : "hook",
       method,
     };
@@ -176,10 +182,14 @@ export function selectContent(input: {
     const authored = authoredLine(opening, afterPly, facts, soloText);
     if (method === "question") {
       const ask = problemAsk(compress.human, facts);
+      const line = authored.text;
       return {
         intent,
-        text: limitWords(soloText || ask.prompt),
+        text: limitWords(
+          line && !leadsWithSan(line) ? line : ask.prompt,
+        ),
         ask,
+        nextAsk: candidateAsk(compress.compressed, compress.human, facts),
         source: "quiz",
         method,
       };
@@ -198,6 +208,14 @@ export function selectContent(input: {
       source: authored.source,
       method,
     };
+  }
+
+  if (facts.kind === "plan") {
+    const line =
+      soloText && !leadsWithSan(soloText) && !looksLikeMoveList(soloText)
+        ? soloText
+        : planStripText(opening, "aggressive");
+    return { intent, text: limitWords(line), source: "hook", method };
   }
 
   const authored = authoredLine(opening, afterPly, facts, soloText);

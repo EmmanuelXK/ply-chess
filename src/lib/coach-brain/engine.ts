@@ -1,5 +1,7 @@
 import { Chess } from "chess.js";
 import { maiaScore, planScore } from "@/lib/engines/heuristic";
+import type { EngineMove } from "@/lib/engines/types";
+import { stockfishEval, stockfishSupported, uciToSan } from "@/lib/engines/stockfish";
 import type {
   AnalyzeRequest,
   CandidateMove,
@@ -102,6 +104,88 @@ export function engineConsensus(analyses: EngineAnalysis[]): EngineConsensus {
 
 export function teachingPv(sans: string[], depth: number): string[] {
   return sans.slice(0, Math.min(Math.max(depth, 0), TEACHING_PV_CAP));
+}
+
+/** Map Stockfish multipv onto the compressed set. Never dump a 30-ply PV. */
+export function analysisFromStockfishMoves(
+  compressed: CandidateMove[],
+  fish: EngineMove[],
+  fen: string,
+  depth: number,
+): EngineAnalysis {
+  const mapped: CandidateMove[] = [];
+  for (const move of fish) {
+    const san = (fen ? uciToSan(fen, move.uci) : null) ?? move.san;
+    if (!san || san === "(none)") continue;
+    const known = compressed.find((row) => row.san === san);
+    mapped.push({
+      san,
+      uci: move.uci,
+      classification: known?.classification ?? "Interesting",
+      reason: known?.reason ?? "Engine candidate — investigate, don't crown it.",
+      book: known?.book,
+      changesPlan: known?.changesPlan ?? true,
+    });
+  }
+  const top = fish[0];
+  const pv = (top?.pv ?? [])
+    .slice(0, Math.min(depth, TEACHING_PV_CAP))
+    .map((uci) => (fen ? uciToSan(fen, uci) : null) ?? uci);
+  const book = compressed.find((row) => row.book)?.san;
+  const split = Boolean(book && mapped[0]?.san && mapped[0].san !== book);
+  return {
+    engineId: "stockfish",
+    ready: mapped.length > 0,
+    candidates: mapped.slice(0, 5),
+    evalCp: top?.scoreCp,
+    mate: top?.mate,
+    pv,
+    note: split
+      ? "Stockfish disagrees with the teaching candidate. Investigate — do not crown max eval."
+      : "Stockfish verifying compressed candidates.",
+  };
+}
+
+export async function stockfishAnalyze(request: AnalyzeRequest): Promise<EngineAnalysis> {
+  if (!request.fen || typeof window === "undefined" || !stockfishSupported()) {
+    return {
+      engineId: "stockfish",
+      ready: false,
+      candidates: request.candidates,
+      note: "Stockfish WASM is browser-only. Teaching still uses understanding.",
+    };
+  }
+  try {
+    const coarse =
+      typeof navigator !== "undefined" &&
+      /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    const { moves } = await stockfishEval(request.fen, {
+      depth: Math.min(request.depth, coarse ? 8 : 12),
+      movetime: coarse ? 160 : 260,
+      multipv: 3,
+    });
+    return analysisFromStockfishMoves(
+      request.candidates,
+      moves,
+      request.fen,
+      request.depth,
+    );
+  } catch {
+    return {
+      engineId: "stockfish",
+      ready: false,
+      candidates: request.candidates,
+      note: "Stockfish failed. Teaching still uses understanding.",
+    };
+  }
+}
+
+/** Understanding + heuristic + Stockfish. Disagreement → investigate. */
+export async function verifyWithEngines(request: AnalyzeRequest): Promise<EngineConsensus> {
+  const stub = stubAnalyzer.analyze(request);
+  const heuristic = singlePathAnalyzer.analyze(request);
+  const fish = await stockfishAnalyze(request);
+  return engineConsensus([stub, heuristic, fish]);
 }
 
 export type { CandidateMove };
