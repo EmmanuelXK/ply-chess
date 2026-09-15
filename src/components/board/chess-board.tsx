@@ -7,6 +7,10 @@ import type { Api } from "@lichess-org/chessground/api";
 import type { Key } from "@lichess-org/chessground/types";
 import type { DrawBrushes, DrawShape } from "@lichess-org/chessground/draw";
 import type { ArrowBrush, MoveGlyph } from "@/lib/openings/types";
+import {
+  clearChessgroundTransients,
+  dropStuckFadingPieces,
+} from "@/lib/chess/clear-transients";
 
 export interface BoardArrow {
   orig: Key;
@@ -87,6 +91,7 @@ export function ChessBoard({
   const [side, setSide] = useState(0);
   const [ready, setReady] = useState(false);
   const sideRef = useRef(0);
+  const resyncSeenRef = useRef(resyncKey);
 
   useEffect(() => {
     onMoveRef.current = onMove;
@@ -149,12 +154,13 @@ export function ChessBoard({
     host.replaceChildren(el);
 
     const latest = latestRef.current;
+    const scrub = () => clearChessgroundTransients(el);
     const api = Chessground(el, {
       fen: latest.fen,
       orientation: latest.orientation,
       turnColor: latest.turnColor,
       check: latest.check,
-      lastMove: latest.lastMove ?? undefined,
+      lastMove: latest.lastMove ?? [],
       coordinates: latest.coordinates,
       disableContextMenu: true,
       blockTouchScroll: true,
@@ -165,7 +171,7 @@ export function ChessBoard({
       animation: { enabled: true, duration: latest.animationMs },
       draggable: {
         enabled: true,
-        showGhost: true,
+        showGhost: false,
         autoDistance: true,
         distance: 0,
       },
@@ -178,8 +184,15 @@ export function ChessBoard({
         showDests: true,
         rookCastle: true,
         events: {
-          after: (orig, dest) => onMoveRef.current(orig, dest),
+          after: (orig, dest) => {
+            scrub();
+            onMoveRef.current(orig, dest);
+          },
         },
+      },
+      events: {
+        move: scrub,
+        change: scrub,
       },
       premovable: { enabled: false },
       predroppable: { enabled: false },
@@ -191,6 +204,7 @@ export function ChessBoard({
       },
     });
     apiRef.current = api;
+    scrub();
 
     return () => {
       api.destroy();
@@ -206,17 +220,30 @@ export function ChessBoard({
     wrap.style.width = `${side}px`;
     wrap.style.height = `${side}px`;
     apiRef.current.redrawAll();
+    clearChessgroundTransients(wrap);
   }, [side]);
 
-  useEffect(() => {
-    apiRef.current?.set({
+  useLayoutEffect(() => {
+    const api = apiRef.current;
+    const host = hostRef.current;
+    if (!api || !host) return;
+
+    const snap = resyncKey !== resyncSeenRef.current;
+    resyncSeenRef.current = resyncKey;
+    if (snap && api.state.animation.current) {
+      api.state.animation.current = undefined;
+    }
+    if (snap) api.cancelMove();
+
+    api.set({
       fen,
       orientation,
       turnColor,
       check,
-      lastMove: lastMove ?? undefined,
-      viewOnly,
-      animation: { enabled: true, duration: animationMs },
+      lastMove: lastMove ?? [],
+      animation: snap
+        ? { enabled: false, duration: 0 }
+        : { enabled: true, duration: animationMs },
       movable: {
         color: viewOnly ? undefined : movableColor,
         dests,
@@ -225,6 +252,19 @@ export function ChessBoard({
         autoShapes: toShapes(arrows, circles),
       },
     });
+    if (snap) {
+      api.set({
+        animation: { enabled: animationMs >= 70, duration: animationMs },
+      });
+    }
+    clearChessgroundTransients(host);
+
+    const wait = snap ? 0 : animationMs + 32;
+    const timer = window.setTimeout(() => {
+      if (!api.state.animation.current) dropStuckFadingPieces(host);
+      clearChessgroundTransients(host);
+    }, wait);
+    return () => window.clearTimeout(timer);
   }, [
     fen,
     orientation,
@@ -279,6 +319,22 @@ export function ChessBoard({
       host.removeEventListener("pointerleave", clear);
     };
   }, [onLongPress]);
+
+  useEffect(() => {
+    const host = hostRef.current;
+    if (!host) return;
+    const scrub = () => {
+      requestAnimationFrame(() => clearChessgroundTransients(host));
+    };
+    host.addEventListener("pointerup", scrub);
+    host.addEventListener("pointercancel", scrub);
+    host.addEventListener("lostpointercapture", scrub);
+    return () => {
+      host.removeEventListener("pointerup", scrub);
+      host.removeEventListener("pointercancel", scrub);
+      host.removeEventListener("lostpointercapture", scrub);
+    };
+  }, [ready]);
 
   return (
     <div
