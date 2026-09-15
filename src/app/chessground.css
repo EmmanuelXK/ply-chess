@@ -9,6 +9,7 @@
   height: 100%;
   display: block;
   position: relative;
+  overflow: hidden;
 }
 
 .cg-wrap cg-container,
@@ -30,10 +31,54 @@
   z-index: 2;
 }
 
+/*
+ * Chessground hides its dedicated drag-ghost with inline display:none.
+ * `piece { display: block !important }` above wins that fight and left a
+ * faint piece on the from-square after every drag. Force the ghost node
+ * (and any leftover fade clone) off the board.
+ */
+.cg-wrap piece.ghost,
+.cg-wrap cg-container > piece.ghost {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  background-image: none !important;
+}
+
+.cg-wrap piece:not(.ghost):not(.fading) {
+  opacity: 1;
+}
+
+.cg-wrap cg-auto-pieces:empty {
+  display: none !important;
+}
+
+.cg-wrap cg-auto-pieces piece {
+  display: none !important;
+}
+
 .board-cg cg-board square.last-move {
   background-color: rgb(245 158 11 / 46%);
+  will-change: auto;
 }
 
 .board-cg cg-board square.selected {
   background-color: rgb(245 158 11 / 28%);
+}
+
+/* Keep file/rank labels on the board; the vendor sheet offsets them off-canvas. */
+.board-cg coords.ranks {
+  top: 0;
+  left: auto;
+  right: 2px;
+}
+
+.board-cg coords.files {
+  bottom: 1px;
+  left: 0;
+}
+
+.board-cg coords.ranks coord {
+  transform: none;
 }
