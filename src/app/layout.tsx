@@ -3,21 +3,25 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Source_Serif_4 } from "next/font/google";
 import { AuthProvider } from "@/components/auth/auth-provider";
 import "./globals.css";
-import "./chessground.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  display: "swap",
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  display: "swap",
+  preload: false,
 });
 
 const prestigeSerif = Source_Serif_4({
   variable: "--font-prestige",
   subsets: ["latin"],
+  display: "swap",
+  preload: false,
 });
 
 export const metadata: Metadata = {
@@ -61,6 +65,13 @@ export default function RootLayout({
       lang="en"
       className={`dark ${geistSans.variable} ${geistMono.variable} ${prestigeSerif.variable} h-full antialiased`}
     >
+      <head>
+        <style
+          dangerouslySetInnerHTML={{
+            __html: "html,body{background:#070708;color:#f3ebe0}",
+          }}
+        />
+      </head>
       <body className="app-body bg-[#070708] text-[#f3ebe0]">
         <AuthProvider>{children}</AuthProvider>
       </body>

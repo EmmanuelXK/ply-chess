@@ -14,6 +14,7 @@ export async function GET() {
     const res = await fetch(authorize, {
       method: "GET",
       redirect: "manual",
+      signal: AbortSignal.timeout(1500),
       headers: {
         Accept: "application/json",
         apikey: key,

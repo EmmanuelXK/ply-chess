@@ -5,11 +5,10 @@ import Link from "next/link";
 import { Chess } from "chess.js";
 import type { Key } from "@lichess-org/chessground/types";
 import {
-  BookOpen,
   ChevronLeft,
   FlipVertical2,
-  HelpCircle,
   Lightbulb,
+  Menu,
   RotateCcw,
   ScanSearch,
   Volume2,
@@ -19,8 +18,8 @@ import {
 import { ChessBoard, type BoardArrow } from "@/components/board/chess-board";
 import { Button } from "@/components/ui/button";
 import { AnalyzeSplash } from "@/components/drill/analyze-splash";
-import { MemoryRail } from "@/components/drill/memory-rail";
 import { HistoryMark } from "@/components/drill/history-mark";
+import { LineTreeMenu } from "@/components/drill/line-tree-menu";
 import { HistorySplash } from "@/components/drill/history-splash";
 import { InlineAsk } from "@/components/drill/inline-ask";
 import { PlyNav } from "@/components/drill/ply-nav";
@@ -28,11 +27,12 @@ import { PracticePanel } from "@/components/drill/practice-panel";
 import { QuizSheet } from "@/components/drill/quiz-sheet";
 import { StudySheet } from "@/components/drill/study-sheet";
 import { WhySplash } from "@/components/drill/why-splash";
-import { needsPromotion, toDests } from "@/lib/chess/dests";
+import { lastMoveFrom, needsPromotion, toDests } from "@/lib/chess/dests";
 import { playLine } from "@/lib/chess/line";
 import {
   prefetchDialogue,
   silence,
+  speak,
   speakDialogue,
   unlockSpeech,
   type SpeakHandle,
@@ -46,26 +46,28 @@ import {
   type LessonStyle,
   type MissMemory,
 } from "@/lib/dialogue";
-import { readVoiceOnDefault } from "@/lib/tts/prefs";
+import { readVoiceOnDefault, writeVoiceOnDefault } from "@/lib/tts/prefs";
+import { shouldAutoSpeakOnScene } from "@/lib/tts/ask-coach";
 import {
-  dueChunks,
+  drillStudyMode,
   markProgress,
   markReviewed,
   reviewStartPly,
   type StudyMode,
 } from "@/lib/reps/schedule";
+import { shouldAutoOpenAnalyze } from "@/lib/coach-brain/handoff";
 import {
   coachAfterPly,
   coachAtStart,
   coachOnFail,
   coachOnHint,
   coachOnPlan,
+  textForCoachTap,
   type CoachKind,
   type CoachState,
 } from "@/lib/openings/coach";
 import {
   isUserPly,
-  openingDossier,
   openingFromTrap,
   quizForPly,
   STUDY_MODES,
@@ -80,6 +82,7 @@ import type { Square } from "chess.js";
 const MOVE_MS = 90;
 const OPPONENT_MS = 140;
 const AUTO_WAIT_MS = 720;
+const PLAN_VOICES = ["steady", "creative", "aggressive"] as const;
 
 export function DrillScreen({
   opening: root,
@@ -122,13 +125,16 @@ export function DrillScreen({
   const [busy, setBusy] = useState(false);
   const [check, setCheck] = useState(false);
   const [bookOpen, setBookOpen] = useState(false);
+  const [lineMenuOpen, setLineMenuOpen] = useState(false);
   const [whyOpen, setWhyOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [analyzeOpen, setAnalyzeOpen] = useState(false);
   const [quizOpen, setQuizOpen] = useState(initialReps === "drill");
   const [thinkOpen, setThinkOpen] = useState(initialReps === "practice");
-  const [reps, setReps] = useState<StudyMode>(initialReps);
+  const [reps, setReps] = useState(() => drillStudyMode(initialReps));
+  const [boardEpoch, setBoardEpoch] = useState(0);
   const [trialLeft, setTrialLeft] = useState(8);
+  const [coachSpeaking, setCoachSpeaking] = useState(false);
   const [scene, setScene] = useState<DialogueScene>(() =>
     dialogueForStart(opening, { duo: ACTIVE_COACH, mode: "solo" }),
   );
@@ -139,6 +145,9 @@ export function DrillScreen({
   const missesRef = useRef<MissMemory[]>([]);
   const askWaitRef = useRef<((id: string | null) => void) | null>(null);
   const speechRef = useRef<SpeakHandle | null>(null);
+  const lastSpokenRef = useRef("");
+  const resumePlyRef = useRef<number | null>(null);
+  const autoAnalyzeRef = useRef(false);
 
   useEffect(() => {
     lessonRef.current = lessonStyle;
@@ -154,7 +163,13 @@ export function DrillScreen({
     setPlayed(g.history());
     setCheck(g.inCheck());
     setMode(modeRef.current);
+    setLastMove(lastMoveFrom(g));
   }, []);
+
+  const snapBoard = useCallback(() => {
+    setBoardEpoch((n) => n + 1);
+    sync();
+  }, [sync]);
 
   const pushScene = useCallback(
     (next: CoachState, afterPly: number, kind?: CoachKind) => {
@@ -184,33 +199,47 @@ export function DrillScreen({
     [opening],
   );
 
+  const finishBook = useCallback(
+    (wasPlan: boolean) => {
+      modeRef.current = "plan";
+      pushScene(
+        {
+          text: "Book done. Pick a plan.",
+          chunkName: "Plan mode",
+          kind: "plan",
+        },
+        opening.moves.length - 1,
+        "plan",
+      );
+      if (shouldAutoOpenAnalyze(wasPlan, true, autoAnalyzeRef.current)) {
+        autoAnalyzeRef.current = true;
+        setAnalyzeOpen(true);
+      }
+    },
+    [opening.moves.length, pushScene],
+  );
+
   const applyPly = useCallback(
     (nextPly: number) => {
       const capped = Math.max(0, Math.min(nextPly, opening.moves.length));
       const pos = playLine(opening.moves, capped);
+      const wasPlan = modeRef.current === "plan";
       gameRef.current = pos.chess;
-      plyRef.current = capped;
-      modeRef.current = capped >= opening.moves.length ? "plan" : "drill";
+      plyRef.current = pos.appliedPly;
+      modeRef.current =
+        pos.appliedPly >= opening.moves.length ? "plan" : "drill";
       setLastMove(pos.lastMove);
       setHintKeys(null);
       setHintUsed(false);
-      if (capped === 0) pushScene(coachAtStart(opening), -1, "start");
-      else if (capped >= opening.moves.length) {
-        pushScene(
-          {
-            text: "Book done. Pick a plan.",
-            chunkName: "Plan mode",
-            kind: "plan",
-          },
-          opening.moves.length - 1,
-          "plan",
-        );
+      if (pos.appliedPly === 0) pushScene(coachAtStart(opening), -1, "start");
+      else if (pos.appliedPly >= opening.moves.length) {
+        finishBook(wasPlan);
       } else {
-        pushScene(coachAfterPly(opening, capped - 1), capped - 1);
+        pushScene(coachAfterPly(opening, pos.appliedPly - 1), pos.appliedPly - 1);
       }
       sync();
     },
-    [opening, pushScene, sync],
+    [opening, pushScene, sync, finishBook],
   );
 
   const playSan = useCallback(
@@ -229,25 +258,43 @@ export function DrillScreen({
   );
 
   useEffect(() => {
-    gameRef.current = new Chess();
-    plyRef.current = 0;
-    modeRef.current = "drill";
+    const startPly =
+      resumePlyRef.current ??
+      (drillStudyMode(initialReps) === "reps" ? reviewStartPly(opening) : 0);
+    resumePlyRef.current = null;
+    const pos = playLine(opening.moves, startPly);
+    gameRef.current = pos.chess;
+    plyRef.current = pos.appliedPly;
+    const wasPlan = false;
+    modeRef.current =
+      pos.appliedPly >= opening.moves.length ? "plan" : "drill";
     lockRef.current = false;
-    setFen(gameRef.current.fen());
-    setPly(0);
-    setPlayed([]);
-    setLastMove(null);
+    autoAnalyzeRef.current = false;
+    setAnalyzeOpen(false);
+    setFen(pos.fen);
+    setPly(pos.appliedPly);
+    setPlayed(pos.chess.history());
+    setLastMove(pos.lastMove);
     setOrientation(opening.side);
-    setMode("drill");
-    pushScene(coachAtStart(opening), -1, "start");
+    setMode(modeRef.current);
+    if (pos.appliedPly === 0) pushScene(coachAtStart(opening), -1, "start");
+    else if (pos.appliedPly >= opening.moves.length) {
+      finishBook(wasPlan);
+    } else {
+      pushScene(
+        coachAfterPly(opening, pos.appliedPly - 1),
+        pos.appliedPly - 1,
+      );
+    }
     setHintKeys(null);
     setHintUsed(false);
     setVoice("aggressive");
     setBusy(false);
-    setCheck(false);
+    setCheck(pos.check);
     setMisses([]);
     missesRef.current = [];
     setBookOpen(initialReps === "drill");
+    setLineMenuOpen(false);
     setQuizOpen(false);
     setThinkOpen(initialReps === "practice");
     if (lessonRef.current === "podcast" || initialReps === "trial") {
@@ -269,7 +316,8 @@ export function DrillScreen({
         await sleep(plyRef.current === 0 ? 160 : OPPONENT_MS);
         if (cancelled) return;
         const move = playSan(opening.moves[plyRef.current]);
-        if (move) pushScene(coachAfterPly(opening, plyRef.current - 1), plyRef.current - 1);
+        if (!move) break;
+        pushScene(coachAfterPly(opening, plyRef.current - 1), plyRef.current - 1);
       }
       lockRef.current = false;
       setBusy(false);
@@ -284,43 +332,21 @@ export function DrillScreen({
         timerRef.current = null;
       }
     };
-  }, [opening, playSan, session, initialReps, pushScene]);
+  }, [opening, playSan, session, initialReps, pushScene, finishBook]);
 
   useEffect(() => {
     askWaitRef.current?.(null);
     askWaitRef.current = null;
     speechRef.current?.stop();
     speechRef.current = null;
-    if (!tts || scene.beats.length === 0) {
-      silence();
-      return;
-    }
-    const handle = speakDialogue(scene.beats, {
-      premium: false,
-      onBeat: (index, beat) => {
-        setBeatIndex(index);
-        setAsk(beat.ask ?? null);
-        setAskPicked(null);
-      },
-      waitForAsk: () =>
-        new Promise((resolve) => {
-          askWaitRef.current = (id) => {
-            askWaitRef.current = null;
-            resolve(id);
-          };
-          window.setTimeout(() => {
-            if (askWaitRef.current) {
-              askWaitRef.current(null);
-            }
-          }, 14_000);
-        }),
-    });
-    speechRef.current = handle;
-    return () => {
-      handle.stop();
-      if (speechRef.current === handle) speechRef.current = null;
-    };
-  }, [scene, tts]);
+    setCoachSpeaking(false);
+    silence();
+    const beat = scene.beats[0];
+    setBeatIndex(0);
+    setAsk(beat?.ask ?? null);
+    setAskPicked(null);
+    void shouldAutoSpeakOnScene();
+  }, [scene]);
 
   useEffect(() => {
     if (lessonStyle !== "podcast" || !podcastPlaying) return;
@@ -330,10 +356,10 @@ export function DrillScreen({
       if (handle) {
         await Promise.race([
           handle.done,
-          new Promise((r) => window.setTimeout(r, tts ? AUTO_WAIT_MS + 2200 : AUTO_WAIT_MS)),
+          new Promise((r) => window.setTimeout(r, AUTO_WAIT_MS + 2200)),
         ]);
       } else {
-        await new Promise((r) => window.setTimeout(r, tts ? AUTO_WAIT_MS + 400 : 420));
+        await new Promise((r) => window.setTimeout(r, AUTO_WAIT_MS));
       }
       if (cancelled) return;
       if (plyRef.current < opening.moves.length) {
@@ -346,7 +372,7 @@ export function DrillScreen({
     return () => {
       cancelled = true;
     };
-  }, [scene, lessonStyle, podcastPlaying, tts, opening.moves.length, applyPly]);
+  }, [scene, lessonStyle, podcastPlaying, opening.moves.length, applyPly]);
 
   useEffect(() => {
     if (reps !== "trial" || !podcastPlaying) return;
@@ -383,7 +409,6 @@ export function DrillScreen({
   const quiz = quizForPly(opening, Math.max(0, ply - 1));
   const why = useMemo(() => explainLessonAt(opening, ply), [opening, ply]);
   const historyNow = historyAt(opening, ply);
-  const weakFrom = dueChunks(opening).find((chunk) => chunk.due)?.start ?? -1;
 
   const arrows = useMemo<BoardArrow[]>(() => {
     const next: BoardArrow[] = [];
@@ -408,25 +433,24 @@ export function DrillScreen({
   const onMove = useCallback(
     (from: Key, to: Key) => {
       if (lessonRef.current === "podcast") {
-        sync();
+        snapBoard();
         return;
       }
       if (lockRef.current && modeRef.current === "drill") {
-        sync();
+        snapBoard();
         return;
       }
       const g = gameRef.current;
-      const promotion = needsPromotion(g, from as Square, to as Square)
-        ? "q"
-        : undefined;
 
       if (modeRef.current === "plan") {
+        const promotion = needsPromotion(g, from as Square, to as Square)
+          ? "q"
+          : undefined;
         const move = g.move({ from, to, promotion });
         if (!move) {
-          sync();
+          snapBoard();
           return;
         }
-        setLastMove([move.from as Key, move.to as Key]);
         setHintKeys(null);
         sync();
         return;
@@ -435,7 +459,7 @@ export function DrillScreen({
       const plyNow = plyRef.current;
       const bookSan = opening.moves[plyNow];
       if (!bookSan || !isUserPly(opening.side, plyNow)) {
-        sync();
+        snapBoard();
         return;
       }
 
@@ -447,9 +471,12 @@ export function DrillScreen({
         expected = null;
       }
 
+      const promotion = expected?.promotion
+        ?? (needsPromotion(g, from as Square, to as Square) ? "q" : undefined);
+
       const move = g.move({ from, to, promotion });
       if (!move) {
-        sync();
+        snapBoard();
         return;
       }
 
@@ -475,26 +502,16 @@ export function DrillScreen({
         pushScene(fail, plyNow, "fail");
         markReviewed(opening.id, plyNow, false);
         setHintKeys(null);
-        sync();
+        snapBoard();
         return;
       }
 
       plyRef.current += 1;
-      setLastMove([move.from as Key, move.to as Key]);
       setHintKeys(null);
       setHintUsed(false);
 
       if (plyRef.current >= opening.moves.length) {
-        modeRef.current = "plan";
-        pushScene(
-          {
-            text: "Book done. Pick a plan.",
-            chunkName: "Plan mode",
-            kind: "plan",
-          },
-          opening.moves.length - 1,
-          "plan",
-        );
+        finishBook(false);
         sync();
         return;
       }
@@ -513,15 +530,7 @@ export function DrillScreen({
           const reply = playSan(opening.moves[plyRef.current]);
           if (reply) {
             if (modeRef.current === "plan") {
-              pushScene(
-                {
-                  text: "Book done. Pick a plan.",
-                  chunkName: "Plan mode",
-                  kind: "plan",
-                },
-                opening.moves.length - 1,
-                "plan",
-              );
+              finishBook(false);
             } else {
               pushScene(
                 coachAfterPly(opening, plyRef.current - 1),
@@ -534,7 +543,7 @@ export function DrillScreen({
         }, OPPONENT_MS);
       }
     },
-    [opening, playSan, pushScene, sync],
+    [opening, playSan, pushScene, snapBoard, sync, finishBook],
   );
 
   const hint = () => {
@@ -565,6 +574,11 @@ export function DrillScreen({
     pushScene(coachOnPlan(next, opening), opening.moves.length - 1, "plan");
   };
 
+  const cyclePlan = () => {
+    const i = PLAN_VOICES.indexOf(voice);
+    pickVoice(PLAN_VOICES[(i + 1) % PLAN_VOICES.length]);
+  };
+
   const stepBack = useCallback(() => {
     cancelTimer();
     if (lessonStyle === "podcast") setPodcastPlaying(false);
@@ -580,7 +594,13 @@ export function DrillScreen({
 
   useEffect(() => {
     const sheetOpen =
-      bookOpen || whyOpen || historyOpen || analyzeOpen || quizOpen || thinkOpen;
+      bookOpen ||
+      lineMenuOpen ||
+      whyOpen ||
+      historyOpen ||
+      analyzeOpen ||
+      quizOpen ||
+      thinkOpen;
     const onKey = (event: KeyboardEvent) => {
       if (sheetOpen) return;
       const target = event.target as HTMLElement | null;
@@ -607,6 +627,7 @@ export function DrillScreen({
     analyzeOpen,
     bookOpen,
     historyOpen,
+    lineMenuOpen,
     quizOpen,
     stepBack,
     stepForward,
@@ -614,21 +635,79 @@ export function DrillScreen({
     whyOpen,
   ]);
 
-  const switchTrap = (next: Trap | null) => {
-    setLineId(next?.id ?? null);
+  const switchTrap = (next: Trap | null, jumpPly?: number) => {
+    const same = (next?.id ?? null) === lineId;
+    setLineMenuOpen(false);
     setBookOpen(false);
+    if (same) {
+      if (jumpPly != null) {
+        cancelTimer();
+        applyPly(jumpPly);
+      }
+      return;
+    }
+    resumePlyRef.current = jumpPly ?? null;
+    setLineId(next?.id ?? null);
     setSession((n) => n + 1);
   };
+
+  const askCoach = useCallback(() => {
+    unlockSpeech();
+    const beat = scene.beats[beatIndex] ?? scene.beats[0];
+    const authored = (beat?.text ?? coach.text).trim();
+    const text = textForCoachTap(authored, lastSpokenRef.current);
+    if (!tts) {
+      setWhyOpen(true);
+      return;
+    }
+    if (!text && scene.beats.length === 0) {
+      setWhyOpen(true);
+      return;
+    }
+    speechRef.current?.stop();
+    const handle =
+      scene.beats.length > 0
+        ? speakDialogue(scene.beats, {
+            premium: false,
+            onBeat: (index, next) => {
+              setBeatIndex(index);
+              setAsk(next.ask ?? null);
+              setAskPicked(null);
+              const spoken = next.text.replace(/\s+/g, " ").trim();
+              if (spoken) lastSpokenRef.current = spoken;
+            },
+            waitForAsk: () =>
+              new Promise((resolve) => {
+                askWaitRef.current = (id) => {
+                  askWaitRef.current = null;
+                  resolve(id);
+                };
+                window.setTimeout(() => {
+                  if (askWaitRef.current) askWaitRef.current(null);
+                }, 14_000);
+              }),
+          })
+        : speak(text ?? "");
+    speechRef.current = handle;
+    setCoachSpeaking(true);
+    void handle.done.then(() => {
+      if (speechRef.current === handle) setCoachSpeaking(false);
+    });
+  }, [scene.beats, beatIndex, coach.text, tts]);
 
   const analyzeLine = useMemo(
     () => [...played, ...opening.moves.slice(ply)],
     [played, opening.moves, ply],
   );
   const coachLine = (scene.beats[beatIndex]?.text ?? coach.text).trim();
-  const lastSan = played.at(-1) ?? "";
 
   return (
-    <div className="drill-shell">
+    <div
+      className="drill-shell"
+      onPointerDown={() => {
+        unlockSpeech();
+      }}
+    >
       <header className="drill-top">
         <div className="drill-nav">
           <Button
@@ -644,7 +723,7 @@ export function DrillScreen({
           <div className="min-w-0 flex-1">
             <div className="flex items-baseline justify-between gap-2">
               <h1 className="truncate text-[15px] font-semibold tracking-tight">
-                {opening.shortName}
+                {root.shortName}
               </h1>
               <p className="shrink-0 font-mono text-[11px] tabular-nums text-zinc-500">
                 {shownMove}/{fullMoves}
@@ -654,32 +733,34 @@ export function DrillScreen({
               <p className="truncate text-[11px] text-[var(--mist)]">
                 Plan mode — free play
               </p>
-            ) : (
-              <p className="drill-dossier">{openingDossier(root)}</p>
-            )}
+            ) : trap ? (
+              <p className="drill-branch">{trap.name}</p>
+            ) : null}
           </div>
           <Button
             variant="ghost"
             size="icon-sm"
             className="text-zinc-300 hover:text-white"
-            onClick={() => setBookOpen(true)}
-            aria-label="Pillars and traps"
+            onClick={() =>
+              setOrientation((o) => (o === "white" ? "black" : "white"))
+            }
+            aria-label="Flip board"
+            title="Flip board"
           >
-            <BookOpen />
+            <FlipVertical2 />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            className="text-zinc-300 hover:text-white"
+            onClick={() => setLineMenuOpen(true)}
+            aria-label="Repertoire branches"
+            aria-expanded={lineMenuOpen}
+            aria-haspopup="dialog"
+          >
+            <Menu />
           </Button>
         </div>
-
-        {mode !== "plan" ? (
-          <MemoryRail
-            opening={opening}
-            ply={ply}
-            weakFrom={weakFrom}
-            onJump={(next) => {
-              cancelTimer();
-              applyPly(next);
-            }}
-          />
-        ) : null}
 
         <div className="reps-row" role="tablist" aria-label="Study mode">
           {STUDY_MODES.filter((m) => m.id !== "progress").map((m) => (
@@ -690,7 +771,7 @@ export function DrillScreen({
               aria-selected={reps === m.id}
               className={reps === m.id ? "reps-chip reps-chip-on" : "reps-chip"}
               onClick={() => {
-                setReps(m.id);
+                setReps(drillStudyMode(m.id));
                 const auto = m.id === "trial";
                 setLessonStyle(auto ? "podcast" : "teach");
                 setPodcastPlaying(auto);
@@ -714,48 +795,80 @@ export function DrillScreen({
         <div
           className={`coach-strip coach-${coach.kind}${
             coachLine ? "" : " coach-quiet"
+          }${ask ? " coach-strip-ask" : ""}${
+            coachSpeaking ? " coach-speaking" : ""
           }`}
-          role="status"
-          aria-live="polite"
+          data-speaking={coachSpeaking ? "on" : "off"}
         >
-          {coach.kind === "pin" ? <span className="pin-dot" aria-hidden /> : null}
-          <div className="min-w-0 flex-1">
+          <div className="coach-copy">
+            {coach.kind === "pin" ? <span className="pin-dot" aria-hidden /> : null}
             {reps === "trial" ? (
               <div className="coach-who">
                 <span className="coach-mode-tag">{trialLeft}s</span>
               </div>
             ) : null}
             <p className="coach-line">
-              {coachLine || lastSan || "Your move"}
+              {coachLine || (mode === "plan" ? "Pick a plan" : "Your move")}
             </p>
-            {ask ? (
-              <InlineAsk
-                ask={ask}
-                picked={askPicked}
-                onPick={(id) => {
-                  setAskPicked(id);
-                  askWaitRef.current?.(id);
-                }}
+            {coach.detail &&
+            (coach.kind === "fail" || coach.kind === "hint") ? (
+              <p className="coach-detail">{coach.detail}</p>
+            ) : null}
+          </div>
+          {ask ? (
+            <InlineAsk
+              ask={ask}
+              picked={askPicked}
+              onPick={(id) => {
+                setAskPicked(id);
+                askWaitRef.current?.(id);
+              }}
+            />
+          ) : null}
+          <div className="coach-ask-row">
+            <button
+              type="button"
+              className="ask-coach"
+              onClick={askCoach}
+              aria-label="Ask Coach"
+              title="Ask Aldric to explain this position"
+              data-testid="ask-coach"
+              data-speaking={coachSpeaking ? "on" : "off"}
+            >
+              <Volume2 />
+              Ask Coach
+            </button>
+            <button
+              type="button"
+              className="why-chip"
+              onClick={() => setWhyOpen(true)}
+              title="Open the Why board"
+              aria-label="Open the Why board"
+            >
+              Why
+            </button>
+            {mode === "plan" ? (
+              <button
+                type="button"
+                className="plan-cycle"
+                onClick={cyclePlan}
+                aria-label={`Plan voice ${voice}. Tap to cycle.`}
+              >
+                {voice}
+              </button>
+            ) : null}
+            {historyNow.length ? (
+              <HistoryMark
+                glyph={historyNow[0].glyph}
+                label={`${historyNow[0].title} (${historyNow[0].year})`}
+                onClick={() => setHistoryOpen(true)}
               />
             ) : null}
           </div>
-          <button
-            type="button"
-            className="why-chip"
-            onClick={() => setWhyOpen(true)}
-            title="Explain this move"
-            aria-label="Explain this move"
-          >
-            Why
-          </button>
-          {historyNow.length ? (
-            <HistoryMark
-              glyph={historyNow[0].glyph}
-              label={`${historyNow[0].title} (${historyNow[0].year})`}
-              onClick={() => setHistoryOpen(true)}
-            />
-          ) : null}
         </div>
+        <p className="sr-only" role="status" aria-live="polite">
+          {coachLine}
+        </p>
       </header>
 
       <div className="board-stage">
@@ -772,6 +885,7 @@ export function DrillScreen({
               movableColor={movableColor}
               check={check}
               animationMs={MOVE_MS}
+              resyncKey={boardEpoch}
               onMove={onMove}
               onLongPress={() => setAnalyzeOpen(true)}
             />
@@ -799,33 +913,7 @@ export function DrillScreen({
         </div>
       </div>
 
-      {mode === "plan" ? (
-        <div className="plan-bar">
-          {(["steady", "creative", "aggressive"] as const).map((v) => (
-            <button
-              key={v}
-              type="button"
-              onClick={() => pickVoice(v)}
-              className={voice === v ? "plan-chip plan-chip-on" : "plan-chip"}
-            >
-              {v}
-            </button>
-          ))}
-        </div>
-      ) : null}
-
       <footer className="drill-dock">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setWhyOpen(true)}
-          className="dock-btn"
-          title="Explain this move"
-          aria-label="Explain this move"
-        >
-          <HelpCircle />
-          Explain
-        </Button>
         <Button
           variant="ghost"
           size="sm"
@@ -857,31 +945,36 @@ export function DrillScreen({
         <Button
           variant="ghost"
           size="sm"
-          onClick={() =>
-            setOrientation((o) => (o === "white" ? "black" : "white"))
-          }
-          className="dock-btn"
-        >
-          <FlipVertical2 />
-          Flip
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
           onClick={() => {
             setTts((v) => {
               const next = !v;
+              writeVoiceOnDefault(next);
               if (next) unlockSpeech();
               return next;
             });
           }}
           className="dock-btn"
           aria-pressed={tts}
+          title={tts ? "Mute coach voice" : "Coach voice on when you Ask Coach"}
         >
           {tts ? <Volume2 /> : <VolumeX />}
           {tts ? "Voice" : "Mute"}
         </Button>
       </footer>
+
+      {lineMenuOpen ? (
+        <LineTreeMenu
+          opening={root}
+          trapId={lineId}
+          ply={ply}
+          onClose={() => setLineMenuOpen(false)}
+          onPickBranch={switchTrap}
+          onOpenBook={() => {
+            setLineMenuOpen(false);
+            setBookOpen(true);
+          }}
+        />
+      ) : null}
 
       {bookOpen ? (
         <StudySheet
@@ -919,6 +1012,7 @@ export function DrillScreen({
 
       {analyzeOpen ? (
         <AnalyzeSplash
+          opening={opening}
           line={analyzeLine}
           startPly={played.length}
           orientation={orientation}

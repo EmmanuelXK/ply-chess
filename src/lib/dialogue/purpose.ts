@@ -1,6 +1,6 @@
 import { COACH_SPEAKER, type SpeakerId } from "@/lib/tts/types";
 import { looksLikeMoveList } from "@/lib/openings/helpers";
-import { hookAt } from "./hooks";
+import { hookAt, spokenHook } from "./hooks";
 import { limitWords, nugget, wordCount } from "./short";
 import type { DialogueAsk, DialogueBeat, LessonFacts, PurposeTag } from "./types";
 
@@ -162,27 +162,27 @@ function composeBody(facts: LessonFacts, purpose: PurposeTag, seed: number): str
     return variants[seed % variants.length];
   }
   if (facts.kind === "hint") {
-    return `Play ${san ?? "the book move"}. ${tag} — ${idea || "that's the idea"}.`;
+    return `${tag}. ${idea || "That's the square."}`;
   }
   if (facts.kind === "history") {
     return `${facts.historyYear ?? "Here"}. ${nugget(facts.historyTitle, 5)}. ${tag}.`;
   }
   if (facts.kind === "start" || facts.ply < 0) {
-    const hook = authored ? limitWords(authored.hook, 9) : ideaOf(facts.concept, facts.chunkName);
+    if (authored) return spokenHook(authored);
+    const hook = ideaOf(facts.concept, facts.chunkName);
     return hook ? `${tag}. ${hook}` : tag;
   }
 
   if (authored && facts.ply === authored.ply) {
-    const line = seed % 2 === 0 ? authored.hook : authored.punch;
-    return `${tag}. ${limitWords(line, 9)}`;
+    return spokenHook(authored);
   }
 
   const variants = [
-    san ? `${san}. ${tag} — ${idea || "that's the job"}.` : `${tag}. ${idea}`,
+    `${tag}. ${idea || "that's the job"}`,
     authored
-      ? `${tag}. ${nugget(seed % 2 === 0 ? authored.hook : authored.punch, 8)}`
+      ? spokenHook(authored)
       : `${tag}. ${idea || facts.shortName}`,
-    san ? `${tag} with ${san}. ${idea || "One square, one job."}` : `${tag}. ${idea}`,
+    `${tag}. ${idea || "One square, one job."}`,
   ].filter((line) => line.trim() && !looksLikeMoveList(line));
   return variants[seed % variants.length] || `${tag}. ${idea || facts.shortName}`;
 }
@@ -205,9 +205,8 @@ export function purposeBeats(facts: LessonFacts, soloText?: string): DialogueBea
   let guard = 0;
   while (prior && limitWords(text) === prior && guard < 4) {
     seed += 17;
-    text = keyPoint
-      ? limitWords(`${keyPoint} ${phrase(purpose, seed)}`)
-      : composeBody(facts, purpose, seed);
+    if (keyPoint) break;
+    text = composeBody(facts, purpose, seed);
     guard += 1;
   }
 

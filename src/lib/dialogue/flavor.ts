@@ -22,7 +22,7 @@ function lastMiss(facts: LessonFacts) {
 function pair(facts: LessonFacts): { hook: string; punch: string } {
   const authored = hookAt(facts);
   if (authored && facts.kind !== "fail" && facts.kind !== "hint") {
-    return { hook: authored.hook, punch: authored.punch };
+    return { hook: authored.they, punch: authored.we };
   }
   const idea = nugget(facts.concept || facts.chunkName || facts.shortName, 8);
   const plan = nugget(facts.plan || facts.why, 8);

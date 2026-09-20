@@ -51,9 +51,10 @@ function autoBranch(opening: Opening, startPly: number, count = 6): WhyPly[] {
       opening.side === "white" ? ply % 2 === 0 : ply % 2 === 1;
     branch.push({
       san,
-      narrate:
-        script?.concept ??
-        `${san}. ${userMove ? "That's your move in this system." : "They play. Watch the squares it leaves."}`,
+      narrate: userMove
+        ? `${san}. ${script?.concept ?? "That's your move in this system."}`
+        : (script?.concept ??
+          `${san}. They play. Watch the squares it leaves.`),
       glyph: userMove ? "!" : undefined,
       arrows: [
         { orig: played.from, dest: played.to, brush: userMove ? "green" : "blue" },
@@ -75,12 +76,12 @@ function generateScripts(opening: Opening): ProfessorScript[] {
     const san = opening.moves[line.afterPly] ?? "";
     scripts.push({
       afterPly: line.afterPly,
-      concept: `${san} — ${line.text}`,
-      why: `${chunk?.job ?? opening.story.conflict} In this opening that square-job is the whole point.`,
+      concept: line.text,
+      why: `${san}. ${chunk?.job ?? opening.story.conflict} In this opening that square-job is the whole point.`,
       plan: opening.pillars.attackingPlan,
       whyLesson: {
         title: chunk?.name ?? san,
-        intro: `${san}. Here's why it belongs in ${opening.shortName}.`,
+        intro: `${san}. ${line.text}`,
         startPly: Math.min(line.afterPly + 1, opening.moves.length),
         branch: [],
       },
@@ -93,8 +94,8 @@ function generateScripts(opening: Opening): ProfessorScript[] {
     const san = opening.moves[ply] ?? "";
     scripts.push({
       afterPly: ply,
-      concept: `${san} — ${chunk.name}.`,
-      why: chunk.job,
+      concept: chunk.job || chunk.name,
+      why: `${san}. ${chunk.job}`,
       plan: opening.pillars.breaksAndStorms,
     });
   }

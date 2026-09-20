@@ -74,8 +74,13 @@ export function edgeVoiceFor(speaker: SpeakerId = COACH_SPEAKER): string {
   return row?.edge ?? VOICE_PRESETS[COACH_SPEAKER][0].edge;
 }
 
+/** Unset and unknown values default ON so new players hear Aldric. */
+export function voiceOnFromStored(raw: string | null): boolean {
+  return raw !== "0";
+}
+
 export function readVoiceOnDefault(): boolean {
-  return read(VOICE_ON_KEY) === "1";
+  return voiceOnFromStored(read(VOICE_ON_KEY));
 }
 
 export function writeVoiceOnDefault(on: boolean): void {

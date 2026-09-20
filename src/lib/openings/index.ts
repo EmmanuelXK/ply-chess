@@ -2,10 +2,7 @@ import { makeOpening } from "./make-opening";
 import { openingSpecs } from "./specs";
 import { validateAll } from "./validate";
 import type { Family, Opening, Side } from "./types";
-import {
-  STUDY_MODES,
-  parseStudyMode,
-} from "@/lib/reps/schedule";
+import { STUDY_MODES, parseStudyMode, drillStudyMode } from "@/lib/reps/schedule";
 
 export type {
   Opening,
@@ -40,6 +37,18 @@ export {
 } from "./helpers";
 export { openingDossier, openingHouses, studyHref } from "./dossier";
 export {
+  RACK_META,
+  RACK_ORDER,
+  RESERVED_OPENING_IDS,
+  canonicalOpeningId,
+  openingsInRack,
+  rackForOpening,
+  rackForOpeningId,
+  weaponRacks,
+  type RackId,
+  type WeaponRack,
+} from "./racks";
+export {
   housePicture,
   housePictureAt,
   pinSpeech,
@@ -50,7 +59,8 @@ export {
 export { openingFromTrap } from "./make-opening";
 export { quizForPly, whyLessonAt, explainLessonAt, professorAt } from "./professor";
 export { isKeyPly, keyPlyReasons, type KeyPlyReason } from "./key-ply";
-export { shouldSpeakCoach } from "./coach";
+export { shouldSpeakCoach, textForCoachTap, planStripText } from "./coach";
+export { repertoireLineTree, type LineBranch, type LineLeaf } from "./line-tree";
 export {
   historyAt,
   historyFen,
@@ -82,7 +92,11 @@ export const SIDE_META = {
   black: { title: "Black", blurb: "Answer 1.e4 and 1.d4." },
 } as const;
 
-export { STUDY_MODES, parseStudyMode };
+export {
+  STUDY_MODES,
+  parseStudyMode,
+  drillStudyMode,
+};
 
 export function openingsInFamily(family: Family): Opening[] {
   return openings.filter((o) => o.family === family);

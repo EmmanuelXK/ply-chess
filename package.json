@@ -8,7 +8,7 @@
     "start": "next start --port 43173 --hostname 0.0.0.0",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "test": "tsx --test src/lib/auth/*.test.ts src/lib/openings/*.test.ts src/lib/tts/speaker.test.ts",
+    "test": "tsx --test src/lib/auth/*.test.ts src/lib/openings/*.test.ts src/lib/tts/*.test.ts src/lib/chess/*.test.ts src/lib/coach-brain/*.test.ts",
     "validate": "tsx scripts/validate-openings.ts",
     "prebuild": "tsx scripts/validate-openings.ts"
   },

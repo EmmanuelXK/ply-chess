@@ -82,13 +82,14 @@ export function WhySplash({
   useEffect(() => {
     stopVoice();
     if (!voiceOn) return;
-    const scene = dialogueForWhy(opening, lesson, lesson.intro, {
+    const narrate = step?.narrate ?? lesson.intro;
+    const scene = dialogueForWhy(opening, lesson, narrate, {
       duo: ACTIVE_COACH,
       mode: "solo",
     });
     handleRef.current = speakDialogue(scene.beats);
     return () => stopVoice();
-  }, [lesson, opening, voiceOn]);
+  }, [lesson, opening, voiceOn, ply, step?.narrate]);
 
   useEffect(() => {
     if (!playing || ply >= line.length) return;
