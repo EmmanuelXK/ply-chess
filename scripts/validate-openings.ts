@@ -23,4 +23,4 @@ validateDialogue(openings);
 validateAtlas();
 console.log(`\n${openings.length} openings legal from the start position.`);
 console.log(`✓ Theory atlas: ${ATLAS.length} mainstream openings, legal routes.`);
-console.log("✓ Single male coach; key-point lines only (≤15 words) on Lion, London, Evans.");
+console.log("✓ Single male coach; concept-first key points (≤15 words) on all 26 systems.");

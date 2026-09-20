@@ -2,10 +2,15 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Chessground } from "@lichess-org/chessground";
+import "@/app/chessground.css";
 import type { Api } from "@lichess-org/chessground/api";
 import type { Key } from "@lichess-org/chessground/types";
 import type { DrawBrushes, DrawShape } from "@lichess-org/chessground/draw";
 import type { ArrowBrush, MoveGlyph } from "@/lib/openings/types";
+import {
+  clearChessgroundTransients,
+  dropStuckFadingPieces,
+} from "@/lib/chess/clear-transients";
 
 export interface BoardArrow {
   orig: Key;
@@ -32,6 +37,7 @@ interface ChessBoardProps {
   check?: boolean;
   coordinates?: boolean;
   animationMs?: number;
+  resyncKey?: number;
   onMove: (from: Key, to: Key) => void;
   onLongPress?: () => void;
 }
@@ -43,7 +49,7 @@ const brushes: DrawBrushes = {
   yellow: { key: "y", color: "#e68f00", opacity: 1, lineWidth: 10 },
   purple: { key: "p", color: "#7e22ce", opacity: 0.92, lineWidth: 9 },
   last: { key: "last", color: "#d97706", opacity: 0.92, lineWidth: 7 },
-  hint: { key: "hint", color: "#7aa2ff", opacity: 0.88, lineWidth: 9 },
+  hint: { key: "hint", color: "#d97706", opacity: 0.88, lineWidth: 9 },
 };
 
 export function ChessBoard({
@@ -60,6 +66,7 @@ export function ChessBoard({
   check = false,
   coordinates = true,
   animationMs = 90,
+  resyncKey = 0,
   onMove,
   onLongPress,
 }: ChessBoardProps) {
@@ -79,10 +86,12 @@ export function ChessBoard({
     check,
     coordinates,
     animationMs,
+    resyncKey,
   });
   const [side, setSide] = useState(0);
   const [ready, setReady] = useState(false);
   const sideRef = useRef(0);
+  const resyncSeenRef = useRef(resyncKey);
 
   useEffect(() => {
     onMoveRef.current = onMove;
@@ -99,6 +108,7 @@ export function ChessBoard({
       check,
       coordinates,
       animationMs,
+      resyncKey,
     };
   });
 
@@ -144,12 +154,13 @@ export function ChessBoard({
     host.replaceChildren(el);
 
     const latest = latestRef.current;
+    const scrub = () => clearChessgroundTransients(el);
     const api = Chessground(el, {
       fen: latest.fen,
       orientation: latest.orientation,
       turnColor: latest.turnColor,
       check: latest.check,
-      lastMove: latest.lastMove ?? undefined,
+      lastMove: latest.lastMove ?? [],
       coordinates: latest.coordinates,
       disableContextMenu: true,
       blockTouchScroll: true,
@@ -160,7 +171,7 @@ export function ChessBoard({
       animation: { enabled: true, duration: latest.animationMs },
       draggable: {
         enabled: true,
-        showGhost: true,
+        showGhost: false,
         autoDistance: true,
         distance: 0,
       },
@@ -173,8 +184,15 @@ export function ChessBoard({
         showDests: true,
         rookCastle: true,
         events: {
-          after: (orig, dest) => onMoveRef.current(orig, dest),
+          after: (orig, dest) => {
+            scrub();
+            onMoveRef.current(orig, dest);
+          },
         },
+      },
+      events: {
+        move: scrub,
+        change: scrub,
       },
       premovable: { enabled: false },
       predroppable: { enabled: false },
@@ -186,6 +204,7 @@ export function ChessBoard({
       },
     });
     apiRef.current = api;
+    scrub();
 
     return () => {
       api.destroy();
@@ -201,17 +220,30 @@ export function ChessBoard({
     wrap.style.width = `${side}px`;
     wrap.style.height = `${side}px`;
     apiRef.current.redrawAll();
+    clearChessgroundTransients(wrap);
   }, [side]);
 
-  useEffect(() => {
-    apiRef.current?.set({
+  useLayoutEffect(() => {
+    const api = apiRef.current;
+    const host = hostRef.current;
+    if (!api || !host) return;
+
+    const snap = resyncKey !== resyncSeenRef.current;
+    resyncSeenRef.current = resyncKey;
+    if (snap && api.state.animation.current) {
+      api.state.animation.current = undefined;
+    }
+    if (snap) api.cancelMove();
+
+    api.set({
       fen,
       orientation,
       turnColor,
       check,
-      lastMove: lastMove ?? undefined,
-      viewOnly,
-      animation: { enabled: true, duration: animationMs },
+      lastMove: lastMove ?? [],
+      animation: snap
+        ? { enabled: false, duration: 0 }
+        : { enabled: true, duration: animationMs },
       movable: {
         color: viewOnly ? undefined : movableColor,
         dests,
@@ -220,6 +252,19 @@ export function ChessBoard({
         autoShapes: toShapes(arrows, circles),
       },
     });
+    if (snap) {
+      api.set({
+        animation: { enabled: animationMs >= 70, duration: animationMs },
+      });
+    }
+    clearChessgroundTransients(host);
+
+    const wait = snap ? 0 : animationMs + 32;
+    const timer = window.setTimeout(() => {
+      if (!api.state.animation.current) dropStuckFadingPieces(host);
+      clearChessgroundTransients(host);
+    }, wait);
+    return () => window.clearTimeout(timer);
   }, [
     fen,
     orientation,
@@ -232,6 +277,7 @@ export function ChessBoard({
     arrows,
     circles,
     animationMs,
+    resyncKey,
   ]);
 
   useEffect(() => {
@@ -239,25 +285,56 @@ export function ChessBoard({
     const host = hostRef.current;
     if (!host) return;
     let timer: number | null = null;
-    const start = () => {
+    let startX = 0;
+    let startY = 0;
+    const start = (event: PointerEvent) => {
+      startX = event.clientX;
+      startY = event.clientY;
       timer = window.setTimeout(() => onLongPress(), 420);
+    };
+    const moved = (event: PointerEvent) => {
+      if (timer === null) return;
+      const dx = event.clientX - startX;
+      const dy = event.clientY - startY;
+      if (dx * dx + dy * dy > 64) {
+        window.clearTimeout(timer);
+        timer = null;
+      }
     };
     const clear = () => {
       if (timer !== null) window.clearTimeout(timer);
       timer = null;
     };
     host.addEventListener("pointerdown", start);
+    host.addEventListener("pointermove", moved);
     host.addEventListener("pointerup", clear);
     host.addEventListener("pointercancel", clear);
     host.addEventListener("pointerleave", clear);
     return () => {
       clear();
       host.removeEventListener("pointerdown", start);
+      host.removeEventListener("pointermove", moved);
       host.removeEventListener("pointerup", clear);
       host.removeEventListener("pointercancel", clear);
       host.removeEventListener("pointerleave", clear);
     };
   }, [onLongPress]);
+
+  useEffect(() => {
+    const host = hostRef.current;
+    if (!host) return;
+    const scrub = () => {
+      requestAnimationFrame(() => clearChessgroundTransients(host));
+    };
+    host.addEventListener("pointerup", scrub);
+    host.addEventListener("pointercancel", scrub);
+    host.addEventListener("lostpointercapture", scrub);
+    return () => {
+      host.removeEventListener("pointerup", scrub);
+      host.removeEventListener("pointercancel", scrub);
+      host.removeEventListener("lostpointercapture", scrub);
+    };
+  }, [ready]);
 
   return (
     <div

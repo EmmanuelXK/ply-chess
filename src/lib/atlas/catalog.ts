@@ -613,6 +613,7 @@ export const ATLAS: AtlasEntry[] = [
     ],
     "Play d4 and recapture with a pawn. A full classical center.",
     "If …d5 comes, develop and don't cling to the e-pawn.",
+    "alapin",
   ),
   e(
     "smith-morra",
@@ -811,6 +812,7 @@ export const ATLAS: AtlasEntry[] = [
     ],
     "Get the light-square bishop out, then chip …c5.",
     "Solid first. The Caro wins endings, not 12-move mates.",
+    "caro-kann",
   ),
   e(
     "caro-classical",
@@ -841,6 +843,7 @@ export const ATLAS: AtlasEntry[] = [
     ],
     "White wants a kingside bind. Black chips the base with …c5.",
     "Don't close the bishop in. …Bf5 before …e6 is the rule.",
+    "caro-kann",
   ),
   e(
     "caro-fantasy",
@@ -1010,6 +1013,7 @@ export const ATLAS: AtlasEntry[] = [
     ],
     "Minority attack: a- and b-pawns to wreck c6.",
     "Don't rush e4 unless the pieces are ready. The ending is your friend.",
+    "queens-gambit",
   ),
   e(
     "qga",
@@ -1040,6 +1044,7 @@ export const ATLAS: AtlasEntry[] = [
     ],
     "Get the bishop out to f5 before …e6.",
     "The Slav is a wall. Don't invent a pawn storm on move eight.",
+    "slav",
   ),
   e(
     "semi-slav",
@@ -1469,6 +1474,7 @@ export const ATLAS: AtlasEntry[] = [
     ],
     "Control d5. Then expand with b4 or break in the center.",
     "Don't rush d4 unless the pieces are ready. The c-pawn is the hero.",
+    "english",
   ),
   e(
     "english-sym",
@@ -1499,6 +1505,7 @@ export const ATLAS: AtlasEntry[] = [
     ],
     "The Botvinnik bind: pawns on c4 and e4. Sit on d5.",
     "Don't play d4 and give the hole away.",
+    "english",
   ),
   e(
     "reti",

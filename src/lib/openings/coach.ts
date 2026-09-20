@@ -1,26 +1,26 @@
-import { SHORT_HOOKS } from "@/lib/dialogue/hooks";
-import { chunkAt, firstSentence, positionalIdea } from "./helpers";
+import { SHORT_HOOKS, spokenHook } from "@/lib/dialogue/hooks";
+import {
+  leadsWithCoordinateDump,
+  leadsWithSan,
+  limitWords,
+  stripMoveDumpLead,
+  twoBeatLine,
+} from "@/lib/dialogue/short";
+import { chunkAt, looksLikeMoveList, positionalIdea } from "./helpers";
 import { historyAt } from "./history";
 import { isKeyPly } from "./key-ply";
-import { housePicture, pinSpeech } from "./memory";
+import { housePicture } from "./memory";
 import { professorAt } from "./professor";
 import type { Opening } from "./types";
 
 function shortLine(text: string | undefined, max = 15): string {
-  const compact = (text ?? "").replace(/\s+/g, " ").trim();
-  if (!compact) return "";
-  const sentence = firstSentence(compact);
-  const sentenceWords = sentence.split(" ").filter(Boolean);
-  const source = sentenceWords.length >= 6 ? sentence : compact;
-  return source.split(" ").filter(Boolean).slice(0, max).join(" ");
+  return limitWords(text ?? "", max);
 }
 
 function hookLine(opening: Opening, afterPly: number): string | undefined {
   const row = SHORT_HOOKS[opening.id]?.find((h) => h.ply === afterPly);
   if (!row) return undefined;
-  const hook = shortLine(row.hook, 14);
-  if (hook.split(" ").filter(Boolean).length >= 6) return hook;
-  return shortLine(`${row.hook} ${row.punch}`, 14);
+  return spokenHook(row);
 }
 
 export type CoachKind =
@@ -50,8 +50,10 @@ function professorLine(opening: Opening, afterPly: number): string | undefined {
 
 export function coachAtStart(opening: Opening): CoachState {
   const house = opening.chunks[0];
+  const hook = hookLine(opening, -1);
+  const cast = shortLine(opening.story.cast, 12);
   return {
-    text: shortLine(opening.story.cast, 12),
+    text: hook ?? cast,
     chunkName: house?.name,
     kind: "start",
   };
@@ -78,6 +80,20 @@ export function shouldSpeakCoach(
   return isKeyPly(opening, afterPly);
 }
 
+/**
+ * Strip tap is an explicit request to hear — ignore shouldSpeakCoach.
+ * Quiet plies replay the last spoken beat instead of "Your move".
+ */
+export function textForCoachTap(
+  currentLine: string,
+  lastSpoken: string,
+): string | null {
+  const current = currentLine.replace(/\s+/g, " ").trim();
+  if (current) return current;
+  const last = lastSpoken.replace(/\s+/g, " ").trim();
+  return last || null;
+}
+
 export function coachAfterPly(opening: Opening, afterPly: number): CoachState {
   const chunk = chunkAt(opening, afterPly);
   if (!isKeyPly(opening, afterPly)) {
@@ -98,7 +114,7 @@ export function coachAfterPly(opening: Opening, afterPly: number): CoachState {
 
   if (pin) {
     return {
-      text: shortLine(hook ?? `${pinSpeech(pin)} ${picture}`, 15),
+      text: hook ?? shortLine(`${picture} That's the landmark.`, 15),
       chunkName: chunk?.name,
       kind: "pin",
       pinLabel: pin.label,
@@ -106,7 +122,7 @@ export function coachAfterPly(opening: Opening, afterPly: number): CoachState {
   }
   if (hook) {
     return {
-      text: shortLine(hook, 14),
+      text: hook,
       chunkName: chunk?.name,
       kind: "ok",
     };
@@ -165,11 +181,37 @@ export function coachOnHint(opening: Opening, ply: number): CoachState {
   const san = opening.moves[ply] ?? "";
   const script = professorAt(opening, ply);
   return {
-    text: shortLine(`Play ${san}. ${script?.concept ?? chunk?.job ?? ""}`, 14),
-    detail: shortLine(script?.why, 12),
+    text: shortLine(script?.concept ?? chunk?.job ?? "That's the square.", 14),
+    detail: san ? `Play ${san}.` : shortLine(script?.why, 12),
     chunkName: chunk?.name,
     kind: "hint",
   };
+}
+
+function lastHook(opening: Opening) {
+  const rows = SHORT_HOOKS[opening.id];
+  if (!rows?.length) return undefined;
+  return [...rows].sort((a, b) => b.ply - a.ply)[0];
+}
+
+/**
+ * Plan chips change the idea, not a move dump.
+ * Strip = they/we pictures. Raw plan (may name moves) stays in detail/Why.
+ */
+export function planStripText(
+  opening: Opening,
+  voice: "steady" | "creative" | "aggressive",
+): string {
+  const hook = lastHook(opening);
+  const peeled = stripMoveDumpLead(opening.plans[voice]);
+  const dump =
+    !peeled ||
+    leadsWithSan(peeled) ||
+    leadsWithCoordinateDump(peeled) ||
+    looksLikeMoveList(peeled);
+  const we = dump ? (hook?.we ?? opening.story.plan) : peeled;
+  if (hook?.they) return twoBeatLine(hook.they, we);
+  return limitWords(we);
 }
 
 export function coachOnPlan(
@@ -177,8 +219,8 @@ export function coachOnPlan(
   opening: Opening,
 ): CoachState {
   return {
-    text: opening.plans[voice],
-    detail: opening.pillars.attackingPlan,
+    text: planStripText(opening, voice),
+    detail: opening.plans[voice],
     chunkName: "Plan mode",
     kind: "plan",
   };

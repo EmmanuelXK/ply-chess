@@ -10,6 +10,7 @@ import {
   type ReactNode,
 } from "react";
 import type { User } from "@supabase/supabase-js";
+import { AUTH_HYDRATE_TIMEOUT_MS, withTimeout } from "@/lib/auth/timeout";
 import { createBrowserSupabase } from "@/lib/supabase/client";
 import { supabasePublicConfig } from "@/lib/supabase/env";
 import { loadProfile, saveProfile, type ClubProfile } from "@/lib/auth/profile";
@@ -60,17 +61,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const supabase = createBrowserSupabase();
     if (!supabase) return;
     try {
-      const row = await loadProfile(supabase, next);
-      setProfile(row);
-      await pullRemoteProgress(supabase, next.id);
+      await withTimeout(
+        (async () => {
+          const row = await loadProfile(supabase, next);
+          setProfile(row);
+          await pullRemoteProgress(supabase, next.id);
+        })(),
+        AUTH_HYDRATE_TIMEOUT_MS,
+      );
     } catch {
-      /* Local profile/progress still work if tables are not applied yet. */
+      /* Local profile/progress still work if tables or network fail. */
     }
   }, []);
 
   useEffect(() => {
     if (!configured) {
       setProgressUser(null);
+      setReady(true);
       return;
     }
     const supabase = createBrowserSupabase();
@@ -79,12 +86,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
     let cancelled = false;
-    supabase.auth.getUser().then(({ data }) => {
-      if (cancelled) return;
-      void hydrate(data.user ?? null).finally(() => {
-        if (!cancelled) setReady(true);
+    let readyOnce = false;
+    const markReady = () => {
+      if (cancelled || readyOnce) return;
+      readyOnce = true;
+      setReady(true);
+    };
+    const timer = window.setTimeout(markReady, AUTH_HYDRATE_TIMEOUT_MS);
+
+    void supabase.auth
+      .getUser()
+      .then(({ data }) => {
+        if (cancelled) return;
+        markReady();
+        return hydrate(data.user ?? null);
+      })
+      .catch(() => {
+        markReady();
       });
-    });
+
     const { data } = supabase.auth.onAuthStateChange((_event, session) => {
       void hydrate(session?.user ?? null);
     });
@@ -95,6 +115,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
     return () => {
       cancelled = true;
+      window.clearTimeout(timer);
       data.subscription.unsubscribe();
       setProgressDirtyHandler(null);
     };
@@ -118,4 +139,3 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
-

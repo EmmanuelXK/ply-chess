@@ -4,6 +4,10 @@ import { useEffect, useState } from "react";
 import { TabBar } from "@/components/app/tab-bar";
 import { useAuth } from "@/components/auth/auth-provider";
 import {
+  readCoachBrainV2Stored,
+  writeCoachBrainV2Stored,
+} from "@/lib/coach-brain/flag";
+import {
   readTtsRate,
   readVoiceOnDefault,
   writeTtsRate,
@@ -11,12 +15,14 @@ import {
 } from "@/lib/tts/prefs";
 import type { TtsRatePref } from "@/lib/tts/prosody";
 import type { SidePref } from "@/lib/auth/sanitize";
+import { profileSeed } from "@/lib/auth/profile";
 import { APP_MILESTONE, APP_VERSION } from "@/lib/version";
 
 export function SettingsScreen() {
-  const { configured, user, profile, save } = useAuth();
+  const { configured, ready, user, profile, save } = useAuth();
   const [rate, setRate] = useState<TtsRatePref>(() => readTtsRate());
   const [voiceOn, setVoiceOn] = useState(() => readVoiceOnDefault());
+  const [coachBrain, setCoachBrain] = useState(() => readCoachBrainV2Stored());
   const [displayName, setDisplayName] = useState("");
   const [initials, setInitials] = useState("");
   const [sidePref, setSidePref] = useState<SidePref>("both");
@@ -24,12 +30,21 @@ export function SettingsScreen() {
   const [saved, setSaved] = useState("");
 
   useEffect(() => {
-    if (!profile) return;
-    setDisplayName(profile.displayName);
-    setInitials(profile.initials);
-    setSidePref(profile.sidePref);
-    setClubTag(profile.clubTag);
-  }, [profile]);
+    if (profile) {
+      setDisplayName(profile.displayName);
+      setInitials(profile.initials);
+      setSidePref(profile.sidePref);
+      setClubTag(profile.clubTag);
+      return;
+    }
+    if (user) {
+      const seed = profileSeed(user);
+      setDisplayName(seed.displayName);
+      setInitials(seed.initials);
+      setSidePref(seed.sidePref);
+      setClubTag(seed.clubTag);
+    }
+  }, [profile, user]);
 
   return (
     <div className="dash-shell">
@@ -99,8 +114,8 @@ export function SettingsScreen() {
           />
           <button
             type="button"
-            className="auth-phone"
-            disabled={!user}
+            className="set-save"
+            disabled={!user || !ready}
             onClick={() => {
               void save({ displayName, initials, sidePref, clubTag }).then(
                 () => setSaved("Saved."),
@@ -119,7 +134,7 @@ export function SettingsScreen() {
             </form>
           ) : (
             <p className="set-help">
-              Sign in with Google or Phone to keep this profile on your account.
+              Sign in with Google to keep this profile on your account.
             </p>
           )}
         </section>
@@ -127,8 +142,9 @@ export function SettingsScreen() {
         <section className="set-block" id="voices">
           <h2>Voice</h2>
           <p className="set-help">
-            One man. He talks on key moves and theory — pins, story, history.
-            Why / Explain is on tap for any move.
+            One man. Voice starts on for new players, but the board stays quiet
+            until you tap <strong>Ask Coach</strong>. Mute still silences him.
+            Why is the move board with SAN allowed.
           </p>
           <div className="mode-row" role="tablist" aria-label="Speech rate">
             {(["slow", "clear", "brisk"] as const).map((id) => (
@@ -156,7 +172,27 @@ export function SettingsScreen() {
                 writeVoiceOnDefault(e.target.checked);
               }}
             />
-            Start drills with Voice on
+            Start drills with Voice on (Ask Coach still required)
+          </label>
+        </section>
+
+        <section className="set-block" id="coach-brain">
+          <h2>Experimental</h2>
+          <p className="set-help">
+            Coach Brain v2 decides when to introduce, reinforce, correct, or
+            stay silent — still from authored hooks, never invented book moves.
+            Off by default. The current coach stays until you turn this on.
+          </p>
+          <label className="set-toggle">
+            <input
+              type="checkbox"
+              checked={coachBrain}
+              onChange={(e) => {
+                setCoachBrain(e.target.checked);
+                writeCoachBrainV2Stored(e.target.checked);
+              }}
+            />
+            Use Coach Brain v2
           </label>
         </section>
 

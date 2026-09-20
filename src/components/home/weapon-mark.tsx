@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import type { Opening } from "@/lib/openings/types";
+import { canonicalOpeningId } from "@/lib/openings/racks";
 import { WEAPON_MARK_IDS, type WeaponMarkId } from "@/lib/openings/mark-ids";
 
 const CREAM = "#f3ebe0";
@@ -128,6 +129,25 @@ const GLYPHS: Record<WeaponMarkId, ReactNode> = {
       <circle cx="48" cy="52" r="7" fill={AMBER} />
     </>
   ),
+  alapin: (
+    <>
+      <rect x="42" y="20" width="12" height="56" rx="3" fill={CREAM} />
+      <rect x="24" y="50" width="12" height="26" rx="3" fill={AMBER} />
+      <rect x="60" y="62" width="12" height="14" rx="3" fill={MUTED} />
+    </>
+  ),
+  english: (
+    <>
+      <rect x="20" y="28" width="24" height="24" rx="5" fill={AMBER} />
+      <rect x="48" y="44" width="28" height="28" rx="5" fill={CREAM} />
+    </>
+  ),
+  "queens-gambit": (
+    <>
+      <rect x="22" y="36" width="30" height="30" rx="5" fill={CREAM} />
+      <rect x="56" y="26" width="18" height="18" rx="4" fill={AMBER} />
+    </>
+  ),
   "black-lion": (
     <>
       <circle cx="48" cy="50" r="18" fill="none" stroke={CREAM} strokeWidth="4" />
@@ -164,6 +184,18 @@ const GLYPHS: Record<WeaponMarkId, ReactNode> = {
       <rect x="20" y="58" width="16" height="16" rx="3" fill={MUTED} />
       <rect x="40" y="40" width="16" height="16" rx="3" fill={CREAM} />
       <rect x="60" y="22" width="16" height="16" rx="3" fill={AMBER} />
+    </>
+  ),
+  "caro-kann": (
+    <>
+      <path
+        d="M48 18 L74 32 V58 L48 78 L22 58 V32 Z"
+        fill="none"
+        stroke={CREAM}
+        strokeWidth="3.4"
+        strokeLinejoin="round"
+      />
+      <rect x="40" y="40" width="16" height="22" rx="2.5" fill={AMBER} />
     </>
   ),
   "kings-indian": (
@@ -205,6 +237,12 @@ const GLYPHS: Record<WeaponMarkId, ReactNode> = {
       <circle cx="24" cy="66" r="5" fill={CREAM} />
     </>
   ),
+  slav: (
+    <>
+      <rect x="22" y="28" width="52" height="42" rx="7" fill={CREAM} />
+      <rect x="22" y="28" width="16" height="42" rx="7" fill={AMBER} />
+    </>
+  ),
 };
 
 const FALLBACK = (
@@ -217,11 +255,17 @@ const FALLBACK = (
 export { WEAPON_MARK_IDS };
 export type { WeaponMarkId };
 
+function glyphFor(id: string): ReactNode {
+  const canonical = canonicalOpeningId(id);
+  if (canonical in GLYPHS) return GLYPHS[canonical as WeaponMarkId];
+  if (id in GLYPHS) return GLYPHS[id as WeaponMarkId];
+  return FALLBACK;
+}
+
 export function WeaponMark({ opening }: { opening: Opening }) {
-  const glyph = GLYPHS[opening.id as WeaponMarkId] ?? FALLBACK;
   return (
     <Frame id={opening.id} side={opening.side}>
-      {glyph}
+      {glyphFor(opening.id)}
     </Frame>
   );
 }

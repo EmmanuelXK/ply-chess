@@ -1,3 +1,4 @@
+import { SHORT_HOOKS, spokenHook } from "./hooks";
 import type { LessonFacts } from "./types";
 
 /** Shared pedagogical facts — duo flavor is applied later. Never triple this. */
@@ -27,14 +28,14 @@ export const AUTHORED_FACTS: Record<string, Partial<LessonFacts>[]> = {
     {
       ply: 1,
       concept:
-        "…d6 is the Lion house. The pawn holds e5 and keeps the dark bishop's door closed until you're ready.",
+        "This is the Lion house. The pawn holds the break and keeps the dark bishop's door closed until you're ready.",
       why: "You want a Philidor center, not a fianchetto. …d6 lets …e5 come in one breath.",
       plan: "Next is …Nf6 and …Nbd7. Don't rush …g6.",
     },
     {
       ply: 5,
       concept:
-        "…Nbd7 is the tell. Not …Nc6, not …g6. The Lion develops behind the e-pawn.",
+        "The knight hides behind the pawn. Not the other hop, not a fianchetto. The Lion develops in the coil.",
       why: "The knight supports …e5 and keeps c6 free for the spine pawn.",
       plan: "Now …e5. That's the break.",
       quizPrompt: "Why …Nbd7 instead of …Nc6?",
@@ -47,14 +48,14 @@ export const AUTHORED_FACTS: Record<string, Partial<LessonFacts>[]> = {
     {
       ply: 7,
       concept:
-        "…e5 — the knight and pawns should own d4 and f4. Without it you're a passive Philidor.",
+        "That's the Lion waking. The knight and pawns should own the dark squares.",
       why: "With …e5 you have a stake, a later …e4 wedge, and you blunt Bc4's stare at f7.",
       plan: "Cover f7 with …Be7, then …c6, then castle.",
       romantic: true,
     },
     {
       ply: 11,
-      concept: "…c6 is the Lion's spine. It blunts d5 and gives the queen a path to c7.",
+      concept: "The spine pawn. It blunts their hops and gives the queen a path.",
       why: "It stops Nb5 and Nd5 cheap shots, and prepares the queenside yawn …b5 if they sit.",
       plan: "Castle. Then coil: …Qc7, …h6, …Re8. Queen first.",
     },
@@ -67,7 +68,7 @@ export const AUTHORED_FACTS: Record<string, Partial<LessonFacts>[]> = {
     {
       ply: 15,
       concept:
-        "…Qc7 is a coil square, not a raid. It eyes e5 and the c-file, and it unblocks the rook.",
+        "Coil the queen. Not a raid. It eyes the break and the file, and it unblocks the rook.",
       why: "If the queen stays on d8, the rook can't reach e8. c7 is the battery square for later …e4.",
       plan: "…h6 next — air, and no Bg5. Then …Re8. Then the hop …Nf8-g6.",
       quizPrompt: "What's the plan from …Qc7 — coil or raid?",
@@ -102,33 +103,33 @@ export const AUTHORED_FACTS: Record<string, Partial<LessonFacts>[]> = {
     },
     {
       ply: 0,
-      concept: "d4 — you own the dark squares. This pawn should be a rock, not a battering ram.",
+      concept: "You own the dark squares. This pawn should be a rock, not a battering ram.",
       why: "The London is a system. d4 plus Bf4 plus e3 is the triangle.",
       plan: "Bf4 next. Don't play Nc3 here.",
     },
     {
       ply: 2,
       concept:
-        "Bf4 — this bishop should breathe on the h2–b8 diagonal. It's the soul of the London.",
+        "London bishop needs room to breathe on that diagonal. It's the soul of the house.",
       why: "If you lose this bishop cheaply, you have a boring Queen's Pawn Game.",
       plan: "e3, Nf3, c3. Triangle. Meet …c5 by guarding d4.",
       romantic: true,
     },
     {
       ply: 8,
-      concept: "c3 — d4 is a rock. This pawn overprotects the center so the knights can hop.",
+      concept: "Same house every game. This pawn overprotects the rock so the knights can hop.",
       why: "c3 is how you refuse Jobava. It blunts …Nb4 and …Bb4.",
       plan: "Both knights, then Bg3 if they hit Bd6. Keep the bishop.",
     },
     {
       ply: 12,
-      concept: "Bg3 — they wanted the London bishop. You said no. It still bites.",
+      concept: "They wanted the London bishop. You said no. It still bites.",
       why: "Retreating to g3 keeps the diagonal and dares them to wreck their kingside with …Bxg3 hxg3.",
       plan: "Ne5. Sit on their throat. Then f4 clamps.",
     },
     {
       ply: 16,
-      concept: "Ne5 — the knight should sit here. Control f7, d7, c6, g6. Don't hop off.",
+      concept: "The knight sits. Control the holes. Don't hop off.",
       why: "Ne5 is the London's attacking outpost. It frees f4, eyes h7, and makes …c5 less comfortable.",
       plan: "f4 next — space. Queen lifts. Castle. Don't donate the outpost.",
       quizPrompt: "Ne5 is in. What should that knight actually do?",
@@ -146,14 +147,30 @@ export const AUTHORED_FACTS: Record<string, Partial<LessonFacts>[]> = {
   ],
 };
 
+function fromHook(
+  openingId: string,
+  ply: number,
+): Partial<LessonFacts> | undefined {
+  const row = SHORT_HOOKS[openingId]?.find((hook) => hook.ply === ply);
+  if (!row) return undefined;
+  return {
+    ply,
+    concept: spokenHook(row),
+    why: row.they,
+    plan: row.we,
+  };
+}
+
 export function authoredAt(
   openingId: string,
   ply: number,
 ): Partial<LessonFacts> | undefined {
   const rows = AUTHORED_FACTS[openingId];
-  if (!rows?.length) return undefined;
-  const exact = rows.find((r) => r.ply === ply);
+  const exact = rows?.find((r) => r.ply === ply);
   if (exact) return exact;
+  const hooked = fromHook(openingId, ply);
+  if (hooked) return hooked;
+  if (!rows?.length) return undefined;
   return [...rows]
     .filter((r) => typeof r.ply === "number" && r.ply <= ply && r.ply >= 0)
     .sort((a, b) => (b.ply ?? 0) - (a.ply ?? 0))[0];

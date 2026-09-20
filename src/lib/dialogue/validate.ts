@@ -4,8 +4,9 @@ import { COACH_SPEAKER } from "@/lib/tts/types";
 import { ACTIVE_COACH } from "./coach";
 import { dialogueForPly, dialogueForStart } from "./generate";
 import { PURPOSE_LABELS } from "./purpose";
-import { wordCount } from "./short";
+import { leadsWithSan, wordCount } from "./short";
 import { MAX_BEAT_WORDS } from "./types";
+import { looksLikeMoveList } from "@/lib/openings/helpers";
 
 const BANNED =
   /\b(dumbledore|grindelwald|albus|gellert|carlsen|magnus|harmon|beth|raquel|tokyo|nairobi|bella ciao|voldemort|harry potter|queen'?s gambit)\b/i;
@@ -107,6 +108,18 @@ export function validateDialogue(openings: Opening[]): void {
       }
       if (beat.kind !== "quiz" && !beat.purpose) {
         throw new Error(`[${opening.id}] ply 0 missing purpose`);
+      }
+    }
+
+    for (let ply = 0; ply < opening.moves.length; ply++) {
+      if (!isKeyPly(opening, ply)) continue;
+      const key = dialogueForPly(opening, ply, { duo: ACTIVE_COACH, mode: "solo" });
+      const line = key.beats[0]?.text ?? "";
+      if (!line) {
+        throw new Error(`[${opening.id}] empty concept line at ply ${ply}`);
+      }
+      if (leadsWithSan(line) || looksLikeMoveList(line)) {
+        throw new Error(`[${opening.id}] ply ${ply} is notation-first: "${line}"`);
       }
     }
   }

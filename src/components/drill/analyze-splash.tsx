@@ -5,18 +5,23 @@ import { X } from "lucide-react";
 
 import { EvalBar } from "@/components/board/eval-bar";
 import { HumanPlan } from "@/components/drill/human-plan";
+import { TeachLayer } from "@/components/drill/teach-layer";
 import { PlyNav } from "@/components/drill/ply-nav";
 import { SplashBoard } from "@/components/drill/splash-board";
 import { useEngineTick } from "@/components/drill/use-engine-tick";
 import { playLine } from "@/lib/chess/line";
+import { isCoachBrainV2Enabled } from "@/lib/coach-brain";
 import { uciToSan } from "@/lib/engines/stockfish";
+import type { Opening } from "@/lib/openings";
 
 export function AnalyzeSplash({
+  opening,
   line,
   startPly,
   orientation,
   onClose,
 }: {
+  opening?: Opening;
   line: string[];
   startPly: number;
   orientation: "white" | "black";
@@ -77,7 +82,7 @@ export function AnalyzeSplash({
       <div className="splash-card splash-in analyze-card">
         <header className="splash-head">
           <div className="min-w-0">
-            <p className="text-[11px] font-medium tracking-[0.16em] text-sky-200/80 uppercase">
+            <p className="text-[11px] font-medium tracking-[0.16em] text-[var(--ember)] uppercase">
               Analyze
             </p>
             <h2 className="truncate text-[17px] font-semibold tracking-tight">
@@ -134,6 +139,13 @@ export function AnalyzeSplash({
           <span>Engine</span> {pv}
           {tick.depth ? ` · d${tick.depth}` : ""}
         </p>
+        {opening && isCoachBrainV2Enabled() ? (
+          <TeachLayer
+            opening={opening}
+            fen={pos.fen}
+            afterPly={Math.max(-1, ply - 1)}
+          />
+        ) : null}
         <HumanPlan advice={advice} />
       </div>
     </div>

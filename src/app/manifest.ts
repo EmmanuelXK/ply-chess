@@ -8,7 +8,7 @@ export default function manifest(): MetadataRoute.Manifest {
       "iPhone-first chess opening trainer. Noir repertoire, theory atlas, one coach.",
     start_url: "/",
     display: "standalone",
-    orientation: "portrait",
+    orientation: "any",
     background_color: "#070708",
     theme_color: "#070708",
     icons: [

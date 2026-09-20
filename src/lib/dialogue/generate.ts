@@ -10,6 +10,11 @@ import {
   type CoachKind,
 } from "@/lib/openings/coach";
 import { COACH_SPEAKER } from "@/lib/tts/types";
+import { sessionBudget } from "@/lib/coach-brain/budget";
+import { decideCoachBrain } from "@/lib/coach-brain/brain";
+import { isCoachBrainV2Enabled } from "@/lib/coach-brain/flag";
+import { sessionPlayer } from "@/lib/coach-brain/player";
+import type { PlayerModel, SpeechBudget } from "@/lib/coach-brain/types";
 import { authoredAt } from "./authored-facts";
 import { purposeBeats } from "./purpose";
 import { limitWords, nugget } from "./short";
@@ -140,6 +145,11 @@ export function sceneFromFacts(
   };
 }
 
+/**
+ * Insertion point for Coach Brain v2.
+ * Flag off (default): legacy shouldSpeakCoach → authored strip copy.
+ * Flag on: TeachingIntent + ContentSelector + speech budget; Aldric still only speaks.
+ */
 export function dialogueForPly(
   opening: Opening,
   afterPly: number,
@@ -150,12 +160,14 @@ export function dialogueForPly(
     fen?: string;
     soloText?: string;
     misses?: MissMemory[];
+    /** Override COACH_BRAIN_V2. Default reads the flag (off). */
+    brain?: boolean;
+    player?: PlayerModel;
+    budget?: SpeechBudget;
   },
 ): DialogueScene {
   const kind = opts.kind ?? "ok";
-  if (!shouldSpeakCoach(kind, opening, afterPly)) {
-    return silentScene(kind);
-  }
+  const brainOn = opts.brain ?? isCoachBrainV2Enabled();
   const soloText =
     opts.soloText ??
     (kind === "start"
@@ -163,6 +175,21 @@ export function dialogueForPly(
       : kind === "ok"
         ? coachAfterPly(opening, afterPly).text
         : undefined);
+
+  if (!brainOn) {
+    if (!shouldSpeakCoach(kind, opening, afterPly)) {
+      return silentScene(kind);
+    }
+    const facts = collectFacts({
+      opening,
+      ply: afterPly,
+      kind,
+      fen: opts.fen,
+      misses: opts.misses,
+    });
+    return sceneFromFacts(facts, opts.duo, opts.mode, soloText);
+  }
+
   const facts = collectFacts({
     opening,
     ply: afterPly,
@@ -170,12 +197,50 @@ export function dialogueForPly(
     fen: opts.fen,
     misses: opts.misses,
   });
-  return sceneFromFacts(facts, opts.duo, opts.mode, soloText);
+  const decision = decideCoachBrain({
+    opening,
+    afterPly,
+    kind,
+    facts,
+    fen: opts.fen,
+    soloText,
+    player: opts.player ?? sessionPlayer(),
+    budget: opts.budget ?? sessionBudget(),
+  });
+  if (!decision.speak) return silentScene(kind);
+
+  const scene = sceneFromFacts(facts, opts.duo, opts.mode, decision.content.text);
+  if (decision.content.ask) {
+    const lead = scene.beats[0];
+    if (lead) {
+      lead.ask = decision.content.ask;
+      lead.kind = "quiz";
+      if (!lead.text.trim()) lead.text = limitWords(decision.content.ask.prompt);
+    }
+    if (decision.content.nextAsk) {
+      scene.beats.push({
+        speaker: COACH_SPEAKER,
+        text: limitWords(decision.content.nextAsk.prompt),
+        kind: "quiz",
+        ask: decision.content.nextAsk,
+        purpose: scene.purpose,
+      });
+    }
+  }
+  return scene;
 }
 
 export function dialogueForStart(
   opening: Opening,
-  opts: { duo: DuoId; mode: DialogueMode; soloText?: string; misses?: MissMemory[] },
+  opts: {
+    duo: DuoId;
+    mode: DialogueMode;
+    soloText?: string;
+    misses?: MissMemory[];
+    brain?: boolean;
+    player?: PlayerModel;
+    budget?: SpeechBudget;
+  },
 ): DialogueScene {
   return dialogueForPly(opening, -1, {
     ...opts,
@@ -195,9 +260,9 @@ export function dialogueForWhy(
     kind: "why",
     whyLesson: lesson,
   });
-  facts.concept = nugget(narrate, 10) || facts.concept;
-  facts.why = nugget(lesson.intro, 8);
-  return sceneFromFacts(facts, opts.duo, opts.mode, nugget(narrate, 12));
+  facts.concept = limitWords(narrate, 15) || facts.concept;
+  facts.why = limitWords(lesson.intro, 15);
+  return sceneFromFacts(facts, opts.duo, opts.mode, limitWords(narrate, 15));
 }
 
 export function dialogueForHistory(

@@ -20,7 +20,11 @@ function labelFromUser(user: User): string {
     "";
   const fromName = sanitizeName(named);
   if (fromName) return fromName;
-  if (user.phone) return `Club ${user.phone.slice(-4)}`;
+  if (user.email) {
+    const local = user.email.split("@")[0]?.replace(/[._+-]+/g, " ") ?? "";
+    const fromEmail = sanitizeName(local);
+    if (fromEmail) return fromEmail;
+  }
   return "Club player";
 }
 
