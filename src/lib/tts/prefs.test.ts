@@ -3,16 +3,13 @@ import { describe, it } from "node:test";
 import { voiceOnFromStored } from "./prefs";
 
 describe("voiceOnFromStored", () => {
-  it("defaults ON when prefs are unset", () => {
-    assert.equal(voiceOnFromStored(null), true);
-    assert.equal(voiceOnFromStored(""), true);
+  it("defaults silent when prefs are unset", () => {
+    assert.equal(voiceOnFromStored(null), false);
+    assert.equal(voiceOnFromStored(""), false);
   });
 
-  it("honors an explicit mute", () => {
+  it("stays off unless explicitly enabled", () => {
     assert.equal(voiceOnFromStored("0"), false);
-  });
-
-  it("stays ON when stored as on", () => {
     assert.equal(voiceOnFromStored("1"), true);
   });
 });

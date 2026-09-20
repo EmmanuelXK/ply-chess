@@ -5,9 +5,6 @@ import { X } from "lucide-react";
 
 import { SplashBoard } from "@/components/drill/splash-board";
 import { playLine } from "@/lib/chess/line";
-import { speakDialogue } from "@/lib/chess/speak";
-import { SpeakerChip } from "@/components/drill/speaker-chip";
-import { ACTIVE_COACH, dialogueForHistory } from "@/lib/dialogue";
 import {
   HISTORY_OPENER,
   historyFen,
@@ -27,13 +24,11 @@ export function HistorySplash({
   opening,
   milestones,
   orientation,
-  voiceOn = true,
   onClose,
 }: {
   opening: Opening;
   milestones: HistoryMilestone[];
   orientation: "white" | "black";
-  voiceOn?: boolean;
   onClose: () => void;
 }) {
   const [idx, setIdx] = useState(0);
@@ -52,16 +47,6 @@ export function HistorySplash({
       turnColor: (fen.includes(" w ") ? "white" : "black") as "white" | "black",
     };
   }, [milestone, opening]);
-
-  useEffect(() => {
-    if (!milestone || !voiceOn) return;
-    const scene = dialogueForHistory(opening, milestone, {
-      duo: ACTIVE_COACH,
-      mode: "solo",
-    });
-    const handle = speakDialogue(scene.beats);
-    return () => handle.stop();
-  }, [milestone, opening, voiceOn]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -109,15 +94,9 @@ export function HistorySplash({
           </div>
         ) : null}
 
-        <p className="history-opener">
-          <SpeakerChip />{" "}
-          {HISTORY_OPENER}
-        </p>
+        <p className="history-opener">{HISTORY_OPENER}</p>
         <p className="splash-copy">{milestone.summary}</p>
-        <p className="history-here">
-          <SpeakerChip />{" "}
-          {milestone.whyItMattersHere}
-        </p>
+        <p className="history-here">{milestone.whyItMattersHere}</p>
 
         <div className="splash-board history-board">
           <SplashBoard

@@ -2,6 +2,7 @@ import { chunkAt, firstSentence, looksLikeMoveList, positionalIdea } from "@/lib
 import { housePicture } from "@/lib/openings/memory";
 import { historyAt } from "@/lib/openings/history";
 import { professorAt, quizForPly, speakableProfessor } from "@/lib/openings/professor";
+import { theoryAt } from "@/lib/openings/theory-reason";
 import type { HistoryMilestone, Opening, WhyLesson } from "@/lib/openings/types";
 import {
   coachAfterPly,
@@ -260,9 +261,11 @@ export function dialogueForWhy(
     kind: "why",
     whyLesson: lesson,
   });
-  facts.concept = limitWords(narrate, 15) || facts.concept;
-  facts.why = limitWords(lesson.intro, 15);
-  return sceneFromFacts(facts, opts.duo, opts.mode, limitWords(narrate, 15));
+  const theory = theoryAt(opening, Math.max(-1, lesson.startPly - 1));
+  facts.concept = theory.idea;
+  facts.why = theory.reason;
+  const solo = theory.intro || limitWords(narrate, 15) || facts.concept;
+  return sceneFromFacts(facts, opts.duo, opts.mode, solo);
 }
 
 export function dialogueForHistory(

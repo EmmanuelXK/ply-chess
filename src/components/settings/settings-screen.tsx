@@ -7,21 +7,12 @@ import {
   readCoachBrainV2Stored,
   writeCoachBrainV2Stored,
 } from "@/lib/coach-brain/flag";
-import {
-  readTtsRate,
-  readVoiceOnDefault,
-  writeTtsRate,
-  writeVoiceOnDefault,
-} from "@/lib/tts/prefs";
-import type { TtsRatePref } from "@/lib/tts/prosody";
 import type { SidePref } from "@/lib/auth/sanitize";
 import { profileSeed } from "@/lib/auth/profile";
 import { APP_MILESTONE, APP_VERSION } from "@/lib/version";
 
 export function SettingsScreen() {
   const { configured, ready, user, profile, save } = useAuth();
-  const [rate, setRate] = useState<TtsRatePref>(() => readTtsRate());
-  const [voiceOn, setVoiceOn] = useState(() => readVoiceOnDefault());
   const [coachBrain, setCoachBrain] = useState(() => readCoachBrainV2Stored());
   const [displayName, setDisplayName] = useState("");
   const [initials, setInitials] = useState("");
@@ -137,43 +128,6 @@ export function SettingsScreen() {
               Sign in with Google to keep this profile on your account.
             </p>
           )}
-        </section>
-
-        <section className="set-block" id="voices">
-          <h2>Voice</h2>
-          <p className="set-help">
-            One man. Voice starts on for new players, but the board stays quiet
-            until you tap <strong>Ask Coach</strong>. Mute still silences him.
-            Why is the move board with SAN allowed.
-          </p>
-          <div className="mode-row" role="tablist" aria-label="Speech rate">
-            {(["slow", "clear", "brisk"] as const).map((id) => (
-              <button
-                key={id}
-                type="button"
-                role="tab"
-                aria-selected={rate === id}
-                className={rate === id ? "filter-chip filter-chip-on" : "filter-chip"}
-                onClick={() => {
-                  setRate(id);
-                  writeTtsRate(id);
-                }}
-              >
-                {id}
-              </button>
-            ))}
-          </div>
-          <label className="set-toggle">
-            <input
-              type="checkbox"
-              checked={voiceOn}
-              onChange={(e) => {
-                setVoiceOn(e.target.checked);
-                writeVoiceOnDefault(e.target.checked);
-              }}
-            />
-            Start drills with Voice on (Ask Coach still required)
-          </label>
         </section>
 
         <section className="set-block" id="coach-brain">

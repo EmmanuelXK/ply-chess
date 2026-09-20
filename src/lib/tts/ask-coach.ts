@@ -1,6 +1,5 @@
 /**
- * Product lock: the Learn board is quiet until the player taps Ask Coach.
- * shouldSpeakCoach / Coach Brain still decide *what* to say when asked.
+ * Product lock: Learn is silent. Ask Coach / Why / Explain show text, never TTS.
  */
 export function shouldAutoSpeakOnScene(): boolean {
   return false;

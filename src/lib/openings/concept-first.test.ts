@@ -223,6 +223,7 @@ describe("concept-first Memory OS", () => {
     const lesson = explainLessonAt(london, 3);
     assert.match(`${lesson.intro} ${lesson.branch.map((b) => b.san).join(" ")}`, /e3|Nf6|Bf4|bishop/i);
     assert.ok(lesson.branch.length >= 1);
+    assert.equal(leadsWithSan(lesson.intro), false, lesson.intro);
   });
 
   it("keeps Plan / Aggressive as they-we pictures — SAN stays in detail", () => {

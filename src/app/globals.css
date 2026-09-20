@@ -1046,7 +1046,10 @@ body,
   font-weight: 550;
   color: var(--ember-soft);
   line-height: 1.35;
-  -webkit-line-clamp: 2;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .why-chip {
@@ -1930,9 +1933,24 @@ body,
   color: #d4d4d8;
   font-size: 14px;
   line-height: 1.4;
-  margin: 0.45rem 0 0.55rem;
+  margin: 0.2rem 0 0.45rem;
   max-height: 4.6rem;
   overflow: auto;
+}
+
+.splash-kicker {
+  margin: 0.35rem 0 0;
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ember);
+}
+
+.splash-ply-note {
+  color: var(--mist);
+  font-size: 13px;
+  max-height: 3.2rem;
 }
 
 .splash-board {

@@ -58,8 +58,9 @@ export {
 } from "./memory";
 export { openingFromTrap } from "./make-opening";
 export { quizForPly, whyLessonAt, explainLessonAt, professorAt } from "./professor";
+export { theoryAt, theoryHasReason, type TheoryPoint } from "./theory-reason";
 export { isKeyPly, keyPlyReasons, type KeyPlyReason } from "./key-ply";
-export { shouldSpeakCoach, textForCoachTap, planStripText } from "./coach";
+export { shouldSpeakCoach, textForCoachTap, planStripText, coachOnAsk } from "./coach";
 export { repertoireLineTree, type LineBranch, type LineLeaf } from "./line-tree";
 export {
   historyAt,

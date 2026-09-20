@@ -1,16 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Key } from "@lichess-org/chessground/types";
 import { X } from "lucide-react";
 
 import { ChessBoard, type BoardArrow, type BoardGlyph } from "@/components/board/chess-board";
 import { PlyNav } from "@/components/drill/ply-nav";
 import { playLine } from "@/lib/chess/line";
-import { silence, speakDialogue, type SpeakHandle } from "@/lib/chess/speak";
-import { SpeakerChip } from "@/components/drill/speaker-chip";
-import { ACTIVE_COACH, dialogueForWhy } from "@/lib/dialogue";
-import { chunkAt, housePicture } from "@/lib/openings";
+import { chunkAt, housePicture, theoryAt } from "@/lib/openings";
 import type { Opening, WhyLesson } from "@/lib/openings";
 
 const EMPTY_DESTS = new Map<Key, Key[]>();
@@ -19,13 +16,11 @@ export function WhySplash({
   opening,
   lesson,
   orientation,
-  voiceOn = true,
   onClose,
 }: {
   opening: Opening;
   lesson: WhyLesson;
   orientation: "white" | "black";
-  voiceOn?: boolean;
   onClose: () => void;
 }) {
   const prefix = useMemo(
@@ -38,13 +33,19 @@ export function WhySplash({
   );
   const [ply, setPly] = useState(lesson.startPly);
   const [playing, setPlaying] = useState(true);
-  const handleRef = useRef<SpeakHandle | null>(null);
 
   const pos = useMemo(() => playLine(line, ply), [line, ply]);
   const branchIndex = ply - lesson.startPly;
   const step = branchIndex > 0 ? lesson.branch[branchIndex - 1] : undefined;
   const house = chunkAt(opening, Math.max(0, lesson.startPly - 1));
   const picture = housePicture(house);
+  const theory = useMemo(
+    () => theoryAt(opening, Math.max(-1, lesson.startPly - 1)),
+    [opening, lesson.startPly],
+  );
+  const idea = theory.idea || lesson.intro || picture;
+  const reason = theory.reason;
+  const plyNote = step?.narrate;
 
   const arrows = useMemo<BoardArrow[]>(() => {
     const next: BoardArrow[] = [];
@@ -66,12 +67,6 @@ export function WhySplash({
     return [{ square: pos.lastMove[1], glyph: step.glyph }];
   }, [step, pos.lastMove]);
 
-  const stopVoice = () => {
-    handleRef.current?.stop();
-    handleRef.current = null;
-    silence();
-  };
-
   const go = useCallback(
     (next: number) => {
       setPly(Math.max(0, Math.min(next, line.length)));
@@ -80,30 +75,10 @@ export function WhySplash({
   );
 
   useEffect(() => {
-    stopVoice();
-    if (!voiceOn) return;
-    const narrate = step?.narrate ?? lesson.intro;
-    const scene = dialogueForWhy(opening, lesson, narrate, {
-      duo: ACTIVE_COACH,
-      mode: "solo",
-    });
-    handleRef.current = speakDialogue(scene.beats);
-    return () => stopVoice();
-  }, [lesson, opening, voiceOn, ply, step?.narrate]);
-
-  useEffect(() => {
     if (!playing || ply >= line.length) return;
     let cancelled = false;
     const run = async () => {
-      const handle = handleRef.current;
-      if (handle) {
-        await Promise.race([
-          handle.done,
-          new Promise((r) => window.setTimeout(r, 2400)),
-        ]);
-      } else {
-        await new Promise((r) => window.setTimeout(r, 420));
-      }
+      await new Promise((r) => window.setTimeout(r, 900));
       if (cancelled) return;
       setPly((p) => Math.min(p + 1, line.length));
     };
@@ -151,11 +126,13 @@ export function WhySplash({
             Close
           </button>
         </header>
-        <p className="splash-picture">{picture}</p>
-        <p className="splash-copy">
-          <SpeakerChip />{" "}
-          {step?.narrate ?? lesson.intro}
-        </p>
+        <p className="splash-kicker">Idea</p>
+        <p className="splash-picture">{idea}</p>
+        <p className="splash-kicker">Reason</p>
+        <p className="splash-copy">{reason}</p>
+        {plyNote && plyNote !== idea && plyNote !== reason ? (
+          <p className="splash-copy splash-ply-note">{plyNote}</p>
+        ) : null}
         <div className="splash-board">
           <ChessBoard
             fen={pos.fen}

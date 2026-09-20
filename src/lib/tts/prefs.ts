@@ -74,9 +74,9 @@ export function edgeVoiceFor(speaker: SpeakerId = COACH_SPEAKER): string {
   return row?.edge ?? VOICE_PRESETS[COACH_SPEAKER][0].edge;
 }
 
-/** Unset and unknown values default ON so new players hear Aldric. */
+/** Voice playback is off. Unset prefs stay silent. */
 export function voiceOnFromStored(raw: string | null): boolean {
-  return raw !== "0";
+  return raw === "1";
 }
 
 export function readVoiceOnDefault(): boolean {
