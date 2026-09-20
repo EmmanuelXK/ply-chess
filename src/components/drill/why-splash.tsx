@@ -1,0 +1,201 @@
+"use client";
+
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { Key } from "@lichess-org/chessground/types";
+import { X } from "lucide-react";
+
+import { ChessBoard, type BoardArrow, type BoardGlyph } from "@/components/board/chess-board";
+import { PlyNav } from "@/components/drill/ply-nav";
+import { playLine } from "@/lib/chess/line";
+import { silence, speakDialogue, type SpeakHandle } from "@/lib/chess/speak";
+import { SpeakerChip } from "@/components/drill/speaker-chip";
+import { ACTIVE_COACH, dialogueForWhy } from "@/lib/dialogue";
+import { chunkAt, housePicture } from "@/lib/openings";
+import type { Opening, WhyLesson } from "@/lib/openings";
+
+const EMPTY_DESTS = new Map<Key, Key[]>();
+
+export function WhySplash({
+  opening,
+  lesson,
+  orientation,
+  voiceOn = true,
+  onClose,
+}: {
+  opening: Opening;
+  lesson: WhyLesson;
+  orientation: "white" | "black";
+  voiceOn?: boolean;
+  onClose: () => void;
+}) {
+  const prefix = useMemo(
+    () => opening.moves.slice(0, lesson.startPly),
+    [opening.moves, lesson.startPly],
+  );
+  const line = useMemo(
+    () => [...prefix, ...lesson.branch.map((b) => b.san)],
+    [prefix, lesson.branch],
+  );
+  const [ply, setPly] = useState(lesson.startPly);
+  const [playing, setPlaying] = useState(true);
+  const handleRef = useRef<SpeakHandle | null>(null);
+
+  const pos = useMemo(() => playLine(line, ply), [line, ply]);
+  const branchIndex = ply - lesson.startPly;
+  const step = branchIndex > 0 ? lesson.branch[branchIndex - 1] : undefined;
+  const house = chunkAt(opening, Math.max(0, lesson.startPly - 1));
+  const picture = housePicture(house);
+
+  const arrows = useMemo<BoardArrow[]>(() => {
+    const next: BoardArrow[] = [];
+    if (pos.lastMove) {
+      next.push({ orig: pos.lastMove[0], dest: pos.lastMove[1], brush: "last" });
+    }
+    for (const a of step?.arrows ?? []) {
+      next.push({
+        orig: a.orig as Key,
+        dest: a.dest as Key,
+        brush: a.brush,
+      });
+    }
+    return next;
+  }, [pos.lastMove, step]);
+
+  const glyphs = useMemo<BoardGlyph[]>(() => {
+    if (!step?.glyph || !pos.lastMove) return [];
+    return [{ square: pos.lastMove[1], glyph: step.glyph }];
+  }, [step, pos.lastMove]);
+
+  const stopVoice = () => {
+    handleRef.current?.stop();
+    handleRef.current = null;
+    silence();
+  };
+
+  const go = useCallback(
+    (next: number) => {
+      setPly(Math.max(0, Math.min(next, line.length)));
+    },
+    [line.length],
+  );
+
+  useEffect(() => {
+    stopVoice();
+    if (!voiceOn) return;
+    const scene = dialogueForWhy(opening, lesson, lesson.intro, {
+      duo: ACTIVE_COACH,
+      mode: "solo",
+    });
+    handleRef.current = speakDialogue(scene.beats);
+    return () => stopVoice();
+  }, [lesson, opening, voiceOn]);
+
+  useEffect(() => {
+    if (!playing || ply >= line.length) return;
+    let cancelled = false;
+    const run = async () => {
+      const handle = handleRef.current;
+      if (handle) {
+        await Promise.race([
+          handle.done,
+          new Promise((r) => window.setTimeout(r, 2400)),
+        ]);
+      } else {
+        await new Promise((r) => window.setTimeout(r, 420));
+      }
+      if (cancelled) return;
+      setPly((p) => Math.min(p + 1, line.length));
+    };
+    void run();
+    return () => {
+      cancelled = true;
+    };
+  }, [ply, playing, line.length]);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+      if (e.key === "ArrowLeft") {
+        setPlaying(false);
+        go(ply - 1);
+      }
+      if (e.key === "ArrowRight") {
+        setPlaying(false);
+        go(ply + 1);
+      }
+      if (e.key === " ") {
+        e.preventDefault();
+        setPlaying((on) => !on);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [go, onClose, ply]);
+
+  return (
+    <div className="splash-root" role="dialog" aria-modal="true" aria-label="Why">
+      <button type="button" className="splash-scrim" aria-label="Close why" onClick={onClose} />
+      <div className="splash-card splash-in">
+        <header className="splash-head">
+          <div className="min-w-0">
+            <p className="text-[11px] font-medium tracking-[0.16em] text-[var(--ember)] uppercase">
+              Why{house ? ` · ${house.name}` : ""}
+            </p>
+            <h2 className="truncate text-[17px] font-semibold tracking-tight">
+              {lesson.title}
+            </h2>
+          </div>
+          <button type="button" className="study-close" onClick={onClose} aria-label="Close">
+            <X className="size-3.5" />
+            Close
+          </button>
+        </header>
+        <p className="splash-picture">{picture}</p>
+        <p className="splash-copy">
+          <SpeakerChip />{" "}
+          {step?.narrate ?? lesson.intro}
+        </p>
+        <div className="splash-board">
+          <ChessBoard
+            fen={pos.fen}
+            dests={EMPTY_DESTS}
+            lastMove={pos.lastMove}
+            arrows={arrows}
+            glyphs={glyphs}
+            circles={(step?.circles ?? []) as Key[]}
+            orientation={orientation}
+            turnColor={pos.turnColor}
+            viewOnly
+            movableColor={undefined}
+            check={pos.check}
+            coordinates={false}
+            animationMs={90}
+            onMove={() => {}}
+          />
+        </div>
+        <PlyNav
+          canBack={ply > 0}
+          canForward={ply < line.length}
+          lastSan={ply > 0 ? line[ply - 1] : "Start"}
+          playing={playing && ply < line.length}
+          onBack={() => {
+            setPlaying(false);
+            go(ply - 1);
+          }}
+          onForward={() => {
+            setPlaying(false);
+            go(ply + 1);
+          }}
+          onPlay={() => {
+            if (ply >= line.length) {
+              go(lesson.startPly);
+              setPlaying(true);
+              return;
+            }
+            setPlaying((on) => !on);
+          }}
+        />
+      </div>
+    </div>
+  );
+}

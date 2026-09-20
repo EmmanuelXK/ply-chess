@@ -1,5 +1,7 @@
+import type { ReactNode } from "react";
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Source_Serif_4 } from "next/font/google";
+import { AuthProvider } from "@/components/auth/auth-provider";
 import "./globals.css";
 import "./chessground.css";
 
@@ -13,19 +15,27 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const prestigeSerif = Source_Serif_4({
+  variable: "--font-prestige",
+  subsets: ["latin"],
+});
+
 export const metadata: Metadata = {
-  title: "Opening Trainer",
+  title: "Opening Edge",
   description:
-    "iPhone-first PWA. Drill London, Pirc, and the Black Lion to a playable middlegame.",
-  applicationName: "Opening Trainer",
+    "Dark repertoire trainer. Tablet-aware weapons grid, world openings atlas, one coach.",
+  applicationName: "Opening Edge",
   appleWebApp: {
     capable: true,
-    title: "Openings",
+    title: "Opening Edge",
     statusBarStyle: "black-translucent",
   },
   icons: {
-    icon: "/icon.svg",
-    apple: "/apple-touch-icon.png",
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
   },
   formatDetection: {
     telephone: false,
@@ -38,16 +48,22 @@ export const viewport: Viewport = {
   maximumScale: 1,
   userScalable: false,
   viewportFit: "cover",
-  themeColor: "#0c0c0e",
+  themeColor: "#070708",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({
+  children,
+}: {
+  children: ReactNode;
+}) {
   return (
     <html
       lang="en"
-      className={`dark ${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`dark ${geistSans.variable} ${geistMono.variable} ${prestigeSerif.variable} h-full antialiased`}
     >
-      <body className="min-h-full bg-[#0c0c0e] text-zinc-100">{children}</body>
+      <body className="app-body bg-[#070708] text-[#f3ebe0]">
+        <AuthProvider>{children}</AuthProvider>
+      </body>
     </html>
   );
 }

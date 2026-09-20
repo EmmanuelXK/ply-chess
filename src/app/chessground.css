@@ -29,3 +29,11 @@
   pointer-events: none;
   z-index: 2;
 }
+
+.board-cg cg-board square.last-move {
+  background-color: rgb(245 158 11 / 46%);
+}
+
+.board-cg cg-board square.selected {
+  background-color: rgb(245 158 11 / 28%);
+}

@@ -1,51 +1,142 @@
-import { chunkAt } from "./index";
+import { SHORT_HOOKS } from "@/lib/dialogue/hooks";
+import { chunkAt, firstSentence, positionalIdea } from "./helpers";
+import { historyAt } from "./history";
+import { isKeyPly } from "./key-ply";
+import { housePicture, pinSpeech } from "./memory";
+import { professorAt } from "./professor";
 import type { Opening } from "./types";
 
-export type CoachKind = "start" | "ok" | "fail" | "hint" | "pin" | "plan";
+function shortLine(text: string | undefined, max = 15): string {
+  const compact = (text ?? "").replace(/\s+/g, " ").trim();
+  if (!compact) return "";
+  const sentence = firstSentence(compact);
+  const sentenceWords = sentence.split(" ").filter(Boolean);
+  const source = sentenceWords.length >= 6 ? sentence : compact;
+  return source.split(" ").filter(Boolean).slice(0, max).join(" ");
+}
+
+function hookLine(opening: Opening, afterPly: number): string | undefined {
+  const row = SHORT_HOOKS[opening.id]?.find((h) => h.ply === afterPly);
+  if (!row) return undefined;
+  const hook = shortLine(row.hook, 14);
+  if (hook.split(" ").filter(Boolean).length >= 6) return hook;
+  return shortLine(`${row.hook} ${row.punch}`, 14);
+}
+
+export type CoachKind =
+  | "start"
+  | "ok"
+  | "fail"
+  | "hint"
+  | "pin"
+  | "plan"
+  | "why"
+  | "quiz"
+  | "history";
 
 export interface CoachState {
   text: string;
+  detail?: string;
   chunkName?: string;
   kind: CoachKind;
   pinLabel?: string;
 }
 
+function professorLine(opening: Opening, afterPly: number): string | undefined {
+  const script = professorAt(opening, afterPly);
+  if (!script) return undefined;
+  return shortLine(script.concept, 12);
+}
+
 export function coachAtStart(opening: Opening): CoachState {
-  const line = opening.coach.find((c) => c.afterPly === -1);
+  const house = opening.chunks[0];
   return {
-    text: line?.text ?? opening.story.cast,
-    chunkName: opening.chunks[0]?.name,
+    text: shortLine(opening.story.cast, 12),
+    chunkName: house?.name,
     kind: "start",
   };
 }
 
+const ALWAYS_SPEAK: ReadonlySet<CoachKind> = new Set([
+  "start",
+  "fail",
+  "hint",
+  "pin",
+  "plan",
+  "why",
+  "quiz",
+  "history",
+]);
+
+/** Auto-teach only on key / highlighted plies. Fail, hint, Why, and plan stay live. */
+export function shouldSpeakCoach(
+  kind: CoachKind,
+  opening: Opening,
+  afterPly: number,
+): boolean {
+  if (ALWAYS_SPEAK.has(kind)) return true;
+  return isKeyPly(opening, afterPly);
+}
+
 export function coachAfterPly(opening: Opening, afterPly: number): CoachState {
   const chunk = chunkAt(opening, afterPly);
+  if (!isKeyPly(opening, afterPly)) {
+    return {
+      text: "",
+      chunkName: chunk?.name,
+      kind: "ok",
+    };
+  }
+
   const pin = opening.pins.find((p) => p.afterPly === afterPly);
+  const hook = hookLine(opening, afterPly);
   const beat = opening.storyBeats.find((b) => b.afterPly === afterPly);
   const line = opening.coach.find((c) => c.afterPly === afterPly);
-  const enteredChunk =
-    chunk && (afterPly === chunk.fromPly || afterPly === chunk.fromPly + 1);
+  const mark = historyAt(opening, afterPly + 1)[0];
+  const concept = professorLine(opening, afterPly);
+  const picture = housePicture(chunk);
 
   if (pin) {
     return {
-      text: pin.label,
+      text: shortLine(hook ?? `${pinSpeech(pin)} ${picture}`, 15),
       chunkName: chunk?.name,
       kind: "pin",
       pinLabel: pin.label,
     };
   }
-  if (beat) {
-    return { text: beat.beat, chunkName: chunk?.name, kind: "ok" };
+  if (hook) {
+    return {
+      text: shortLine(hook, 14),
+      chunkName: chunk?.name,
+      kind: "ok",
+    };
   }
-  if (enteredChunk && chunk) {
-    return { text: line?.text ?? chunk.name, chunkName: chunk.name, kind: "ok" };
+  if (beat) {
+    return {
+      text: shortLine(concept ?? beat.beat ?? picture, 14),
+      chunkName: chunk?.name,
+      kind: "ok",
+    };
   }
   if (line) {
-    return { text: line.text, chunkName: chunk?.name, kind: "ok" };
+    return {
+      text: shortLine(concept ?? line.text ?? picture, 14),
+      chunkName: chunk?.name,
+      kind: "ok",
+    };
+  }
+  if (mark) {
+    return {
+      text: shortLine(
+        mark.whyItMattersHere || `${mark.year}. ${mark.title} is the landmark.`,
+        14,
+      ),
+      chunkName: chunk?.name,
+      kind: "history",
+    };
   }
   return {
-    text: chunk?.name ?? opening.story.plan,
+    text: shortLine(concept ?? picture ?? opening.story.plan, 14),
     chunkName: chunk?.name,
     kind: "ok",
   };
@@ -53,9 +144,17 @@ export function coachAfterPly(opening: Opening, afterPly: number): CoachState {
 
 export function coachOnFail(opening: Opening, ply: number): CoachState {
   const chunk = chunkAt(opening, ply);
-  const idea = chunk?.job ?? opening.moves[ply];
+  const expected = opening.moves[ply] ?? "";
+  const script = professorAt(opening, Math.max(0, ply - 1));
+  const idea = positionalIdea(
+    script?.why ?? chunk?.job ?? "",
+    chunk?.name ?? "one square, one job",
+  );
   return {
-    text: `No. ${idea}`,
+    text: shortLine(`Not that square. ${idea}`, 14),
+    detail: expected
+      ? `Play ${expected}. That's the job.`
+      : "Stay with the idea. One move.",
     chunkName: chunk?.name,
     kind: "fail",
   };
@@ -63,8 +162,11 @@ export function coachOnFail(opening: Opening, ply: number): CoachState {
 
 export function coachOnHint(opening: Opening, ply: number): CoachState {
   const chunk = chunkAt(opening, ply);
+  const san = opening.moves[ply] ?? "";
+  const script = professorAt(opening, ply);
   return {
-    text: `Play ${opening.moves[ply]}.`,
+    text: shortLine(`Play ${san}. ${script?.concept ?? chunk?.job ?? ""}`, 14),
+    detail: shortLine(script?.why, 12),
     chunkName: chunk?.name,
     kind: "hint",
   };
@@ -76,6 +178,7 @@ export function coachOnPlan(
 ): CoachState {
   return {
     text: opening.plans[voice],
+    detail: opening.pillars.attackingPlan,
     chunkName: "Plan mode",
     kind: "plan",
   };
