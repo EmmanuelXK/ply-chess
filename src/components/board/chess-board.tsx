@@ -63,6 +63,7 @@ export function ChessBoard({
     check,
   });
   const [side, setSide] = useState(0);
+  const [moveNudge, setMoveNudge] = useState(0);
 
   useEffect(() => {
     onMoveRef.current = onMove;
@@ -138,7 +139,13 @@ export function ChessBoard({
         showDests: true,
         rookCastle: true,
         events: {
-          after: (orig, dest) => onMoveRef.current(orig, dest),
+          after: (orig, dest) => {
+            onMoveRef.current(orig, dest);
+            // Parent may undo (wrong book move) without changing fen.
+            // Nudge so we re-apply the authoritative position and drop
+            // selection / drag leftover.
+            setMoveNudge((n) => n + 1);
+          },
         },
       },
       premovable: { enabled: false },
@@ -160,7 +167,10 @@ export function ChessBoard({
   }, [side]);
 
   useEffect(() => {
-    apiRef.current?.set({
+    const api = apiRef.current;
+    if (!api) return;
+    api.cancelMove();
+    api.set({
       fen,
       orientation,
       turnColor,
@@ -185,6 +195,7 @@ export function ChessBoard({
     movableColor,
     dests,
     arrows,
+    moveNudge,
   ]);
 
   return (
