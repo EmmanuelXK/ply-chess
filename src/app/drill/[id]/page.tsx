@@ -20,11 +20,23 @@ export async function generateMetadata({
 
 export default async function DrillPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ mode?: string; queue?: string }>;
 }) {
   const { id } = await params;
+  const query = await searchParams;
   const opening = getOpening(id);
   if (!opening) notFound();
-  return <DrillScreen opening={opening} />;
+  const initialMode =
+    query.mode === "learn" || query.mode === "train" ? query.mode : undefined;
+  return (
+    <DrillScreen
+      key={`${id}-${initialMode ?? "auto"}-${query.queue === "due" ? "due" : ""}`}
+      opening={opening}
+      initialMode={initialMode}
+      queueDue={query.queue === "due"}
+    />
+  );
 }
