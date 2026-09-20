@@ -20,7 +20,7 @@ Home modes: **Learn · Reps · Practice · Drill · Time Trial · Progress**. Ki
 
 ## Single coach
 
-The strip shows the key point (they/we pictures, 6–15 words, no SAN dumps) plus the **reason** (chunk job, conflict, or plan). Routine developing moves stay quiet until you tap **Ask Coach**. **Why** and dock **Explain** open the move board (SAN allowed). History opens from the strip mark when a milestone is on the ply. There is no floating or draggable head.
+The strip shows the key point (they/we pictures, 6–15 words, no SAN dumps) plus the **reason** (chunk job, conflict, or plan). Routine developing moves stay quiet until you tap **Ask Coach**. **Ask Coach**, **Why**, and dock **Explain** answer three questions: **plan**, **why they moved**, and **what the near-miss costs**. Key / highlighted plies also show a short **do / prevent / their reply** triad. History opens from the strip mark when a milestone is on the ply. There is no floating or draggable head.
 
 Spine, houses, and trap branches live in the drill **sandwich menu** (a tree), not as noisy labels above the board.
 
@@ -34,7 +34,7 @@ The app is **silent**. There is no Speak-on-ply, mute toggle, speaker chip, or S
 Focus / ambient music is not in this cut.
 
 ### Why splash
-Tap **Why** on the coach strip or **Explain** on the dock — available on every ply, including quiet developing moves. A splash opens with a mini board. **Idea** and **Reason** sit above the board in plain language (plan, conflict, chunk job). The relevant **branch** auto-plays. Colored arrows + Chess.com-style glyphs (`!!` `!` `!?` `?` `??`) land on those Why plies. **Back / Forward** and play/pause work inside the splash. The ply list may name SAN; the sentences do not dump move lists.
+Tap **Why** on the coach strip or **Explain** on the dock — available on every ply, including quiet developing moves. A splash opens with a mini board. **Idea** and **Reason** sit above the board in plain language (plan, conflict, chunk job), then the question set: **Plan**, **Their idea**, **If you miss**. On key plies a short **Do / Prevent / Their reply** triad sits under that. The relevant **branch** auto-plays. Colored arrows + Chess.com-style glyphs (`!!` `!` `!?` `?` `??`) land on those Why plies. **Back / Forward** and play/pause work inside the splash. The ply list may name SAN; the sentences do not dump move lists.
 
 Lion and London have authored Why lessons (Nd4-style “the knight should control these squares”). Other systems get generated lessons from the spine + coach. Copy is concept-first: idea, then reason.
 

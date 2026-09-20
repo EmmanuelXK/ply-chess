@@ -26,6 +26,7 @@ import { PlyNav } from "@/components/drill/ply-nav";
 import { PracticePanel } from "@/components/drill/practice-panel";
 import { QuizSheet } from "@/components/drill/quiz-sheet";
 import { StudySheet } from "@/components/drill/study-sheet";
+import { CoachQuestions } from "@/components/drill/coach-questions";
 import { WhySplash } from "@/components/drill/why-splash";
 import { lastMoveFrom, needsPromotion, toDests } from "@/lib/chess/dests";
 import { playLine } from "@/lib/chess/line";
@@ -736,12 +737,41 @@ export function DrillScreen({
                 <span className="coach-mode-tag">{trialLeft}s</span>
               </div>
             ) : null}
-            <p className="coach-line">
-              {coachLine || (mode === "plan" ? "Pick a plan" : "Your move")}
-            </p>
-            {coach.detail ? (
-              <p className="coach-detail">{coach.detail}</p>
-            ) : null}
+            <div className="coach-copy-stack">
+              <p className="coach-line">
+                {coachLine || (mode === "plan" ? "Pick a plan" : "Your move")}
+              </p>
+              {coach.detail ? (
+                <p className="coach-detail">{coach.detail}</p>
+              ) : null}
+              {coach.kind === "why" &&
+              coach.plan &&
+              coach.theyMoved &&
+              coach.secondBest ? (
+                <CoachQuestions
+                  plan={coach.plan}
+                  theyMoved={coach.theyMoved}
+                  secondBest={coach.secondBest}
+                  triad={coach.triad}
+                  compact
+                />
+              ) : coach.triad ? (
+                <ul className="coach-triad coach-triad-strip" data-testid="coach-triad">
+                  <li>
+                    <span>Do</span>
+                    {coach.triad.do}
+                  </li>
+                  <li>
+                    <span>Prevent</span>
+                    {coach.triad.prevent}
+                  </li>
+                  <li>
+                    <span>Their reply</span>
+                    {coach.triad.reply}
+                  </li>
+                </ul>
+              ) : null}
+            </div>
           </div>
           {ask ? (
             <InlineAsk
@@ -758,7 +788,7 @@ export function DrillScreen({
               className="ask-coach"
               onClick={askCoach}
               aria-label="Ask Coach"
-              title="Show the idea and the reason"
+              title="Show the plan, their idea, and the miss"
               data-testid="ask-coach"
             >
               <MessageCircle />
