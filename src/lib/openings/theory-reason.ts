@@ -218,11 +218,12 @@ function secondBestLine(
   const against = `${idea} ${reason} ${plan}`;
   const fromExtract = distinctCoach(against, extracted, 22);
   if (fromExtract && wordCount(fromExtract) >= 6) return fromExtract;
-  if (extracted && wordCount(extracted) >= 6 && keyOf(extracted) !== keyOf(idea)) {
-    return extracted;
-  }
   const conflict = cleanCoachLine(opening.story.conflict, 16);
-  if (conflict && !keyOf(against).includes(keyOf(conflict))) {
+  if (
+    conflict &&
+    !looksLikeMoveList(opening.story.conflict) &&
+    !keyOf(against).includes(keyOf(conflict))
+  ) {
     return `Miss this and they get their hunt — ${conflict.replace(/[.!?]+$/, "")}.`;
   }
   const house = chunk?.name && !looksLikeMoveList(chunk.name) ? chunk.name : "the job";

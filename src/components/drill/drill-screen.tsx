@@ -752,7 +752,6 @@ export function DrillScreen({
                   plan={coach.plan}
                   theyMoved={coach.theyMoved}
                   secondBest={coach.secondBest}
-                  triad={coach.triad}
                   compact
                 />
               ) : coach.triad ? (

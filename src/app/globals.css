@@ -1150,6 +1150,10 @@ body,
   gap: 0.22rem;
 }
 
+.coach-strip:has(.coach-q-compact) .coach-detail {
+  -webkit-line-clamp: 2;
+}
+
 .why-chip {
   flex: none;
   height: 2.15rem;
@@ -2049,6 +2053,30 @@ body,
   color: var(--mist);
   font-size: 13px;
   max-height: 3.2rem;
+}
+
+.splash-card:has(.coach-q) .splash-picture {
+  font-size: 12px;
+  margin-bottom: 0.12rem;
+}
+
+.splash-card:has(.coach-q) .splash-copy {
+  font-size: 13px;
+  max-height: 3.4rem;
+  margin-bottom: 0.2rem;
+}
+
+.splash-card:has(.coach-q) .coach-q {
+  margin: 0.12rem 0 0.15rem;
+  gap: 0.16rem;
+}
+
+.splash-card:has(.coach-q) .coach-q p {
+  font-size: 12px;
+}
+
+.splash-card:has(.coach-q) .splash-board {
+  max-height: min(46vw, 28dvh);
 }
 
 .splash-board {
