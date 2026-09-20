@@ -11,6 +11,7 @@ import {
 } from "react";
 import type { User } from "@supabase/supabase-js";
 import { AUTH_HYDRATE_TIMEOUT_MS, withTimeout } from "@/lib/auth/timeout";
+import { strayOAuthCallbackPath } from "@/lib/auth/redirect";
 import { createBrowserSupabase } from "@/lib/supabase/client";
 import { supabasePublicConfig } from "@/lib/supabase/env";
 import { loadProfile, saveProfile, type ClubProfile } from "@/lib/auth/profile";
@@ -75,6 +76,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
+    const stray = strayOAuthCallbackPath(
+      window.location.pathname,
+      new URLSearchParams(window.location.search),
+    );
+    if (stray) {
+      window.location.replace(stray);
+      return;
+    }
+
     if (!configured) {
       setProgressUser(null);
       setReady(true);

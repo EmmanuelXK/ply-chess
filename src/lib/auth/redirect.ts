@@ -1,8 +1,52 @@
+export const AUTH_CALLBACK_PATH = "/auth/callback";
+
 /** Same-origin path after login. Reject protocol-relative and off-site URLs. */
 export function safeInternalPath(value: string | null | undefined): string {
   if (!value || !value.startsWith("/") || value.startsWith("//")) return "/";
   if (value.includes("\\") || value.includes("://")) return "/";
   return value;
+}
+
+function normalizePathname(pathname: string): string {
+  if (pathname.length > 1 && pathname.endsWith("/")) {
+    return pathname.slice(0, -1);
+  }
+  return pathname || "/";
+}
+
+/**
+ * PKCE `code` that landed on Site URL `/` or `/login` (or any non-callback
+ * path) must be exchanged on `/auth/callback`. Returns a same-origin path
+ * + query, or null when this request is already the callback / has no code.
+ */
+export function strayOAuthCallbackPath(
+  pathname: string,
+  searchParams: URLSearchParams,
+): string | null {
+  const code = searchParams.get("code");
+  if (!code) return null;
+
+  const path = normalizePathname(pathname);
+  if (path === AUTH_CALLBACK_PATH || path.startsWith(`${AUTH_CALLBACK_PATH}/`)) {
+    return null;
+  }
+
+  const params = new URLSearchParams(searchParams);
+  if (!params.get("next")) {
+    params.set("next", path === "/login" ? "/" : safeInternalPath(pathname));
+  }
+  return `${AUTH_CALLBACK_PATH}?${params.toString()}`;
+}
+
+export function searchParamsFromRecord(
+  query: Record<string, string | string[] | undefined>,
+): URLSearchParams {
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries(query)) {
+    const raw = Array.isArray(value) ? value[0] : value;
+    if (raw) params.set(key, raw);
+  }
+  return params;
 }
 
 /**

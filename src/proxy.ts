@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { isPublicPath, signedInFromClaims } from "@/lib/auth/session-gate";
+import { appOrigin, strayOAuthCallbackPath } from "@/lib/auth/redirect";
 import { AUTH_PROXY_TIMEOUT_MS } from "@/lib/auth/timeout";
 import { authIsRequired, supabasePublicConfig } from "@/lib/supabase/env";
 import { copyResponseCookies } from "@/lib/supabase/server";
@@ -15,6 +16,16 @@ export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   let response = NextResponse.next({ request });
   const { url, key, configured } = supabasePublicConfig();
+
+  // Site URL `/` (and `/login`) may receive the PKCE `code` when the
+  // dashboard allow-list falls back. Exchange it on /auth/callback — do
+  // not wait on getClaims() or bounce to login and drop the code.
+  const stray = strayOAuthCallbackPath(pathname, request.nextUrl.searchParams);
+  if (stray) {
+    const dest = NextResponse.redirect(new URL(stray, appOrigin(request)));
+    dest.headers.set("Cache-Control", "private, no-store");
+    return dest;
+  }
 
   if (!configured) {
     if (authIsRequired() && !isPublicPath(pathname)) {
