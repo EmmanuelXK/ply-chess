@@ -178,7 +178,7 @@ export function DrillScreen({
             });
       setScene(nextScene);
       setBeatIndex(0);
-      setAsk(null);
+      setAsk(nextScene.beats[0]?.ask ?? null);
       setAskPicked(null);
     },
     [opening],
@@ -318,13 +318,6 @@ export function DrillScreen({
       }
     };
   }, [opening, playSan, session, initialReps, pushScene, finishBook]);
-
-  useEffect(() => {
-    const beat = scene.beats[0];
-    setBeatIndex(0);
-    setAsk(beat?.ask ?? null);
-    setAskPicked(null);
-  }, [scene]);
 
   useEffect(() => {
     if (lessonStyle !== "podcast" || !podcastPlaying) return;

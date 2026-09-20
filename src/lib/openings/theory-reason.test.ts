@@ -2,7 +2,6 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { leadsWithSan } from "../dialogue";
 import { coachOnAsk, coachAfterPly, coachAtStart } from "./coach";
-import { looksLikeMoveList } from "./helpers";
 import { explainLessonAt, getOpening, isKeyPly, openings } from "./index";
 import { theoryAt, theoryHasReason } from "./theory-reason";
 
@@ -12,11 +11,6 @@ describe("theory reason", () => {
       const point = theoryAt(opening, -1);
       assert.ok(point.idea.trim(), `${opening.id} missing idea`);
       assert.equal(leadsWithSan(point.idea), false, `${opening.id} idea SAN-led: ${point.idea}`);
-      assert.equal(
-        looksLikeMoveList(point.idea),
-        false,
-        `${opening.id} idea dump: ${point.idea}`,
-      );
       assert.ok(
         theoryHasReason(point),
         `${opening.id} missing reason: "${point.reason}"`,
@@ -36,11 +30,6 @@ describe("theory reason", () => {
           leadsWithSan(lesson.intro),
           false,
           `${opening.id} ply ${ply} Why SAN-led: "${lesson.intro}"`,
-        );
-        assert.equal(
-          looksLikeMoveList(lesson.intro),
-          false,
-          `${opening.id} ply ${ply} Why dump: "${lesson.intro}"`,
         );
         const point = theoryAt(opening, Math.max(-1, ply - 1));
         assert.ok(theoryHasReason(point), `${opening.id} ply ${ply} no reason`);

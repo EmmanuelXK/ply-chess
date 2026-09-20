@@ -44,23 +44,29 @@ function cleanIdea(text: string | undefined): string {
   return firstSentence(cleaned);
 }
 
+function cleanReason(text: string | undefined): string {
+  const cleaned = stripLeadingSanLabel(text);
+  if (!cleaned || looksLikeMoveList(cleaned) || leadsWithSan(cleaned)) return "";
+  return limitReason(cleaned);
+}
+
 function limitReason(text: string, max = 28): string {
   const compact = text.replace(/\s+/g, " ").trim();
   if (!compact) return "";
   const parts = compact.split(/(?<=[.!?])\s+/).filter(Boolean);
-  if (parts.length >= 2) {
-    const two = `${parts[0]} ${parts[1]}`.replace(/\s+/g, " ").trim();
-    if (wordCount(two) <= max) return two;
+  let out = parts[0] ?? compact;
+  for (let i = 1; i < parts.length; i++) {
+    const next = `${out} ${parts[i]}`.replace(/\s+/g, " ").trim();
+    if (wordCount(next) > max) break;
+    out = next;
+    if (wordCount(out) >= 8) break;
   }
-  const sentence = firstSentence(compact);
-  if (wordCount(sentence) <= max) return sentence;
-  return sentence.split(" ").filter(Boolean).slice(0, max).join(" ");
+  if (wordCount(out) <= max) return out;
+  return out.split(" ").filter(Boolean).slice(0, max).join(" ");
 }
 
 function distinctFrom(idea: string, candidate: string | undefined): string {
-  const cleaned = cleanIdea(candidate);
-  if (!cleaned) return "";
-  const reason = limitReason(cleaned);
+  const reason = cleanReason(candidate);
   if (!reason) return "";
   const ideaKey = idea.replace(/[.—–,]/g, " ").replace(/\s+/g, " ").trim().toLowerCase();
   const reasonKey = reason.replace(/[.—–,]/g, " ").replace(/\s+/g, " ").trim().toLowerCase();
@@ -87,17 +93,23 @@ export function theoryAt(opening: Opening, afterPly: number): TheoryPoint {
     cleanIdea(opening.story.cast) ||
     "One house. One job.";
 
-  const reason =
+  let reason =
     distinctFrom(idea, script?.why) ||
     distinctFrom(idea, chunk?.job) ||
     distinctFrom(idea, opening.story.conflict) ||
     distinctFrom(idea, script?.plan) ||
     distinctFrom(idea, opening.story.plan) ||
-    limitReason(
-      cleanIdea(opening.story.conflict) ||
-        cleanIdea(opening.story.plan) ||
-        "That's the job in this system.",
-    );
+    cleanReason(opening.story.conflict) ||
+    cleanReason(opening.story.plan) ||
+    "That's the job in this system.";
+
+  if (wordCount(reason) < 6) {
+    const extra =
+      distinctFrom(`${idea} ${reason}`, opening.story.conflict) ||
+      distinctFrom(`${idea} ${reason}`, opening.story.plan) ||
+      distinctFrom(`${idea} ${reason}`, chunk?.job);
+    if (extra) reason = `${reason.replace(/[.!?]+$/, "")}. ${extra}`;
+  }
 
   const intro = `${idea.replace(/[.!?]+$/, "")}. ${reason}`.replace(/\s+/g, " ").trim();
   return { idea, reason, intro };
@@ -140,7 +152,7 @@ export function conceptFirstNarrate(
 }
 
 export function theoryHasReason(point: TheoryPoint): boolean {
-  if (wordCount(point.reason) < 4) return false;
-  if (looksLikeMoveList(point.reason) || leadsWithSan(point.reason)) return false;
+  if (wordCount(point.reason) < 5) return false;
+  if (leadsWithSan(point.reason)) return false;
   return true;
 }

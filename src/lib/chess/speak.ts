@@ -15,16 +15,21 @@ function silentHandle(): SpeakHandle {
 }
 
 export function prefetchDialogue(
-  _beats: DialogueBeat[],
-  _opts?: { premium?: boolean },
-): void {}
+  beats: DialogueBeat[],
+  opts?: { premium?: boolean },
+): void {
+  void beats;
+  void opts;
+}
 
 export function unlockSpeech(): void {}
 
 export function speak(
-  _text: string,
-  _opts?: { speaker?: SpeakerId; premium?: boolean; interrupt?: boolean },
+  text: string,
+  opts?: { speaker?: SpeakerId; premium?: boolean; interrupt?: boolean },
 ): SpeakHandle {
+  void text;
+  void opts;
   return silentHandle();
 }
 
@@ -36,13 +41,15 @@ export function speakProfessor(
 }
 
 export function speakDialogue(
-  _beats: DialogueBeat[],
-  _opts?: {
+  beats: DialogueBeat[],
+  opts?: {
     premium?: boolean;
     onBeat?: (index: number, beat: DialogueBeat) => void;
     waitForAsk?: (beat: DialogueBeat) => Promise<string | null>;
   },
 ): SpeakHandle {
+  void beats;
+  void opts;
   return silentHandle();
 }
 
