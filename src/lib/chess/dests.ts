@@ -1,5 +1,5 @@
 import type { Key } from "@lichess-org/chessground/types";
-import { Chess, type Square } from "chess.js";
+import type { Chess, Square } from "chess.js";
 
 export function toDests(chess: Chess): Map<Key, Key[]> {
   const dests = new Map<Key, Key[]>();
@@ -28,20 +28,6 @@ export function sameMove(
     );
   } catch {
     return played.san === bookSan;
-  }
-}
-
-export function sanToSquares(
-  fen: string,
-  san: string,
-): { from: Key; to: Key } | null {
-  const probe = new Chess(fen);
-  try {
-    const move = probe.move(san);
-    if (!move) return null;
-    return { from: move.from as Key, to: move.to as Key };
-  } catch {
-    return null;
   }
 }
 
