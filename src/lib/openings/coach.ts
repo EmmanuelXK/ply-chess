@@ -11,6 +11,7 @@ import { historyAt } from "./history";
 import { isKeyPly } from "./key-ply";
 import { housePicture } from "./memory";
 import { professorAt } from "./professor";
+import { theoryAt } from "./theory-reason";
 import type { Opening } from "./types";
 
 function shortLine(text: string | undefined, max = 15): string {
@@ -51,9 +52,11 @@ function professorLine(opening: Opening, afterPly: number): string | undefined {
 export function coachAtStart(opening: Opening): CoachState {
   const house = opening.chunks[0];
   const hook = hookLine(opening, -1);
+  const theory = theoryAt(opening, -1);
   const cast = shortLine(opening.story.cast, 12);
   return {
     text: hook ?? cast,
+    detail: theory.reason,
     chunkName: house?.name,
     kind: "start",
   };
@@ -81,8 +84,8 @@ export function shouldSpeakCoach(
 }
 
 /**
- * Strip tap is an explicit request to hear — ignore shouldSpeakCoach.
- * Quiet plies replay the last spoken beat instead of "Your move".
+ * Strip tap is an explicit request for the idea — ignore shouldSpeakCoach.
+ * Quiet plies replay the last beat instead of "Your move".
  */
 export function textForCoachTap(
   currentLine: string,
@@ -92,6 +95,28 @@ export function textForCoachTap(
   if (current) return current;
   const last = lastSpoken.replace(/\s+/g, " ").trim();
   return last || null;
+}
+
+/**
+ * Ask Coach: always surface idea + reason in the strip.
+ * Quiet developing plies still get the current house's theory.
+ */
+export function coachOnAsk(
+  opening: Opening,
+  afterPly: number,
+  currentLine: string,
+  lastLine: string,
+): CoachState {
+  const chunk = chunkAt(opening, Math.max(0, afterPly));
+  const theory = theoryAt(opening, afterPly);
+  const idea =
+    textForCoachTap(currentLine, lastLine) || theory.idea;
+  return {
+    text: idea,
+    detail: theory.reason,
+    chunkName: chunk?.name,
+    kind: "why",
+  };
 }
 
 export function coachAfterPly(opening: Opening, afterPly: number): CoachState {
@@ -111,10 +136,12 @@ export function coachAfterPly(opening: Opening, afterPly: number): CoachState {
   const mark = historyAt(opening, afterPly + 1)[0];
   const concept = professorLine(opening, afterPly);
   const picture = housePicture(chunk);
+  const reason = theoryAt(opening, afterPly).reason;
 
   if (pin) {
     return {
       text: hook ?? shortLine(`${picture} That's the landmark.`, 15),
+      detail: reason,
       chunkName: chunk?.name,
       kind: "pin",
       pinLabel: pin.label,
@@ -123,6 +150,7 @@ export function coachAfterPly(opening: Opening, afterPly: number): CoachState {
   if (hook) {
     return {
       text: hook,
+      detail: reason,
       chunkName: chunk?.name,
       kind: "ok",
     };
@@ -130,6 +158,7 @@ export function coachAfterPly(opening: Opening, afterPly: number): CoachState {
   if (beat) {
     return {
       text: shortLine(concept ?? beat.beat ?? picture, 14),
+      detail: reason,
       chunkName: chunk?.name,
       kind: "ok",
     };
@@ -137,6 +166,7 @@ export function coachAfterPly(opening: Opening, afterPly: number): CoachState {
   if (line) {
     return {
       text: shortLine(concept ?? line.text ?? picture, 14),
+      detail: reason,
       chunkName: chunk?.name,
       kind: "ok",
     };
@@ -147,12 +177,14 @@ export function coachAfterPly(opening: Opening, afterPly: number): CoachState {
         mark.whyItMattersHere || `${mark.year}. ${mark.title} is the landmark.`,
         14,
       ),
+      detail: reason,
       chunkName: chunk?.name,
       kind: "history",
     };
   }
   return {
     text: shortLine(concept ?? picture ?? opening.story.plan, 14),
+    detail: reason,
     chunkName: chunk?.name,
     kind: "ok",
   };

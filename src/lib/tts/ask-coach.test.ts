@@ -3,7 +3,7 @@ import { describe, it } from "node:test";
 import { shouldAutoSpeakOnScene } from "./ask-coach";
 
 describe("Ask Coach", () => {
-  it("never auto-speaks a new scene — the board stays quiet until Ask Coach", () => {
+  it("never auto-speaks — Learn stays silent", () => {
     assert.equal(shouldAutoSpeakOnScene(), false);
   });
 });

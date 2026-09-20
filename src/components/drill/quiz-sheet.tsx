@@ -1,20 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { speakDialogue } from "@/lib/chess/speak";
-import { SpeakerChip } from "@/components/drill/speaker-chip";
-import { ACTIVE_COACH, dialogueForQuizReaction } from "@/lib/dialogue";
-import type { Opening, PositionalQuiz } from "@/lib/openings";
+import type { PositionalQuiz } from "@/lib/openings";
 
 export function QuizSheet({
   quiz,
-  opening,
-  voiceOn = true,
   onClose,
 }: {
   quiz: PositionalQuiz;
-  opening: Opening;
-  voiceOn?: boolean;
   onClose: () => void;
 }) {
   const [picked, setPicked] = useState<string | null>(null);
@@ -45,9 +38,7 @@ export function QuizSheet({
             Close
           </button>
         </header>
-        <p className="splash-copy">
-          <SpeakerChip /> {quiz.prompt}
-        </p>
+        <p className="splash-copy">{quiz.prompt}</p>
         <div className="quiz-choices">
           {quiz.choices.map((choice) => {
             const state =
@@ -66,15 +57,6 @@ export function QuizSheet({
                 onClick={() => {
                   if (picked) return;
                   setPicked(choice.id);
-                  if (voiceOn) {
-                    const scene = dialogueForQuizReaction(
-                      opening,
-                      choice.reaction,
-                      choice.correct,
-                      { duo: ACTIVE_COACH, mode: "solo" },
-                    );
-                    speakDialogue(scene.beats);
-                  }
                 }}
               >
                 {choice.text}
@@ -84,7 +66,6 @@ export function QuizSheet({
         </div>
         {chosen ? (
           <p className={`quiz-react ${chosen.correct ? "quiz-react-ok" : "quiz-react-no"}`}>
-            <SpeakerChip purpose={chosen.correct ? "hold-the-square" : "stop-opponent-plan"} />{" "}
             {chosen.reaction}
           </p>
         ) : null}

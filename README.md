@@ -1,6 +1,6 @@
 # Opening Edge
 
-iPhone-first PWA dashboard (`100dvh`, no page scroll). **26 attacking systems** on one **Your Weapons** home in **four racks** (White Gambits, White Systems, Black vs 1.e4, Black vs 1.d4). Square widget tiles; full details live in Learn. Each line is a **spine to move 21**, **traps**, and **six pillars** — then Plan mode. Aldric speaks when you tap **Ask Coach** — not on every key move. The strip stays concept-first; Why may name the move. No floating chat head. Login is **Google only**.
+iPhone-first PWA dashboard (`100dvh`, no page scroll). **26 attacking systems** on one **Your Weapons** home in **four racks** (White Gambits, White Systems, Black vs 1.e4, Black vs 1.d4). Square widget tiles; full details live in Learn. Each line is a **spine to move 21**, **traps**, and **six pillars** — then Plan mode. The board is silent. Tap **Ask Coach** or **Why** / **Explain** to read the idea and the reason. The strip stays concept-first; Why may name the move on the board. No floating chat head. Login is **Google only**.
 
 Production: [https://blitzbar.app](https://blitzbar.app) (Vercel project `ply-chess`, GitHub `EmmanuelXK/ply-chess`).
 
@@ -20,7 +20,7 @@ Home modes: **Learn · Reps · Practice · Drill · Time Trial · Progress**. Ki
 
 ## Single coach
 
-The strip shows the key point (they/we pictures, 6–15 words, no SAN dumps). Routine developing moves stay silent. Tap **Ask Coach** to hear Aldric — the board is quiet until then. **Why** opens the move board (SAN allowed). History opens from the strip mark when a milestone is on the ply. There is no floating or draggable head.
+The strip shows the key point (they/we pictures, 6–15 words, no SAN dumps) plus the **reason** (chunk job, conflict, or plan). Routine developing moves stay quiet until you tap **Ask Coach**. **Why** and dock **Explain** open the move board (SAN allowed). History opens from the strip mark when a milestone is on the ply. There is no floating or draggable head.
 
 Spine, houses, and trap branches live in the drill **sandwich menu** (a tree), not as noisy labels above the board.
 
@@ -29,53 +29,17 @@ Coach Brain v2 is flagged (`COACH_BRAIN_V2`, off by default). Settings has **no 
 Lion and London have authored facts; other systems generate from the professor pack + History Gig Pack.
 
 ### Voice
-Voice is **on by default** for new players (and when the preference is unset), but it does **not** auto-speak moves. Toggle **Voice** on the drill dock to mute Ask Coach. Ask Coach, Restart, Back/Forward, and navigation cancel in-flight coach audio.
+The app is **silent**. There is no Speak-on-ply, mute toggle, speaker chip, or Settings voice/music panel. Ask Coach, Why, and Explain are **text**. TTS helpers remain in the repo as dead code and do not play.
 
-**Priority when speaking**
-
-1. **ElevenLabs** — only if `ELEVENLABS_API_KEY` is set *and* Dual masters requested character voices.
-2. **Google Cloud TTS** — when `GOOGLE_CLOUD_TTS` / `GOOGLE_CLOUD_TTS_API_KEY` / `GOOGLE_APPLICATION_CREDENTIALS` is configured. Defaults are **WaveNet** (typically **4M free characters/month**). Neural2 is typically **1M/month**. Confirm current quotas on [Google Cloud TTS pricing](https://cloud.google.com/text-to-speech/pricing). Billing must be enabled for the API; the monthly free allowance still applies.
-3. **Edge TTS** — free neural path via `/api/tts` (Node.js, outbound WebSocket, in-memory MP3). **Needs network. It is not true offline.**
-4. **Web Speech API** — true offline / local browser fallback.
-
-The production build is green with **zero cloud keys**.
-
-**Default free voices (Edge)**
-
-| Speaker | Edge | Google WaveNet | ElevenLabs stock |
-| --- | --- | --- | --- |
-| Aldric ♂ | `en-GB-RyanNeural` | `en-GB-Wavenet-B` | George `JBFqnCBsd6RMkjVDRZzb` |
-| Kael ♀ | `en-US-AvaNeural` | `en-US-Wavenet-F` | Charlotte `XB0fDUnXU5powFXDhCwa` |
-| Soren ♂ | `en-GB-ThomasNeural` | `en-GB-Wavenet-D` | Daniel `onwK4e9ZLuTAKqWW03F9` |
-| Rhea ♀ | `en-US-JennyNeural` | `en-US-Wavenet-E` | Bella `EXAVITQu4vr4xnSDxMaL` |
-| Silas ♂ | `en-US-AndrewNeural` | `en-US-Wavenet-D` | Josh `TxGEqnHWrfWFTfGW9XjX` |
-| Lena ♀ | `en-US-EmmaNeural` | `en-US-Wavenet-C` | Rachel `21m00Tcm4TlvDq8ikWAM` |
-
-Override with `TTS_VOICE_<SPEAKER>` or provider-specific `EDGE_TTS_VOICE_<SPEAKER>`, `GOOGLE_TTS_VOICE_<SPEAKER>`, `ELEVENLABS_VOICE_<SPEAKER>`. See `.env.example`.
-
-### GCP setup (optional)
-
-```bash
-# enable Cloud Text-to-Speech, create an API key, then:
-cp .env.example .env.local
-# GOOGLE_CLOUD_TTS_API_KEY=...
-npm run dev
-```
-
-Vercel: Project → Settings → Environment Variables. Server-only — never `NEXT_PUBLIC_`.
-
-### Why this still deploys without keys
-`/api/tts` uses the `ws` package only (no Python, no native binaries). Short clips finish under the function limit (`maxDuration` 15s). If Edge is down or you are offline, the client falls back to Web Speech.
-
-The default path does **not** teach every book move. Key points fire on highlighted plies. Soft-fail is still professor copy: one square, one job.
+Focus / ambient music is not in this cut.
 
 ### Why splash
-Tap **Why** on the coach strip or **Explain** on the dock — available on every ply, including quiet developing moves. A splash opens with a mini board. The relevant **branch** auto-plays while the coach narrates. Colored arrows + Chess.com-style glyphs (`!!` `!` `!?` `?` `??`) land on those Why plies. **Back / Forward** and play/pause work inside the splash.
+Tap **Why** on the coach strip or **Explain** on the dock — available on every ply, including quiet developing moves. A splash opens with a mini board. **Idea** and **Reason** sit above the board in plain language (plan, conflict, chunk job). The relevant **branch** auto-plays. Colored arrows + Chess.com-style glyphs (`!!` `!` `!?` `?` `??`) land on those Why plies. **Back / Forward** and play/pause work inside the splash. The ply list may name SAN; the sentences do not dump move lists.
 
-Lion and London have authored Why lessons (Nd4-style “the knight should control these squares”). Other systems get generated lessons from the spine + coach.
+Lion and London have authored Why lessons (Nd4-style “the knight should control these squares”). Other systems get generated lessons from the spine + coach. Copy is concept-first: idea, then reason.
 
 ### Quizzes
-Reps → **Quiz**, or the Quiz chip. Short **positional** questions tied to the current chunk (not trivia). The professor reacts out loud to right and wrong answers. Lion + London are fully authored; others fall back to chunk-job questions.
+Reps → **Quiz**, or the Quiz chip. Short **positional** questions tied to the current chunk (not trivia). Lion + London are fully authored; others fall back to chunk-job questions.
 
 ### Hybrid practice (Think)
 From the current ply: play vs a **hybrid** of
@@ -97,7 +61,7 @@ Large **Back** and **Forward** under the board (thumb zone). Instant ply-by-ply 
 **Analyze** on the dock, or **long-press the board**. Fast splash: board, play/pause, Back/Forward, close. Vertical **eval bar** (Lichess/Chess.com style) beside the board — Stockfish primary. The human-plan strip shows Stockfish / Lc0-style / Maia-style votes.
 
 ### History Gig Pack
-When the current ply has a real chess-history milestone, a small **paper mark** appears on the coach strip and the board corner. Tap it: fast splash, professor voice (“This is where history kissed the board…”), year, people, why it matters *here*, Wikipedia (and Chess.com when cited). Never blocks training.
+When the current ply has a real chess-history milestone, a small **paper mark** appears on the coach strip and the board corner. Tap it: fast splash, year, people, why it matters *here*, Wikipedia (and Chess.com when cited). Never blocks training.
 
 Data: `src/lib/openings/history.ts`. Typed `HistoryMilestone` (`plyOrFen`, `era`, `glyph`, `sources`, optional `famousGame`). Validation requires **≥1 sourced milestone per system** and **https** URLs. No folklore — if Wikipedia does not support a game/year, it is not in the pack. Romantic gambits (King’s Gambit, Evans) carry extra marks (Immortal, Evergreen, Kasparov revival). The Black Lion cites Dutch club pages (Jansen–den Ouden, 14 Jan 1967) plus Chess.com book notes, because it has no Wikipedia article.
 

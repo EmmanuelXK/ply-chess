@@ -34,7 +34,7 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_...
 
 Legacy `NEXT_PUBLIC_SUPABASE_ANON_KEY` also works. **Never** add `SERVICE_ROLE`, Twilio, or Google client secrets as `NEXT_PUBLIC_*`.
 
-Optional server-only TTS keys stay as they are (no `NEXT_PUBLIC_`). See `.env.example`.
+Voice playback is off in this cut. Do not add TTS keys.
 
 Redeploy after saving env vars.
 

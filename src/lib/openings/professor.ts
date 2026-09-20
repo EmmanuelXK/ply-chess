@@ -9,6 +9,12 @@ import type {
   WhyPly,
 } from "./types";
 import { authoredProfessor, authoredQuizzes } from "./authored";
+import {
+  conceptFirstIntro,
+  conceptFirstNarrate,
+  preferConceptIntro,
+  theoryAt,
+} from "./theory-reason";
 
 function moveSquares(san: string, beforeFen: string) {
   const g = new Chess(beforeFen);
@@ -49,12 +55,13 @@ function autoBranch(opening: Opening, startPly: number, count = 6): WhyPly[] {
     const script = opening.professor.find((p) => p.afterPly === ply);
     const userMove =
       opening.side === "white" ? ply % 2 === 0 : ply % 2 === 1;
+    const chunk = chunkAt(opening, ply);
     branch.push({
       san,
-      narrate: userMove
-        ? `${san}. ${script?.concept ?? "That's your move in this system."}`
-        : (script?.concept ??
-          `${san}. They play. Watch the squares it leaves.`),
+      narrate: conceptFirstNarrate(
+        script?.concept ?? chunk?.job ?? "",
+        userMove,
+      ),
       glyph: userMove ? "!" : undefined,
       arrows: [
         { orig: played.from, dest: played.to, brush: userMove ? "green" : "blue" },
@@ -74,14 +81,16 @@ function generateScripts(opening: Opening): ProfessorScript[] {
     seen.add(line.afterPly);
     const chunk = chunkAt(opening, line.afterPly);
     const san = opening.moves[line.afterPly] ?? "";
+    const idea = line.text;
+    const reason = chunk?.job ?? opening.story.conflict;
     scripts.push({
       afterPly: line.afterPly,
-      concept: line.text,
-      why: `${san}. ${chunk?.job ?? opening.story.conflict} In this opening that square-job is the whole point.`,
+      concept: idea,
+      why: conceptFirstIntro(reason, opening.story.plan, opening.story.conflict),
       plan: opening.pillars.attackingPlan,
       whyLesson: {
         title: chunk?.name ?? san,
-        intro: `${san}. ${line.text}`,
+        intro: conceptFirstIntro(idea, reason, opening.story.conflict),
         startPly: Math.min(line.afterPly + 1, opening.moves.length),
         branch: [],
       },
@@ -91,11 +100,10 @@ function generateScripts(opening: Opening): ProfessorScript[] {
   for (const chunk of opening.chunks) {
     const ply = Math.min(chunk.toPly, opening.moves.length - 1);
     if (seen.has(ply)) continue;
-    const san = opening.moves[ply] ?? "";
     scripts.push({
       afterPly: ply,
       concept: chunk.job || chunk.name,
-      why: `${san}. ${chunk.job}`,
+      why: conceptFirstIntro(chunk.job, opening.story.conflict, chunk.name),
       plan: opening.pillars.breaksAndStorms,
     });
   }
@@ -113,7 +121,9 @@ function fillLessons(opening: Opening, scripts: ProfessorScript[]): ProfessorScr
       ...script,
       whyLesson: {
         title: script.whyLesson?.title ?? chunkAt(opening, start)?.name ?? "Why",
-        intro: script.whyLesson?.intro ?? `${script.concept} ${script.why}`,
+        intro:
+          script.whyLesson?.intro ??
+          conceptFirstIntro(script.concept, script.why, opening.story.conflict),
         startPly: start,
         branch: autoBranch(opening, start),
       },
@@ -204,23 +214,37 @@ export function whyLessonAt(
 }
 
 function withBranch(opening: Opening, lesson: WhyLesson): WhyLesson {
-  if (lesson.branch.length > 0) return lesson;
-  return { ...lesson, branch: autoBranch(opening, lesson.startPly, 4) };
+  const theory = theoryAt(opening, Math.max(-1, lesson.startPly - 1));
+  const intro = preferConceptIntro(lesson.intro, theory.intro);
+  if (lesson.branch.length > 0) {
+    return {
+      ...lesson,
+      intro,
+      branch: lesson.branch.map((step, i) => ({
+        ...step,
+        narrate: preferConceptIntro(
+          step.narrate,
+          conceptFirstNarrate(step.narrate, i % 2 === 0),
+        ),
+      })),
+    };
+  }
+  return { ...lesson, intro, branch: autoBranch(opening, lesson.startPly, 4) };
 }
 
 function buildExplainLesson(opening: Opening, ply: number): WhyLesson {
   const after = Math.max(0, ply > 0 ? ply - 1 : 0);
   const script = professorAt(opening, after);
   const chunk = chunkAt(opening, after);
-  const san = ply > 0 ? opening.moves[ply - 1] : (opening.moves[0] ?? "");
+  const theory = theoryAt(opening, after);
   const startPly = Math.min(after, opening.moves.length);
   return {
     title: script?.whyLesson?.title ?? chunk?.name ?? "Why this move",
-    intro:
-      script?.why ??
-      script?.concept ??
-      chunk?.job ??
-      `${san ? `${san}. ` : ""}${opening.story.conflict}`,
+    intro: conceptFirstIntro(
+      script?.concept ?? theory.idea,
+      script?.why ?? theory.reason,
+      opening.story.conflict,
+    ),
     startPly,
     branch: autoBranch(opening, startPly, 4),
   };
