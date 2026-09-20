@@ -20,14 +20,6 @@ export function isUserPly(side: Opening["side"], ply: number): boolean {
   return side === "white" ? ply % 2 === 0 : ply % 2 === 1;
 }
 
-/** Book plies the learner must play (the other color auto-moves). */
-export function userPlyCount(opening: Opening): number {
-  return opening.moves.reduce(
-    (n, _, ply) => n + (isUserPly(opening.side, ply) ? 1 : 0),
-    0,
-  );
-}
-
 export function chunkAt(opening: Opening, ply: number) {
   return opening.chunks.find((c) => ply >= c.fromPly && ply <= c.toPly);
 }

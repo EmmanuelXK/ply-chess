@@ -9,7 +9,7 @@ import type { DrawBrushes, DrawShape } from "@lichess-org/chessground/draw";
 export interface BoardArrow {
   orig: Key;
   dest: Key;
-  brush: "last" | "hint" | "book" | "correct";
+  brush: "last" | "hint";
 }
 
 interface ChessBoardProps {
@@ -32,8 +32,6 @@ const brushes: DrawBrushes = {
   yellow: { key: "y", color: "#e68f00", opacity: 1, lineWidth: 10 },
   last: { key: "last", color: "#0a0a0a", opacity: 0.94, lineWidth: 6 },
   hint: { key: "hint", color: "#7aa2ff", opacity: 0.88, lineWidth: 9 },
-  book: { key: "book", color: "#e8c36a", opacity: 0.9, lineWidth: 8 },
-  correct: { key: "correct", color: "#3dd68c", opacity: 0.95, lineWidth: 9 },
 };
 
 export function ChessBoard({
@@ -205,8 +203,6 @@ function toShapes(arrows: BoardArrow[]): DrawShape[] {
     orig: a.orig,
     dest: a.dest,
     brush: a.brush,
-    modifiers: {
-      lineWidth: a.brush === "last" ? 7 : a.brush === "book" ? 8 : 10,
-    },
+    modifiers: { lineWidth: a.brush === "last" ? 7 : 10 },
   }));
 }
