@@ -23,6 +23,7 @@ App: [http://127.0.0.1:43173](http://127.0.0.1:43173)
 
 ```bash
 npm run validate   # every book move is legal from the start position
+npm test           # FSRS grade map, enroll-due-tomorrow, local journal
 npm run build
 ```
 
@@ -30,10 +31,27 @@ On an iPhone: open the URL, Share → Add to Home Screen. The shell is standalon
 
 ## Drill
 
+- **Learn** — guided first pass. The book move is shown (amber). Play it, or tap **Next**. Finishing enrolls the line. Due **tomorrow** on this device. Not graded as a perfect recall.
+- **Train** — play your book moves from memory. Wrong: the correct move flashes, then the line continues. Grade is % of *your* plies correct on the first try (a hint counts as a miss for that ply).
 - **Coach strip** — few words. Names the chunk. Pins event boundaries. Soft-fails with the chunk’s job, not a lecture.
 - **Board** — Lichess Chessground. Touch-drag + tap-to-move. Thin black last-move arrow.
-- **Hint** — next book move, once.
 - **Plan mode** — after the book, free play. Coach shifts to a plan voice.
+
+## Memory OS (private journal)
+
+No login. Progress, FSRS state, and collected pins live in this browser (`localStorage` key `opening-edge.journal.v1`). Refresh-safe on the same device. Cloud sync is out of scope.
+
+**Card unit:** one opening line (London, Pirc, or Black Lion) — not per-ply.
+
+Home shows a **due count**. Failed / fragile lines sort first in the due queue. Empty due right after Learn is expected: spacing is the point.
+
+| First-attempt correct | FSRS grade |
+| --- | --- |
+| 100% | Good (Easy if the line was already reviewed once and you used no hints) |
+| ≥ 70% and &lt; 100% | Hard |
+| &lt; 70% | Again |
+
+Scheduler is [`ts-fsrs`](https://github.com/open-spaced-repetition/ts-fsrs) at **0.9** requested retention, max interval 180 days, short-term (minute) steps off so a failed line returns **tomorrow**, not in ten minutes.
 
 ## Add opening #4
 
@@ -74,4 +92,4 @@ Author chunks as 3–5 plies with one job. Put pins where the goal flips (castle
 
 ## Stack
 
-Next.js App Router, TypeScript, Tailwind, shadcn/ui, `chess.js`, [`@lichess-org/chessground`](https://github.com/lichess-org/chessground) (Lichess board — better mobile drag than `react-chessboard`).
+Next.js App Router, TypeScript, Tailwind, shadcn/ui, `chess.js`, [`@lichess-org/chessground`](https://github.com/lichess-org/chessground) (Lichess board — better mobile drag than `react-chessboard`), [`ts-fsrs`](https://github.com/open-spaced-repetition/ts-fsrs) for the local Memory OS schedule.
