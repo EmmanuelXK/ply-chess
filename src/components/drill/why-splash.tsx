@@ -7,6 +7,7 @@ import { X } from "lucide-react";
 import { ChessBoard, type BoardArrow, type BoardGlyph } from "@/components/board/chess-board";
 import { PlyNav } from "@/components/drill/ply-nav";
 import { playLine } from "@/lib/chess/line";
+import { CoachQuestions } from "@/components/drill/coach-questions";
 import { chunkAt, housePicture, theoryAt } from "@/lib/openings";
 import type { Opening, WhyLesson } from "@/lib/openings";
 
@@ -109,7 +110,7 @@ export function WhySplash({
   }, [go, onClose, ply]);
 
   return (
-    <div className="splash-root" role="dialog" aria-modal="true" aria-label="Why">
+    <div className="splash-root" role="dialog" aria-modal="true" aria-label="Why" data-testid="why-splash">
       <button type="button" className="splash-scrim" aria-label="Close why" onClick={onClose} />
       <div className="splash-card splash-in">
         <header className="splash-head">
@@ -130,6 +131,12 @@ export function WhySplash({
         <p className="splash-picture">{idea}</p>
         <p className="splash-kicker">Reason</p>
         <p className="splash-copy">{reason}</p>
+        <CoachQuestions
+          plan={theory.plan}
+          theyMoved={theory.theyMoved}
+          secondBest={theory.secondBest}
+          triad={theory.triad}
+        />
         {plyNote && plyNote !== idea && plyNote !== reason ? (
           <p className="splash-copy splash-ply-note">{plyNote}</p>
         ) : null}

@@ -11,7 +11,7 @@ import { historyAt } from "./history";
 import { isKeyPly } from "./key-ply";
 import { housePicture } from "./memory";
 import { professorAt } from "./professor";
-import { theoryAt } from "./theory-reason";
+import { theoryAt, type DrillTriad } from "./theory-reason";
 import type { Opening } from "./types";
 
 function shortLine(text: string | undefined, max = 15): string {
@@ -41,6 +41,10 @@ export interface CoachState {
   chunkName?: string;
   kind: CoachKind;
   pinLabel?: string;
+  plan?: string;
+  theyMoved?: string;
+  secondBest?: string;
+  triad?: DrillTriad;
 }
 
 function professorLine(opening: Opening, afterPly: number): string | undefined {
@@ -59,6 +63,9 @@ export function coachAtStart(opening: Opening): CoachState {
     detail: theory.reason,
     chunkName: house?.name,
     kind: "start",
+    plan: theory.plan,
+    theyMoved: theory.theyMoved,
+    secondBest: theory.secondBest,
   };
 }
 
@@ -116,6 +123,10 @@ export function coachOnAsk(
     detail: theory.reason,
     chunkName: chunk?.name,
     kind: "why",
+    plan: theory.plan,
+    theyMoved: theory.theyMoved,
+    secondBest: theory.secondBest,
+    triad: theory.triad,
   };
 }
 
@@ -136,7 +147,14 @@ export function coachAfterPly(opening: Opening, afterPly: number): CoachState {
   const mark = historyAt(opening, afterPly + 1)[0];
   const concept = professorLine(opening, afterPly);
   const picture = housePicture(chunk);
-  const reason = theoryAt(opening, afterPly).reason;
+  const theory = theoryAt(opening, afterPly);
+  const reason = theory.reason;
+  const questions = {
+    plan: theory.plan,
+    theyMoved: theory.theyMoved,
+    secondBest: theory.secondBest,
+    triad: theory.triad,
+  };
 
   if (pin) {
     return {
@@ -145,6 +163,7 @@ export function coachAfterPly(opening: Opening, afterPly: number): CoachState {
       chunkName: chunk?.name,
       kind: "pin",
       pinLabel: pin.label,
+      ...questions,
     };
   }
   if (hook) {
@@ -153,6 +172,7 @@ export function coachAfterPly(opening: Opening, afterPly: number): CoachState {
       detail: reason,
       chunkName: chunk?.name,
       kind: "ok",
+      ...questions,
     };
   }
   if (beat) {
@@ -161,6 +181,7 @@ export function coachAfterPly(opening: Opening, afterPly: number): CoachState {
       detail: reason,
       chunkName: chunk?.name,
       kind: "ok",
+      ...questions,
     };
   }
   if (line) {
@@ -169,6 +190,7 @@ export function coachAfterPly(opening: Opening, afterPly: number): CoachState {
       detail: reason,
       chunkName: chunk?.name,
       kind: "ok",
+      ...questions,
     };
   }
   if (mark) {
@@ -180,6 +202,7 @@ export function coachAfterPly(opening: Opening, afterPly: number): CoachState {
       detail: reason,
       chunkName: chunk?.name,
       kind: "history",
+      ...questions,
     };
   }
   return {
@@ -187,6 +210,7 @@ export function coachAfterPly(opening: Opening, afterPly: number): CoachState {
     detail: reason,
     chunkName: chunk?.name,
     kind: "ok",
+    ...questions,
   };
 }
 

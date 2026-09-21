@@ -889,6 +889,14 @@ body,
   min-width: 0;
 }
 
+.coach-copy-stack {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.12rem;
+}
+
 .coach-line {
   flex: 1 1 auto;
   min-width: 0;
@@ -1050,6 +1058,100 @@ body,
   -webkit-line-clamp: 4;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+.coach-q {
+  margin: 0.28rem 0 0.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.28rem;
+}
+
+.coach-q p {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.35;
+  color: #d4d4d8;
+}
+
+.coach-q-kicker {
+  display: block;
+  margin: 0 0 0.08rem;
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ember);
+}
+
+.coach-q-compact {
+  margin-top: 0.22rem;
+  gap: 0.18rem;
+}
+
+.coach-q-compact p {
+  font-size: 12px;
+  font-weight: 550;
+  color: var(--cream);
+}
+
+.coach-q-compact .coach-q-kicker {
+  display: inline;
+  margin: 0 0.4rem 0 0;
+  font-size: 9px;
+}
+
+.coach-triad {
+  list-style: none;
+  margin: 0.2rem 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.2rem;
+}
+
+.coach-triad li {
+  margin: 0;
+  padding: 0.28rem 0.4rem;
+  border-radius: 0.45rem;
+  background: rgb(245 158 11 / 8%);
+  border: 1px solid rgb(245 158 11 / 16%);
+  font-size: 12px;
+  font-weight: 550;
+  line-height: 1.3;
+  color: var(--cream);
+}
+
+.coach-triad li span {
+  display: block;
+  margin-bottom: 0.04rem;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ember);
+}
+
+.coach-triad-strip {
+  margin-top: 0.28rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.22rem;
+}
+
+.coach-triad-strip li {
+  padding: 0.22rem 0.3rem;
+  font-size: 11px;
+}
+
+.coach-q .coach-triad {
+  margin-top: 0.12rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.22rem;
+}
+
+.coach-strip:has(.coach-q-compact) .coach-detail {
+  -webkit-line-clamp: 2;
 }
 
 .why-chip {
@@ -1951,6 +2053,30 @@ body,
   color: var(--mist);
   font-size: 13px;
   max-height: 3.2rem;
+}
+
+.splash-card:has(.coach-q) .splash-picture {
+  font-size: 12px;
+  margin-bottom: 0.12rem;
+}
+
+.splash-card:has(.coach-q) .splash-copy {
+  font-size: 13px;
+  max-height: 3.4rem;
+  margin-bottom: 0.2rem;
+}
+
+.splash-card:has(.coach-q) .coach-q {
+  margin: 0.12rem 0 0.15rem;
+  gap: 0.16rem;
+}
+
+.splash-card:has(.coach-q) .coach-q p {
+  font-size: 12px;
+}
+
+.splash-card:has(.coach-q) .splash-board {
+  max-height: min(46vw, 28dvh);
 }
 
 .splash-board {

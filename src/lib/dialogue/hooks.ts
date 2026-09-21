@@ -18,7 +18,8 @@ export interface ShortHook {
  * 2. Picture language (breathe, house, clamp, outpost, coil, gift, open the center).
  * 3. Two short sentences, 6–15 words total. Lupin-noir: sharp, male, premium.
  * 4. No leading SAN (`Bf4`, `…Nbd7`) and no dumped move list.
- * 5. Why/Explain may name the move on the board; the sentences state idea + reason.
+ * 5. Why/Explain/Ask Coach keep Idea + Reason, then plan / their idea / near-miss.
+ *    Key plies add a short do / prevent / their reply triad. SAN stays on the move list.
  */
 export function spokenHook(row: ShortHook): string {
   return twoBeatLine(row.they, row.we);
