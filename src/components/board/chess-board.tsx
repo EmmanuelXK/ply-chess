@@ -6,6 +6,8 @@ import "@/app/chessground.css";
 import type { Api } from "@lichess-org/chessground/api";
 import type { Key } from "@lichess-org/chessground/types";
 import type { DrawBrushes, DrawShape } from "@lichess-org/chessground/draw";
+import type { MoveMark } from "@/lib/openings/move-mark";
+import { MOVE_MARK_LABEL } from "@/lib/openings/move-mark";
 import type { ArrowBrush, MoveGlyph } from "@/lib/openings/types";
 import {
   clearChessgroundTransients,
@@ -23,6 +25,11 @@ export interface BoardGlyph {
   glyph: MoveGlyph;
 }
 
+export interface BoardMark {
+  square: Key;
+  kind: MoveMark;
+}
+
 interface ChessBoardProps {
   fen: string;
   dests: Map<Key, Key[]>;
@@ -30,6 +37,7 @@ interface ChessBoardProps {
   arrows: BoardArrow[];
   glyphs?: BoardGlyph[];
   circles?: Key[];
+  mark?: BoardMark | null;
   orientation: "white" | "black";
   turnColor: "white" | "black";
   viewOnly?: boolean;
@@ -43,13 +51,13 @@ interface ChessBoardProps {
 }
 
 const brushes: DrawBrushes = {
-  green: { key: "g", color: "#15781B", opacity: 1, lineWidth: 10 },
-  red: { key: "r", color: "#882020", opacity: 1, lineWidth: 10 },
-  blue: { key: "b", color: "#003088", opacity: 1, lineWidth: 10 },
-  yellow: { key: "y", color: "#e68f00", opacity: 1, lineWidth: 10 },
-  purple: { key: "p", color: "#7e22ce", opacity: 0.92, lineWidth: 9 },
-  last: { key: "last", color: "#d97706", opacity: 0.92, lineWidth: 7 },
-  hint: { key: "hint", color: "#d97706", opacity: 0.88, lineWidth: 9 },
+  green: { key: "g", color: "#1f8a4c", opacity: 0.96, lineWidth: 14 },
+  red: { key: "r", color: "#882020", opacity: 1, lineWidth: 12 },
+  blue: { key: "b", color: "#2a6294", opacity: 0.95, lineWidth: 13 },
+  yellow: { key: "y", color: "#e4b15a", opacity: 1, lineWidth: 15 },
+  purple: { key: "p", color: "#7e22ce", opacity: 0.92, lineWidth: 11 },
+  last: { key: "last", color: "#e39b2d", opacity: 0.98, lineWidth: 13 },
+  hint: { key: "hint", color: "#e39b2d", opacity: 0.95, lineWidth: 14 },
 };
 
 export function ChessBoard({
@@ -59,6 +67,7 @@ export function ChessBoard({
   arrows,
   glyphs = [],
   circles = [],
+  mark = null,
   orientation,
   turnColor,
   viewOnly = false,
@@ -340,10 +349,20 @@ export function ChessBoard({
     <div
       ref={hostRef}
       className="board-frame"
+      data-mark={mark?.kind}
       style={
         side > 0 ? { width: side, height: side, maxWidth: "none" } : undefined
       }
     >
+      {mark ? (
+        <span
+          className={`move-mark move-mark-${mark.kind}`}
+          style={glyphStyle(mark.square, orientation)}
+          title={markTitle(mark.kind)}
+        >
+          {MOVE_MARK_LABEL[mark.kind]}
+        </span>
+      ) : null}
       {glyphs.map((g) => (
         <span
           key={`${g.square}-${g.glyph}`}
@@ -356,6 +375,12 @@ export function ChessBoard({
       ))}
     </div>
   );
+}
+
+function markTitle(kind: BoardMark["kind"]): string {
+  if (kind === "gem") return "Signature idea";
+  if (kind === "true") return "The house move";
+  return "Clean theory";
 }
 
 function glyphClass(g: MoveGlyph): string {
@@ -383,7 +408,7 @@ function toShapes(arrows: BoardArrow[], circles: Key[]): DrawShape[] {
     orig: a.orig,
     dest: a.dest,
     brush: a.brush,
-    modifiers: { lineWidth: a.brush === "last" ? 7 : 10 },
+    modifiers: { lineWidth: a.brush === "last" || a.brush === "hint" ? 13 : 15 },
   }));
   for (const sq of circles) {
     shapes.push({ orig: sq, dest: sq, brush: "yellow" });
