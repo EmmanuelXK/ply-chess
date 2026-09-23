@@ -677,7 +677,7 @@ body,
 }
 
 .drill-shell {
-  --coach-box: 13.75rem;
+  --coach-box: 9.5rem;
   height: 100dvh;
   height: 100svh;
   display: flex;
@@ -2431,10 +2431,6 @@ body,
 }
 
 @media (max-height: 720px) {
-  .drill-shell {
-    --coach-box: 12.5rem;
-  }
-
   .drill-top {
     padding-bottom: 0.28rem;
   }
@@ -2514,11 +2510,6 @@ body,
   }
 }
 
-@media (min-width: 840px) and (min-height: 700px) {
-  .drill-shell {
-    --coach-box: 10rem;
-  }
-}
 
 .speaker-chip {
   display: inline-flex;
