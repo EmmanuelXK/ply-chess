@@ -99,6 +99,23 @@ describe("handleAuthCallback", () => {
     assert.equal(location.pathname, "/login");
     assert.equal(location.searchParams.get("error"), "config");
   });
+
+  it("fails closed to /login when the code exchange hangs", async () => {
+    const createClient: CreateCallbackClient = () => ({
+      auth: {
+        exchangeCodeForSession: () => new Promise(() => {}),
+      },
+    });
+
+    const res = await handleAuthCallback(
+      request("/auth/callback?code=pkce-code"),
+      createClient,
+      20,
+    );
+    const location = new URL(res.headers.get("location") ?? "");
+    assert.equal(location.pathname, "/login");
+    assert.equal(location.searchParams.get("error"), "google");
+  });
 });
 
 describe("applyCookiesToResponse", () => {

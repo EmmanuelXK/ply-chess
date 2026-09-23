@@ -1,6 +1,11 @@
+import { redirect } from "next/navigation";
 import { LoginScreen } from "@/components/auth/login-screen";
 import { noteFromSearchParams } from "@/lib/auth/errors";
-import { safeInternalPath } from "@/lib/auth/redirect";
+import {
+  safeInternalPath,
+  searchParamsFromRecord,
+  strayOAuthCallbackPath,
+} from "@/lib/auth/redirect";
 import { supabasePublicConfig } from "@/lib/supabase/env";
 
 export const metadata = {
@@ -18,6 +23,9 @@ export default async function LoginPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const query = await searchParams;
+  const stray = strayOAuthCallbackPath("/login", searchParamsFromRecord(query));
+  if (stray) redirect(stray);
+
   const params = {
     get(name: string) {
       return firstParam(query[name]);

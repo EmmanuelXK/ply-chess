@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { classifyAuthError } from "@/lib/auth/errors";
 import { appOrigin, loginErrorUrl, safeInternalPath } from "@/lib/auth/redirect";
+import { AUTH_OAUTH_START_TIMEOUT_MS, withTimeout } from "@/lib/auth/timeout";
 import { createRouteHandlerSupabase } from "@/lib/supabase/server";
 
 const NO_STORE = { "Cache-Control": "private, no-store" } as const;
@@ -34,6 +35,7 @@ function fail(
 export async function handleAuthCallback(
   request: NextRequest,
   createClient: CreateCallbackClient = createRouteHandlerSupabase,
+  timeoutMs: number = AUTH_OAUTH_START_TIMEOUT_MS,
 ): Promise<NextResponse> {
   const url = new URL(request.url);
   const origin = appOrigin(request);
@@ -59,9 +61,16 @@ export async function handleAuthCallback(
     return fail(origin, "config", next);
   }
 
-  const { error } = await supabase.auth.exchangeCodeForSession(code);
-  if (error) {
-    return fail(origin, error.message, next);
+  try {
+    const { error } = await withTimeout(
+      supabase.auth.exchangeCodeForSession(code),
+      timeoutMs,
+    );
+    if (error) {
+      return fail(origin, error.message, next);
+    }
+  } catch {
+    return fail(origin, "google", next);
   }
 
   return destination;

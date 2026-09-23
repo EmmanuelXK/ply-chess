@@ -1,6 +1,11 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { appOrigin, loginErrorUrl, safeInternalPath } from "./redirect";
+import {
+  appOrigin,
+  loginErrorUrl,
+  safeInternalPath,
+  strayOAuthCallbackPath,
+} from "./redirect";
 
 describe("safeInternalPath", () => {
   it("defaults empty and off-site values to the dashboard", () => {
@@ -39,6 +44,49 @@ describe("appOrigin", () => {
       headers: { "x-forwarded-host": "evil.example/phish" },
     });
     assert.equal(appOrigin(request), "https://blitzbar.app");
+  });
+});
+
+describe("strayOAuthCallbackPath", () => {
+  it("sends a PKCE code on / to /auth/callback so the exchange can run", () => {
+    assert.equal(
+      strayOAuthCallbackPath("/", new URLSearchParams("code=pkce-code")),
+      "/auth/callback?code=pkce-code&next=%2F",
+    );
+  });
+
+  it("sends a PKCE code on /login to /auth/callback and defaults next to home", () => {
+    assert.equal(
+      strayOAuthCallbackPath("/login", new URLSearchParams("code=pkce-code")),
+      "/auth/callback?code=pkce-code&next=%2F",
+    );
+  });
+
+  it("keeps an explicit next when the code lands on /login", () => {
+    assert.equal(
+      strayOAuthCallbackPath(
+        "/login",
+        new URLSearchParams("code=pkce-code&next=/theory"),
+      ),
+      "/auth/callback?code=pkce-code&next=%2Ftheory",
+    );
+  });
+
+  it("does not steal /login?error=google (no code)", () => {
+    assert.equal(
+      strayOAuthCallbackPath("/login", new URLSearchParams("error=google")),
+      null,
+    );
+  });
+
+  it("leaves /auth/callback alone so the route handler can exchange", () => {
+    assert.equal(
+      strayOAuthCallbackPath(
+        "/auth/callback",
+        new URLSearchParams("code=pkce-code&next=/"),
+      ),
+      null,
+    );
   });
 });
 
