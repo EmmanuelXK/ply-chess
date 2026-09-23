@@ -677,6 +677,7 @@ body,
 }
 
 .drill-shell {
+  --coach-box: 13.75rem;
   height: 100dvh;
   height: 100svh;
   display: flex;
@@ -863,7 +864,11 @@ body,
 
 .coach-strip {
   margin-top: 0.45rem;
-  min-height: 4.4rem;
+  flex: 0 0 var(--coach-box);
+  height: var(--coach-box);
+  min-height: var(--coach-box);
+  max-height: var(--coach-box);
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -880,6 +885,32 @@ body,
   font-weight: 650;
   letter-spacing: -0.02em;
   line-height: 1.35;
+}
+
+.coach-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgb(245 158 11 / 40%) transparent;
+}
+
+.coach-scroll:focus-visible {
+  outline: 2px solid var(--ember);
+  outline-offset: 1px;
+  border-radius: 0.45rem;
+}
+
+.coach-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.coach-scroll::-webkit-scrollbar-thumb {
+  background: rgb(245 158 11 / 40%);
+  border-radius: 999px;
 }
 
 .coach-copy {
@@ -915,10 +946,12 @@ body,
 }
 
 .coach-ask-row {
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  min-width: 0;
 }
 
 .ask-coach {
@@ -1025,13 +1058,8 @@ body,
   opacity: 1;
 }
 
-.coach-strip.coach-strip-ask {
-  align-items: flex-start;
-}
-
 .coach-strip.coach-strip-ask .inline-ask {
-  flex: 1 1 100%;
-  margin-top: 0.05rem;
+  margin-top: 0.35rem;
 }
 
 .coach-strip p {
@@ -1205,7 +1233,7 @@ body,
 }
 
 .board-stage {
-  flex: 1 1 auto;
+  flex: 1 1 0%;
   min-height: 0;
   min-width: 0;
   display: flex;
@@ -1217,10 +1245,11 @@ body,
 }
 
 .board-stack {
-  flex: 1 1 auto;
+  flex: 1 1 0%;
   min-height: 0;
   min-width: 0;
   width: 100%;
+  height: 100%;
   max-width: 36rem;
   display: flex;
   flex-direction: column;
@@ -1228,7 +1257,7 @@ body,
 }
 
 .board-with-history {
-  flex: 1 1 auto;
+  flex: 1 1 0%;
   min-height: 0;
   min-width: 0;
   width: 100%;
@@ -2402,6 +2431,10 @@ body,
 }
 
 @media (max-height: 720px) {
+  .drill-shell {
+    --coach-box: 12.5rem;
+  }
+
   .drill-top {
     padding-bottom: 0.28rem;
   }
@@ -2409,7 +2442,6 @@ body,
   .coach-strip {
     margin-top: 0.3rem;
     padding: 0.48rem 0.55rem 0.5rem 0.6rem;
-    min-height: 4.1rem;
   }
 
   .mem-rail {
@@ -2429,6 +2461,62 @@ body,
   .ply-btn-play {
     min-height: 3.05rem;
     height: 3.05rem;
+  }
+}
+
+@media (max-height: 560px) {
+  .drill-shell {
+    --coach-box: 7.25rem;
+  }
+}
+
+@media (max-height: 520px) and (min-width: 700px) {
+  .drill-shell {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) min(20rem, 38vw);
+    grid-template-rows: auto auto minmax(0, 1fr) auto;
+  }
+
+  .drill-top {
+    display: contents;
+  }
+
+  .drill-nav {
+    grid-column: 1;
+    grid-row: 1;
+    padding: 0.2rem 0.45rem 0 0.35rem;
+  }
+
+  .reps-row {
+    grid-column: 1;
+    grid-row: 2;
+    margin: 0.2rem 0.45rem 0.15rem;
+  }
+
+  .coach-strip {
+    grid-column: 2;
+    grid-row: 1 / -1;
+    align-self: stretch;
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    margin: 0.35rem 0.4rem 0.35rem 0;
+  }
+
+  .board-stage {
+    grid-column: 1;
+    grid-row: 3;
+  }
+
+  .drill-dock {
+    grid-column: 1;
+    grid-row: 4;
+  }
+}
+
+@media (min-width: 840px) and (min-height: 700px) {
+  .drill-shell {
+    --coach-box: 10rem;
   }
 }
 

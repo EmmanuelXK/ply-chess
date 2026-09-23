@@ -729,58 +729,61 @@ export function DrillScreen({
           className={`coach-strip coach-${coach.kind}${
             coachLine ? "" : " coach-quiet"
           }${ask ? " coach-strip-ask" : ""}`}
+          data-testid="coach-teach-box"
         >
-          <div className="coach-copy">
-            {coach.kind === "pin" ? <span className="pin-dot" aria-hidden /> : null}
-            {reps === "trial" ? (
-              <div className="coach-who">
-                <span className="coach-mode-tag">{trialLeft}s</span>
+          <div className="coach-scroll" tabIndex={0} aria-label="Coach lesson">
+            <div className="coach-copy">
+              {coach.kind === "pin" ? <span className="pin-dot" aria-hidden /> : null}
+              {reps === "trial" ? (
+                <div className="coach-who">
+                  <span className="coach-mode-tag">{trialLeft}s</span>
+                </div>
+              ) : null}
+              <div className="coach-copy-stack">
+                <p className="coach-line">
+                  {coachLine || (mode === "plan" ? "Pick a plan" : "Your move")}
+                </p>
+                {coach.detail ? (
+                  <p className="coach-detail">{coach.detail}</p>
+                ) : null}
+                {coach.kind === "why" &&
+                coach.plan &&
+                coach.theyMoved &&
+                coach.secondBest ? (
+                  <CoachQuestions
+                    plan={coach.plan}
+                    theyMoved={coach.theyMoved}
+                    secondBest={coach.secondBest}
+                    compact
+                  />
+                ) : coach.triad ? (
+                  <ul className="coach-triad coach-triad-strip" data-testid="coach-triad">
+                    <li>
+                      <span>Do</span>
+                      {coach.triad.do}
+                    </li>
+                    <li>
+                      <span>Prevent</span>
+                      {coach.triad.prevent}
+                    </li>
+                    <li>
+                      <span>Their reply</span>
+                      {coach.triad.reply}
+                    </li>
+                  </ul>
+                ) : null}
               </div>
-            ) : null}
-            <div className="coach-copy-stack">
-              <p className="coach-line">
-                {coachLine || (mode === "plan" ? "Pick a plan" : "Your move")}
-              </p>
-              {coach.detail ? (
-                <p className="coach-detail">{coach.detail}</p>
-              ) : null}
-              {coach.kind === "why" &&
-              coach.plan &&
-              coach.theyMoved &&
-              coach.secondBest ? (
-                <CoachQuestions
-                  plan={coach.plan}
-                  theyMoved={coach.theyMoved}
-                  secondBest={coach.secondBest}
-                  compact
-                />
-              ) : coach.triad ? (
-                <ul className="coach-triad coach-triad-strip" data-testid="coach-triad">
-                  <li>
-                    <span>Do</span>
-                    {coach.triad.do}
-                  </li>
-                  <li>
-                    <span>Prevent</span>
-                    {coach.triad.prevent}
-                  </li>
-                  <li>
-                    <span>Their reply</span>
-                    {coach.triad.reply}
-                  </li>
-                </ul>
-              ) : null}
             </div>
+            {ask ? (
+              <InlineAsk
+                ask={ask}
+                picked={askPicked}
+                onPick={(id) => {
+                  setAskPicked(id);
+                }}
+              />
+            ) : null}
           </div>
-          {ask ? (
-            <InlineAsk
-              ask={ask}
-              picked={askPicked}
-              onPick={(id) => {
-                setAskPicked(id);
-              }}
-            />
-          ) : null}
           <div className="coach-ask-row">
             <button
               type="button"
