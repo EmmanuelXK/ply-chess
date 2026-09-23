@@ -4,14 +4,14 @@ import { LoginHomeRedirect } from "@/components/auth/login-home-redirect";
 /** Paints the login card before globals.css / JS. Hardcoded Lupin noir colors. */
 const CRITICAL_LOGIN_CSS = `
 .auth-shell{min-height:100dvh;min-height:100svh;display:flex;align-items:center;justify-content:center;padding:1.25rem 1rem calc(env(safe-area-inset-bottom,0px) + 1.25rem);background:#070708;color:#f3ebe0}
-.auth-card{width:min(100%,22rem);display:flex;flex-direction:column;gap:.45rem}
-.auth-mark{width:4.5rem;height:4.5rem;border-radius:1rem;margin-bottom:.4rem}
-.auth-card .dash-kicker{letter-spacing:.2em;text-transform:uppercase;color:#f59e0b;font-size:10px;font-weight:650;margin:0}
-.auth-card h1{margin:.1rem 0 0;font-size:1.7rem;color:#f3ebe0}
-.auth-lead,.auth-note,.auth-foot{margin:.2rem 0 .45rem;font-size:13px;line-height:1.4;color:#a39484}
+.auth-card{width:min(100%,22rem);display:flex;flex-direction:column;gap:.4rem;padding:1.35rem 1.15rem 1.15rem;border-radius:1.15rem;background:#161412;border:1px solid #2c261e;box-shadow:0 16px 36px rgb(0 0 0 / 36%)}
+.auth-mark{width:4.25rem;height:4.25rem;border-radius:.95rem;margin-bottom:.35rem}
+.auth-card .dash-kicker{letter-spacing:.16em;text-transform:uppercase;color:#f59e0b;font-size:10px;font-weight:600;margin:0}
+.auth-card h1{margin:.2rem 0 0;font-size:1.6rem;letter-spacing:-.034em;color:#f3ebe0}
+.auth-lead,.auth-note,.auth-foot{margin:.2rem 0 .45rem;font-size:13px;line-height:1.45;color:#a39484}
 .auth-note-warn{color:#fb923c}
 .auth-foot{margin-top:1rem;font-size:11px;letter-spacing:.02em}
-.auth-google{margin-top:.85rem;display:inline-flex;align-items:center;justify-content:center;gap:.65rem;width:100%;height:2.85rem;border-radius:.85rem;font-size:14px;font-weight:750;letter-spacing:.02em;color:#070708;background:linear-gradient(180deg,#fb923c,#f59e0b);text-decoration:none;box-sizing:border-box;border:0}
+.auth-google{margin-top:.85rem;display:inline-flex;align-items:center;justify-content:center;gap:.65rem;width:100%;height:2.75rem;border-radius:.8rem;font-size:14px;font-weight:650;letter-spacing:.01em;color:#070708;background:linear-gradient(180deg,#fb923c,#f59e0b);text-decoration:none;box-sizing:border-box;border:0}
 .auth-google[aria-disabled="true"]{opacity:.72;pointer-events:none}
 .auth-google-mark{width:1.15rem;height:1.15rem;flex:none}
 `;
