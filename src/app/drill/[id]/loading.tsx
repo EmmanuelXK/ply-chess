@@ -2,12 +2,12 @@ export default function DrillLoading() {
   return (
     <div className="drill-shell">
       <div className="drill-top">
-        <div className="h-8 w-32 rounded bg-zinc-800/80" />
+        <div className="shell-skel" />
       </div>
       <div className="learn-main">
         <div className="board-stage">
           <div className="board-with-history">
-            <div className="board-frame animate-pulse bg-zinc-900" />
+            <div className="board-frame animate-pulse" />
           </div>
         </div>
         <div className="ply-nav" aria-hidden>
@@ -15,7 +15,7 @@ export default function DrillLoading() {
           <span className="ply-btn ply-btn-fwd" />
         </div>
         <div className="coach-strip">
-          <p className="text-zinc-500">Loading the book…</p>
+          <p className="shell-wait">Loading the book…</p>
         </div>
       </div>
     </div>
