@@ -15,7 +15,7 @@ import {
   ScanSearch,
 } from "lucide-react";
 
-import { ChessBoard, type BoardArrow } from "@/components/board/chess-board";
+import { ChessBoard, type BoardArrow, type BoardMark } from "@/components/board/chess-board";
 import { Button } from "@/components/ui/button";
 import { AnalyzeSplash } from "@/components/drill/analyze-splash";
 import { HistoryMark } from "@/components/drill/history-mark";
@@ -57,6 +57,7 @@ import {
   type CoachKind,
   type CoachState,
 } from "@/lib/openings/coach";
+import { moveMarkAt } from "@/lib/openings/move-mark";
 import {
   isUserPly,
   openingFromTrap,
@@ -374,16 +375,31 @@ export function DrillScreen({
   const why = useMemo(() => explainLessonAt(opening, ply), [opening, ply]);
   const historyNow = historyAt(opening, ply);
 
+  const mark = useMemo<BoardMark | null>(() => {
+    if (ply <= 0 || !lastMove || lastMove.length < 2) return null;
+    const kind = moveMarkAt(opening, ply - 1);
+    if (!kind) return null;
+    return { kind, square: lastMove[1] };
+  }, [opening, ply, lastMove]);
+
   const arrows = useMemo<BoardArrow[]>(() => {
     const next: BoardArrow[] = [];
     if (lastMove && lastMove.length === 2) {
-      next.push({ orig: lastMove[0], dest: lastMove[1], brush: "last" });
+      const brush =
+        mark?.kind === "gem"
+          ? "yellow"
+          : mark?.kind === "true"
+            ? "green"
+            : mark?.kind === "clean"
+              ? "blue"
+              : "last";
+      next.push({ orig: lastMove[0], dest: lastMove[1], brush });
     }
     if (hintKeys && hintKeys.length === 2) {
       next.push({ orig: hintKeys[0], dest: hintKeys[1], brush: "hint" });
     }
     return next;
-  }, [lastMove, hintKeys]);
+  }, [lastMove, hintKeys, mark]);
 
   const cancelTimer = () => {
     if (timerRef.current !== null) {
@@ -724,7 +740,52 @@ export function DrillScreen({
             </button>
           ))}
         </div>
+        <p className="sr-only" role="status" aria-live="polite">
+          {coachLine}
+        </p>
+      </header>
 
+      <div className="learn-main">
+        <div className="board-stage">
+          <div className="board-with-history">
+            <ChessBoard
+              fen={fen}
+              dests={dests}
+              lastMove={lastMove}
+              arrows={arrows}
+              mark={mark}
+              orientation={orientation}
+              turnColor={turnColor}
+              viewOnly={(busy && mode === "drill") || lessonStyle === "podcast"}
+              movableColor={movableColor}
+              check={check}
+              animationMs={MOVE_MS}
+              resyncKey={boardEpoch}
+              onMove={onMove}
+              onLongPress={() => setAnalyzeOpen(true)}
+            />
+          </div>
+        </div>
+        <PlyNav
+          onBack={stepBack}
+          onForward={stepForward}
+          canBack={ply > 0}
+          canForward={ply < opening.moves.length}
+          lastSan={played.at(-1) ?? "Start"}
+          playing={lessonStyle === "podcast" ? podcastPlaying : undefined}
+          onPlay={
+            lessonStyle === "podcast"
+              ? () => {
+                  if (plyRef.current >= opening.moves.length) {
+                    applyPly(0);
+                    setPodcastPlaying(true);
+                    return;
+                  }
+                  setPodcastPlaying((on) => !on);
+                }
+              : undefined
+          }
+        />
         <div
           className={`coach-strip coach-${coach.kind}${
             coachLine ? "" : " coach-quiet"
@@ -823,51 +884,6 @@ export function DrillScreen({
               />
             ) : null}
           </div>
-        </div>
-        <p className="sr-only" role="status" aria-live="polite">
-          {coachLine}
-        </p>
-      </header>
-
-      <div className="board-stage">
-        <div className="board-stack">
-          <div className="board-with-history">
-            <ChessBoard
-              fen={fen}
-              dests={dests}
-              lastMove={lastMove}
-              arrows={arrows}
-              orientation={orientation}
-              turnColor={turnColor}
-              viewOnly={(busy && mode === "drill") || lessonStyle === "podcast"}
-              movableColor={movableColor}
-              check={check}
-              animationMs={MOVE_MS}
-              resyncKey={boardEpoch}
-              onMove={onMove}
-              onLongPress={() => setAnalyzeOpen(true)}
-            />
-          </div>
-          <PlyNav
-            onBack={stepBack}
-            onForward={stepForward}
-            canBack={ply > 0}
-            canForward={ply < opening.moves.length}
-            lastSan={played.at(-1) ?? "Start"}
-            playing={lessonStyle === "podcast" ? podcastPlaying : undefined}
-            onPlay={
-              lessonStyle === "podcast"
-                ? () => {
-                    if (plyRef.current >= opening.moves.length) {
-                      applyPly(0);
-                      setPodcastPlaying(true);
-                      return;
-                    }
-                    setPodcastPlaying((on) => !on);
-                  }
-                : undefined
-            }
-          />
         </div>
       </div>
 

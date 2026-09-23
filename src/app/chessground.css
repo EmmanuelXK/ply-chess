@@ -59,8 +59,28 @@
 }
 
 .board-cg cg-board square.last-move {
-  background-color: rgb(245 158 11 / 46%);
+  background-color: rgb(227 155 45 / 72%);
   will-change: auto;
+}
+
+.board-frame[data-mark="gem"] cg-board square.last-move {
+  background-color: rgb(228 177 90 / 78%);
+}
+
+.board-frame[data-mark="true"] cg-board square.last-move {
+  background-color: rgb(64 150 96 / 55%);
+}
+
+.board-frame[data-mark="clean"] cg-board square.last-move {
+  background-color: rgb(90 150 196 / 50%);
+}
+
+.board-cg cg-board square.move-dest {
+  background: radial-gradient(
+    rgb(227 155 45 / 78%) 16%,
+    rgb(180 110 16 / 96%) 17%,
+    transparent 0
+  );
 }
 
 .board-cg cg-board square.selected {
