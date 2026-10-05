@@ -50,7 +50,7 @@ cp .env.example .env.local
 npm run dev
 ```
 
-Without keys, local/preview can still open Home / Learn for craft work. Production (`VERCEL_ENV=production`) requires login.
+Personal use opens Home, Learn, and Analyze with no login, including production. Set `OPENING_EDGE_REQUIRE_AUTH=1` only if a later public launch should put the Google wall back.
 
 ## Security checklist
 

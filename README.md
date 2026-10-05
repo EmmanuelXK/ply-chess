@@ -1,6 +1,6 @@
 # Opening Edge
 
-iPhone-first PWA dashboard (`100dvh`, no page scroll). **26 attacking systems** on one **Your Weapons** home in **four racks** (White Gambits, White Systems, Black vs 1.e4, Black vs 1.d4). Square widget tiles; full details live in Learn. Each line is a **spine to move 21**, **traps**, and **six pillars** — then Plan mode. Under the board, a fixed note shows the move in SAN and, when the book already has one, a single short comment. Login is **Google only**.
+iPhone-first PWA dashboard (`100dvh`, no page scroll). **26 attacking systems** on one **Your Weapons** home in **four racks** (White Gambits, White Systems, Black vs 1.e4, Black vs 1.d4). Square widget tiles; full details live in Learn. Each line is a **spine to move 21**, **traps**, and **six pillars** — then Plan mode. Under the board, a fixed note shows the move in SAN and, when the book already has one, a single short comment. The board opens with no sign-in. Analyze runs Stockfish, Fairy-Stockfish, or Lc0 on the device.
 
 Production: [https://blitzbar.app](https://blitzbar.app) (Vercel project `ply-chess`, GitHub `EmmanuelXK/ply-chess`).
 
@@ -16,7 +16,7 @@ Home is four racks on one page (not color pages). Rack membership lives in `src/
 
 **Black · vs 1.d4:** King's Indian, Modern Benoni, Benko, Dutch Leningrad, Budapest, **Slav**.
 
-Home modes: **Learn · Reps · Practice · Drill · Time Trial · Progress**. Kind, vs-line, time, and traps live in Learn.
+Home is Learn: one move at a time, then Analyze. Kind, vs-line, time, and traps live in Learn.
 
 ## Move note
 
@@ -25,9 +25,6 @@ Learn keeps a fixed strip under the board so the board does not jump. It shows t
 Spine, houses, and trap branches live in the drill **sandwich menu** (a tree), not as noisy labels above the board.
 
 Gem, True, and Clean marks still land on signature theory moves. History opens from the note when a milestone is on the ply.
-
-### Quizzes
-Reps → **Quiz**, or the Quiz chip. Short **positional** questions tied to the current chunk (not trivia). Lion + London are fully authored; others fall back to chunk-job questions.
 
 ### Engines
 Analyze (dock or long-press) runs one browser engine at a time. The last choice is stored on the device.
@@ -44,7 +41,7 @@ Notices and the GPL text live in `public/engines/NOTICE.md`.
 Large **Back** and **Forward** under the board (thumb zone). Instant ply-by-ply through the spine — hurry the repertoire. Same control set inside Analyze. Chessground animations ~90ms (no teleports).
 
 ### Analyze
-**Analyze** on the dock, or **long-press the board**, from Learn, Quiz, or Review. The sheet keeps the board, a vertical eval bar, the top lines, depth, node count, and Stop / Go. Back and Forward still walk the line.
+**Analyze** on the dock, or **long-press the board**, from Learn. The sheet keeps the board, a vertical eval bar, the top lines, depth, node count, and Stop / Go. Back and Forward still walk the line.
 
 ### History Gig Pack
 When the current ply has a real chess-history milestone, a small **paper mark** appears on the move note. Tap it: fast splash, year, people, why it matters *here*, Wikipedia (and Chess.com when cited). Never blocks training.
@@ -72,7 +69,7 @@ npm run validate   # 26 spines legal, fingerprints, quizzes, sourced history
 npm run build
 ```
 
-On an iPhone: open the URL, Share → Add to Home Screen.
+On an iPhone: open the URL in Safari, Share → Add to Home Screen. Settings repeats those steps. Android and Chrome can use Install app. The service worker is network-first for pages and does not intercept `/engines/`, so Fairy-Stockfish keeps cross-origin isolation.
 
 ## Add a system
 

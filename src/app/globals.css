@@ -681,6 +681,26 @@ body,
   color: var(--cream);
 }
 
+.install-steps {
+  margin: 0.55rem 0 0;
+  padding-left: 1.15rem;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--mist);
+}
+
+.install-steps li + li {
+  margin-top: 0.2rem;
+}
+
+.install-label {
+  margin: 0.7rem 0 0;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ember);
+}
+
 .set-block-focus {
   outline: 1px solid var(--ember);
   outline-offset: 4px;

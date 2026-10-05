@@ -1,10 +1,6 @@
-import type { Metadata } from "next";
-import { ReviewScreen } from "@/components/drill/review-screen";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = {
-  title: "Review · Opening Edge",
-};
-
+/** Old spaced-review bookmarks open the repertoire. */
 export default function ReviewPage() {
-  return <ReviewScreen />;
+  redirect("/");
 }

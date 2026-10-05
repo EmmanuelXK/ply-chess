@@ -1,41 +1,20 @@
 import Link from "next/link";
 import { WeaponMark } from "@/components/home/weapon-mark";
-import {
-  openingKind,
-  parseStudyMode,
-  studyHref,
-  type Opening,
-  type RepsMode,
-} from "@/lib/openings";
-import { STUDY_MODES } from "@/lib/reps/schedule";
+import { openingKind, studyHref, type Opening } from "@/lib/openings";
 
-export function OpeningTile({
-  opening,
-  reps = "learn",
-  due = 0,
-}: {
-  opening: Opening;
-  reps?: RepsMode;
-  due?: number;
-  best?: number;
-}) {
-  const mode = parseStudyMode(typeof reps === "string" ? reps : "learn");
-  const href = studyHref(opening.id, mode);
-  const modeLabel =
-    STUDY_MODES.find((item) => item.id === mode)?.label ?? "Learn";
+export function OpeningTile({ opening }: { opening: Opening }) {
+  const href = studyHref(opening.id, "learn");
   const kind = openingKind(opening.id) === "system" ? "System" : "Semi";
-  const dueNote = due > 0 ? ` ${due} due.` : "";
 
   return (
     <Link
       href={href}
       className="weapon-tile"
       data-opening={opening.id}
-      aria-label={`${opening.shortName}. ${kind}. ${modeLabel}.${dueNote}`}
+      aria-label={`${opening.shortName}. ${kind}. Learn.`}
     >
       <span className="weapon-mark-wrap">
         <WeaponMark opening={opening} />
-        {due > 0 ? <span className="weapon-due">{due}</span> : null}
       </span>
       <span className="weapon-name">{opening.shortName}</span>
       <span className="weapon-kind">{kind}</span>

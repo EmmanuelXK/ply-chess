@@ -35,7 +35,6 @@ import {
   type StudyMode,
 } from "@/lib/reps/schedule";
 import {
-  STUDY_MODES,
   getOpening,
   historyAt,
   openingFromTrap,
@@ -48,14 +47,12 @@ const REVIEW_JUMP_MS = 480;
 
 export function DrillScreen({
   opening: root,
-  initialReps = "learn",
   initialTrap = null,
   daily = false,
 }: {
   opening: Opening;
-  initialReps?: StudyMode;
   initialTrap?: string | null;
-  /** Walk due moves across weapons, not only this line. */
+  /** Dormant review queue. Learn does not walk it. */
   daily?: boolean;
 }) {
   const [activeId, setActiveId] = useState(root.id);
@@ -72,7 +69,7 @@ export function DrillScreen({
   const modeRef = useRef<"drill" | "plan">("drill");
   const lockRef = useRef(false);
   const timerRef = useRef<number | null>(null);
-  const repsRef = useRef<StudyMode>(initialReps);
+  const repsRef = useRef<StudyMode>("learn");
   const dailyRef = useRef(daily);
   const activeIdRef = useRef(activeId);
   const queueRef = useRef<DueMove[]>([]);
@@ -96,13 +93,13 @@ export function DrillScreen({
   const [lineMenuOpen, setLineMenuOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [analyzeOpen, setAnalyzeOpen] = useState(false);
-  const [reps, setReps] = useState<StudyMode>(initialReps);
+  const reps: StudyMode = "learn";
   const [boardEpoch, setBoardEpoch] = useState(0);
   const [holdBook, setHoldBook] = useState(false);
-  const [reviewEmpty, setReviewEmpty] = useState(false);
-  const [reviewDone, setReviewDone] = useState(false);
-  const [queuePos, setQueuePos] = useState(0);
-  const [queueLen, setQueueLen] = useState(0);
+  const [, setReviewEmpty] = useState(false);
+  const [, setReviewDone] = useState(false);
+  const [, setQueuePos] = useState(0);
+  const [, setQueueLen] = useState(0);
 
   const setHold = useCallback((next: boolean) => {
     holdRef.current = next;
@@ -274,36 +271,20 @@ export function DrillScreen({
   }, [collectQueue, opening, session]);
 
   const dests = useMemo(() => {
-    if (busy || holdBook || reviewEmpty || (reps === "review" && reviewDone)) {
+    if (busy || holdBook) {
       return new Map<Key, Key[]>();
     }
     if (mode === "drill" && ply >= opening.moves.length) return new Map<Key, Key[]>();
     return toDests(new Chess(fen));
-  }, [busy, fen, holdBook, mode, opening.moves.length, ply, reps, reviewDone, reviewEmpty]);
+  }, [busy, fen, holdBook, mode, opening.moves.length, ply]);
 
   const turnColor = fen.includes(" w ") ? "white" : "black";
-  const movableColor =
-    busy || holdBook || reviewEmpty || (reps === "review" && reviewDone)
-      ? undefined
-      : mode === "plan"
-        ? "both"
-        : turnColor;
+  const movableColor = busy || holdBook ? undefined : mode === "plan" ? "both" : turnColor;
 
   const fullMoves = Math.ceil(opening.moves.length / 2);
   const shownMove = Math.min(Math.ceil(ply / 2), fullMoves);
   const historyNow = historyAt(opening, ply);
-  const note = useMemo(() => {
-    if (reps === "review" && reviewEmpty) {
-      return {
-        san: "Clear",
-        comment: daily ? "Nothing due." : "Nothing due on this line.",
-      };
-    }
-    if (reps === "review" && reviewDone) {
-      return { san: "Done", comment: "Queue finished." };
-    }
-    return moveNoteAt(opening, ply);
-  }, [daily, opening, ply, reps, reviewDone, reviewEmpty]);
+  const note = useMemo(() => moveNoteAt(opening, ply), [opening, ply]);
 
   const mark = useMemo<BoardMark | null>(() => {
     if (ply <= 0 || !lastMove || lastMove.length < 2) return null;
@@ -525,48 +506,13 @@ export function DrillScreen({
     setSession((n) => n + 1);
   };
 
-  const selectMode = (next: StudyMode) => {
-    cancelTimer();
-    setHold(false);
-    setReps(next);
-    repsRef.current = next;
-    setHintKeys(null);
-    setHintUsed(false);
-    if (next === "learn" || next === "quiz") {
-      setReviewEmpty(false);
-      setReviewDone(false);
-      applyPly(0);
-      return;
-    }
-    const items = dailyRef.current ? collectQueue() : collectQueue(opening.id);
-    queueRef.current = items;
-    queueIndexRef.current = 0;
-    setQueueLen(items.length);
-    setQueuePos(0);
-    setReviewDone(false);
-    setReviewEmpty(items.length === 0);
-    if (!items.length) {
-      applyPly(0);
-      return;
-    }
-    const first = items[0];
-    if (first.openingId === opening.id) {
-      applyPly(first.ply);
-      return;
-    }
-    resumePlyRef.current = first.ply;
-    if (lineId) setLineId(null);
-    setActiveId(first.openingId);
-  };
-
   const analyzeLine = useMemo(
     () => [...played, ...opening.moves.slice(ply)],
     [played, opening.moves, ply],
   );
 
-  const canForward =
-    reps === "learn" ? ply < opening.moves.length : holdBook || (reps === "review" && busy);
-  const canBack = reps === "review" ? queuePos > 0 : ply > 0;
+  const canForward = ply < opening.moves.length || holdBook;
+  const canBack = ply > 0;
   const status = holdBook
     ? `Book move. ${note.san}. ${note.comment ?? ""}`.trim()
     : note.comment
@@ -586,16 +532,10 @@ export function DrillScreen({
             <div className="flex items-baseline justify-between gap-2">
               <h1 className="drill-title">{activeRoot.shortName}</h1>
               <p className="drill-count">
-                {reps === "review" && queueLen > 0
-                  ? `${Math.min(queuePos + 1, queueLen)}/${queueLen}`
-                  : `${shownMove}/${fullMoves}`}
+                {shownMove}/{fullMoves}
               </p>
             </div>
-            {reps === "review" ? (
-              <p className="drill-branch">
-                {reviewDone ? "Queue finished" : reviewEmpty ? "Nothing due" : "Due moves"}
-              </p>
-            ) : mode === "plan" ? (
+            {mode === "plan" ? (
               <p className="truncate text-[11px] text-[var(--mist)]">Plan mode — free play</p>
             ) : trap ? (
               <p className="drill-branch">{trap.name}</p>
@@ -622,20 +562,6 @@ export function DrillScreen({
           </Button>
         </div>
 
-        <div className="reps-row" role="tablist" aria-label="Study mode" data-testid="study-mode">
-          {STUDY_MODES.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              role="tab"
-              aria-selected={reps === item.id}
-              className={reps === item.id ? "reps-chip reps-chip-on" : "reps-chip"}
-              onClick={() => selectMode(item.id)}
-            >
-              {item.label}
-            </button>
-          ))}
-        </div>
         <p className="sr-only" role="status" aria-live="polite">
           {status}
         </p>

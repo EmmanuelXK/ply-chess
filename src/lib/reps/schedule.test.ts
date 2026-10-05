@@ -11,24 +11,24 @@ import {
 } from "./schedule";
 
 describe("study modes", () => {
-  it("exposes Learn, Quiz, and Review", () => {
+  it("exposes Learn only", () => {
     assert.deepEqual(
       STUDY_MODES.map((mode) => mode.id),
-      ["learn", "quiz", "review"],
+      ["learn"],
     );
   });
 
-  it("maps older links onto the three modes", () => {
+  it("folds older quiz and review links into Learn", () => {
     assert.equal(parseStudyMode("learn"), "learn");
     assert.equal(parseStudyMode("spine"), "learn");
     assert.equal(parseStudyMode("practice"), "learn");
     assert.equal(parseStudyMode("trial"), "learn");
-    assert.equal(parseStudyMode("quiz"), "quiz");
-    assert.equal(parseStudyMode("drill"), "quiz");
-    assert.equal(parseStudyMode("traps"), "quiz");
-    assert.equal(parseStudyMode("review"), "review");
-    assert.equal(parseStudyMode("reps"), "review");
-    assert.equal(parseStudyMode("progress"), "review");
+    assert.equal(parseStudyMode("quiz"), "learn");
+    assert.equal(parseStudyMode("drill"), "learn");
+    assert.equal(parseStudyMode("traps"), "learn");
+    assert.equal(parseStudyMode("review"), "learn");
+    assert.equal(parseStudyMode("reps"), "learn");
+    assert.equal(parseStudyMode("progress"), "learn");
     assert.equal(parseStudyMode(null), "learn");
   });
 });

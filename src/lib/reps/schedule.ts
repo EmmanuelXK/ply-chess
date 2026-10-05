@@ -13,9 +13,11 @@ import {
 export type { StudyMode };
 
 export const STUDY_MODES: { id: StudyMode; label: string; blurb: string }[] = [
-  { id: "learn", label: "Learn", blurb: "One move at a time, with the book note." },
-  { id: "quiz", label: "Quiz", blurb: "Play the line from memory." },
-  { id: "review", label: "Review", blurb: "Due moves only. A short daily queue." },
+  {
+    id: "learn",
+    label: "Learn",
+    blurb: "One move at a time, with the book note. Analyze any position yourself.",
+  },
 ];
 
 export { DAILY_QUEUE_CAP, queueMinutes };
@@ -157,15 +159,16 @@ export function getProgressUser(): string | null {
   return progressUser;
 }
 
+/** Older Quiz / Review links open Learn. Stored reps stay on disk, unused. */
 export function parseStudyMode(value?: string | null): StudyMode {
-  if (value === "quiz" || value === "drill" || value === "traps") return "quiz";
-  if (value === "review" || value === "reps" || value === "progress") return "review";
+  void value;
   return "learn";
 }
 
-/** Drill only has Learn, Quiz, and Review. */
+/** The board is Learn only. */
 export function drillStudyMode(mode: StudyMode): StudyMode {
-  return mode;
+  void mode;
+  return "learn";
 }
 
 function coerceRep(row: Partial<RepEntry> | null | undefined): RepEntry | null {

@@ -16,12 +16,9 @@ describe("openingDossier", () => {
 
   it("keeps Learn on the existing drill route", () => {
     assert.equal(studyHref("scotch-gambit", "learn"), "/drill/scotch-gambit");
-    assert.equal(studyHref("scotch-gambit", "reps"), "/drill/scotch-gambit?reps=review");
-    assert.equal(studyHref("scotch-gambit", "quiz"), "/drill/scotch-gambit?reps=quiz");
-    assert.equal(
-      studyHref("london", "progress"),
-      "/drill/london?reps=review",
-    );
+    assert.equal(studyHref("scotch-gambit", "reps"), "/drill/scotch-gambit");
+    assert.equal(studyHref("scotch-gambit", "quiz"), "/drill/scotch-gambit");
+    assert.equal(studyHref("london", "progress"), "/drill/london");
   });
 
   it("labels system openings", () => {
