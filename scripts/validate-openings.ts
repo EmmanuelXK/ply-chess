@@ -1,6 +1,5 @@
 import { ATLAS } from "../src/lib/atlas";
 import { validateAtlas } from "../src/lib/atlas/validate";
-import { validateDialogue } from "../src/lib/dialogue/validate";
 import { housePicture, looksLikeMoveList, openings } from "../src/lib/openings";
 
 for (const opening of openings) {
@@ -19,8 +18,7 @@ for (const opening of openings) {
   }
 }
 
-validateDialogue(openings);
 validateAtlas();
 console.log(`\n${openings.length} openings legal from the start position.`);
 console.log(`✓ Theory atlas: ${ATLAS.length} mainstream openings, legal routes.`);
-console.log("✓ Single male coach; concept-first key points + theory reason + plan/their idea/near-miss on all 26 systems.");
+console.log("✓ Spines, fingerprints, quizzes, and sourced history on all 26 systems.");

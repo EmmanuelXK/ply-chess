@@ -1,6 +1,6 @@
 # Opening Edge
 
-iPhone-first PWA dashboard (`100dvh`, no page scroll). **26 attacking systems** on one **Your Weapons** home in **four racks** (White Gambits, White Systems, Black vs 1.e4, Black vs 1.d4). Square widget tiles; full details live in Learn. Each line is a **spine to move 21**, **traps**, and **six pillars** — then Plan mode. The board is silent. Tap **Ask Coach** or **Why** / **Explain** to read the idea and the reason. The strip stays concept-first; Why may name the move on the board. No floating chat head. Login is **Google only**.
+iPhone-first PWA dashboard (`100dvh`, no page scroll). **26 attacking systems** on one **Your Weapons** home in **four racks** (White Gambits, White Systems, Black vs 1.e4, Black vs 1.d4). Square widget tiles; full details live in Learn. Each line is a **spine to move 21**, **traps**, and **six pillars** — then Plan mode. Under the board, a fixed note shows the move in SAN and, when the book already has one, a single short comment. Login is **Google only**.
 
 Production: [https://blitzbar.app](https://blitzbar.app) (Vercel project `ply-chess`, GitHub `EmmanuelXK/ply-chess`).
 
@@ -18,25 +18,13 @@ Home is four racks on one page (not color pages). Rack membership lives in `src/
 
 Home modes: **Learn · Reps · Practice · Drill · Time Trial · Progress**. Kind, vs-line, time, and traps live in Learn.
 
-## Single coach
+## Move note
 
-The strip shows the key point (they/we pictures, 6–15 words, no SAN dumps) plus the **reason** (chunk job, conflict, or plan). Routine developing moves stay quiet until you tap **Ask Coach**. **Ask Coach**, **Why**, and dock **Explain** answer three questions: **plan**, **why they moved**, and **what the near-miss costs**. Key / highlighted plies also show a short **do / prevent / their reply** triad. History opens from the strip mark when a milestone is on the ply. There is no floating or draggable head.
+Learn keeps a fixed strip under the board so the board does not jump. It shows the current move in SAN. If that ply already has a stored book comment, the strip adds the first sentence and nothing else. Quiet plies stay SAN-only. There is no Ask Coach, Why, or Explain control, and no generated prose.
 
 Spine, houses, and trap branches live in the drill **sandwich menu** (a tree), not as noisy labels above the board.
 
-Coach Brain v2 is flagged (`COACH_BRAIN_V2`, off by default). Settings has **no coach picker, no duos, no Dual/Solo switch**.
-
-Lion and London have authored facts; other systems generate from the professor pack + History Gig Pack.
-
-### Voice
-The app is **silent**. There is no Speak-on-ply, mute toggle, speaker chip, or Settings voice/music panel. Ask Coach, Why, and Explain are **text**. TTS helpers remain in the repo as dead code and do not play.
-
-Focus / ambient music is not in this cut.
-
-### Why splash
-Tap **Why** on the coach strip or **Explain** on the dock — available on every ply, including quiet developing moves. A splash opens with a mini board. **Idea** and **Reason** sit above the board in plain language (plan, conflict, chunk job), then the question set: **Plan**, **Their idea**, **If you miss**. On key plies a short **Do / Prevent / Their reply** triad sits under that. The relevant **branch** auto-plays. Colored arrows + Chess.com-style glyphs (`!!` `!` `!?` `?` `??`) land on those Why plies. **Back / Forward** and play/pause work inside the splash. The ply list may name SAN; the sentences do not dump move lists.
-
-Lion and London have authored Why lessons (Nd4-style “the knight should control these squares”). Other systems get generated lessons from the spine + coach. Copy is concept-first: idea, then reason.
+Gem, True, and Clean marks still land on signature theory moves. History opens from the note when a milestone is on the ply.
 
 ### Quizzes
 Reps → **Quiz**, or the Quiz chip. Short **positional** questions tied to the current chunk (not trivia). Lion + London are fully authored; others fall back to chunk-job questions.
@@ -55,13 +43,13 @@ When they disagree, the panel explains the **human-practical** choice. Mate or a
 No env vars. Engines load lazily the first time you open Analyze or Think.
 
 ### Back / Forward
-Large **Back** and **Forward** under the board (thumb zone). Instant ply-by-ply through the spine — hurry the repertoire. Same control set inside Why and Analyze. Chessground animations ~90ms (no teleports).
+Large **Back** and **Forward** under the board (thumb zone). Instant ply-by-ply through the spine — hurry the repertoire. Same control set inside Analyze. Chessground animations ~90ms (no teleports).
 
 ### Analyze
 **Analyze** on the dock, or **long-press the board**. Fast splash: board, play/pause, Back/Forward, close. Vertical **eval bar** (Lichess/Chess.com style) beside the board — Stockfish primary. The human-plan strip shows Stockfish / Lc0-style / Maia-style votes.
 
 ### History Gig Pack
-When the current ply has a real chess-history milestone, a small **paper mark** appears on the coach strip and the board corner. Tap it: fast splash, year, people, why it matters *here*, Wikipedia (and Chess.com when cited). Never blocks training.
+When the current ply has a real chess-history milestone, a small **paper mark** appears on the move note. Tap it: fast splash, year, people, why it matters *here*, Wikipedia (and Chess.com when cited). Never blocks training.
 
 Data: `src/lib/openings/history.ts`. Typed `HistoryMilestone` (`plyOrFen`, `era`, `glyph`, `sources`, optional `famousGame`). Validation requires **≥1 sourced milestone per system** and **https** URLs. No folklore — if Wikipedia does not support a game/year, it is not in the pack. Romantic gambits (King’s Gambit, Evans) carry extra marks (Immortal, Evergreen, Kasparov revival). The Black Lion cites Dutch club pages (Jansen–den Ouden, 14 Jan 1967) plus Chess.com book notes, because it has no Wikipedia article.
 
@@ -82,7 +70,7 @@ npm run dev
 App: [http://127.0.0.1:43173](http://127.0.0.1:43173)
 
 ```bash
-npm run validate   # 26 spines legal, fingerprints, quizzes, professor, sourced history, legal Why branches
+npm run validate   # 26 spines legal, fingerprints, quizzes, sourced history
 npm run build
 ```
 
@@ -94,7 +82,7 @@ On an iPhone: open the URL, Share → Add to Home Screen.
 2. Add a spec in `src/lib/openings/specs.ts` (`bookChunks`, traps, pillars, coach). Spec `id` is the playable-system source of truth.
 3. Add that id to the right rack sequence in `src/lib/openings/racks.ts`. Home tiles come from racks, not from a second category list.
 4. Add a fingerprint in `src/lib/openings/fingerprints.ts`.
-5. Optional authored Why/quizzes in `src/lib/openings/authored.ts`.
+5. Optional authored quizzes in `src/lib/openings/authored.ts`.
 6. Add at least one sourced `HISTORY_PACK` row in `src/lib/openings/history.ts`.
 7. Add a square mark id in `src/lib/openings/mark-ids.ts`. `makeOpening` compiles chunks + professor + history. Home and `/drill/[id]` pick it up.
 

@@ -1,28 +1,8 @@
-import { twoBeatLine } from "./short";
-import type { LessonFacts } from "./types";
-
 export interface ShortHook {
   ply: number;
-  /** Why the opponent replied like that — their idea, threat, or plan. */
+  /** Kept so signature plies stay marked. Not shown as coach prose. */
   they: string;
-  /** How we concern / treat that idea — our conceptual answer. */
   we: string;
-}
-
-/**
- * Default strip copy — two pictures on key plies, never a SAN lead.
- * Align plies with existing pins / story / history so teaching stays sparse.
- *
- * Rubric for a good coach line:
- * 1. On a highlight, plant TWO concepts: why they moved, then how we treat it.
- * 2. Picture language (breathe, house, clamp, outpost, coil, gift, open the center).
- * 3. Two short sentences, 6–15 words total. Lupin-noir: sharp, male, premium.
- * 4. No leading SAN (`Bf4`, `…Nbd7`) and no dumped move list.
- * 5. Why/Explain/Ask Coach keep Idea + Reason, then plan / their idea / near-miss.
- *    Key plies add a short do / prevent / their reply triad. SAN stays on the move list.
- */
-export function spokenHook(row: ShortHook): string {
-  return twoBeatLine(row.they, row.we);
 }
 
 export const SHORT_HOOKS: Record<string, ShortHook[]> = {
@@ -974,13 +954,3 @@ export const SHORT_HOOKS: Record<string, ShortHook[]> = {
     },
   ],
 };
-
-export function hookAt(facts: LessonFacts): ShortHook | undefined {
-  const rows = SHORT_HOOKS[facts.openingId];
-  if (!rows?.length) return undefined;
-  const exact = rows.find((r) => r.ply === facts.ply);
-  if (exact) return exact;
-  return [...rows]
-    .filter((r) => r.ply <= facts.ply)
-    .sort((a, b) => b.ply - a.ply)[0];
-}

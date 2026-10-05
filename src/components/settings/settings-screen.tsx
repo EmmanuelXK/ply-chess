@@ -3,17 +3,12 @@
 import { useEffect, useState } from "react";
 import { TabBar } from "@/components/app/tab-bar";
 import { useAuth } from "@/components/auth/auth-provider";
-import {
-  readCoachBrainV2Stored,
-  writeCoachBrainV2Stored,
-} from "@/lib/coach-brain/flag";
 import type { SidePref } from "@/lib/auth/sanitize";
 import { profileSeed } from "@/lib/auth/profile";
 import { APP_MILESTONE, APP_VERSION } from "@/lib/version";
 
 export function SettingsScreen() {
   const { configured, ready, user, profile, save } = useAuth();
-  const [coachBrain, setCoachBrain] = useState(() => readCoachBrainV2Stored());
   const [displayName, setDisplayName] = useState("");
   const [initials, setInitials] = useState("");
   const [sidePref, setSidePref] = useState<SidePref>("both");
@@ -128,26 +123,6 @@ export function SettingsScreen() {
               Sign in with Google to keep this profile on your account.
             </p>
           )}
-        </section>
-
-        <section className="set-block" id="coach-brain">
-          <h2>Experimental</h2>
-          <p className="set-help">
-            Coach Brain v2 decides when to introduce, reinforce, correct, or
-            stay silent — still from authored hooks, never invented book moves.
-            Off by default. The current coach stays until you turn this on.
-          </p>
-          <label className="set-toggle">
-            <input
-              type="checkbox"
-              checked={coachBrain}
-              onChange={(e) => {
-                setCoachBrain(e.target.checked);
-                writeCoachBrainV2Stored(e.target.checked);
-              }}
-            />
-            Use Coach Brain v2
-          </label>
         </section>
 
         <section className="set-block" id="about">

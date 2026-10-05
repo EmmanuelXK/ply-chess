@@ -27,7 +27,7 @@ const prestigeSerif = Source_Serif_4({
 export const metadata: Metadata = {
   title: "Opening Edge",
   description:
-    "Dark repertoire trainer. Tablet-aware weapons grid, world openings atlas, one coach.",
+    "Dark repertoire trainer. Tablet-aware weapons grid, world openings atlas.",
   applicationName: "Opening Edge",
   appleWebApp: {
     capable: true,

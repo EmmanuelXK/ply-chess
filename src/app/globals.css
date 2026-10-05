@@ -742,7 +742,7 @@ body,
 }
 
 .drill-shell {
-  --coach-floor: 6.75rem;
+  --note-floor: 2.7rem;
   --ply-rail: 4.05rem;
   height: 100dvh;
   height: 100svh;
@@ -972,6 +972,60 @@ body,
   align-items: center;
   justify-content: center;
   text-decoration: none;
+}
+
+.move-note {
+  flex: 0 0 var(--note-floor);
+  height: var(--note-floor);
+  min-height: var(--note-floor);
+  max-height: var(--note-floor);
+  margin: 0.1rem 0.7rem 0.15rem;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-rows: 1.15rem 1.05rem;
+  column-gap: 0.55rem;
+  align-items: center;
+  overflow: hidden;
+  color: var(--cream);
+}
+
+.move-note-san {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  margin: 0;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 15px;
+  font-weight: 750;
+  letter-spacing: -0.03em;
+  color: var(--ember);
+  white-space: nowrap;
+}
+
+.move-note-comment {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  margin: 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 550;
+  line-height: 1.3;
+  color: var(--mist);
+}
+
+.move-note-timer {
+  grid-column: 3;
+  grid-row: 1;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: var(--mist-2);
+}
+
+.move-note .history-mark {
+  grid-column: 3;
+  grid-row: 2;
 }
 
 .coach-strip {
@@ -1354,7 +1408,7 @@ body,
 .board-stage {
   flex: 0 0 auto;
   width: 100%;
-  height: min(100cqw, calc(100cqh - var(--coach-floor) - var(--ply-rail)));
+  height: min(100cqw, calc(100cqh - var(--note-floor) - var(--ply-rail)));
   min-height: 0;
   min-width: 0;
   display: flex;
@@ -2675,21 +2729,21 @@ body,
 
   .drill-shell {
     --ply-rail: 3.55rem;
-    --coach-floor: 6.25rem;
+    --note-floor: 2.7rem;
   }
 }
 
 @media (max-height: 560px) {
   .drill-shell {
-    --coach-floor: 5.5rem;
+    --note-floor: 2.7rem;
   }
 }
 
 @media (max-height: 520px) and (min-width: 700px) {
   .drill-shell {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) min(18rem, 36vw);
-    grid-template-rows: auto minmax(0, 1fr) auto auto;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr) auto auto auto;
   }
 
   .drill-top {
@@ -2715,19 +2769,16 @@ body,
     grid-row: 3;
   }
 
-  .drill-dock {
+  .move-note {
     grid-column: 1;
     grid-row: 4;
+    align-self: center;
+    margin-bottom: 0.2rem;
   }
 
-  .coach-strip {
-    grid-column: 2;
-    grid-row: 1 / -1;
-    align-self: stretch;
-    height: auto;
-    min-height: 0;
-    max-height: none;
-    margin: 0.3rem 0.4rem 0.3rem 0;
+  .drill-dock {
+    grid-column: 1;
+    grid-row: 5;
   }
 }
 
