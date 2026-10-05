@@ -1,29 +1,41 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { Opening } from "@/lib/openings/types";
+import type { StudyMode } from "@/lib/openings/types";
+import {
+  DAILY_QUEUE_CAP,
+  clampLevel,
+  gradeCard,
+  introduceCard,
+  queueMinutes,
+  takeDailyQueue,
+  type RepCard,
+} from "@/lib/reps/ladder";
 
-export type StudyMode =
-  | "learn"
-  | "reps"
-  | "practice"
-  | "drill"
-  | "trial"
-  | "progress";
+export type { StudyMode };
 
 export const STUDY_MODES: { id: StudyMode; label: string; blurb: string }[] = [
-  { id: "learn", label: "Learn", blurb: "Walk the line. You move." },
-  { id: "reps", label: "Reps", blurb: "Spaced recall. Soft-fail, then retry." },
-  { id: "practice", label: "Practice", blurb: "Hybrid engines. Human-practical plans." },
-  { id: "drill", label: "Drill", blurb: "Traps and positional shots." },
-  { id: "trial", label: "Time Trial", blurb: "Beat the clock through the line." },
-  { id: "progress", label: "Progress", blurb: "What stuck — and what to review next." },
+  { id: "learn", label: "Learn", blurb: "One move at a time, with the book note." },
+  { id: "quiz", label: "Quiz", blurb: "Play the line from memory." },
+  { id: "review", label: "Review", blurb: "Due moves only. A short daily queue." },
 ];
+
+export { DAILY_QUEUE_CAP, queueMinutes };
 
 const REPS_BASE = "opening-edge.reps.v1";
 const PROGRESS_BASE = "opening-edge.progress.v1";
+const STREAK_BASE = "opening-edge.streak.v1";
 const USER_KEY = "opening-edge.progress-user";
 
 let progressUser: string | null = null;
 let dirtyHandler: (() => void) | null = null;
+let progressVersion = 0;
+const progressListeners = new Set<() => void>();
+
+export interface DueMove {
+  openingId: string;
+  ply: number;
+  due: number;
+  level: number;
+}
 
 export function setProgressUser(id: string | null): void {
   progressUser = id;
@@ -34,10 +46,35 @@ export function setProgressUser(id: string | null): void {
   } catch {
     /* ignore */
   }
+  emitProgress();
 }
 
 export function setProgressDirtyHandler(fn: (() => void) | null): void {
   dirtyHandler = fn;
+}
+
+export function subscribeProgress(listener: () => void): () => void {
+  progressListeners.add(listener);
+  return () => progressListeners.delete(listener);
+}
+
+export function getProgressVersion(): number {
+  return progressVersion;
+}
+
+/** localStorage fingerprint for Learn / Quiz / Review progress. */
+export function readProgressSnapshot(): string {
+  if (typeof window === "undefined") return "";
+  try {
+    return [
+      repsKey(),
+      window.localStorage.getItem(repsKey()) ?? "",
+      streakKey(),
+      window.localStorage.getItem(streakKey()) ?? "",
+    ].join("\n");
+  } catch {
+    return "";
+  }
 }
 
 function repsKey(): string {
@@ -48,29 +85,33 @@ function progressKey(): string {
   return progressUser ? `${PROGRESS_BASE}.${progressUser}` : PROGRESS_BASE;
 }
 
+function streakKey(): string {
+  return progressUser ? `${STREAK_BASE}.${progressUser}` : STREAK_BASE;
+}
+
 export function adoptAnonIfNeeded(userId: string): void {
   if (typeof window === "undefined") return;
   try {
-    const nextReps = `${REPS_BASE}.${userId}`;
-    const nextProg = `${PROGRESS_BASE}.${userId}`;
-    if (!window.localStorage.getItem(nextReps)) {
-      const anon = window.localStorage.getItem(REPS_BASE);
-      if (anon) window.localStorage.setItem(nextReps, anon);
+    const pairs = [
+      [REPS_BASE, `${REPS_BASE}.${userId}`],
+      [PROGRESS_BASE, `${PROGRESS_BASE}.${userId}`],
+      [STREAK_BASE, `${STREAK_BASE}.${userId}`],
+    ];
+    for (const [anonKey, userKey] of pairs) {
+      if (!window.localStorage.getItem(userKey)) {
+        const anon = window.localStorage.getItem(anonKey);
+        if (anon) window.localStorage.setItem(userKey, anon);
+      }
     }
-    if (!window.localStorage.getItem(nextProg)) {
-      const anon = window.localStorage.getItem(PROGRESS_BASE);
-      if (anon) window.localStorage.setItem(nextProg, anon);
-    }
+    emitProgress();
   } catch {
     /* ignore */
   }
 }
 
-interface RepEntry {
-  openingId: string;
-  ply: number;
-  due: number;
+interface RepEntry extends RepCard {
   ease: number;
+  /** Mirrors level so the existing remote row still round-trips. */
   streak: number;
 }
 
@@ -79,6 +120,11 @@ interface ProgressEntry {
   seen: number;
   best: number;
   lastAt: number;
+}
+
+interface StreakEntry {
+  day: string;
+  count: number;
 }
 
 function readJson<T>(key: string, fallback: T): T {
@@ -91,10 +137,16 @@ function readJson<T>(key: string, fallback: T): T {
   }
 }
 
+function emitProgress(): void {
+  progressVersion += 1;
+  for (const listener of progressListeners) listener();
+}
+
 function writeJson(key: string, value: unknown, remote = true): void {
   if (typeof window === "undefined") return;
   try {
     window.localStorage.setItem(key, JSON.stringify(value));
+    emitProgress();
     if (remote) dirtyHandler?.();
   } catch {
     /* ignore */
@@ -106,107 +158,105 @@ export function getProgressUser(): string | null {
 }
 
 export function parseStudyMode(value?: string | null): StudyMode {
-  if (
-    value === "learn" ||
-    value === "reps" ||
-    value === "practice" ||
-    value === "drill" ||
-    value === "trial" ||
-    value === "progress"
-  ) {
-    return value;
-  }
-  if (value === "spine") return "learn";
-  if (value === "traps" || value === "quiz") return "drill";
-  if (value === "think") return "practice";
+  if (value === "quiz" || value === "drill" || value === "traps") return "quiz";
+  if (value === "review" || value === "reps" || value === "progress") return "review";
   return "learn";
 }
 
-/** Home Progress is a dashboard filter — drill has no Progress chip. */
-export function drillStudyMode(
-  mode: StudyMode,
-): Exclude<StudyMode, "progress"> {
-  return mode === "progress" ? "reps" : mode;
+/** Drill only has Learn, Quiz, and Review. */
+export function drillStudyMode(mode: StudyMode): StudyMode {
+  return mode;
 }
 
-export function markReviewed(openingId: string, ply: number, ok: boolean): void {
-  const rows = readJson<RepEntry[]>(repsKey(), []);
-  const now = Date.now();
-  const idx = rows.findIndex((r) => r.openingId === openingId && r.ply === ply);
-  const prev = idx >= 0 ? rows[idx] : { openingId, ply, due: now, ease: 2.3, streak: 0 };
-  const streak = ok ? prev.streak + 1 : 0;
-  const ease = Math.max(1.3, prev.ease + (ok ? 0.12 : -0.28));
-  const waitMin = ok ? Math.round(20 * ease ** Math.min(streak, 6)) : 8;
-  const next: RepEntry = {
-    openingId,
-    ply,
-    due: now + waitMin * 60_000,
-    ease,
-    streak,
+function coerceRep(row: Partial<RepEntry> | null | undefined): RepEntry | null {
+  if (!row?.openingId || row.ply == null || !Number.isFinite(Number(row.ply))) return null;
+  const level = clampLevel(row.level ?? row.streak ?? 0);
+  return {
+    openingId: String(row.openingId),
+    ply: Number(row.ply),
+    level,
+    due: Number(row.due) || Date.now(),
+    ease: Number(row.ease) || 2.3,
+    streak: level,
   };
-  if (idx >= 0) rows[idx] = next;
-  else rows.push(next);
+}
+
+function readReps(): RepEntry[] {
+  return readJson<Partial<RepEntry>[]>(repsKey(), [])
+    .map((row) => coerceRep(row))
+    .filter((row): row is RepEntry => row != null);
+}
+
+function writeReps(rows: RepEntry[]): void {
   writeJson(repsKey(), rows);
 }
 
-function plyRecord(
-  rows: RepEntry[],
-  openingId: string,
-  ply: number,
-): RepEntry | undefined {
-  return rows.find((r) => r.openingId === openingId && r.ply === ply);
+function upsertRep(next: RepCard): void {
+  const rows = readReps();
+  const idx = rows.findIndex((row) => row.openingId === next.openingId && row.ply === next.ply);
+  const stored: RepEntry = { ...next, ease: 2.3, streak: next.level };
+  if (idx >= 0) rows[idx] = stored;
+  else rows.push(stored);
+  writeReps(rows);
 }
 
-function recordIsWeak(rec: RepEntry | undefined, now: number): boolean {
-  if (!rec) return false;
-  return rec.due <= now || rec.ease < 2.2 || rec.streak === 0;
+function dayKey(now: number): string {
+  const date = new Date(now);
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${date.getFullYear()}-${month}-${day}`;
 }
 
-export function duePly(openingId: string, maxPly: number): number {
-  const rows = readJson<RepEntry[]>(repsKey(), []).filter((r) => r.openingId === openingId);
-  const now = Date.now();
-  const due = rows
-    .filter((r) => r.due <= now && r.ply < maxPly)
-    .sort((a, b) => a.ply - b.ply);
-  return due[0]?.ply ?? 0;
+function previousDay(key: string): string {
+  const [year, month, day] = key.split("-").map(Number);
+  const date = new Date(year, (month || 1) - 1, day || 1);
+  date.setDate(date.getDate() - 1);
+  return dayKey(date.getTime());
 }
 
-/** Houses that contain a failed, stale, or due review ply. */
-export function dueChunks(opening: Opening): {
-  start: number;
-  name: string;
-  due: boolean;
-}[] {
-  const rows = readJson<RepEntry[]>(repsKey(), []).filter(
-    (r) => r.openingId === opening.id,
-  );
-  const now = Date.now();
-  return opening.chunks.map((chunk) => {
-    let due = false;
-    for (let ply = chunk.fromPly; ply <= chunk.toPly; ply++) {
-      if (recordIsWeak(plyRecord(rows, opening.id, ply), now)) {
-        due = true;
-        break;
-      }
-    }
-    return { start: chunk.fromPly, name: chunk.name, due };
-  });
+export function touchStreak(now = Date.now()): void {
+  const today = dayKey(now);
+  const prev = readJson<StreakEntry | null>(streakKey(), null);
+  let count = 1;
+  if (prev?.day === today) count = Math.max(1, prev.count || 1);
+  else if (prev?.day === previousDay(today)) count = Math.max(1, prev.count || 1) + 1;
+  writeJson(streakKey(), { day: today, count } satisfies StreakEntry, false);
 }
 
-export function weakHouseName(opening: Opening): string | null {
-  return dueChunks(opening).find((chunk) => chunk.due)?.name ?? null;
+export function currentStreak(now = Date.now()): number {
+  const prev = readJson<StreakEntry | null>(streakKey(), null);
+  if (!prev?.day || !prev.count) return 0;
+  const today = dayKey(now);
+  if (prev.day === today || prev.day === previousDay(today)) return prev.count;
+  return 0;
 }
 
-/** First ply of the weakest due house, else the oldest due ply. */
-export function reviewStartPly(opening: Opening): number {
-  const house = dueChunks(opening).find((chunk) => chunk.due);
-  if (house) return house.start;
-  return duePly(opening.id, opening.moves.length);
+export function markReviewed(openingId: string, ply: number, ok: boolean, now = Date.now()): void {
+  const prev = readReps().find((row) => row.openingId === openingId && row.ply === ply);
+  upsertRep(gradeCard(prev, openingId, ply, ok, now));
+  touchStreak(now);
+}
+
+export function introduceMove(openingId: string, ply: number, now = Date.now()): void {
+  const prev = readReps().find((row) => row.openingId === openingId && row.ply === ply);
+  const next = introduceCard(prev, openingId, ply, now);
+  if (next) upsertRep(next);
+  touchStreak(now);
+}
+
+export function listDueCards(openingId?: string, now = Date.now()): DueMove[] {
+  const cards = readReps().filter((row) => (openingId ? row.openingId === openingId : true));
+  return takeDailyQueue(cards, now, Math.max(cards.length, 1)).map((row) => ({
+    openingId: row.openingId,
+    ply: row.ply,
+    due: row.due,
+    level: row.level,
+  }));
 }
 
 export function markProgress(openingId: string, ply: number): void {
   const rows = readJson<ProgressEntry[]>(progressKey(), []);
-  const idx = rows.findIndex((r) => r.openingId === openingId);
+  const idx = rows.findIndex((row) => row.openingId === openingId);
   const prev = idx >= 0 ? rows[idx] : { openingId, seen: 0, best: 0, lastAt: 0 };
   const next: ProgressEntry = {
     openingId,
@@ -220,15 +270,12 @@ export function markProgress(openingId: string, ply: number): void {
 }
 
 export function progressFor(openingId: string): { seen: number; best: number } {
-  const row = readJson<ProgressEntry[]>(progressKey(), []).find((r) => r.openingId === openingId);
+  const row = readJson<ProgressEntry[]>(progressKey(), []).find((item) => item.openingId === openingId);
   return { seen: row?.seen ?? 0, best: row?.best ?? 0 };
 }
 
-export function dueCount(openingId: string): number {
-  const now = Date.now();
-  return readJson<RepEntry[]>(repsKey(), []).filter(
-    (r) => r.openingId === openingId && r.due <= now,
-  ).length;
+export function dueCount(openingId: string, now = Date.now()): number {
+  return listDueCards(openingId, now).length;
 }
 
 export async function pullRemoteProgress(
@@ -254,13 +301,17 @@ export async function pullRemoteProgress(
   if (Array.isArray(reps) && reps.length) {
     writeJson(
       `${REPS_BASE}.${userId}`,
-      reps.map((row) => ({
-        openingId: String(row.opening_id),
-        ply: Number(row.ply) || 0,
-        due: Date.parse(String(row.due)) || Date.now(),
-        ease: Number(row.ease) || 2.3,
-        streak: Number(row.streak) || 0,
-      })),
+      reps.map((row) => {
+        const level = clampLevel(Number(row.streak) || 0);
+        return {
+          openingId: String(row.opening_id),
+          ply: Number(row.ply) || 0,
+          due: Date.parse(String(row.due)) || Date.now(),
+          ease: Number(row.ease) || 2.3,
+          streak: level,
+          level,
+        };
+      }),
       false,
     );
   }
@@ -271,7 +322,9 @@ export async function pushRemoteProgress(
   userId: string,
 ): Promise<void> {
   const progress = readJson<ProgressEntry[]>(`${PROGRESS_BASE}.${userId}`, []);
-  const reps = readJson<RepEntry[]>(`${REPS_BASE}.${userId}`, []);
+  const reps = readJson<Partial<RepEntry>[]>(`${REPS_BASE}.${userId}`, [])
+    .map((row) => coerceRep(row))
+    .filter((row): row is RepEntry => row != null);
   if (progress.length) {
     await supabase.from("opening_progress").upsert(
       progress.map((row) => ({
@@ -291,7 +344,7 @@ export async function pushRemoteProgress(
         ply: row.ply,
         due: new Date(row.due).toISOString(),
         ease: row.ease,
-        streak: row.streak,
+        streak: row.level,
       })),
     );
   }

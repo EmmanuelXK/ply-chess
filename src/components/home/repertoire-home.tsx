@@ -1,8 +1,10 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { TabBar } from "@/components/app/tab-bar";
+import { DueQueue, visibleDue } from "@/components/home/due-queue";
 import { OpeningTile } from "@/components/home/opening-tile";
+import { useProgressStore } from "@/components/home/use-progress-store";
 import { useTileArranger } from "@/components/home/use-tile-arranger";
 import {
   STUDY_MODES,
@@ -14,15 +16,26 @@ import {
 } from "@/lib/openings";
 import type { TileLayout } from "@/lib/openings/arranger";
 import { useAuth } from "@/components/auth/auth-provider";
-import { dueCount, progressFor } from "@/lib/reps/schedule";
+import { dueCount } from "@/lib/reps/schedule";
 
 export function RepertoireHome() {
   const [mode, setMode] = useState<StudyMode>("learn");
+  const stored = useProgressStore();
   const { profile } = useAuth();
   const stageRef = useRef<HTMLDivElement>(null);
   const layout = useTileArranger(stageRef);
   const racks = weaponRacks(openings);
   const trained = racks.reduce((sum, rack) => sum + rack.openings.length, 0);
+  const dueById = useMemo(() => {
+    const map = new Map<string, number>();
+    if (!stored) return map;
+    for (const opening of openings) map.set(opening.id, dueCount(opening.id));
+    return map;
+  }, [stored]);
+  const dueTotal = useMemo(() => {
+    if (!stored) return 0;
+    return visibleDue(openings).length;
+  }, [stored]);
 
   return (
     <div className="dash-shell dash-repertoire">
@@ -31,6 +44,7 @@ export function RepertoireHome() {
         <h1>Opening Edge</h1>
         <p className="dash-sub">
           {trained} systems
+          {dueTotal > 0 ? ` · ${dueTotal} due` : ""}
           {profile?.displayName ? ` · ${profile.displayName}` : ""}
         </p>
         <div className="mode-grid" role="tablist" aria-label="Study mode">
@@ -48,17 +62,14 @@ export function RepertoireHome() {
             </button>
           ))}
         </div>
-        <p className="dash-mode-blurb">
-          {mode === "progress"
-            ? "What stuck. Due counts sit on the mark."
-            : STUDY_MODES.find((m) => m.id === mode)?.blurb}
-        </p>
+        <p className="dash-mode-blurb">{STUDY_MODES.find((item) => item.id === mode)?.blurb}</p>
       </header>
 
       <div className="dash-scroll dash-weapons-scroll">
+        <DueQueue openings={openings} />
         <div ref={stageRef} className="weapons-stage">
           {racks.map((rack) => (
-            <RackPane key={rack.id} rack={rack} mode={mode} layout={layout} />
+            <RackPane key={rack.id} rack={rack} mode={mode} layout={layout} dueById={dueById} />
           ))}
         </div>
       </div>
@@ -72,10 +83,12 @@ function RackPane({
   rack,
   mode,
   layout,
+  dueById,
 }: {
   rack: WeaponRack<Opening>;
   mode: StudyMode;
   layout: TileLayout | null;
+  dueById: Map<string, number>;
 }) {
   return (
     <section
@@ -101,20 +114,14 @@ function RackPane({
             : undefined
         }
       >
-        {rack.openings.map((opening) => {
-          const progress = progressFor(opening.id);
-          const due = dueCount(opening.id);
-          return (
-            <OpeningTile
-              key={opening.id}
-              opening={opening}
-              reps={mode}
-              due={due}
-              best={progress.best}
-              showProgress={mode === "progress" || mode === "reps"}
-            />
-          );
-        })}
+        {rack.openings.map((opening) => (
+          <OpeningTile
+            key={opening.id}
+            opening={opening}
+            reps={mode}
+            due={dueById.get(opening.id) ?? 0}
+          />
+        ))}
       </div>
     </section>
   );

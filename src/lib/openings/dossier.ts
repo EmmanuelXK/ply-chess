@@ -16,6 +16,5 @@ export function openingHouses(opening: Opening): string {
 
 export function studyHref(id: string, mode?: string | null): string {
   const resolved = parseStudyMode(mode);
-  const drill = resolved === "progress" ? "reps" : resolved;
-  return drill === "learn" ? `/drill/${id}` : `/drill/${id}?reps=${drill}`;
+  return resolved === "learn" ? `/drill/${id}` : `/drill/${id}?reps=${resolved}`;
 }
