@@ -34,10 +34,8 @@ export function StudySheet({
     <div className="study-sheet splash-in" role="dialog" aria-label="Book">
       <div className="study-sheet-top">
         <div>
-          <p className="text-[11px] font-medium tracking-[0.16em] text-zinc-500 uppercase">
-            Six pillars
-          </p>
-          <h2 className="text-[18px] font-semibold tracking-tight">{opening.shortName}</h2>
+          <p className="sheet-kicker">Six pillars</p>
+          <h2 className="sheet-title">{opening.shortName}</h2>
         </div>
         <button type="button" className="study-close" onClick={onClose}>
           Close
@@ -49,12 +47,8 @@ export function StudySheet({
       <div className="pillar-list">
         {PILLAR_LABELS.map(([key, label]) => (
           <div key={key}>
-            <h3 className="text-[11px] font-semibold tracking-[0.1em] text-amber-200 uppercase">
-              {label}
-            </h3>
-            <p className="mt-1 text-[13px] leading-snug text-zinc-300">
-              {opening.pillars[key]}
-            </p>
+            <h3 className="sheet-label">{label}</h3>
+            <p className="sheet-copy">{opening.pillars[key]}</p>
           </div>
         ))}
       </div>

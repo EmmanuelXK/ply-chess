@@ -663,7 +663,6 @@ export function DrillScreen({
             asChild
             variant="ghost"
             size="icon-sm"
-            className="text-zinc-300 hover:text-white"
           >
             <Link href="/" aria-label="Back to repertoire">
               <ChevronLeft />
@@ -671,10 +670,8 @@ export function DrillScreen({
           </Button>
           <div className="min-w-0 flex-1">
             <div className="flex items-baseline justify-between gap-2">
-              <h1 className="truncate text-[15px] font-semibold tracking-tight">
-                {root.shortName}
-              </h1>
-              <p className="shrink-0 font-mono text-[11px] tabular-nums text-zinc-500">
+              <h1 className="drill-title">{root.shortName}</h1>
+              <p className="drill-count">
                 {shownMove}/{fullMoves}
               </p>
             </div>
@@ -689,7 +686,6 @@ export function DrillScreen({
           <Button
             variant="ghost"
             size="icon-sm"
-            className="text-zinc-300 hover:text-white"
             onClick={() =>
               setOrientation((o) => (o === "white" ? "black" : "white"))
             }
@@ -701,7 +697,6 @@ export function DrillScreen({
           <Button
             variant="ghost"
             size="icon-sm"
-            className="text-zinc-300 hover:text-white"
             onClick={() => setLineMenuOpen(true)}
             aria-label="Repertoire branches"
             aria-expanded={lineMenuOpen}
