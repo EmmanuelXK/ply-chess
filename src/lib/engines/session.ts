@@ -17,6 +17,7 @@ interface SearchRequest {
   depth: EngineDepth;
   /** Bumps when the user presses Go again on the same position. */
   nonce: number;
+  multipv: number;
 }
 
 function normalizeLine(data: unknown): string[] {
@@ -42,6 +43,7 @@ class EngineSession {
   private searchingKey: string | null = null;
   private finishedKey: string | null = null;
   private bootToken = 0;
+  private owner: string | null = null;
 
   subscribe(fn: LineListener): () => void {
     this.listeners.add(fn);
@@ -54,7 +56,8 @@ class EngineSession {
     return () => this.phaseListeners.delete(fn);
   }
 
-  configure(req: SearchRequest): void {
+  configure(req: SearchRequest, owner: string): void {
+    this.owner = owner;
     this.req = req;
     if (this.engineId !== req.id || !this.worker) {
       this.boot(req.id);
@@ -63,8 +66,8 @@ class EngineSession {
     this.flush();
   }
 
-  halt(): void {
-    if (!this.req) return;
+  halt(owner: string): void {
+    if (this.owner !== owner || !this.req) return;
     this.req = { ...this.req, run: false };
     this.flush();
   }
@@ -81,7 +84,7 @@ class EngineSession {
   }
 
   private keyOf(req: SearchRequest): string {
-    return `${req.id}|${req.depth}|${req.nonce}|${req.fen}`;
+    return `${req.id}|${req.depth}|${req.multipv}|${req.nonce}|${req.fen}`;
   }
 
   private post(line: string): void {
@@ -166,7 +169,7 @@ class EngineSession {
     this.phase = "searching";
     this.searchingKey = key;
     this.setUi("searching");
-    if (req.id !== "lc0") this.post("setoption name MultiPV value 3");
+    if (req.id !== "lc0") this.post(`setoption name MultiPV value ${req.multipv}`);
     this.post(`position fen ${req.fen}`);
     this.post(`go depth ${req.depth}`);
   }
@@ -188,9 +191,13 @@ class EngineSession {
   }
 }
 
-let singleton: EngineSession | null = null;
+const sessions = new Map<AnalysisEngineId, EngineSession>();
 
-export function getEngineSession(): EngineSession {
-  if (!singleton) singleton = new EngineSession();
-  return singleton;
+export function getEngineSession(id: AnalysisEngineId): EngineSession {
+  let session = sessions.get(id);
+  if (!session) {
+    session = new EngineSession();
+    sessions.set(id, session);
+  }
+  return session;
 }

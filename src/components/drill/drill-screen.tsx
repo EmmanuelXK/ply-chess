@@ -23,6 +23,8 @@ import { PlyNav } from "@/components/drill/ply-nav";
 import { StudySheet } from "@/components/drill/study-sheet";
 import { lastMoveFrom, needsPromotion, toDests } from "@/lib/chess/dests";
 import { playLine } from "@/lib/chess/line";
+import { BoardEngines } from "@/components/drill/board-engines";
+import { explainPly } from "@/lib/openings/explain";
 import { moveNoteAt } from "@/lib/openings/move-note";
 import { moveMarkAt } from "@/lib/openings/move-mark";
 import {
@@ -132,9 +134,8 @@ export function DrillScreen({
   }, [sync]);
 
   const finishBook = useCallback(
-    (wasPlan: boolean) => {
+    (_wasPlan: boolean) => {
       modeRef.current = "plan";
-      if (!wasPlan) setAnalyzeOpen(true);
       sync();
     },
     [sync],
@@ -285,6 +286,7 @@ export function DrillScreen({
   const shownMove = Math.min(Math.ceil(ply / 2), fullMoves);
   const historyNow = historyAt(opening, ply);
   const note = useMemo(() => moveNoteAt(opening, ply), [opening, ply]);
+  const explanation = useMemo(() => explainPly(opening, ply), [opening, ply]);
 
   const mark = useMemo<BoardMark | null>(() => {
     if (ply <= 0 || !lastMove || lastMove.length < 2) return null;
@@ -536,7 +538,7 @@ export function DrillScreen({
               </p>
             </div>
             {mode === "plan" ? (
-              <p className="truncate text-[11px] text-[var(--mist)]">Plan mode — free play</p>
+              <p className="truncate text-[11px] text-[var(--mist)]">Line complete. Analyze from here.</p>
             ) : trap ? (
               <p className="drill-branch">{trap.name}</p>
             ) : null}
@@ -595,17 +597,25 @@ export function DrillScreen({
           canForward={canForward}
           lastSan={played.at(-1) ?? "Start"}
         />
-        <div className="move-note" data-testid="move-note" data-book={holdBook ? "true" : undefined}>
-          <p className="move-note-san">{note.san}</p>
-          <p className="move-note-comment">{note.comment ?? ""}</p>
-          {holdBook ? <span className="move-note-timer">Book</span> : null}
-          {historyNow.length ? (
-            <HistoryMark
-              glyph={historyNow[0].glyph}
-              label={`${historyNow[0].title} (${historyNow[0].year})`}
-              onClick={() => setHistoryOpen(true)}
-            />
+        <div className="learn-readout" data-testid="move-note" data-book={holdBook ? "true" : undefined}>
+          <div className="learn-readout-head">
+            <p className="move-note-san">{note.san}</p>
+            {holdBook ? <span className="move-note-timer">Book</span> : null}
+            {historyNow.length ? (
+              <HistoryMark
+                glyph={historyNow[0].glyph}
+                label={`${historyNow[0].title} (${historyNow[0].year})`}
+                onClick={() => setHistoryOpen(true)}
+              />
+            ) : null}
+          </div>
+          <p className="explain-copy" data-testid="explain">
+            {explanation}
+          </p>
+          {mode === "plan" ? (
+            <p className="explain-done">Line complete. Analyze from here.</p>
           ) : null}
+          <BoardEngines fen={fen} orientation={orientation} enabled={!analyzeOpen} />
         </div>
       </div>
 

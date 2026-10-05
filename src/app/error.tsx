@@ -19,7 +19,7 @@ export default function Error({
   return (
     <div className="dash-shell">
       <header className="dash-head">
-        <p className="dash-kicker">Opening Edge</p>
+        <p className="dash-kicker">EDGES</p>
         <h1>That line slipped.</h1>
         <p className="dash-sub">Reload the book, or go back to the racks.</p>
       </header>

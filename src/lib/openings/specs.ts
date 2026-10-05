@@ -141,18 +141,30 @@ export const openingSpecs = [
       },
       {
         afterPly: 18,
-        text: "f3. No outpost for them.",
+        text: "Be3. Challenge the dark bishop.",
       },
       {
         afterPly: 20,
+        text: "f3. No outpost for them.",
+      },
+      {
+        afterPly: 22,
         text: "f4. Space. That's the squeeze.",
       },
       {
         afterPly: 24,
-        text: "Queen centralizes. e-file next.",
+        text: "Nd2. Trade their knight.",
+      },
+      {
+        afterPly: 26,
+        text: "Queen centralizes. The e-file is next.",
       },
       {
         afterPly: 28,
+        text: "c3. Support the center.",
+      },
+      {
+        afterPly: 30,
         text: "Rook to e. You asked for this file.",
       },
       {
@@ -306,20 +318,28 @@ export const openingSpecs = [
         text: "d4. You asked for the center.",
       },
       {
-        afterPly: 14,
+        afterPly: 12,
         text: "Castle. The king is the cheap insurance.",
       },
       {
-        afterPly: 20,
+        afterPly: 14,
+        text: "cxd4. Take the center.",
+      },
+      {
+        afterPly: 18,
         text: "e5. Open Ba3's diagonal.",
       },
       {
-        afterPly: 22,
+        afterPly: 20,
         text: "Ba3. They don't castle for free.",
       },
       {
+        afterPly: 22,
+        text: "Nxe5. Take the pawn. Then the check.",
+      },
+      {
         afterPly: 24,
-        text: "Take e5. Then the check.",
+        text: "Qa4+. The check wins the piece back.",
       },
       {
         afterPly: 31,
@@ -638,8 +658,12 @@ export const openingSpecs = [
         text: "Castle. Then take the knight.",
       },
       {
-        afterPly: 22,
+        afterPly: 18,
         text: "Nxe4. Tension dies on your terms.",
+      },
+      {
+        afterPly: 22,
+        text: "Ng5. Hit the dark bishop.",
       },
       {
         afterPly: 31,
@@ -797,11 +821,15 @@ export const openingSpecs = [
       },
       {
         afterPly: 16,
-        text: "Castle. Through the fire.",
+        text: "Nc3. Develop through the center.",
+      },
+      {
+        afterPly: 20,
+        text: "g3. Cover. Then take f3.",
       },
       {
         afterPly: 22,
-        text: "g3. Cover. Then take f3.",
+        text: "Castle. Through the fire.",
       },
       {
         afterPly: 31,
@@ -856,11 +884,11 @@ export const openingSpecs = [
     side: "white",
     family: "white",
     versus: "Sicilian",
-    blurb: "Nc3 f4 vs the Sicilian. Bc4, f5, Qh5. You don't play Open Sicilian theory.",
+    blurb: "Nc3 f4 vs the Sicilian. Bc4, f5, Qh4. You don't play Open Sicilian theory.",
     story: {
       cast: "You are a Closed Sicilian that learned to punch.",
       conflict: "Black wants …d6 …g6 and a queenside minority.",
-      plan: "f5, Qh5, Bh6. Mate the fianchetto before …b5 matters.",
+      plan: "f5, Qh4, Bh6. Mate the fianchetto before …b5 matters.",
     },
     modelFromPly: 32,
     bookChunks: [
@@ -886,18 +914,18 @@ export const openingSpecs = [
       ],
       [
         4,
-        "d3 Bg5",
-        "Pin. Then Bh4-g3.",
+        "d3 Bb3",
+        "Hold the center. Bishop stays on the diagonal.",
       ],
       [
         4,
         "Castle hops",
-        "O-O. Knights to e5.",
+        "O-O. Queen swings to the kingside.",
       ],
       [
         8,
-        "Trade and Qh5",
-        "Take e5. Queen to h5.",
+        "Qh4 and Bh6",
+        "Trade the dark bishop. Queen on the dark squares.",
       ],
     ],
     pins: [
@@ -911,11 +939,11 @@ export const openingSpecs = [
       },
       {
         afterPly: 20,
-        label: "at the e5 hop…",
+        label: "at the queen swing…",
       },
       {
         afterPly: 26,
-        label: "at the Qh5 raid…",
+        label: "at the Bh6 trade…",
       },
       {
         afterPly: 31,
@@ -933,7 +961,7 @@ export const openingSpecs = [
       },
       {
         afterPly: 26,
-        beat: "Plan: Qh5. The fianchetto is a target.",
+        beat: "Plan: Bh6. The fianchetto is a target.",
       },
     ],
     coach: [
@@ -955,15 +983,19 @@ export const openingSpecs = [
       },
       {
         afterPly: 20,
-        text: "Knights hop e5. Trade toward the king.",
+        text: "Qe1. The queen swings toward the kingside.",
+      },
+      {
+        afterPly: 24,
+        text: "Qh4. Dark squares. Bh6 next.",
       },
       {
         afterPly: 26,
-        text: "Qh5. Look at h6 and f7.",
+        text: "Bh6. Trade the fianchetto bishop.",
       },
       {
         afterPly: 31,
-        text: "Book's done. Storm the fianchetto.",
+        text: "The attack is on the dark squares. Keep the h-file.",
       },
     ],
     traps: [
@@ -994,16 +1026,16 @@ export const openingSpecs = [
     ],
     pillars: {
       pawnStructure: "f-file vs …e6/…g6. After fxe6 the d-pawn can become backward. You don't care — you attack.",
-      pieceCoordination: "Bc4, Qh5, Bg5-h4-g3, Nc3, Rf3-f1 doubled.",
+      pieceCoordination: "Bc4, Qe1-h4, Bh6, Ng5. The attack trades the dark bishop. No knight sacrifice on d5.",
       kingSafety: "Short castle. Their king is short behind a fianchetto you want to rip.",
       breaksAndStorms: "f5 is the break. Then h4 if they play …g5.",
       tacticsBank: "f5 sac, Bb5 vs …Nd4, fxe6 structure wreck.",
-      attackingPlan: "Aggressive: Qh5, Bh6, Nd5. Steady: take e5 and play a plus center. Creative: rook lift Rf3-h3.",
+      attackingPlan: "Aggressive: Qh4, Bh6, and the h-file. Steady: take on d5 and play the center. Creative: rook lift after the dark bishops trade.",
     },
     plans: {
-      steady: "Trade dark bishops. Sit on e5. Don't sac if Qh5 is kicked.",
+      steady: "Trade dark bishops. Hold the center. Don't sac a knight on d5.",
       creative: "Rf3-h3. Queen to h4. Same idea, slower.",
-      aggressive: "Nd5, Qh5, Bh6. Mate the g7 bishop.",
+      aggressive: "Bh6, Qxh6, Ng5. Mate the fianchetto without a piece sacrifice.",
     },
     depthNote: "21 moves. Bc4 Grand Prix vs 2…Nc6 / …g6 is the spine (not the slower Bb5-only system). Open Sicilian trees are out of scope on purpose.",
   },
@@ -1105,19 +1137,27 @@ export const openingSpecs = [
       },
       {
         afterPly: 8,
-        text: "Bc4. Tempos on f7.",
+        text: "Nf3. Then the bishop on c4.",
       },
       {
-        afterPly: 16,
+        afterPly: 14,
         text: "Bf4. d6 is the patient.",
       },
       {
+        afterPly: 16,
+        text: "Qe2. The queen supports the center.",
+      },
+      {
         afterPly: 18,
-        text: "Qe2. Rook to d1 next.",
+        text: "Rad1. The d-file is the patient.",
+      },
+      {
+        afterPly: 22,
+        text: "Nd5. Best square. Sit.",
       },
       {
         afterPly: 24,
-        text: "Nd5. Best square. Sit.",
+        text: "Bxd5. Recapture. Keep the bind.",
       },
       {
         afterPly: 31,
@@ -1267,15 +1307,23 @@ export const openingSpecs = [
       },
       {
         afterPly: 14,
-        text: "e5. Wedge. Now the hop.",
+        text: "Re1. The rook supports the coming wedge.",
       },
       {
         afterPly: 16,
+        text: "e5. Wedge. Now the hop.",
+      },
+      {
+        afterPly: 18,
         text: "Nf1. This knight wants g4.",
       },
       {
-        afterPly: 22,
+        afterPly: 20,
         text: "h4. Storm. Don't get distracted by …b4.",
+      },
+      {
+        afterPly: 22,
+        text: "Bf4. The dark bishop joins the attack.",
       },
       {
         afterPly: 28,
@@ -1374,13 +1422,13 @@ export const openingSpecs = [
       ],
       [
         4,
-        "Nb3 a5",
-        "Chip. Bishop pin next.",
+        "a4 and c4",
+        "Queenside space. The knight stays off b3.",
       ],
       [
         4,
-        "Bg5 h6",
-        "Pin. They kick. You sit.",
+        "Rooks and h6",
+        "Rooks to the center. They kick with h6.",
       ],
     ],
     pins: [
@@ -1773,8 +1821,12 @@ export const openingSpecs = [
         text: "Bd3. Trade their bishop. You keep the storm.",
       },
       {
-        afterPly: 24,
+        afterPly: 22,
         text: "O-O-O. Opposite. Now race.",
+      },
+      {
+        afterPly: 24,
+        text: "Nxf4. The knight replaces the bishop.",
       },
       {
         afterPly: 29,
@@ -2251,20 +2303,32 @@ export const openingSpecs = [
         text: "They went long. You asked for this.",
       },
       {
-        afterPly: 20,
+        afterPly: 19,
         text: "…Rc8. The c-file is the Dragon's breath.",
       },
       {
-        afterPly: 22,
-        text: "…Ne5. Hop. Eye c4 and c4-sac.",
+        afterPly: 20,
+        text: "Bb3. The bishop steps off the long diagonal.",
       },
       {
-        afterPly: 24,
+        afterPly: 21,
+        text: "…Ne5. Hop. Eye the bishop on c4.",
+      },
+      {
+        afterPly: 22,
+        text: "h4. The pawn storm starts.",
+      },
+      {
+        afterPly: 23,
         text: "…h5. Soltis. Freeze g4.",
       },
       {
+        afterPly: 24,
+        text: "Bg5. Pin before the storm.",
+      },
+      {
         afterPly: 31,
-        text: "Book's done. Sac on c3 or hop c4.",
+        text: "Nc4. The knight sits on the file. Don't leave the rook hanging there.",
       },
     ],
     traps: [
@@ -2414,10 +2478,18 @@ export const openingSpecs = [
       },
       {
         afterPly: 14,
+        text: "Nd5. The queen has to step off a5.",
+      },
+      {
+        afterPly: 17,
         text: "gxf6. Ugly. Open. That's the point.",
       },
       {
         afterPly: 18,
+        text: "Bb3. The bishop steps off the c-file.",
+      },
+      {
+        afterPly: 23,
         text: "Long castle. You asked for a race.",
       },
       {
@@ -2567,16 +2639,24 @@ export const openingSpecs = [
         text: "Four pawns. Perfect. That's the spine.",
       },
       {
-        afterPly: 14,
+        afterPly: 13,
         text: "…Bf5. Out before …e6.",
+      },
+      {
+        afterPly: 14,
+        text: "Nc3. Develop. The center is the argument.",
       },
       {
         afterPly: 20,
         text: "Castle. Then rip f6.",
       },
       {
-        afterPly: 22,
+        afterPly: 21,
         text: "…f6. The whole opening.",
+      },
+      {
+        afterPly: 22,
+        text: "exf6. Open the file they asked for.",
       },
       {
         afterPly: 29,
@@ -2721,24 +2801,44 @@ export const openingSpecs = [
         text: "Fianchetto. This bishop is the soul.",
       },
       {
-        afterPly: 12,
+        afterPly: 11,
         text: "…e5. Close it. Then storm.",
       },
       {
-        afterPly: 16,
+        afterPly: 12,
+        text: "Castle. The king is in before the storm.",
+      },
+      {
+        afterPly: 15,
         text: "…Ne7. This knight wants g6.",
       },
       {
-        afterPly: 20,
+        afterPly: 16,
+        text: "Ne1. The knight makes room for f3.",
+      },
+      {
+        afterPly: 19,
         text: "…f5. That's the KID.",
       },
       {
+        afterPly: 20,
+        text: "Bd2. The bishop supports the queenside.",
+      },
+      {
         afterPly: 22,
+        text: "f3. Support the center before they lock.",
+      },
+      {
+        afterPly: 23,
         text: "…f4. Lock. Now the pawns run.",
       },
       {
-        afterPly: 26,
+        afterPly: 25,
         text: "…g5. Don't look at the queenside.",
+      },
+      {
+        afterPly: 26,
+        text: "cxd6. Open the c-file.",
       },
       {
         afterPly: 32,
@@ -2892,19 +2992,35 @@ export const openingSpecs = [
       },
       {
         afterPly: 16,
+        text: "Bd3. The bishop aims at the kingside.",
+      },
+      {
+        afterPly: 17,
         text: "…a6. Prep …b5. Don't rush it.",
       },
       {
         afterPly: 20,
+        text: "Castle. King in before the race.",
+      },
+      {
+        afterPly: 21,
         text: "…Re8. e4 is hanging in the air.",
       },
       {
         afterPly: 24,
+        text: "Bf4. Eye the center.",
+      },
+      {
+        afterPly: 25,
         text: "…Ne5. Hop. Trade toward the majority.",
       },
       {
         afterPly: 31,
-        text: "Book's done. …b5. Run the pawns.",
+        text: "Qc7. The queen supports the queenside.",
+      },
+      {
+        afterPly: 33,
+        text: "b5. Run the pawns.",
       },
     ],
     traps: [
@@ -3054,11 +3170,19 @@ export const openingSpecs = [
       },
       {
         afterPly: 22,
+        text: "Re1. The rook comes to the center.",
+      },
+      {
+        afterPly: 23,
         text: "…Qa5. Pin. Pressure a2.",
       },
       {
-        afterPly: 26,
+        afterPly: 25,
         text: "…Rfb8. That's the whole opening.",
+      },
+      {
+        afterPly: 26,
+        text: "Re2. Double on the file they opened.",
       },
       {
         afterPly: 31,
@@ -3203,16 +3327,28 @@ export const openingSpecs = [
         text: "Fianchetto. Leningrad, not Stonewall.",
       },
       {
-        afterPly: 14,
+        afterPly: 13,
         text: "…Qe8. That's the Leningrad queen.",
       },
       {
-        afterPly: 18,
+        afterPly: 14,
+        text: "d5. Claim space before the queen swing.",
+      },
+      {
+        afterPly: 15,
         text: "…a5. Stop b4. Knight to a6.",
       },
       {
+        afterPly: 18,
+        text: "b3. Support the center.",
+      },
+      {
         afterPly: 31,
-        text: "…e5. The break. Book's done. Use the f-file.",
+        text: "Rae8. The rook supports the break.",
+      },
+      {
+        afterPly: 33,
+        text: "…e5. The break. Use the f-file.",
       },
     ],
     traps: [
@@ -3304,7 +3440,7 @@ export const openingSpecs = [
       [
         6,
         "…a5 files",
-        "Open a. Rooks. Bf5 next.",
+        "Open a. Rooks. Knight to g6.",
       ],
     ],
     pins: [
@@ -3401,7 +3537,7 @@ export const openingSpecs = [
     ],
     pillars: {
       pawnStructure: "You recoup e5. Then …d6 / …c5. Their c4 can become a target. Don't play as if you're still down a pawn.",
-      pieceCoordination: "Bb4, Qe7, Ng4-e5, Nc6. After the trade, Bf5 and rooks on a/d.",
+      pieceCoordination: "Bb4, Qe7, Ng4-e5, Nc6. After the trade, the knight goes to g6 and the rooks use the d-file.",
       kingSafety: "Short castle. Kieninger is their king in the center — only if they grab b4.",
       breaksAndStorms: "…a5 opening the a-file. …f5 later. …c5 vs a slow setup.",
       tacticsBank: "Kieninger …Nd3#, Adler …Bc5, late Kieninger after Nxe5.",

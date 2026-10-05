@@ -7,7 +7,7 @@ import type { ProfileDraft } from "@/lib/auth/sanitize";
 import { profileSeed } from "@/lib/auth/profile";
 import { defaultOwner, writeLocalOwner } from "@/lib/owner";
 import { useLocalOwner } from "@/lib/use-local-owner";
-import { APP_MILESTONE, APP_VERSION } from "@/lib/version";
+import { APP_NAME, APP_TAGLINE, APP_VERSION } from "@/lib/version";
 import { InstallHint } from "@/components/settings/install-hint";
 
 export function SettingsScreen() {
@@ -27,10 +27,10 @@ export function SettingsScreen() {
   return (
     <div className="dash-shell">
       <header className="dash-head">
-        <p className="dash-kicker">Opening Edge</p>
+        <p className="dash-kicker">{APP_NAME}</p>
         <h1>Settings</h1>
+        <p className="dash-tagline">{APP_TAGLINE}</p>
         <p className="dash-sub">{APP_VERSION}</p>
-        <p className="dash-mode-blurb">{APP_MILESTONE}</p>
       </header>
 
       <div className="dash-scroll">
@@ -113,8 +113,9 @@ export function SettingsScreen() {
 
         <section className="set-block" id="about">
           <h2>About</h2>
-          <p className="set-version">{APP_VERSION}</p>
-          <p className="set-help">{APP_MILESTONE}</p>
+          <p className="set-version">{APP_NAME}</p>
+          <p className="set-help">{APP_TAGLINE}</p>
+          <p className="set-help">{APP_VERSION}</p>
         </section>
       </div>
 

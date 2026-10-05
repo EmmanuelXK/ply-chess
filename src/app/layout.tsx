@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Source_Serif_4 } from "next/font/google";
 import { AuthProvider } from "@/components/auth/auth-provider";
 import { RegisterServiceWorker } from "@/components/pwa/register-sw";
+import { APP_NAME, APP_TAGLINE } from "@/lib/version";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -26,21 +27,22 @@ const prestigeSerif = Source_Serif_4({
 });
 
 export const metadata: Metadata = {
-  title: "Opening Edge",
-  description:
-    "Personal repertoire. Learn one move at a time, then analyze the position yourself.",
-  applicationName: "Opening Edge",
+  title: APP_NAME,
+  description: `${APP_TAGLINE} Learn one move at a time, then analyze the position yourself.`,
+  applicationName: APP_NAME,
   appleWebApp: {
     capable: true,
-    title: "Opening Edge",
+    title: APP_NAME,
     statusBarStyle: "black-translucent",
   },
   icons: {
     icon: [
+      { url: "/favicon.ico", sizes: "32x32" },
       { url: "/icon.svg", type: "image/svg+xml" },
       { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
     ],
-    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
   },
   formatDetection: {
     telephone: false,
@@ -53,7 +55,7 @@ export const viewport: Viewport = {
   maximumScale: 1,
   userScalable: false,
   viewportFit: "cover",
-  themeColor: "#070708",
+  themeColor: "#040406",
 };
 
 export default function RootLayout({
@@ -69,11 +71,11 @@ export default function RootLayout({
       <head>
         <style
           dangerouslySetInnerHTML={{
-            __html: "html,body{background:#070708;color:#f3ebe0}",
+            __html: "html,body{background:#040406;color:#f3ebe0}",
           }}
         />
       </head>
-      <body className="app-body bg-[#070708] text-[#f3ebe0]">
+      <body className="app-body bg-[#040406] text-[#f3ebe0]">
         <AuthProvider>
           <RegisterServiceWorker />
           {children}

@@ -1,4 +1,4 @@
-/* Opening Edge shell.
+/* EDGES shell.
    Documents are network-first so a Vercel deploy shows up on the next open.
    /engines/ is never intercepted. Fairy-Stockfish needs the document to stay
    cross-origin isolated (COOP + COEP / SharedArrayBuffer). Cached documents

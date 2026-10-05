@@ -5,7 +5,7 @@ import { safeInternalPath } from "@/lib/auth/redirect";
 import { authIsRequired, supabasePublicConfig } from "@/lib/supabase/env";
 
 export const metadata = {
-  title: "Login · Opening Edge",
+  title: "Login · EDGES",
 };
 
 function firstParam(value: string | string[] | undefined): string | null {

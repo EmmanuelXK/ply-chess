@@ -36,7 +36,7 @@ function subscribePrefs(onStoreChange: () => void): () => void {
 function phaseCopy(phase: string, engineId: AnalysisEngineId): string {
   if (phase === "loading") return engineId === "lc0" ? "Loading network" : "Loading";
   if (phase === "searching") return "Searching";
-  if (phase === "ready") return "Done";
+  if (phase === "ready") return "Ready";
   if (phase === "error") return "Did not start";
   return "Stopped";
 }

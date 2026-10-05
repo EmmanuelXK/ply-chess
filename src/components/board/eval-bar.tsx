@@ -24,10 +24,12 @@ export function EvalBar({
   tick,
   orientation = "white",
   layout = "vertical",
+  showLabel = true,
 }: {
   tick: EvalTick;
   orientation?: "white" | "black";
   layout?: "vertical" | "horizontal";
+  showLabel?: boolean;
 }) {
   const whiteFill = fillFromEval(tick);
   const bottomIsWhite = orientation === "white";
@@ -47,11 +49,13 @@ export function EvalBar({
           className="eval-fill-white"
           style={{ width: bottomIsWhite ? whitePct : `calc(100% - ${whitePct})` }}
         />
-        <span
-          className={`eval-label ${whiteWinning ? "eval-label-w" : blackWinning ? "eval-label-b" : ""}`}
-        >
-          {text}
-        </span>
+        {showLabel ? (
+          <span
+            className={`eval-label ${whiteWinning ? "eval-label-w" : blackWinning ? "eval-label-b" : ""}`}
+          >
+            {text}
+          </span>
+        ) : null}
       </div>
     );
   }
@@ -68,11 +72,13 @@ export function EvalBar({
         className={bottomIsWhite ? "eval-fill-white" : "eval-fill-black"}
         style={{ height: bottomIsWhite ? whitePct : `calc(100% - ${whitePct})` }}
       />
-      <span
-        className={`eval-label ${whiteWinning ? "eval-label-w" : blackWinning ? "eval-label-b" : ""}`}
-      >
-        {text}
-      </span>
+      {showLabel ? (
+        <span
+          className={`eval-label ${whiteWinning ? "eval-label-w" : blackWinning ? "eval-label-b" : ""}`}
+        >
+          {text}
+        </span>
+      ) : null}
     </div>
   );
 }

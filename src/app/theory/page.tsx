@@ -1,7 +1,7 @@
 import { TheoryAtlas } from "@/components/theory/theory-atlas";
 
 export const metadata = {
-  title: "Universal Openings · Opening Edge",
+  title: "Universal Openings · EDGES",
   description:
     "World openings tree — families, key routes, and 1250-friendly plans.",
 };
