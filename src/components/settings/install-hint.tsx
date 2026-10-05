@@ -47,7 +47,7 @@ export function InstallHint() {
       <h2>Add to Home Screen</h2>
       {onHomeScreen ? (
         <p className="set-help">
-          EDGES is on this home screen. The next open picks up a new deploy.
+          EDGES is on this home screen. iOS keeps the old icon until you remove it and Add to Home Screen again.
         </p>
       ) : (
         <p className="set-help">

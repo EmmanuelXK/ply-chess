@@ -1,4 +1,4 @@
-import { APP_MARK } from "@/lib/version";
+import { APP_MARK, PWA_ICONS } from "@/lib/version";
 import { LoginHomeRedirect } from "@/components/auth/login-home-redirect";
 
 /** Paints the login card before globals.css / JS. Hardcoded Lupin noir colors. */
@@ -57,7 +57,7 @@ export function LoginScreen({
       <div className="auth-shell" style={{ background: "#070708", color: "#f3ebe0" }}>
         <div className="auth-card">
           <img
-            src="/icon-192.png"
+            src={PWA_ICONS.icon192}
             alt=""
             width={72}
             height={72}

@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { APP_NAME, APP_TAGLINE } from "@/lib/version";
+import { APP_NAME, APP_TAGLINE, PWA_ICONS } from "@/lib/version";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
@@ -15,34 +15,28 @@ export default function manifest(): MetadataRoute.Manifest {
     theme_color: "#040406",
     icons: [
       {
-        src: "/icon-192.png",
+        src: PWA_ICONS.icon192,
         sizes: "192x192",
         type: "image/png",
         purpose: "any",
       },
       {
-        src: "/icon-512.png",
+        src: PWA_ICONS.icon512,
         sizes: "512x512",
         type: "image/png",
         purpose: "any",
       },
       {
-        src: "/icon-maskable-192.png",
+        src: PWA_ICONS.maskable192,
         sizes: "192x192",
         type: "image/png",
         purpose: "maskable",
       },
       {
-        src: "/icon-maskable-512.png",
+        src: PWA_ICONS.maskable512,
         sizes: "512x512",
         type: "image/png",
         purpose: "maskable",
-      },
-      {
-        src: "/apple-touch-icon.png",
-        sizes: "180x180",
-        type: "image/png",
-        purpose: "any",
       },
     ],
   };
