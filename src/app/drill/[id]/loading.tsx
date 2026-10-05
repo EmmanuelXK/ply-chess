@@ -14,7 +14,7 @@ export default function DrillLoading() {
           <span className="ply-btn" />
           <span className="ply-btn ply-btn-fwd" />
         </div>
-        <div className="coach-strip">
+        <div className="move-note">
           <p className="shell-wait">Loading the book…</p>
         </div>
       </div>

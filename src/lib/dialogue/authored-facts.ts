@@ -1,8 +1,15 @@
-import { SHORT_HOOKS, spokenHook } from "./hooks";
-import type { LessonFacts } from "./types";
+/** Ply marks used by Gem / True / Clean. Not rendered as coach prose. */
+export interface AuthoredFact {
+  ply: number;
+  concept?: string;
+  why?: string;
+  plan?: string;
+  quizPrompt?: string;
+  quizChoices?: { id: string; text: string; correct: boolean }[];
+  romantic?: boolean;
+}
 
-/** Shared pedagogical facts — duo flavor is applied later. Never triple this. */
-export const AUTHORED_FACTS: Record<string, Partial<LessonFacts>[]> = {
+export const AUTHORED_FACTS: Record<string, AuthoredFact[]> = {
   "black-lion": [
     {
       ply: -1,
@@ -146,32 +153,3 @@ export const AUTHORED_FACTS: Record<string, Partial<LessonFacts>[]> = {
     },
   ],
 };
-
-function fromHook(
-  openingId: string,
-  ply: number,
-): Partial<LessonFacts> | undefined {
-  const row = SHORT_HOOKS[openingId]?.find((hook) => hook.ply === ply);
-  if (!row) return undefined;
-  return {
-    ply,
-    concept: spokenHook(row),
-    why: row.they,
-    plan: row.we,
-  };
-}
-
-export function authoredAt(
-  openingId: string,
-  ply: number,
-): Partial<LessonFacts> | undefined {
-  const rows = AUTHORED_FACTS[openingId];
-  const exact = rows?.find((r) => r.ply === ply);
-  if (exact) return exact;
-  const hooked = fromHook(openingId, ply);
-  if (hooked) return hooked;
-  if (!rows?.length) return undefined;
-  return [...rows]
-    .filter((r) => typeof r.ply === "number" && r.ply <= ply && r.ply >= 0)
-    .sort((a, b) => (b.ply ?? 0) - (a.ply ?? 0))[0];
-}

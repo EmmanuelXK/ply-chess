@@ -1,5 +1,4 @@
-import { SHORT_HOOKS, spokenHook } from "@/lib/dialogue/hooks";
-import type { Chunk, CoachLine, Opening, StoryBeat } from "./types";
+import type { Chunk, Opening } from "./types";
 
 /** Chunk jobs and names — house pictures, never a dumped move list. */
 const CHUNK_JOBS: Record<string, Record<string, { name?: string; job: string }>> = {
@@ -257,26 +256,10 @@ function overlayChunks(chunks: Chunk[], openingId: string): Chunk[] {
   });
 }
 
-function coachFromHooks(openingId: string): CoachLine[] | undefined {
-  const hooks = SHORT_HOOKS[openingId];
-  if (!hooks?.length) return undefined;
-  return hooks.map((row) => ({ afterPly: row.ply, text: spokenHook(row) }));
-}
-
-function beatsFromHooks(opening: Opening): StoryBeat[] {
-  return opening.storyBeats.map((beat) => {
-    const hook = SHORT_HOOKS[opening.id]?.find((row) => row.ply === beat.afterPly);
-    return hook ? { ...beat, beat: spokenHook(hook) } : beat;
-  });
-}
-
-/** Apply Memory OS copy onto a compiled opening before professor enrichment. */
+/** Apply stored house names onto a compiled opening. Does not invent move prose. */
 export function applyConceptCopy(opening: Opening): Opening {
-  const coach = coachFromHooks(opening.id);
   return {
     ...opening,
     chunks: overlayChunks(opening.chunks, opening.id),
-    coach: coach ?? opening.coach,
-    storyBeats: beatsFromHooks(opening),
   };
 }

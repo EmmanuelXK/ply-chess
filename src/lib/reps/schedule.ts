@@ -10,7 +10,7 @@ export type StudyMode =
   | "progress";
 
 export const STUDY_MODES: { id: StudyMode; label: string; blurb: string }[] = [
-  { id: "learn", label: "Learn", blurb: "Coach walks the spine. You move." },
+  { id: "learn", label: "Learn", blurb: "Walk the line. You move." },
   { id: "reps", label: "Reps", blurb: "Spaced recall. Soft-fail, then retry." },
   { id: "practice", label: "Practice", blurb: "Hybrid engines. Human-practical plans." },
   { id: "drill", label: "Drill", blurb: "Traps and positional shots." },
