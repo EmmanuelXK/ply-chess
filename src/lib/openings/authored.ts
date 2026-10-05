@@ -190,7 +190,7 @@ export const authoredProfessor: Record<string, ProfessorScript[]> = {
             narrate:
               "Take it. That knight was the only attacking piece. The Lion trades when the trade kills their plan.",
             glyph: "!",
-            arrows: [{ orig: "e7", dest: "f5", brush: "green" }],
+            arrows: [{ orig: "c8", dest: "f5", brush: "green" }],
           },
           {
             san: "exf5",

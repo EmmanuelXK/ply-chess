@@ -4,32 +4,24 @@ import { useRef } from "react";
 import { TabBar } from "@/components/app/tab-bar";
 import { OpeningTile } from "@/components/home/opening-tile";
 import { useTileArranger } from "@/components/home/use-tile-arranger";
-import { useAuth } from "@/components/auth/auth-provider";
 import { openings, weaponRacks, type Opening, type WeaponRack } from "@/lib/openings";
 import type { TileLayout } from "@/lib/openings/arranger";
-import { ownerLabel } from "@/lib/owner";
-import { STUDY_MODES } from "@/lib/reps/schedule";
-import { useLocalOwner } from "@/lib/use-local-owner";
+import { APP_NAME, APP_TAGLINE } from "@/lib/version";
 
 export function RepertoireHome() {
   const stageRef = useRef<HTMLDivElement>(null);
   const layout = useTileArranger(stageRef);
-  const { profile } = useAuth();
-  const local = useLocalOwner();
   const racks = weaponRacks(openings);
   const trained = racks.reduce((sum, rack) => sum + rack.openings.length, 0);
-  const name = ownerLabel(local?.displayName, profile?.displayName);
-  const blurb = STUDY_MODES[0]?.blurb ?? "One move at a time, with the book note.";
 
   return (
     <div className="dash-shell dash-repertoire">
       <header className="dash-head">
         <p className="dash-kicker">Your Weapons</p>
-        <h1>Opening Edge</h1>
-        <p className="dash-sub">
-          {trained} systems · {name}
-        </p>
-        <p className="dash-mode-blurb">{blurb}</p>
+        <h1>{APP_NAME}</h1>
+        <p className="dash-tagline">{APP_TAGLINE}</p>
+        <p className="dash-sub">{trained} systems</p>
+        <p className="dash-mode-blurb">Learn one move at a time. Analyze the position yourself.</p>
       </header>
 
       <div className="dash-scroll dash-weapons-scroll">

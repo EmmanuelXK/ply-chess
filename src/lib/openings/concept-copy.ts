@@ -53,9 +53,9 @@ const CHUNK_JOBS: Record<string, Record<string, { name?: string; job: string }>>
     "Nf3 Bc4": { name: "Aim the bishop", job: "Aim at the king. Same soft-square religion." },
     "f5 lever": { job: "Crack the file. They wanted a slow game." },
     "Take e6": { job: "Ruin the center. Then the queen swing." },
-    "d3 Bg5": { job: "Pin. Then the bishop slides toward the king." },
-    "Castle hops": { job: "King in. Knights hop toward the fianchetto." },
-    "Trade and Qh5": { name: "Queen raid", job: "Look at the holes. The fianchetto is the target." },
+    "d3 Bb3": { job: "Hold the center. The light bishop stays on the diagonal." },
+    "Castle hops": { job: "King in. The queen swings toward the fianchetto." },
+    "Qh4 and Bh6": { name: "Queen raid", job: "Trade the dark bishop. The queen sits on the dark squares." },
   },
   "smith-morra": {
     "d4 c3 gift": { name: "c3 gift", job: "Gift the pawn. Buy the tempos." },
@@ -82,8 +82,8 @@ const CHUNK_JOBS: Record<string, Record<string, { name?: string; job: string }>>
     "c3 Bd3": { job: "Triangle. Aim at the king." },
     "Castle Bd6": { job: "King tucked. Queen wants the swing." },
     "Qe1 Qc7": { job: "Swing the queen. The wall has a crack." },
-    "Nb3 a5": { job: "Chip. Pin next." },
-    "Bg5 h6": { job: "Pin. They kick. You sit. Open the leftover file." },
+    "a4 and c4": { job: "Queenside space. Leave the knight off b3." },
+    "Rooks and h6": { job: "Rooks to the center. They kick with the h-pawn." },
   },
   london: {
     "London triangle": {
@@ -193,7 +193,7 @@ const CHUNK_JOBS: Record<string, Record<string, { name?: string; job: string }>>
     "Take e5": { job: "Cash the gambit. You got the pawn back." },
     "Castle d6": { job: "King in. Nothing hanging. Hold the recoup." },
     "…b6 Bc5": { name: "Keep the bishop", job: "They hop. You keep the bishop. Squeeze next." },
-    "…a5 files": { name: "Open a", job: "Squeeze the leftover pawn. Files next." },
+    "…a5 files": { name: "Open a", job: "Open the a-file. The knight reroutes to g6." },
   },
   alapin: {
     "c3 house": { job: "Same house every game. Recapture with a pawn." },

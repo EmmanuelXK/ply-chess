@@ -64,8 +64,8 @@ describe("isKeyPly", () => {
     assert.equal(getOpening("english")?.moves.length, 42);
     assert.equal(getOpening("caro-kann")?.moves.length, 42);
     assert.equal(getOpening("alapin")?.moves.at(-1), "Qd7");
-    assert.equal(getOpening("english")?.moves.at(-1), "Nc6");
-    assert.equal(getOpening("caro-kann")?.moves.at(-1), "Bxa3");
+    assert.equal(getOpening("english")?.moves.at(-1), "Re8");
+    assert.equal(getOpening("caro-kann")?.moves.at(-1), "Rd8");
     assert.equal(isUserPly("black", (getOpening("caro-kann")?.moves.length ?? 0) - 1), true);
   });
 });

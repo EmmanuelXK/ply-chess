@@ -50,8 +50,8 @@
 
 :root,
 .dark {
-  --ink: #070708;
-  --ink-2: #0c0b0a;
+  --ink: #040406;
+  --ink-2: #070709;
   --charcoal: #161412;
   --charcoal-2: #1c1916;
   --line: #2c261e;
@@ -191,6 +191,15 @@ body,
   );
 }
 
+.dash-repertoire.dash-shell {
+  background: #030305;
+}
+
+.dash-repertoire.dash-shell::before {
+  height: 9rem;
+  background: radial-gradient(70% 80% at 50% 0%, rgb(255 255 255 / 3.5%), transparent 72%);
+}
+
 .dash-shell.dash-repertoire,
 .dash-shell.theory-shell {
   max-width: 72rem;
@@ -231,6 +240,30 @@ body,
   line-height: 1.05;
   font-family: var(--font-heading);
   color: var(--cream);
+}
+
+.dash-repertoire .dash-head h1 {
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  font-size: 1.7rem;
+  font-weight: 560;
+  letter-spacing: 0.28em;
+  text-indent: 0.28em;
+  line-height: 1;
+  color: #f7f4ef;
+}
+
+.dash-tagline {
+  margin: 0.55rem 0 0;
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  font-weight: 450;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  color: #f3ebe0;
+}
+
+.dash-repertoire .dash-family-head h2 {
+  color: #d5cbbf;
 }
 
 .dash-sub {
@@ -854,7 +887,7 @@ body,
 }
 
 .drill-shell {
-  --note-floor: 2.7rem;
+  --note-floor: 15.5rem;
   --ply-rail: 4.05rem;
   height: 100dvh;
   height: 100svh;
@@ -1086,24 +1119,27 @@ body,
   text-decoration: none;
 }
 
-.move-note {
-  flex: 0 0 var(--note-floor);
-  height: var(--note-floor);
-  min-height: var(--note-floor);
+.move-note,
+.learn-readout {
+  flex: 0 1 auto;
+  min-height: 0;
   max-height: var(--note-floor);
   margin: 0.1rem 0.7rem 0.15rem;
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  grid-template-rows: 1.15rem 1.05rem;
-  column-gap: 0.55rem;
-  align-items: center;
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  overflow: auto;
   color: var(--cream);
 }
 
+.learn-readout-head {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: 1.2rem;
+}
+
 .move-note-san {
-  grid-column: 1;
-  grid-row: 1 / span 2;
   margin: 0;
   font-family: var(--font-geist-mono), ui-monospace, monospace;
   font-size: 15px;
@@ -1113,14 +1149,27 @@ body,
   white-space: nowrap;
 }
 
+.explain-copy {
+  margin: 0;
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  font-size: 14.5px;
+  font-weight: 450;
+  line-height: 1.45;
+  letter-spacing: -0.011em;
+  color: #f4efe8;
+}
+
+.explain-done {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+  color: var(--ember);
+}
+
 .move-note-comment {
-  grid-column: 2;
-  grid-row: 1 / span 2;
   margin: 0;
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
   font-size: 13px;
   font-weight: 550;
   line-height: 1.3;
@@ -1128,23 +1177,69 @@ body,
 }
 
 .move-note-timer {
-  grid-column: 3;
-  grid-row: 1;
   font-size: 11px;
   font-variant-numeric: tabular-nums;
   color: var(--mist-2);
 }
 
+.engine-strip {
+  display: flex;
+  flex-direction: column;
+  gap: 0.32rem;
+  flex: 0 0 auto;
+  padding-bottom: 0.15rem;
+}
+
+.engine-eval-row {
+  display: grid;
+  grid-template-columns: 4.8rem minmax(0, 1fr) 3.4rem;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.engine-eval-name {
+  display: flex;
+  flex-direction: column;
+  gap: 0.05rem;
+  font-size: 11px;
+  font-weight: 680;
+  letter-spacing: -0.01em;
+  color: #f7f4ef;
+}
+
+.engine-eval-phase {
+  font-size: 9px;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--mist-2);
+}
+
+.engine-eval-cp {
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  font-weight: 720;
+  text-align: right;
+  color: #f7f4ef;
+}
+
+.engine-eval-row .eval-bar-h {
+  height: 0.7rem;
+  margin: 0;
+  border-radius: 0.28rem;
+}
+
 .move-note[data-book="true"] .move-note-san,
-.move-note[data-book="true"] .move-note-timer {
+.learn-readout[data-book="true"] .move-note-san,
+.move-note[data-book="true"] .move-note-timer,
+.learn-readout[data-book="true"] .move-note-timer {
   color: var(--ember);
   font-weight: 750;
   letter-spacing: 0.04em;
 }
 
-.move-note .history-mark {
-  grid-column: 3;
-  grid-row: 2;
+.learn-readout .history-mark {
+  margin-left: auto;
 }
 
 .coach-strip {
@@ -2966,13 +3061,13 @@ body,
 
   .drill-shell {
     --ply-rail: 3.55rem;
-    --note-floor: 2.7rem;
+    --note-floor: 12.5rem;
   }
 }
 
 @media (max-height: 560px) {
   .drill-shell {
-    --note-floor: 2.7rem;
+    --note-floor: 10.5rem;
   }
 }
 
@@ -3006,11 +3101,13 @@ body,
     grid-row: 3;
   }
 
-  .move-note {
+  .move-note,
+  .learn-readout {
     grid-column: 1;
     grid-row: 4;
-    align-self: center;
+    align-self: stretch;
     margin-bottom: 0.2rem;
+    max-height: none;
   }
 
   .drill-dock {

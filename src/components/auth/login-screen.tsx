@@ -64,7 +64,8 @@ export function LoginScreen({
             className="auth-mark"
           />
           <p className="dash-kicker">Club login</p>
-          <h1>Opening Edge</h1>
+          <h1>EDGES</h1>
+          <p className="auth-lead">A chess notebook by K.</p>
           <p className="auth-lead">
             Sign in with Google to train. Every signed-in friend gets the full board.
           </p>

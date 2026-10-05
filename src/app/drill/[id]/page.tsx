@@ -14,7 +14,7 @@ export async function generateMetadata({
   const { id } = await params;
   const opening = getOpening(id);
   return {
-    title: opening ? `${opening.name} · Opening Edge` : "Opening Edge",
+    title: opening ? `${opening.name} · EDGES` : "EDGES",
   };
 }
 

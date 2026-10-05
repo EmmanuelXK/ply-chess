@@ -1,25 +1,19 @@
 import type { MetadataRoute } from "next";
+import { APP_NAME, APP_TAGLINE } from "@/lib/version";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Opening Edge",
-    short_name: "Opening Edge",
-    description:
-      "Personal repertoire. Learn one move at a time, then analyze it yourself.",
+    name: APP_NAME,
+    short_name: APP_NAME,
+    description: APP_TAGLINE,
     id: "/",
     scope: "/",
     start_url: "/",
     display: "standalone",
     orientation: "any",
-    background_color: "#070708",
-    theme_color: "#070708",
+    background_color: "#040406",
+    theme_color: "#040406",
     icons: [
-      {
-        src: "/icon.svg",
-        sizes: "any",
-        type: "image/svg+xml",
-        purpose: "any",
-      },
       {
         src: "/icon-192.png",
         sizes: "192x192",
@@ -31,6 +25,18 @@ export default function manifest(): MetadataRoute.Manifest {
         sizes: "512x512",
         type: "image/png",
         purpose: "any",
+      },
+      {
+        src: "/icon-maskable-192.png",
+        sizes: "192x192",
+        type: "image/png",
+        purpose: "maskable",
+      },
+      {
+        src: "/icon-maskable-512.png",
+        sizes: "512x512",
+        type: "image/png",
+        purpose: "maskable",
       },
       {
         src: "/apple-touch-icon.png",

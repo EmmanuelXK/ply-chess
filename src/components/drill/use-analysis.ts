@@ -13,6 +13,8 @@ export function useAnalysis({
   run,
   nonce,
   enabled,
+  owner,
+  multipv = 3,
 }: {
   fen: string;
   engineId: AnalysisEngineId;
@@ -20,19 +22,23 @@ export function useAnalysis({
   run: boolean;
   nonce: number;
   enabled: boolean;
+  /** Keeps a second surface from stopping this engine when it releases. */
+  owner?: string;
+  multipv?: number;
 }): { view: AnalysisView; phase: AnalysisPhase } {
   const [snap, setSnap] = useState<{ key: string; view: AnalysisView }>({
     key: "",
     view: emptyAnalysis(),
   });
   const [phase, setPhase] = useState<AnalysisPhase>("loading");
-  const expected = `${engineId}|${depth}|${nonce}|${fen}`;
+  const ownerId = owner ?? `analyze:${engineId}`;
+  const expected = `${engineId}|${depth}|${multipv}|${nonce}|${fen}`;
   const view = snap.key === expected ? snap.view : emptyAnalysis();
 
   useEffect(() => {
     if (!enabled) return;
     let alive = true;
-    const session = getEngineSession();
+    const session = getEngineSession(engineId);
     const unsubLine = session.subscribe((line, key) => {
       if (!alive || key !== expected) return;
       if (line.startsWith("info ") || line.startsWith("bestmove")) {
@@ -45,14 +51,14 @@ export function useAnalysis({
     const unsubPhase = session.subscribePhase((next) => {
       if (alive) setPhase(next);
     });
-    session.configure({ id: engineId, fen, run, depth, nonce });
+    session.configure({ id: engineId, fen, run, depth, nonce, multipv }, ownerId);
     return () => {
       alive = false;
       unsubLine();
       unsubPhase();
-      session.halt();
+      session.halt(ownerId);
     };
-  }, [enabled, expected, fen, engineId, depth, run, nonce]);
+  }, [enabled, expected, fen, engineId, depth, run, nonce, ownerId, multipv]);
 
   return { view, phase };
 }
