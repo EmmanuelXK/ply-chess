@@ -2529,6 +2529,124 @@ body,
   display: none;
 }
 
+.engine-picker {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.35rem;
+  margin-top: 0.45rem;
+}
+
+.engine-choice {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.05rem;
+  min-width: 0;
+  padding: 0.35rem 0.45rem;
+  border-radius: 0.65rem;
+  border: 1px solid var(--line);
+  background: var(--charcoal);
+  color: var(--cream);
+  text-align: left;
+}
+
+.engine-choice strong {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.engine-choice em {
+  font-style: normal;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mist-2);
+}
+
+.engine-choice-on {
+  background: var(--ember-wash);
+  box-shadow: inset 0 0 0 1px rgb(245 158 11 / 34%);
+}
+
+.engine-warn {
+  margin: 0.35rem 0 0;
+  font-size: 11px;
+  line-height: 1.35;
+  color: var(--mist);
+}
+
+.engine-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.45rem;
+  margin-top: 0.15rem;
+  font-size: 11px;
+  color: var(--mist);
+}
+
+.engine-meta > span:first-child {
+  color: var(--cream);
+  font-weight: 650;
+}
+
+.engine-depths {
+  display: flex;
+  gap: 0.2rem;
+  margin-left: auto;
+}
+
+.engine-depth,
+.engine-go {
+  height: 1.45rem;
+  border-radius: 0.45rem;
+  border: 1px solid var(--line);
+  background: var(--charcoal);
+  color: var(--cream);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 0 0.4rem;
+}
+
+.engine-depth-on,
+.engine-go {
+  background: var(--ember-wash);
+  box-shadow: inset 0 0 0 1px rgb(245 158 11 / 34%);
+}
+
+.engine-lines {
+  list-style: none;
+  margin: 0.4rem 0 0.15rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.28rem;
+}
+
+.engine-lines li {
+  display: grid;
+  grid-template-columns: 3.1rem minmax(0, 1fr);
+  gap: 0.4rem;
+  align-items: baseline;
+  min-width: 0;
+}
+
+.engine-lines span {
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  font-weight: 750;
+  color: var(--cream);
+}
+
+.engine-lines strong {
+  font-size: 12px;
+  font-weight: 550;
+  color: var(--mist);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .analyze-pv {
   margin: 0.4rem 0 0;
   font-size: 12px;
