@@ -5,7 +5,9 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "Opening Edge",
     short_name: "Opening Edge",
     description:
-      "iPhone-first chess opening trainer. Noir repertoire, theory atlas, one coach.",
+      "Personal repertoire. Learn one move at a time, then analyze it yourself.",
+    id: "/",
+    scope: "/",
     start_url: "/",
     display: "standalone",
     orientation: "any",

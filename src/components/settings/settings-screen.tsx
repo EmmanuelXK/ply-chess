@@ -1,36 +1,28 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { TabBar } from "@/components/app/tab-bar";
 import { useAuth } from "@/components/auth/auth-provider";
-import type { SidePref } from "@/lib/auth/sanitize";
+import type { ProfileDraft } from "@/lib/auth/sanitize";
 import { profileSeed } from "@/lib/auth/profile";
+import { defaultOwner, writeLocalOwner } from "@/lib/owner";
+import { useLocalOwner } from "@/lib/use-local-owner";
 import { APP_MILESTONE, APP_VERSION } from "@/lib/version";
+import { InstallHint } from "@/components/settings/install-hint";
 
 export function SettingsScreen() {
-  const { configured, ready, user, profile, save } = useAuth();
-  const [displayName, setDisplayName] = useState("");
-  const [initials, setInitials] = useState("");
-  const [sidePref, setSidePref] = useState<SidePref>("both");
-  const [clubTag, setClubTag] = useState("");
+  const { user, profile, save } = useAuth();
+  const stored = useLocalOwner();
+  const session = profile ?? (user ? profileSeed(user) : null);
+  const base = stored ?? session ?? defaultOwner();
+  const [edits, setEdits] = useState<ProfileDraft | null>(null);
   const [saved, setSaved] = useState("");
+  const draft = edits ?? base;
 
-  useEffect(() => {
-    if (profile) {
-      setDisplayName(profile.displayName);
-      setInitials(profile.initials);
-      setSidePref(profile.sidePref);
-      setClubTag(profile.clubTag);
-      return;
-    }
-    if (user) {
-      const seed = profileSeed(user);
-      setDisplayName(seed.displayName);
-      setInitials(seed.initials);
-      setSidePref(seed.sidePref);
-      setClubTag(seed.clubTag);
-    }
-  }, [profile, user]);
+  const patch = (partial: Partial<ProfileDraft>) => {
+    setEdits({ ...draft, ...partial });
+    setSaved("");
+  };
 
   return (
     <div className="dash-shell">
@@ -46,10 +38,10 @@ export function SettingsScreen() {
           <h2>Profile</h2>
           <div className="profile-row">
             <span className="profile-avatar" aria-hidden>
-              {initials || profile?.initials || "OE"}
+              {draft.initials || "RE"}
             </span>
             <p className="set-help">
-              Simple personal card. Every signed-in club friend has full access.
+              Name on this phone. The board opens without signing in.
             </p>
           </div>
           <label className="auth-label" htmlFor="displayName">
@@ -58,8 +50,8 @@ export function SettingsScreen() {
           <input
             id="displayName"
             className="auth-input"
-            value={displayName}
-            onChange={(e) => setDisplayName(e.target.value)}
+            value={draft.displayName}
+            onChange={(e) => patch({ displayName: e.target.value })}
             maxLength={40}
           />
           <label className="auth-label" htmlFor="initials">
@@ -68,8 +60,8 @@ export function SettingsScreen() {
           <input
             id="initials"
             className="auth-input"
-            value={initials}
-            onChange={(e) => setInitials(e.target.value)}
+            value={draft.initials}
+            onChange={(e) => patch({ initials: e.target.value })}
             maxLength={2}
           />
           <p className="auth-label">Side you train first</p>
@@ -79,9 +71,9 @@ export function SettingsScreen() {
                 key={id}
                 type="button"
                 role="tab"
-                aria-selected={sidePref === id}
-                className={sidePref === id ? "filter-chip filter-chip-on" : "filter-chip"}
-                onClick={() => setSidePref(id)}
+                aria-selected={draft.sidePref === id}
+                className={draft.sidePref === id ? "filter-chip filter-chip-on" : "filter-chip"}
+                onClick={() => patch({ sidePref: id })}
               >
                 {id}
               </button>
@@ -93,37 +85,31 @@ export function SettingsScreen() {
           <input
             id="clubTag"
             className="auth-input"
-            value={clubTag}
-            onChange={(e) => setClubTag(e.target.value)}
+            value={draft.clubTag}
+            onChange={(e) => patch({ clubTag: e.target.value })}
             maxLength={24}
             placeholder="optional"
           />
           <button
             type="button"
             className="set-save"
-            disabled={!user || !ready}
             onClick={() => {
-              void save({ displayName, initials, sidePref, clubTag }).then(
-                () => setSaved("Saved."),
-                () => setSaved("Could not save yet — local still works."),
-              );
+              const next = writeLocalOwner(draft);
+              setEdits(null);
+              setSaved("Saved on this device.");
+              if (user) {
+                void save(next).catch(() => {
+                  /* Local copy already landed. */
+                });
+              }
             }}
           >
             Save profile
           </button>
           {saved ? <p className="set-help">{saved}</p> : null}
-          {configured && user ? (
-            <form action="/auth/sign-out" method="post">
-              <button type="submit" className="auth-signout">
-                Sign out
-              </button>
-            </form>
-          ) : (
-            <p className="set-help">
-              Sign in with Google to keep this profile on your account.
-            </p>
-          )}
         </section>
+
+        <InstallHint />
 
         <section className="set-block" id="about">
           <h2>About</h2>

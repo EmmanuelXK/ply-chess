@@ -14,10 +14,13 @@ function redirectKeepingCookies(target: URL, source: NextResponse): NextResponse
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   let response = NextResponse.next({ request });
+
+  if (!authIsRequired()) return response;
+
   const { url, key, configured } = supabasePublicConfig();
 
   if (!configured) {
-    if (authIsRequired() && !isPublicPath(pathname)) {
+    if (!isPublicPath(pathname)) {
       const login = request.nextUrl.clone();
       login.pathname = "/login";
       login.searchParams.set("next", pathname);

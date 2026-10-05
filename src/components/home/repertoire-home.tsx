@@ -1,41 +1,25 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useRef } from "react";
 import { TabBar } from "@/components/app/tab-bar";
-import { DueQueue, visibleDue } from "@/components/home/due-queue";
 import { OpeningTile } from "@/components/home/opening-tile";
-import { useProgressStore } from "@/components/home/use-progress-store";
 import { useTileArranger } from "@/components/home/use-tile-arranger";
-import {
-  STUDY_MODES,
-  openings,
-  weaponRacks,
-  type Opening,
-  type StudyMode,
-  type WeaponRack,
-} from "@/lib/openings";
-import type { TileLayout } from "@/lib/openings/arranger";
 import { useAuth } from "@/components/auth/auth-provider";
-import { dueCount } from "@/lib/reps/schedule";
+import { openings, weaponRacks, type Opening, type WeaponRack } from "@/lib/openings";
+import type { TileLayout } from "@/lib/openings/arranger";
+import { ownerLabel } from "@/lib/owner";
+import { STUDY_MODES } from "@/lib/reps/schedule";
+import { useLocalOwner } from "@/lib/use-local-owner";
 
 export function RepertoireHome() {
-  const [mode, setMode] = useState<StudyMode>("learn");
-  const stored = useProgressStore();
-  const { profile } = useAuth();
   const stageRef = useRef<HTMLDivElement>(null);
   const layout = useTileArranger(stageRef);
+  const { profile } = useAuth();
+  const local = useLocalOwner();
   const racks = weaponRacks(openings);
   const trained = racks.reduce((sum, rack) => sum + rack.openings.length, 0);
-  const dueById = useMemo(() => {
-    const map = new Map<string, number>();
-    if (!stored) return map;
-    for (const opening of openings) map.set(opening.id, dueCount(opening.id));
-    return map;
-  }, [stored]);
-  const dueTotal = useMemo(() => {
-    if (!stored) return 0;
-    return visibleDue(openings).length;
-  }, [stored]);
+  const name = ownerLabel(local?.displayName, profile?.displayName);
+  const blurb = STUDY_MODES[0]?.blurb ?? "One move at a time, with the book note.";
 
   return (
     <div className="dash-shell dash-repertoire">
@@ -43,33 +27,15 @@ export function RepertoireHome() {
         <p className="dash-kicker">Your Weapons</p>
         <h1>Opening Edge</h1>
         <p className="dash-sub">
-          {trained} systems
-          {dueTotal > 0 ? ` · ${dueTotal} due` : ""}
-          {profile?.displayName ? ` · ${profile.displayName}` : ""}
+          {trained} systems · {name}
         </p>
-        <div className="mode-grid" role="tablist" aria-label="Study mode">
-          {STUDY_MODES.map((m) => (
-            <button
-              key={m.id}
-              type="button"
-              role="tab"
-              aria-selected={mode === m.id}
-              className={mode === m.id ? "filter-chip filter-chip-on" : "filter-chip"}
-              onClick={() => setMode(m.id)}
-              title={m.blurb}
-            >
-              {m.label}
-            </button>
-          ))}
-        </div>
-        <p className="dash-mode-blurb">{STUDY_MODES.find((item) => item.id === mode)?.blurb}</p>
+        <p className="dash-mode-blurb">{blurb}</p>
       </header>
 
       <div className="dash-scroll dash-weapons-scroll">
-        <DueQueue openings={openings} />
         <div ref={stageRef} className="weapons-stage">
           {racks.map((rack) => (
-            <RackPane key={rack.id} rack={rack} mode={mode} layout={layout} dueById={dueById} />
+            <RackPane key={rack.id} rack={rack} layout={layout} />
           ))}
         </div>
       </div>
@@ -81,14 +47,10 @@ export function RepertoireHome() {
 
 function RackPane({
   rack,
-  mode,
   layout,
-  dueById,
 }: {
   rack: WeaponRack<Opening>;
-  mode: StudyMode;
   layout: TileLayout | null;
-  dueById: Map<string, number>;
 }) {
   return (
     <section
@@ -115,12 +77,7 @@ function RackPane({
         }
       >
         {rack.openings.map((opening) => (
-          <OpeningTile
-            key={opening.id}
-            opening={opening}
-            reps={mode}
-            due={dueById.get(opening.id) ?? 0}
-          />
+          <OpeningTile key={opening.id} opening={opening} />
         ))}
       </div>
     </section>

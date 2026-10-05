@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Source_Serif_4 } from "next/font/google";
 import { AuthProvider } from "@/components/auth/auth-provider";
+import { RegisterServiceWorker } from "@/components/pwa/register-sw";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -27,7 +28,7 @@ const prestigeSerif = Source_Serif_4({
 export const metadata: Metadata = {
   title: "Opening Edge",
   description:
-    "Dark repertoire trainer. Tablet-aware weapons grid, world openings atlas.",
+    "Personal repertoire. Learn one move at a time, then analyze the position yourself.",
   applicationName: "Opening Edge",
   appleWebApp: {
     capable: true,
@@ -73,7 +74,10 @@ export default function RootLayout({
         />
       </head>
       <body className="app-body bg-[#070708] text-[#f3ebe0]">
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <RegisterServiceWorker />
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );

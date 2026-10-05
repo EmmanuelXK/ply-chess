@@ -1,7 +1,8 @@
+import { redirect } from "next/navigation";
 import { LoginScreen } from "@/components/auth/login-screen";
 import { noteFromSearchParams } from "@/lib/auth/errors";
 import { safeInternalPath } from "@/lib/auth/redirect";
-import { supabasePublicConfig } from "@/lib/supabase/env";
+import { authIsRequired, supabasePublicConfig } from "@/lib/supabase/env";
 
 export const metadata = {
   title: "Login · Opening Edge",
@@ -17,6 +18,8 @@ export default async function LoginPage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
+  if (!authIsRequired()) redirect("/");
+
   const query = await searchParams;
   const params = {
     get(name: string) {

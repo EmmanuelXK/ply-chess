@@ -13,7 +13,11 @@ export function supabasePublicConfig(): {
   return { url, key, configured: Boolean(url && key) };
 }
 
+/**
+ * Personal Opening Edge is open on this phone.
+ * Set OPENING_EDGE_REQUIRE_AUTH=1 to restore the login wall for a public launch.
+ */
 export function authIsRequired(): boolean {
-  if (supabasePublicConfig().configured) return true;
-  return process.env.VERCEL_ENV === "production";
+  const flag = process.env.OPENING_EDGE_REQUIRE_AUTH?.trim().toLowerCase();
+  return flag === "1" || flag === "true";
 }

@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { DrillScreen } from "@/components/drill/drill-screen";
-import { getOpening, openings, parseStudyMode, type StudyMode } from "@/lib/openings";
+import { getOpening, openings } from "@/lib/openings";
 
 export function generateStaticParams() {
   return openings.map((opening) => ({ id: opening.id }));
@@ -18,11 +18,6 @@ export async function generateMetadata({
   };
 }
 
-function parseReps(value: string | string[] | undefined): StudyMode {
-  const v = Array.isArray(value) ? value[0] : value;
-  return parseStudyMode(v);
-}
-
 export default async function DrillPage({
   params,
   searchParams,
@@ -36,11 +31,5 @@ export default async function DrillPage({
   if (!opening) notFound();
   const trapRaw = query.trap;
   const trap = Array.isArray(trapRaw) ? trapRaw[0] : trapRaw;
-  return (
-    <DrillScreen
-      opening={opening}
-      initialReps={parseReps(query.reps)}
-      initialTrap={trap ?? null}
-    />
-  );
+  return <DrillScreen opening={opening} initialTrap={trap ?? null} />;
 }

@@ -24,6 +24,14 @@ const nextConfig: NextConfig = {
         ],
       },
       {
+        source: "/sw.js",
+        headers: [
+          ...isolated,
+          { key: "Cache-Control", value: "no-cache" },
+          { key: "Service-Worker-Allowed", value: "/" },
+        ],
+      },
+      {
         source: "/engines/lc0/weights_9155.txt.gz",
         headers: [
           ...isolated,
