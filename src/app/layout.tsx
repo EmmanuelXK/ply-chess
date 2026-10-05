@@ -3,7 +3,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Source_Serif_4 } from "next/font/google";
 import { AuthProvider } from "@/components/auth/auth-provider";
 import { RegisterServiceWorker } from "@/components/pwa/register-sw";
-import { APP_NAME, APP_TAGLINE } from "@/lib/version";
+import { APP_NAME, APP_TAGLINE, PWA_ICONS } from "@/lib/version";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -37,12 +37,17 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: "/favicon.ico", sizes: "32x32" },
-      { url: "/icon.svg", type: "image/svg+xml" },
-      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
-      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
+      { url: PWA_ICONS.favicon, sizes: "32x32", type: "image/png" },
+      { url: PWA_ICONS.icon192, sizes: "192x192", type: "image/png" },
+      { url: PWA_ICONS.icon512, sizes: "512x512", type: "image/png" },
     ],
-    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+    apple: [
+      {
+        url: PWA_ICONS.appleTouch,
+        sizes: "180x180",
+        type: "image/png",
+      },
+    ],
   },
   formatDetection: {
     telephone: false,

@@ -40,7 +40,7 @@ Redeploy after saving env vars.
 
 ## iOS Add to Home Screen
 
-After this deploy, delete the old Home Screen icon and add it again so iOS picks up the EDGE wordmark (`apple-touch-icon.png`, `icon-192.png`, `icon-512.png`).
+After this deploy, delete the old Home Screen icon and Add to Home Screen again. iOS will not replace a saved icon on the next open. The touch icon is the full-bleed fedora (`apple-touch-icon-v2.png`).
 
 ## Local
 
