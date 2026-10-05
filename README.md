@@ -29,24 +29,22 @@ Gem, True, and Clean marks still land on signature theory moves. History opens f
 ### Quizzes
 Reps → **Quiz**, or the Quiz chip. Short **positional** questions tied to the current chunk (not trivia). Lion + London are fully authored; others fall back to chunk-job questions.
 
-### Hybrid practice (Think)
-From the current ply: play vs a **hybrid** of
+### Engines
+Analyze (dock or long-press) runs one browser engine at a time. The last choice is stored on the device.
 
 | Engine | Role | What ships |
 | --- | --- | --- |
-| **Stockfish 16** (WASM, single-thread) | Tactical truth + eval bar | `public/engines/stockfish-nnue-16-single.{js,wasm}` (~600KB). GPLv3. |
-| **Lc0-style** | Neural plans (activity, king pressure, storms) | In-browser heuristic. Full Lc0 WASM + net is too heavy for iPhone; drop a tiny net later. |
-| **Maia-style** | Human-like development / mistakes | Policy prior (no early queen raids, don't hang). ONNX Maia is a later drop-in. |
+| **Stockfish lite** (default) | Single-thread search, eval bar, three lines | `public/engines/stockfish-19-lite-single.{js,wasm}` (~1.8 MB). GPL-3.0. |
+| **Fairy-Stockfish** | Smaller NNUE build, one thread | `public/engines/fairy/` (~1.6 MB). GPL-3.0. Needs cross-origin isolation. |
+| **Lc0** | Neural net + Monte Carlo, opt-in | `public/engines/lc0/` engine plus a 22 MB network fetched only after Lc0 is chosen. GPL-3.0. |
 
-When they disagree, the panel explains the **human-practical** choice. Mate or a hanging tactic → Stockfish wins the argument.
-
-No env vars. Engines load lazily the first time you open Analyze or Think.
+Notices and the GPL text live in `public/engines/NOTICE.md`.
 
 ### Back / Forward
 Large **Back** and **Forward** under the board (thumb zone). Instant ply-by-ply through the spine — hurry the repertoire. Same control set inside Analyze. Chessground animations ~90ms (no teleports).
 
 ### Analyze
-**Analyze** on the dock, or **long-press the board**. Fast splash: board, play/pause, Back/Forward, close. Vertical **eval bar** (Lichess/Chess.com style) beside the board — Stockfish primary. The human-plan strip shows Stockfish / Lc0-style / Maia-style votes.
+**Analyze** on the dock, or **long-press the board**, from Learn, Quiz, or Review. The sheet keeps the board, a vertical eval bar, the top lines, depth, node count, and Stop / Go. Back and Forward still walk the line.
 
 ### History Gig Pack
 When the current ply has a real chess-history milestone, a small **paper mark** appears on the move note. Tap it: fast splash, year, people, why it matters *here*, Wikipedia (and Chess.com when cited). Never blocks training.

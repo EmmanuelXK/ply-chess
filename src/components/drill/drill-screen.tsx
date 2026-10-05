@@ -694,7 +694,13 @@ export function DrillScreen({
           <Lightbulb />
           Hint
         </Button>
-        <Button variant="ghost" size="sm" onClick={() => setAnalyzeOpen(true)} className="dock-btn">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setAnalyzeOpen(true)}
+          className="dock-btn"
+          data-testid="open-analyze"
+        >
           <ScanSearch />
           Analyze
         </Button>

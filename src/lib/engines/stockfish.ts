@@ -1,5 +1,6 @@
-import { Chess } from "chess.js";
 import type { EvalTick, EngineMove } from "./types";
+
+export { uciToSan } from "./uci";
 
 type Listener = (line: string) => void;
 
@@ -33,7 +34,7 @@ export async function getStockfish(): Promise<Worker> {
   if (boot) return boot;
   boot = new Promise<Worker>((resolve, reject) => {
     try {
-      const w = new Worker("/engines/stockfish-nnue-16-single.js");
+      const w = new Worker("/engines/stockfish-19-lite-single.js");
       const ready = (ev: MessageEvent<string>) => {
         const line = typeof ev.data === "string" ? ev.data : "";
         if (line === "uciok" || line.includes("uciok")) {
@@ -152,16 +153,3 @@ export async function stockfishEval(
   return done;
 }
 
-export function uciToSan(fen: string, uci: string): string | null {
-  if (!uci || uci === "(none)") return null;
-  const from = uci.slice(0, 2);
-  const to = uci.slice(2, 4);
-  const promotion = uci[4] as "q" | "r" | "b" | "n" | undefined;
-  try {
-    const g = new Chess(fen);
-    const move = g.move({ from, to, promotion: promotion ?? "q" });
-    return move?.san ?? null;
-  } catch {
-    return null;
-  }
-}
