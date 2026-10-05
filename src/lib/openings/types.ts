@@ -1,15 +1,18 @@
 export type Side = "white" | "black";
 export type PlanVoice = "steady" | "creative" | "aggressive";
 export type Family = "white" | "black-e4" | "black-d4";
-export type StudyMode =
-  | "learn"
+export type StudyMode = "learn" | "quiz" | "review";
+/** URL aliases from older builds still parse. */
+export type RepsMode =
+  | StudyMode
   | "reps"
   | "practice"
   | "drill"
   | "trial"
-  | "progress";
-/** URL aliases from older builds still parse. */
-export type RepsMode = StudyMode | "spine" | "traps" | "quiz" | "think";
+  | "progress"
+  | "spine"
+  | "traps"
+  | "think";
 export type MoveGlyph = "!!" | "!" | "!?" | "?" | "??" | "?!";
 export type ArrowBrush =
   | "last"

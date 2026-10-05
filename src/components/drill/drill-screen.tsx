@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { Chess } from "chess.js";
+import { Chess, type Square } from "chess.js";
 import type { Key } from "@lichess-org/chessground/types";
 import {
   ChevronLeft,
@@ -20,51 +20,51 @@ import { HistoryMark } from "@/components/drill/history-mark";
 import { LineTreeMenu } from "@/components/drill/line-tree-menu";
 import { HistorySplash } from "@/components/drill/history-splash";
 import { PlyNav } from "@/components/drill/ply-nav";
-import { PracticePanel } from "@/components/drill/practice-panel";
-import { QuizSheet } from "@/components/drill/quiz-sheet";
 import { StudySheet } from "@/components/drill/study-sheet";
 import { lastMoveFrom, needsPromotion, toDests } from "@/lib/chess/dests";
 import { playLine } from "@/lib/chess/line";
 import { moveNoteAt } from "@/lib/openings/move-note";
 import { moveMarkAt } from "@/lib/openings/move-mark";
 import {
-  drillStudyMode,
+  DAILY_QUEUE_CAP,
+  introduceMove,
+  listDueCards,
   markProgress,
   markReviewed,
-  reviewStartPly,
+  type DueMove,
   type StudyMode,
 } from "@/lib/reps/schedule";
 import {
-  isUserPly,
-  openingFromTrap,
-  quizForPly,
   STUDY_MODES,
+  getOpening,
   historyAt,
+  openingFromTrap,
   type Opening,
   type Trap,
 } from "@/lib/openings";
-import type { Square } from "chess.js";
 
 const MOVE_MS = 90;
-const OPPONENT_MS = 140;
-const AUTO_WAIT_MS = 720;
-
-type LessonStyle = "podcast" | "teach";
+const REVIEW_JUMP_MS = 480;
 
 export function DrillScreen({
   opening: root,
   initialReps = "learn",
   initialTrap = null,
+  daily = false,
 }: {
   opening: Opening;
   initialReps?: StudyMode;
   initialTrap?: string | null;
+  /** Walk due moves across weapons, not only this line. */
+  daily?: boolean;
 }) {
+  const [activeId, setActiveId] = useState(root.id);
+  const activeRoot = getOpening(activeId) ?? root;
   const [lineId, setLineId] = useState<string | null>(initialTrap);
-  const trap = root.traps.find((t) => t.id === lineId) ?? null;
+  const trap = activeRoot.traps.find((item) => item.id === lineId) ?? null;
   const opening = useMemo(
-    () => (trap ? openingFromTrap(root, trap) : root),
-    [root, trap],
+    () => (trap ? openingFromTrap(activeRoot, trap) : activeRoot),
+    [activeRoot, trap],
   );
 
   const gameRef = useRef(new Chess());
@@ -72,6 +72,15 @@ export function DrillScreen({
   const modeRef = useRef<"drill" | "plan">("drill");
   const lockRef = useRef(false);
   const timerRef = useRef<number | null>(null);
+  const repsRef = useRef<StudyMode>(initialReps);
+  const dailyRef = useRef(daily);
+  const activeIdRef = useRef(activeId);
+  const queueRef = useRef<DueMove[]>([]);
+  const queueIndexRef = useRef(0);
+  const resumePlyRef = useRef<number | null>(null);
+  const holdRef = useRef(false);
+  const advanceRef = useRef<() => void>(() => {});
+
   const [session, setSession] = useState(0);
   const [fen, setFen] = useState(() => new Chess().fen());
   const [ply, setPly] = useState(0);
@@ -81,28 +90,34 @@ export function DrillScreen({
   const [mode, setMode] = useState<"drill" | "plan">("drill");
   const [hintKeys, setHintKeys] = useState<Key[] | null>(null);
   const [hintUsed, setHintUsed] = useState(false);
-  const [lessonStyle, setLessonStyle] = useState<LessonStyle>(
-    initialReps === "trial" ? "podcast" : "teach",
-  );
-  const [podcastPlaying, setPodcastPlaying] = useState(initialReps === "trial");
   const [busy, setBusy] = useState(false);
   const [check, setCheck] = useState(false);
   const [bookOpen, setBookOpen] = useState(false);
   const [lineMenuOpen, setLineMenuOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [analyzeOpen, setAnalyzeOpen] = useState(false);
-  const [quizOpen, setQuizOpen] = useState(initialReps === "drill");
-  const [thinkOpen, setThinkOpen] = useState(initialReps === "practice");
-  const [reps, setReps] = useState(() => drillStudyMode(initialReps));
+  const [reps, setReps] = useState<StudyMode>(initialReps);
   const [boardEpoch, setBoardEpoch] = useState(0);
-  const [trialLeft, setTrialLeft] = useState(8);
-  const lessonRef = useRef(lessonStyle);
-  const resumePlyRef = useRef<number | null>(null);
-  const autoAnalyzeRef = useRef(false);
+  const [holdBook, setHoldBook] = useState(false);
+  const [reviewEmpty, setReviewEmpty] = useState(false);
+  const [reviewDone, setReviewDone] = useState(false);
+  const [queuePos, setQueuePos] = useState(0);
+  const [queueLen, setQueueLen] = useState(0);
+
+  const setHold = useCallback((next: boolean) => {
+    holdRef.current = next;
+    setHoldBook(next);
+  }, []);
 
   useEffect(() => {
-    lessonRef.current = lessonStyle;
-  }, [lessonStyle]);
+    repsRef.current = reps;
+  }, [reps]);
+  useEffect(() => {
+    dailyRef.current = daily;
+  }, [daily]);
+  useEffect(() => {
+    activeIdRef.current = activeId;
+  }, [activeId]);
 
   const sync = useCallback(() => {
     const g = gameRef.current;
@@ -122,14 +137,20 @@ export function DrillScreen({
   const finishBook = useCallback(
     (wasPlan: boolean) => {
       modeRef.current = "plan";
-      if (!wasPlan && !autoAnalyzeRef.current) {
-        autoAnalyzeRef.current = true;
-        setAnalyzeOpen(true);
-      }
+      if (!wasPlan) setAnalyzeOpen(true);
       sync();
     },
     [sync],
   );
+
+  const cancelTimer = useCallback(() => {
+    if (timerRef.current !== null) {
+      window.clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+    lockRef.current = false;
+    setBusy(false);
+  }, []);
 
   const applyPly = useCallback(
     (nextPly: number) => {
@@ -138,44 +159,99 @@ export function DrillScreen({
       const wasPlan = modeRef.current === "plan";
       gameRef.current = pos.chess;
       plyRef.current = pos.appliedPly;
-      modeRef.current =
-        pos.appliedPly >= opening.moves.length ? "plan" : "drill";
+      modeRef.current = pos.appliedPly >= opening.moves.length ? "plan" : "drill";
       setLastMove(pos.lastMove);
       setHintKeys(null);
       setHintUsed(false);
-      if (pos.appliedPly >= opening.moves.length) finishBook(wasPlan);
-      sync();
-    },
-    [opening, sync, finishBook],
-  );
-
-  const playSan = useCallback(
-    (san: string) => {
-      const move = gameRef.current.move(san);
-      if (!move) return null;
-      plyRef.current += 1;
-      setLastMove([move.from as Key, move.to as Key]);
-      if (plyRef.current >= opening.moves.length) {
-        modeRef.current = "plan";
+      if (pos.appliedPly >= opening.moves.length && repsRef.current !== "review") {
+        finishBook(wasPlan);
       }
       sync();
-      return move;
     },
-    [opening.moves.length, sync],
+    [finishBook, opening.moves, sync],
+  );
+
+  const collectQueue = useCallback(
+    (openingId?: string) => {
+      return listDueCards(openingId)
+        .filter((row) => {
+          if (openingId && row.openingId === opening.id) {
+            return row.ply >= 0 && row.ply < opening.moves.length;
+          }
+          const found = getOpening(row.openingId);
+          return !!found && row.ply >= 0 && row.ply < found.moves.length;
+        })
+        .slice(0, DAILY_QUEUE_CAP);
+    },
+    [opening.id, opening.moves.length],
+  );
+
+  const goToQueueIndex = useCallback(
+    (index: number) => {
+      const item = queueRef.current[index];
+      queueIndexRef.current = index;
+      setQueuePos(index);
+      setHold(false);
+      if (!item) {
+        setReviewDone(queueRef.current.length > 0);
+        setReviewEmpty(queueRef.current.length === 0);
+        return;
+      }
+      if (item.openingId !== opening.id) {
+        resumePlyRef.current = item.ply;
+        if (lineId) setLineId(null);
+        setActiveId(item.openingId);
+        return;
+      }
+      applyPly(item.ply);
+    },
+    [applyPly, lineId, opening.id, setHold],
   );
 
   useEffect(() => {
-    const startPly =
-      resumePlyRef.current ??
-      (drillStudyMode(initialReps) === "reps" ? reviewStartPly(opening) : 0);
+    advanceRef.current = () => {
+      goToQueueIndex(queueIndexRef.current + 1);
+    };
+  }, [goToQueueIndex]);
+
+  useEffect(() => {
+    const modeNow = repsRef.current;
+    let startPly = resumePlyRef.current;
     resumePlyRef.current = null;
-    const pos = playLine(opening.moves, startPly);
+    const clear = () => {
+      lockRef.current = false;
+      if (timerRef.current !== null) {
+        window.clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
+    };
+
+    if (modeNow === "review" && startPly == null) {
+      const items = dailyRef.current ? collectQueue() : collectQueue(opening.id);
+      queueRef.current = items;
+      queueIndexRef.current = 0;
+      setQueueLen(items.length);
+      setQueuePos(0);
+      setReviewDone(false);
+      setReviewEmpty(items.length === 0);
+      if (!items.length) {
+        startPly = 0;
+      } else if (items[0].openingId !== opening.id) {
+        resumePlyRef.current = items[0].ply;
+        setLineId(null);
+        setActiveId(items[0].openingId);
+        return clear;
+      } else {
+        startPly = items[0].ply;
+      }
+    }
+
+    const pos = playLine(opening.moves, startPly ?? 0);
     gameRef.current = pos.chess;
     plyRef.current = pos.appliedPly;
-    modeRef.current =
-      pos.appliedPly >= opening.moves.length ? "plan" : "drill";
+    modeRef.current = pos.appliedPly >= opening.moves.length ? "plan" : "drill";
     lockRef.current = false;
-    autoAnalyzeRef.current = false;
+    holdRef.current = false;
     setAnalyzeOpen(false);
     setFen(pos.fen);
     setPly(pos.appliedPly);
@@ -183,104 +259,51 @@ export function DrillScreen({
     setLastMove(pos.lastMove);
     setOrientation(opening.side);
     setMode(modeRef.current);
-    if (pos.appliedPly >= opening.moves.length) finishBook(false);
     setHintKeys(null);
     setHintUsed(false);
     setBusy(false);
     setCheck(pos.check);
-    setBookOpen(initialReps === "drill");
+    setBookOpen(false);
     setLineMenuOpen(false);
-    setQuizOpen(false);
-    setThinkOpen(initialReps === "practice");
-    if (lessonRef.current === "podcast" || initialReps === "trial") {
-      setPodcastPlaying(true);
+    setHoldBook(false);
+    if (modeNow !== "review") {
+      setReviewEmpty(false);
+      setReviewDone(false);
     }
-
-    let cancelled = false;
-
-    const kick = async () => {
-      if (lessonRef.current === "podcast") return;
-      while (
-        !cancelled &&
-        modeRef.current === "drill" &&
-        plyRef.current < opening.moves.length &&
-        !isUserPly(opening.side, plyRef.current)
-      ) {
-        setBusy(true);
-        lockRef.current = true;
-        await sleep(plyRef.current === 0 ? 160 : OPPONENT_MS);
-        if (cancelled) return;
-        const move = playSan(opening.moves[plyRef.current]);
-        if (!move) break;
-      }
-      lockRef.current = false;
-      setBusy(false);
-    };
-
-    void kick();
-    return () => {
-      cancelled = true;
-      lockRef.current = false;
-      if (timerRef.current !== null) {
-        window.clearTimeout(timerRef.current);
-        timerRef.current = null;
-      }
-    };
-  }, [opening, playSan, session, initialReps, finishBook]);
-
-  useEffect(() => {
-    if (lessonStyle !== "podcast" || !podcastPlaying) return;
-    let cancelled = false;
-    const run = async () => {
-      await new Promise((r) => window.setTimeout(r, AUTO_WAIT_MS));
-      if (cancelled) return;
-      if (plyRef.current < opening.moves.length) {
-        applyPly(plyRef.current + 1);
-      } else {
-        setPodcastPlaying(false);
-      }
-    };
-    void run();
-    return () => {
-      cancelled = true;
-    };
-  }, [ply, lessonStyle, podcastPlaying, opening.moves.length, applyPly]);
-
-  useEffect(() => {
-    if (reps !== "trial" || !podcastPlaying) return;
-    let left = 8;
-    const id = window.setInterval(() => {
-      left -= 1;
-      if (left <= 0) {
-        if (plyRef.current < opening.moves.length) applyPly(plyRef.current + 1);
-        left = 8;
-      }
-      setTrialLeft(left);
-    }, 1000);
-    return () => window.clearInterval(id);
-  }, [reps, podcastPlaying, ply, applyPly, opening.moves.length]);
+    return clear;
+  }, [collectQueue, opening, session]);
 
   const dests = useMemo(() => {
-    const g = new Chess(fen);
-    if (mode === "drill" && (busy || lessonStyle === "podcast")) {
+    if (busy || holdBook || reviewEmpty || (reps === "review" && reviewDone)) {
       return new Map<Key, Key[]>();
     }
-    return toDests(g);
-  }, [fen, mode, busy, lessonStyle]);
+    if (mode === "drill" && ply >= opening.moves.length) return new Map<Key, Key[]>();
+    return toDests(new Chess(fen));
+  }, [busy, fen, holdBook, mode, opening.moves.length, ply, reps, reviewDone, reviewEmpty]);
 
   const turnColor = fen.includes(" w ") ? "white" : "black";
   const movableColor =
-    mode === "plan"
-      ? "both"
-      : busy || lessonStyle === "podcast"
-        ? undefined
-        : opening.side;
+    busy || holdBook || reviewEmpty || (reps === "review" && reviewDone)
+      ? undefined
+      : mode === "plan"
+        ? "both"
+        : turnColor;
 
   const fullMoves = Math.ceil(opening.moves.length / 2);
   const shownMove = Math.min(Math.ceil(ply / 2), fullMoves);
-  const quiz = quizForPly(opening, Math.max(0, ply - 1));
   const historyNow = historyAt(opening, ply);
-  const note = useMemo(() => moveNoteAt(opening, ply), [opening, ply]);
+  const note = useMemo(() => {
+    if (reps === "review" && reviewEmpty) {
+      return {
+        san: "Clear",
+        comment: daily ? "Nothing due." : "Nothing due on this line.",
+      };
+    }
+    if (reps === "review" && reviewDone) {
+      return { san: "Done", comment: "Queue finished." };
+    }
+    return moveNoteAt(opening, ply);
+  }, [daily, opening, ply, reps, reviewDone, reviewEmpty]);
 
   const mark = useMemo<BoardMark | null>(() => {
     if (ply <= 0 || !lastMove || lastMove.length < 2) return null;
@@ -308,31 +331,16 @@ export function DrillScreen({
     return next;
   }, [lastMove, hintKeys, mark]);
 
-  const cancelTimer = () => {
-    if (timerRef.current !== null) {
-      window.clearTimeout(timerRef.current);
-      timerRef.current = null;
-    }
-    lockRef.current = false;
-    setBusy(false);
-  };
-
   const onMove = useCallback(
     (from: Key, to: Key) => {
-      if (lessonRef.current === "podcast") {
-        snapBoard();
-        return;
-      }
-      if (lockRef.current && modeRef.current === "drill") {
+      if (holdRef.current || (lockRef.current && modeRef.current === "drill")) {
         snapBoard();
         return;
       }
       const g = gameRef.current;
 
       if (modeRef.current === "plan") {
-        const promotion = needsPromotion(g, from as Square, to as Square)
-          ? "q"
-          : undefined;
+        const promotion = needsPromotion(g, from as Square, to as Square) ? "q" : undefined;
         const move = g.move({ from, to, promotion });
         if (!move) {
           snapBoard();
@@ -345,7 +353,7 @@ export function DrillScreen({
 
       const plyNow = plyRef.current;
       const bookSan = opening.moves[plyNow];
-      if (!bookSan || !isUserPly(opening.side, plyNow)) {
+      if (!bookSan) {
         snapBoard();
         return;
       }
@@ -358,9 +366,9 @@ export function DrillScreen({
         expected = null;
       }
 
-      const promotion = expected?.promotion
-        ?? (needsPromotion(g, from as Square, to as Square) ? "q" : undefined);
-
+      const promotion =
+        expected?.promotion ??
+        (needsPromotion(g, from as Square, to as Square) ? "q" : undefined);
       const move = g.move({ from, to, promotion });
       if (!move) {
         snapBoard();
@@ -375,7 +383,18 @@ export function DrillScreen({
 
       if (!ok) {
         g.undo();
+        if (repsRef.current === "learn") {
+          snapBoard();
+          return;
+        }
+        const book = g.move(bookSan);
+        if (!book) {
+          snapBoard();
+          return;
+        }
+        plyRef.current += 1;
         markReviewed(opening.id, plyNow, false);
+        setHold(true);
         setHintKeys(null);
         snapBoard();
         return;
@@ -384,36 +403,36 @@ export function DrillScreen({
       plyRef.current += 1;
       setHintKeys(null);
       setHintUsed(false);
-
-      if (plyRef.current >= opening.moves.length) {
-        finishBook(false);
-        sync();
+      if (repsRef.current === "learn") {
+        introduceMove(opening.id, plyNow);
+        markProgress(opening.id, plyRef.current);
+        if (plyRef.current >= opening.moves.length) finishBook(false);
+        else sync();
         return;
       }
 
       markReviewed(opening.id, plyNow, true);
       markProgress(opening.id, plyRef.current);
       sync();
-
-      if (!isUserPly(opening.side, plyRef.current)) {
+      if (repsRef.current === "review") {
         lockRef.current = true;
         setBusy(true);
         if (timerRef.current !== null) window.clearTimeout(timerRef.current);
         timerRef.current = window.setTimeout(() => {
           timerRef.current = null;
-          const reply = playSan(opening.moves[plyRef.current]);
-          if (reply && modeRef.current === "plan") finishBook(false);
           lockRef.current = false;
           setBusy(false);
-        }, OPPONENT_MS);
+          advanceRef.current();
+        }, REVIEW_JUMP_MS);
+        return;
       }
+      if (plyRef.current >= opening.moves.length) finishBook(false);
     },
-    [opening, playSan, snapBoard, sync, finishBook],
+    [finishBook, opening.id, opening.moves, setHold, snapBoard, sync],
   );
 
   const hint = () => {
-    if (mode !== "drill" || hintUsed || busy) return;
-    if (!isUserPly(opening.side, ply)) return;
+    if (reps !== "learn" || hintUsed || busy || holdBook) return;
     const san = opening.moves[ply];
     if (!san) return;
     const probe = new Chess(gameRef.current.fen());
@@ -429,38 +448,51 @@ export function DrillScreen({
 
   const restart = () => {
     cancelTimer();
+    setHold(false);
     setSession((n) => n + 1);
   };
 
   const stepBack = useCallback(() => {
     cancelTimer();
-    if (lessonStyle === "podcast") setPodcastPlaying(false);
+    setHold(false);
+    if (repsRef.current === "review") {
+      if (queueIndexRef.current > 0) goToQueueIndex(queueIndexRef.current - 1);
+      return;
+    }
     applyPly(plyRef.current - 1);
-  }, [applyPly, lessonStyle]);
+  }, [applyPly, cancelTimer, goToQueueIndex, setHold]);
 
   const stepForward = useCallback(() => {
+    const jumping = timerRef.current !== null && repsRef.current === "review" && !holdRef.current;
     cancelTimer();
-    if (lessonStyle === "podcast") setPodcastPlaying(false);
+    if (jumping) {
+      advanceRef.current();
+      return;
+    }
+    if (holdRef.current) {
+      setHold(false);
+      if (repsRef.current === "review") {
+        advanceRef.current();
+        return;
+      }
+      if (plyRef.current >= opening.moves.length) finishBook(false);
+      return;
+    }
+    if (repsRef.current !== "learn") return;
     if (plyRef.current >= opening.moves.length) return;
-    applyPly(plyRef.current + 1);
-  }, [applyPly, lessonStyle, opening.moves.length]);
+    const index = plyRef.current;
+    applyPly(index + 1);
+    introduceMove(opening.id, index);
+  }, [applyPly, cancelTimer, finishBook, opening.id, opening.moves.length, setHold]);
 
   useEffect(() => {
-    const sheetOpen =
-      bookOpen ||
-      lineMenuOpen ||
-      historyOpen ||
-      analyzeOpen ||
-      quizOpen ||
-      thinkOpen;
+    const sheetOpen = bookOpen || lineMenuOpen || historyOpen || analyzeOpen;
     const onKey = (event: KeyboardEvent) => {
       if (sheetOpen) return;
       const target = event.target as HTMLElement | null;
       if (
         target &&
-        (target.tagName === "INPUT" ||
-          target.tagName === "TEXTAREA" ||
-          target.isContentEditable)
+        (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable)
       ) {
         return;
       }
@@ -475,16 +507,7 @@ export function DrillScreen({
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [
-    analyzeOpen,
-    bookOpen,
-    historyOpen,
-    lineMenuOpen,
-    quizOpen,
-    stepBack,
-    stepForward,
-    thinkOpen,
-  ]);
+  }, [analyzeOpen, bookOpen, historyOpen, lineMenuOpen, stepBack, stepForward]);
 
   const switchTrap = (next: Trap | null, jumpPly?: number) => {
     const same = (next?.id ?? null) === lineId;
@@ -502,35 +525,78 @@ export function DrillScreen({
     setSession((n) => n + 1);
   };
 
+  const selectMode = (next: StudyMode) => {
+    cancelTimer();
+    setHold(false);
+    setReps(next);
+    repsRef.current = next;
+    setHintKeys(null);
+    setHintUsed(false);
+    if (next === "learn" || next === "quiz") {
+      setReviewEmpty(false);
+      setReviewDone(false);
+      applyPly(0);
+      return;
+    }
+    const items = dailyRef.current ? collectQueue() : collectQueue(opening.id);
+    queueRef.current = items;
+    queueIndexRef.current = 0;
+    setQueueLen(items.length);
+    setQueuePos(0);
+    setReviewDone(false);
+    setReviewEmpty(items.length === 0);
+    if (!items.length) {
+      applyPly(0);
+      return;
+    }
+    const first = items[0];
+    if (first.openingId === opening.id) {
+      applyPly(first.ply);
+      return;
+    }
+    resumePlyRef.current = first.ply;
+    if (lineId) setLineId(null);
+    setActiveId(first.openingId);
+  };
+
   const analyzeLine = useMemo(
     () => [...played, ...opening.moves.slice(ply)],
     [played, opening.moves, ply],
   );
 
+  const canForward =
+    reps === "learn" ? ply < opening.moves.length : holdBook || (reps === "review" && busy);
+  const canBack = reps === "review" ? queuePos > 0 : ply > 0;
+  const status = holdBook
+    ? `Book move. ${note.san}. ${note.comment ?? ""}`.trim()
+    : note.comment
+      ? `${note.san}. ${note.comment}`
+      : note.san;
+
   return (
-    <div className="drill-shell">
+    <div className="drill-shell" data-mode={reps} data-testid="train-screen">
       <header className="drill-top">
         <div className="drill-nav">
-          <Button
-            asChild
-            variant="ghost"
-            size="icon-sm"
-          >
+          <Button asChild variant="ghost" size="icon-sm">
             <Link href="/" aria-label="Back to repertoire">
               <ChevronLeft />
             </Link>
           </Button>
           <div className="min-w-0 flex-1">
             <div className="flex items-baseline justify-between gap-2">
-              <h1 className="drill-title">{root.shortName}</h1>
+              <h1 className="drill-title">{activeRoot.shortName}</h1>
               <p className="drill-count">
-                {shownMove}/{fullMoves}
+                {reps === "review" && queueLen > 0
+                  ? `${Math.min(queuePos + 1, queueLen)}/${queueLen}`
+                  : `${shownMove}/${fullMoves}`}
               </p>
             </div>
-            {mode === "plan" ? (
-              <p className="truncate text-[11px] text-[var(--mist)]">
-                Plan mode — free play
+            {reps === "review" ? (
+              <p className="drill-branch">
+                {reviewDone ? "Queue finished" : reviewEmpty ? "Nothing due" : "Due moves"}
               </p>
+            ) : mode === "plan" ? (
+              <p className="truncate text-[11px] text-[var(--mist)]">Plan mode — free play</p>
             ) : trap ? (
               <p className="drill-branch">{trap.name}</p>
             ) : null}
@@ -538,9 +604,7 @@ export function DrillScreen({
           <Button
             variant="ghost"
             size="icon-sm"
-            onClick={() =>
-              setOrientation((o) => (o === "white" ? "black" : "white"))
-            }
+            onClick={() => setOrientation((side) => (side === "white" ? "black" : "white"))}
             aria-label="Flip board"
             title="Flip board"
           >
@@ -558,37 +622,22 @@ export function DrillScreen({
           </Button>
         </div>
 
-        <div className="reps-row" role="tablist" aria-label="Study mode">
-          {STUDY_MODES.filter((m) => m.id !== "progress").map((m) => (
+        <div className="reps-row" role="tablist" aria-label="Study mode" data-testid="study-mode">
+          {STUDY_MODES.map((item) => (
             <button
-              key={m.id}
+              key={item.id}
               type="button"
               role="tab"
-              aria-selected={reps === m.id}
-              className={reps === m.id ? "reps-chip reps-chip-on" : "reps-chip"}
-              onClick={() => {
-                setReps(drillStudyMode(m.id));
-                const auto = m.id === "trial";
-                setLessonStyle(auto ? "podcast" : "teach");
-                setPodcastPlaying(auto);
-                if (m.id === "drill") setBookOpen(true);
-                if (m.id === "practice") setThinkOpen(true);
-                if (m.id === "learn") {
-                  setLineId(null);
-                  if (lineId) setSession((n) => n + 1);
-                }
-                if (m.id === "reps") {
-                  cancelTimer();
-                  applyPly(reviewStartPly(opening));
-                }
-              }}
+              aria-selected={reps === item.id}
+              className={reps === item.id ? "reps-chip reps-chip-on" : "reps-chip"}
+              onClick={() => selectMode(item.id)}
             >
-              {m.label}
+              {item.label}
             </button>
           ))}
         </div>
         <p className="sr-only" role="status" aria-live="polite">
-          {note.comment ? `${note.san}. ${note.comment}` : note.san}
+          {status}
         </p>
       </header>
 
@@ -603,7 +652,7 @@ export function DrillScreen({
               mark={mark}
               orientation={orientation}
               turnColor={turnColor}
-              viewOnly={(busy && mode === "drill") || lessonStyle === "podcast"}
+              viewOnly={(busy && mode === "drill") || holdBook}
               movableColor={movableColor}
               check={check}
               animationMs={MOVE_MS}
@@ -616,29 +665,14 @@ export function DrillScreen({
         <PlyNav
           onBack={stepBack}
           onForward={stepForward}
-          canBack={ply > 0}
-          canForward={ply < opening.moves.length}
+          canBack={canBack}
+          canForward={canForward}
           lastSan={played.at(-1) ?? "Start"}
-          playing={lessonStyle === "podcast" ? podcastPlaying : undefined}
-          onPlay={
-            lessonStyle === "podcast"
-              ? () => {
-                  if (plyRef.current >= opening.moves.length) {
-                    applyPly(0);
-                    setPodcastPlaying(true);
-                    return;
-                  }
-                  setPodcastPlaying((on) => !on);
-                }
-              : undefined
-          }
         />
-        <div className="move-note" data-testid="move-note">
+        <div className="move-note" data-testid="move-note" data-book={holdBook ? "true" : undefined}>
           <p className="move-note-san">{note.san}</p>
           <p className="move-note-comment">{note.comment ?? ""}</p>
-          {reps === "trial" ? (
-            <span className="move-note-timer">{trialLeft}s</span>
-          ) : null}
+          {holdBook ? <span className="move-note-timer">Book</span> : null}
           {historyNow.length ? (
             <HistoryMark
               glyph={historyNow[0].glyph}
@@ -654,23 +688,13 @@ export function DrillScreen({
           variant="ghost"
           size="sm"
           onClick={hint}
-          disabled={
-            mode !== "drill" ||
-            hintUsed ||
-            busy ||
-            !isUserPly(opening.side, ply)
-          }
+          disabled={reps !== "learn" || hintUsed || busy || holdBook || ply >= opening.moves.length}
           className="dock-btn"
         >
           <Lightbulb />
           Hint
         </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setAnalyzeOpen(true)}
-          className="dock-btn"
-        >
+        <Button variant="ghost" size="sm" onClick={() => setAnalyzeOpen(true)} className="dock-btn">
           <ScanSearch />
           Analyze
         </Button>
@@ -682,7 +706,7 @@ export function DrillScreen({
 
       {lineMenuOpen ? (
         <LineTreeMenu
-          opening={root}
+          opening={activeRoot}
           trapId={lineId}
           ply={ply}
           onClose={() => setLineMenuOpen(false)}
@@ -696,7 +720,7 @@ export function DrillScreen({
 
       {bookOpen ? (
         <StudySheet
-          opening={root}
+          opening={activeRoot}
           trapId={lineId}
           onClose={() => setBookOpen(false)}
           onSpine={() => {
@@ -704,7 +728,7 @@ export function DrillScreen({
             setBookOpen(false);
             setSession((n) => n + 1);
           }}
-          onTrap={(t) => switchTrap(t)}
+          onTrap={(next) => switchTrap(next)}
         />
       ) : null}
 
@@ -725,27 +749,6 @@ export function DrillScreen({
           onClose={() => setAnalyzeOpen(false)}
         />
       ) : null}
-
-      {quizOpen && quiz ? (
-        <QuizSheet
-          quiz={quiz}
-          onClose={() => setQuizOpen(false)}
-        />
-      ) : null}
-
-      {thinkOpen ? (
-        <PracticePanel
-          opening={opening}
-          startMoves={played}
-          orientation={orientation}
-          onClose={() => setThinkOpen(false)}
-        />
-      ) : null}
-
     </div>
   );
-}
-
-function sleep(ms: number) {
-  return new Promise((r) => setTimeout(r, ms));
 }

@@ -456,6 +456,98 @@ body,
   place-items: center;
 }
 
+.due-queue {
+  margin: 0.15rem 0 0.95rem;
+  padding: 0.75rem 0.8rem 0.8rem;
+  border: 1px solid var(--line);
+  border-radius: 0.95rem;
+  background: rgb(18 16 14 / 78%);
+}
+
+.due-queue-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
+.due-queue h2 {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--cream);
+}
+
+.due-queue-count {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+  color: var(--ember);
+  font-weight: 750;
+  font-size: 13px;
+}
+
+.due-queue-meta,
+.due-queue-empty,
+.due-streak {
+  margin: 0.28rem 0 0;
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--mist);
+}
+
+.due-queue-list {
+  list-style: none;
+  margin: 0.55rem 0 0.15rem;
+  padding: 0;
+  display: grid;
+  gap: 0.32rem;
+}
+
+.due-queue-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-width: 0;
+  font-size: 13px;
+}
+
+.due-queue-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--cream);
+}
+
+.due-queue-san {
+  flex: none;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  color: var(--ember);
+  font-weight: 750;
+}
+
+.due-start {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0.7rem;
+  height: 2.3rem;
+  border-radius: 0.7rem;
+  background: var(--ember);
+  color: #1a1206;
+  font-size: 12px;
+  font-weight: 750;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.due-start:focus-visible {
+  outline: 2px solid var(--cream);
+  outline-offset: 2px;
+}
+
 .weapon-tile:hover .weapon-mark-wrap {
   box-shadow: 0 0 0 1px rgb(243 235 224 / 14%);
 }
@@ -943,7 +1035,7 @@ body,
 .reps-chip {
   height: calc(1.7rem - 4px);
   border-radius: 0.58rem;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 650;
   letter-spacing: 0.03em;
   text-transform: uppercase;
@@ -1021,6 +1113,13 @@ body,
   font-size: 11px;
   font-variant-numeric: tabular-nums;
   color: var(--mist-2);
+}
+
+.move-note[data-book="true"] .move-note-san,
+.move-note[data-book="true"] .move-note-timer {
+  color: var(--ember);
+  font-weight: 750;
+  letter-spacing: 0.04em;
 }
 
 .move-note .history-mark {
