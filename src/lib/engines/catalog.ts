@@ -44,6 +44,6 @@ export function engineById(id: AnalysisEngineId): EngineChoice {
 /** Files planted for the engine. Bounds are the shipped build, not guesses. */
 export const ENGINE_ASSETS: readonly { path: string; min: number; max: number }[] = [
   { path: "public/engines/stockfish-17.1-lite.js", min: 15_000, max: 80_000 },
-  { path: "public/engines/stockfish.wasm", min: 5_000_000, max: 9_000_000 },
+  { path: "public/engines/stockfish-17.1-lite.wasm", min: 5_000_000, max: 9_000_000 },
   { path: "public/engines/licenses/COPYING.txt", min: 10_000, max: 80_000 },
 ];

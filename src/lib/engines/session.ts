@@ -43,6 +43,9 @@ class EngineSession {
   private req: SearchRequest | null = null;
   private searchingKey: string | null = null;
   private finishedKey: string | null = null;
+  /** True after `go` until the matching `bestmove`. A late bestmove must not finish the next search. */
+  private awaiting = false;
+  private stopSent = false;
   private bootToken = 0;
   private owner: string | null = null;
 
@@ -99,6 +102,8 @@ class EngineSession {
     this.phase = "boot";
     this.searchingKey = null;
     this.finishedKey = null;
+    this.awaiting = false;
+    this.stopSent = false;
     this.setUi("loading");
 
     let worker: Worker;
@@ -139,6 +144,9 @@ class EngineSession {
       return;
     }
     if (line.startsWith("bestmove")) {
+      if (!this.awaiting) return;
+      this.awaiting = false;
+      this.stopSent = false;
       this.phase = "idle";
       this.finishedKey = this.searchingKey;
       const req = this.req;
@@ -155,9 +163,12 @@ class EngineSession {
     const req = this.req;
     if (!req || this.phase === "boot" || !this.worker) return;
     const key = this.keyOf(req);
-    if (this.phase === "searching") {
+    if (this.phase === "searching" || this.awaiting) {
       if (!req.run || key !== this.searchingKey) {
-        this.post("stop");
+        if (!this.stopSent) {
+          this.post("stop");
+          this.stopSent = true;
+        }
         if (!req.run) this.setUi("stopped");
       }
       return;
@@ -171,6 +182,8 @@ class EngineSession {
       return;
     }
     this.phase = "searching";
+    this.awaiting = true;
+    this.stopSent = false;
     this.searchingKey = key;
     this.setUi("searching");
     this.post(`setoption name MultiPV value ${req.multipv}`);

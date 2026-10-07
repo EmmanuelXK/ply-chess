@@ -4,8 +4,8 @@ Stockfish is GPL-3.0. The license text is `licenses/COPYING.txt`. Opening Edge d
 
 ## Stockfish 17.1 lite (multithreaded)
 
-- Build: Stockfish.js 17.1 lite, multithreaded (`stockfish-17.1-lite.js` + `stockfish.wasm`)
-- The loader requests `stockfish.wasm` beside the worker script. That file is the lite multithreaded 17.1 wasm.
+- Build: Stockfish.js 17.1 lite, multithreaded (`stockfish-17.1-lite.js` + `stockfish-17.1-lite.wasm`)
+- The worker locates its wasm by replacing `.js` with `.wasm` on its own URL.
 - License: GPL-3.0
 - Upstream: https://github.com/nmrugg/stockfish.js and https://github.com/official-stockfish/Stockfish
 - Network: `nn-9067e33176e` (the lite net published with Stockfish.js 17.1)

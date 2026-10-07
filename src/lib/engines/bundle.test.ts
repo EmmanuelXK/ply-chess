@@ -11,7 +11,7 @@ test("planted engines stay inside their size bounds and wasm files are wasm", ()
       `${asset.path} is ${size} bytes, expected ${asset.min}-${asset.max}`,
     );
   }
-  const magic = readFileSync("public/engines/stockfish.wasm").subarray(0, 4).toString("utf8");
+  const magic = readFileSync("public/engines/stockfish-17.1-lite.wasm").subarray(0, 4).toString("utf8");
   assert.equal(magic, "\0asm");
 });
 

@@ -6,15 +6,17 @@ Production: [https://blitzbar.app](https://blitzbar.app) (Vercel project `ply-ch
 
 ## Repertoire
 
-Home is four racks on one page (not color pages). Rack membership lives in `src/lib/openings/racks.ts`; playable systems live in `src/lib/openings/specs.ts`. Tiles are square marks with the name in regular sans underneath; System / Semi stays a quiet caption. Phone vs iPad Air uses the auto size arranger.
+Home is four racks on one page. Rack membership lives in `src/lib/openings/racks.ts`; tile copy lives in `src/lib/openings/specs.ts`. Tiles are square marks with the name in regular sans underneath and a quiet Gambit or System caption. Phone vs iPad Air uses the auto size arranger.
 
-**White · Gambits:** Scotch Gambit, Evans, Vienna Gambit, King's Gambit, Smith-Morra, Grand Prix (semi-sharp).
+**White Gambits:** Evans Gambit, Scotch Gambit, Vienna Gambit, Smith-Morra.
 
-**White · Systems:** London, Jobava, Italian attacking, French KIA, Caro-Kann Fantasy, **Alapin**, **English**, **Queen's Gambit**.
+**White Systems:** London, Jobava London, French KIA, Caro-Kann Fantasy, Grand Prix, Alapin, English, Queen's Gambit.
 
-**Black · vs 1.e4:** Black Lion, Pirc, Sicilian Dragon, Scandinavian, Alekhine, **Caro-Kann**.
+**Black Gambits:** Benko, Budapest.
 
-**Black · vs 1.d4:** King's Indian, Modern Benoni, Benko, Dutch Leningrad, Budapest, **Slav**.
+**Black Systems:** Caro-Kann, Black Lion, Pirc, Sicilian Dragon, Scandinavian, Alekhine, King's Indian, Modern Benoni, Dutch Leningrad, Slav.
+
+King's Gambit is not on the grid. The Max Lange Attack is a Scotch Gambit branch, not its own tile.
 
 Home is Learn: one move at a time, then Analyze. Kind, vs-line, time, and traps live in Learn.
 
@@ -29,7 +31,7 @@ Learn shows the stored Stockfish 17.1 depth-22 book eval immediately. Live searc
 
 | Engine | Role | What ships |
 | --- | --- | --- |
-| **Stockfish 17.1 lite** | Multithreaded WASM when the page is cross-origin isolated | `public/engines/stockfish-17.1-lite.js` plus `public/engines/stockfish.wasm` (~6.8 MB). The loader requests `stockfish.wasm`. GPL-3.0. |
+| **Stockfish 17.1 lite** | Multithreaded WASM when the page is cross-origin isolated | `public/engines/stockfish-17.1-lite.{js,wasm}` (~6.8 MB). The worker loads the wasm by swapping `.js` for `.wasm`. GPL-3.0. |
 
 Notices and the GPL text live in `public/engines/NOTICE.md`. Lc0 and Fairy-Stockfish are not included.
 
@@ -40,7 +42,7 @@ Large **Back** and **Forward** under the board (thumb zone). Instant ply-by-ply 
 **Analyze** on the dock, or **long-press the board**, from Learn. The sheet keeps the board, a vertical eval bar, the top lines, depth, node count, and Stop / Go. Back and Forward still walk the line.
 
 ### History Gig Pack
-When the current ply has a real chess-history milestone, a small **paper mark** appears on the move note. Tap it: fast splash, year, people, why it matters *here*, Wikipedia (and Chess.com when cited). Never blocks training.
+The old history marks were written for the 21-move spines. They are not attached to the new book lines, so nothing mismatched appears on the move strip. The pack file is still in the repo.
 
 Data: `src/lib/openings/history.ts`. Typed `HistoryMilestone` (`plyOrFen`, `era`, `glyph`, `sources`, optional `famousGame`). Validation requires **≥1 sourced milestone per system** and **https** URLs. No folklore — if Wikipedia does not support a game/year, it is not in the pack. Romantic gambits (King’s Gambit, Evans) carry extra marks (Immortal, Evergreen, Kasparov revival). The Black Lion cites Dutch club pages (Jansen–den Ouden, 14 Jan 1967) plus Chess.com book notes, because it has no Wikipedia article.
 
