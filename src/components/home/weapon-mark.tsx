@@ -56,12 +56,6 @@ const GLYPHS: Record<WeaponMarkId, ReactNode> = {
       <rect x="22" y="62" width="14" height="14" rx="2.5" fill={AMBER} />
     </>
   ),
-  "italian-attack": (
-    <>
-      <path d="M30 70 L30 38 L48 24 L48 70 Z" fill={CREAM} />
-      <path d="M48 70 L48 38 L66 24 L66 70 Z" fill={AMBER} opacity="0.92" />
-    </>
-  ),
   "vienna-gambit": (
     <>
       <path
@@ -73,15 +67,6 @@ const GLYPHS: Record<WeaponMarkId, ReactNode> = {
         strokeLinejoin="round"
       />
       <circle cx="48" cy="22" r="5" fill={AMBER} />
-    </>
-  ),
-  "kings-gambit": (
-    <>
-      <path
-        d="M48 22 L54 34 H66 L56 44 L60 58 L48 50 L36 58 L40 44 L30 34 H42 Z"
-        fill={CREAM}
-      />
-      <path d="M48 50 V76" stroke={AMBER} strokeWidth="4" strokeLinecap="round" />
     </>
   ),
   "grand-prix": (

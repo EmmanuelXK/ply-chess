@@ -1,46 +1,16 @@
-import { AUTHORED_FACTS } from "@/lib/dialogue/authored-facts";
-import { SHORT_HOOKS } from "@/lib/dialogue/hooks";
-import { authoredProfessor } from "./authored";
-import { historyAt } from "./history";
 import type { Opening } from "./types";
 
-export type KeyPlyReason =
-  | "pin"
-  | "story"
-  | "history"
-  | "authored-professor"
-  | "authored-fact"
-  | "hook";
+export type KeyPlyReason = "note";
 
 /**
- * Sparse teaching marks already in the book.
- * Generated coach[] / professor fallbacks are NOT keys — those fire every other ply.
+ * A ply is a teaching mark only when the stored coach note names that exact SAN.
+ * Old pin, story, history, and hook indexes were written for the 21-move spines.
  */
 export function keyPlyReasons(opening: Opening, afterPly: number): KeyPlyReason[] {
-  if (afterPly < 0) return [];
-  const reasons: KeyPlyReason[] = [];
-
-  if (opening.pins.some((pin) => pin.afterPly === afterPly)) {
-    reasons.push("pin");
-  }
-  if (opening.storyBeats.some((beat) => beat.afterPly === afterPly)) {
-    reasons.push("story");
-  }
-  // plyOrFen is the drill ply (moves played). That is afterPly + 1.
-  if (historyAt(opening, afterPly + 1).length > 0) {
-    reasons.push("history");
-  }
-  if (authoredProfessor[opening.id]?.some((row) => row.afterPly === afterPly)) {
-    reasons.push("authored-professor");
-  }
-  if (AUTHORED_FACTS[opening.id]?.some((row) => row.ply === afterPly)) {
-    reasons.push("authored-fact");
-  }
-  if (SHORT_HOOKS[opening.id]?.some((row) => row.ply === afterPly)) {
-    reasons.push("hook");
-  }
-
-  return reasons;
+  if (afterPly < 0 || afterPly >= opening.moves.length) return [];
+  const san = opening.moves[afterPly];
+  const note = opening.notes.find((row) => row.ply === afterPly && row.san === san);
+  return note ? ["note"] : [];
 }
 
 /** True when this ply has a highlight / Why / history / authored theory mark. */

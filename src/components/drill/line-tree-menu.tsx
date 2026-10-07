@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { openingDossier, repertoireLineTree } from "@/lib/openings";
-import type { Opening, Trap } from "@/lib/openings";
+import type { Opening } from "@/lib/openings";
 
 export function LineTreeMenu({
   opening,
@@ -16,21 +16,13 @@ export function LineTreeMenu({
   trapId: string | null;
   ply: number;
   onClose: () => void;
-  onPickBranch: (trap: Trap | null, ply?: number) => void;
+  onPickBranch: (lineId: string | null, ply?: number) => void;
   onOpenBook: () => void;
 }) {
   const tree = useMemo(() => repertoireLineTree(opening), [opening]);
   const [open, setOpen] = useState<Set<string>>(() =>
     new Set([trapId ?? "spine"]),
   );
-
-  useEffect(() => {
-    setOpen((prev) => {
-      const next = new Set(prev);
-      next.add(trapId ?? "spine");
-      return next;
-    });
-  }, [trapId]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -75,12 +67,8 @@ export function LineTreeMenu({
         <ul className="line-tree" role="tree">
           {tree.map((branch, i) => {
             const key = branch.id ?? "spine";
-            const expanded = open.has(key);
+            const expanded = open.has(key) || key === (trapId ?? "spine");
             const current = (branch.id ?? null) === trapId;
-            const trap =
-              branch.id == null
-                ? null
-                : (opening.traps.find((t) => t.id === branch.id) ?? null);
             const last = i === tree.length - 1;
             return (
               <li
@@ -105,7 +93,7 @@ export function LineTreeMenu({
                   <button
                     type="button"
                     className="line-branch-btn"
-                    onClick={() => onPickBranch(trap)}
+                    onClick={() => onPickBranch(branch.id)}
                   >
                     <span className="line-branch-copy">
                       <strong>{branch.title}</strong>
@@ -132,7 +120,7 @@ export function LineTreeMenu({
                           <button
                             type="button"
                             className="line-leaf-btn"
-                            onClick={() => onPickBranch(trap, leaf.ply)}
+                            onClick={() => onPickBranch(branch.id, leaf.ply)}
                           >
                             <span className="line-leaf-dot" aria-hidden />
                             <span className="line-leaf-copy">{leaf.title}</span>

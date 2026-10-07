@@ -34,7 +34,7 @@ export async function getStockfish(): Promise<Worker> {
   if (boot) return boot;
   boot = new Promise<Worker>((resolve, reject) => {
     try {
-      const w = new Worker("/engines/stockfish-19-lite-single.js");
+      const w = new Worker("/engines/stockfish-17.1-lite.js");
       const ready = (ev: MessageEvent<string>) => {
         const line = typeof ev.data === "string" ? ev.data : "";
         if (line === "uciok" || line.includes("uciok")) {
@@ -74,11 +74,8 @@ export async function stockfishEval(
   fen: string,
   opts?: { depth?: number; movetime?: number; multipv?: number },
 ): Promise<{ eval: EvalTick; moves: EngineMove[] }> {
-  const coarse =
-    typeof navigator !== "undefined" &&
-    /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-  const depth = opts?.depth ?? (coarse ? 8 : 12);
-  const movetime = opts?.movetime ?? (coarse ? 160 : 280);
+  const depth = opts?.depth ?? 20;
+  const movetime = opts?.movetime ?? 2500;
   const multipv = opts?.multipv ?? 3;
 
   if (!stockfishSupported()) {

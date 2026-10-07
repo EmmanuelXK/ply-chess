@@ -31,14 +31,6 @@ const nextConfig: NextConfig = {
           { key: "Service-Worker-Allowed", value: "/" },
         ],
       },
-      {
-        source: "/engines/lc0/weights_9155.txt.gz",
-        headers: [
-          ...isolated,
-          { key: "Content-Type", value: "application/octet-stream" },
-          { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
-        ],
-      },
     ];
   },
 };

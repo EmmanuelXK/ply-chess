@@ -25,12 +25,25 @@ export function EvalBar({
   orientation = "white",
   layout = "vertical",
   showLabel = true,
+  pending = false,
 }: {
-  tick: EvalTick;
+  tick: EvalTick | null;
   orientation?: "white" | "black";
   layout?: "vertical" | "horizontal";
   showLabel?: boolean;
+  /** No score yet. Never draw a fake 50% bar. */
+  pending?: boolean;
 }) {
+  const waiting = pending || !tick || (tick.cp == null && (tick.mate == null || tick.mate === 0));
+  if (waiting) {
+    return (
+      <div
+        className={`eval-bar eval-bar-loading ${layout === "horizontal" ? "eval-bar-h" : "eval-bar-v"}`}
+        aria-label="Evaluation loading"
+        data-pending="true"
+      />
+    );
+  }
   const whiteFill = fillFromEval(tick);
   const bottomIsWhite = orientation === "white";
   const whitePct = `${Math.round(whiteFill * 1000) / 10}%`;

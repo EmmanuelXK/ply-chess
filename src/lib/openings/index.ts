@@ -1,3 +1,4 @@
+import { weapons } from "./book";
 import { makeOpening } from "./make-opening";
 import { openingSpecs } from "./specs";
 import { validateAll } from "./validate";
@@ -56,7 +57,8 @@ export {
   chunkIndexAt,
   visualLine,
 } from "./memory";
-export { openingFromTrap } from "./make-opening";
+export { openingFromTrap, openingOnLine } from "./make-opening";
+export { activeLine, branchChoices, moveChip, sharedPrefixLength, type BranchChoice } from "./book";
 export { quizForPly } from "./professor";
 export { moveNoteAt, factualComment, type MoveNote } from "./move-note";
 export { isKeyPly, keyPlyReasons, type KeyPlyReason } from "./key-ply";
@@ -68,7 +70,13 @@ export {
   HISTORY_PACK,
 } from "./history";
 
-export const openings: Opening[] = openingSpecs.map(makeOpening);
+const specById = new Map(openingSpecs.map((spec) => [spec.id, spec]));
+
+export const openings: Opening[] = weapons.map((weapon) => {
+  const spec = specById.get(weapon.id);
+  if (!spec) throw new Error(`missing spec for ${weapon.id}`);
+  return makeOpening(spec);
+});
 
 validateAll(openings);
 

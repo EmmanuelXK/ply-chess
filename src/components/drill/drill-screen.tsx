@@ -24,7 +24,6 @@ import { StudySheet } from "@/components/drill/study-sheet";
 import { lastMoveFrom, needsPromotion, toDests } from "@/lib/chess/dests";
 import { playLine } from "@/lib/chess/line";
 import { BoardEngines } from "@/components/drill/board-engines";
-import { explainPly } from "@/lib/openings/explain";
 import { moveNoteAt } from "@/lib/openings/move-note";
 import { moveMarkAt } from "@/lib/openings/move-mark";
 import {
@@ -37,11 +36,13 @@ import {
   type StudyMode,
 } from "@/lib/reps/schedule";
 import {
+  activeLine,
+  branchChoices,
   getOpening,
   historyAt,
-  openingFromTrap,
+  openingOnLine,
+  sharedPrefixLength,
   type Opening,
-  type Trap,
 } from "@/lib/openings";
 
 const MOVE_MS = 90;
@@ -59,11 +60,15 @@ export function DrillScreen({
 }) {
   const [activeId, setActiveId] = useState(root.id);
   const activeRoot = getOpening(activeId) ?? root;
-  const [lineId, setLineId] = useState<string | null>(initialTrap);
-  const trap = activeRoot.traps.find((item) => item.id === lineId) ?? null;
+  const [lineId, setLineId] = useState<string | null>(() => {
+    if (!initialTrap) return null;
+    const main = root.lines[0];
+    if (!main || initialTrap === main.id) return null;
+    return root.lines.some((line) => line.id === initialTrap) ? initialTrap : null;
+  });
   const opening = useMemo(
-    () => (trap ? openingFromTrap(activeRoot, trap) : activeRoot),
-    [activeRoot, trap],
+    () => openingOnLine(activeRoot, lineId),
+    [activeRoot, lineId],
   );
 
   const gameRef = useRef(new Chess());
@@ -133,13 +138,10 @@ export function DrillScreen({
     sync();
   }, [sync]);
 
-  const finishBook = useCallback(
-    (_wasPlan: boolean) => {
-      modeRef.current = "plan";
-      sync();
-    },
-    [sync],
-  );
+  const finishBook = useCallback(() => {
+    modeRef.current = "plan";
+    sync();
+  }, [sync]);
 
   const cancelTimer = useCallback(() => {
     if (timerRef.current !== null) {
@@ -154,7 +156,6 @@ export function DrillScreen({
     (nextPly: number) => {
       const capped = Math.max(0, Math.min(nextPly, opening.moves.length));
       const pos = playLine(opening.moves, capped);
-      const wasPlan = modeRef.current === "plan";
       gameRef.current = pos.chess;
       plyRef.current = pos.appliedPly;
       modeRef.current = pos.appliedPly >= opening.moves.length ? "plan" : "drill";
@@ -162,7 +163,7 @@ export function DrillScreen({
       setHintKeys(null);
       setHintUsed(false);
       if (pos.appliedPly >= opening.moves.length && repsRef.current !== "review") {
-        finishBook(wasPlan);
+        finishBook();
       }
       sync();
     },
@@ -286,7 +287,18 @@ export function DrillScreen({
   const shownMove = Math.min(Math.ceil(ply / 2), fullMoves);
   const historyNow = historyAt(opening, ply);
   const note = useMemo(() => moveNoteAt(opening, ply), [opening, ply]);
-  const explanation = useMemo(() => explainPly(opening, ply), [opening, ply]);
+  const line = activeLine(opening);
+  const bookPos = useMemo(
+    () => playLine(opening.moves, Math.min(ply, opening.moves.length)),
+    [opening.moves, ply],
+  );
+  const onBook = fen === bookPos.fen;
+  const bookEnded = onBook && ply >= opening.moves.length;
+  const bookEval = onBook ? (opening.evals[Math.min(ply, opening.evals.length - 1)] ?? null) : null;
+  const choices = useMemo(
+    () => (onBook && !bookEnded ? branchChoices(opening, ply) : []),
+    [bookEnded, onBook, opening, ply],
+  );
 
   const mark = useMemo<BoardMark | null>(() => {
     if (ply <= 0 || !lastMove || lastMove.length < 2) return null;
@@ -389,7 +401,7 @@ export function DrillScreen({
       if (repsRef.current === "learn") {
         introduceMove(opening.id, plyNow);
         markProgress(opening.id, plyRef.current);
-        if (plyRef.current >= opening.moves.length) finishBook(false);
+        if (plyRef.current >= opening.moves.length) finishBook();
         else sync();
         return;
       }
@@ -409,7 +421,7 @@ export function DrillScreen({
         }, REVIEW_JUMP_MS);
         return;
       }
-      if (plyRef.current >= opening.moves.length) finishBook(false);
+      if (plyRef.current >= opening.moves.length) finishBook();
     },
     [finishBook, opening.id, opening.moves, setHold, snapBoard, sync],
   );
@@ -458,7 +470,7 @@ export function DrillScreen({
         advanceRef.current();
         return;
       }
-      if (plyRef.current >= opening.moves.length) finishBook(false);
+      if (plyRef.current >= opening.moves.length) finishBook();
       return;
     }
     if (repsRef.current !== "learn") return;
@@ -492,8 +504,10 @@ export function DrillScreen({
     return () => window.removeEventListener("keydown", onKey);
   }, [analyzeOpen, bookOpen, historyOpen, lineMenuOpen, stepBack, stepForward]);
 
-  const switchTrap = (next: Trap | null, jumpPly?: number) => {
-    const same = (next?.id ?? null) === lineId;
+  const switchLine = (nextId: string | null, jumpPly?: number) => {
+    const mainId = activeRoot.lines[0]?.id ?? null;
+    const normalized = !nextId || nextId === mainId ? null : nextId;
+    const same = normalized === lineId;
     setLineMenuOpen(false);
     setBookOpen(false);
     if (same) {
@@ -503,8 +517,14 @@ export function DrillScreen({
       }
       return;
     }
-    resumePlyRef.current = jumpPly ?? null;
-    setLineId(next?.id ?? null);
+    const nextMoves =
+      activeRoot.lines.find((item) => item.id === (normalized ?? mainId))?.moves ??
+      activeRoot.lines[0]?.moves ??
+      opening.moves;
+    const shared = sharedPrefixLength(opening.moves, nextMoves);
+    resumePlyRef.current =
+      jumpPly != null ? Math.min(jumpPly, nextMoves.length) : Math.min(plyRef.current, shared);
+    setLineId(normalized);
     setSession((n) => n + 1);
   };
 
@@ -515,11 +535,14 @@ export function DrillScreen({
 
   const canForward = ply < opening.moves.length || holdBook;
   const canBack = ply > 0;
-  const status = holdBook
-    ? `Book move. ${note.san}. ${note.comment ?? ""}`.trim()
-    : note.comment
-      ? `${note.san}. ${note.comment}`
-      : note.san;
+  const status = [
+    bookEnded ? "Book ends." : "",
+    holdBook ? "Book move." : "",
+    note.san,
+    note.comment ?? "",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
     <div className="drill-shell" data-mode={reps} data-testid="train-screen">
@@ -537,10 +560,12 @@ export function DrillScreen({
                 {shownMove}/{fullMoves}
               </p>
             </div>
-            {mode === "plan" ? (
-              <p className="truncate text-[11px] text-[var(--mist)]">Line complete. Analyze from here.</p>
-            ) : trap ? (
-              <p className="drill-branch">{trap.name}</p>
+            {bookEnded ? (
+              <p className="truncate text-[11px] text-[var(--mist)]">Book ends.</p>
+            ) : mode === "plan" ? (
+              <p className="truncate text-[11px] text-[var(--mist)]">Off book. Analyze from here.</p>
+            ) : line && !line.main ? (
+              <p className="drill-branch">{line.label}</p>
             ) : null}
           </div>
           <Button
@@ -609,13 +634,42 @@ export function DrillScreen({
               />
             ) : null}
           </div>
-          <p className="explain-copy" data-testid="explain">
-            {explanation}
-          </p>
-          {mode === "plan" ? (
-            <p className="explain-done">Line complete. Analyze from here.</p>
+          {choices.length > 1 ? (
+            <div className="branch-chooser" role="listbox" aria-label="Opponent alternatives" data-testid="branch-chooser">
+              {choices.map((choice) => (
+                <button
+                  key={choice.san}
+                  type="button"
+                  role="option"
+                  aria-selected={choice.selected}
+                  className={choice.selected ? "branch-chip branch-chip-on" : "branch-chip"}
+                  onClick={() => switchLine(choice.lineId)}
+                >
+                  {choice.chip}
+                </button>
+              ))}
+            </div>
           ) : null}
-          <BoardEngines fen={fen} orientation={orientation} enabled={!analyzeOpen} />
+          {bookEnded ? (
+            <p className="explain-done" data-testid="book-ends">
+              Book ends{line?.eco.name ? ` · ${line.eco.name}` : ""}
+            </p>
+          ) : null}
+          {note.comment ? (
+            <p className="explain-copy" data-testid="explain">
+              {note.comment}
+            </p>
+          ) : null}
+          <BoardEngines
+            fen={fen}
+            orientation={orientation}
+            enabled={!analyzeOpen}
+            book={
+              bookEval
+                ? { cp: bookEval.cp, mate: bookEval.mate, depth: bookEval.depth, best: bookEval.best }
+                : null
+            }
+          />
         </div>
       </div>
 
@@ -652,7 +706,7 @@ export function DrillScreen({
           trapId={lineId}
           ply={ply}
           onClose={() => setLineMenuOpen(false)}
-          onPickBranch={switchTrap}
+          onPickBranch={switchLine}
           onOpenBook={() => {
             setLineMenuOpen(false);
             setBookOpen(true);
@@ -665,12 +719,8 @@ export function DrillScreen({
           opening={activeRoot}
           trapId={lineId}
           onClose={() => setBookOpen(false)}
-          onSpine={() => {
-            setLineId(null);
-            setBookOpen(false);
-            setSession((n) => n + 1);
-          }}
-          onTrap={(next) => switchTrap(next)}
+          onSpine={() => switchLine(null)}
+          onLine={(id) => switchLine(id)}
         />
       ) : null}
 

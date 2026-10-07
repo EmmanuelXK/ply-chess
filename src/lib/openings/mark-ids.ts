@@ -2,9 +2,7 @@
 export const WEAPON_MARK_IDS = [
   "scotch-gambit",
   "evans-gambit",
-  "italian-attack",
   "vienna-gambit",
-  "kings-gambit",
   "grand-prix",
   "smith-morra",
   "french-kia",

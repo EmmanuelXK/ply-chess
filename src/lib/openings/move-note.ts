@@ -7,11 +7,6 @@ export interface MoveNote {
   comment?: string;
 }
 
-function firstSentence(text: string): string {
-  const sentence = text.match(/^.*?[.!?](?=\s|$)/)?.[0]?.trim();
-  return sentence || text;
-}
-
 function stripLeadingSan(text: string, san: string | undefined): string {
   if (!san) return text;
   const lead = san.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -20,18 +15,16 @@ function stripLeadingSan(text: string, san: string | undefined): string {
     .trim();
 }
 
-/** Stored comment on this ply. Never synthesized. */
+/** Stored coach note on this ply, and only when its SAN is the move on the board. */
 export function factualComment(opening: Opening, afterPly: number): string | undefined {
-  const raw = opening.coach
-    .find((row) => row.afterPly === afterPly)
-    ?.text.replace(/\s+/g, " ")
-    .trim();
-  if (!raw) return undefined;
-  const san = afterPly >= 0 ? opening.moves[afterPly] : undefined;
-  const rest = stripLeadingSan(raw, san);
-  if (!rest || (san && rest === san)) return undefined;
-  const sentence = firstSentence(rest);
-  return sentence || undefined;
+  if (afterPly < 0) return undefined;
+  const san = opening.moves[afterPly];
+  if (!san) return undefined;
+  const note = opening.notes.find((row) => row.ply === afterPly && row.san === san);
+  const text = note?.text.replace(/\s+/g, " ").trim();
+  if (!text) return undefined;
+  const rest = stripLeadingSan(text, san);
+  return rest || undefined;
 }
 
 /** Plain note for the position after `ply` moves of the line. */
