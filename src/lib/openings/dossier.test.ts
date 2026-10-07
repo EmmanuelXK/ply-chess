@@ -5,13 +5,12 @@ import { openingDossier, openingHouses, studyHref } from "./dossier";
 import { WEAPON_MARK_IDS } from "./mark-ids";
 
 describe("openingDossier", () => {
-  it("moves trap counts, time, kind, and vs-line off the home card copy", () => {
+  it("moves line counts, time, and kind off the home card copy", () => {
     const scotch = openings.find((o) => o.id === "scotch-gambit");
     assert.ok(scotch);
     const line = openingDossier(scotch);
-    assert.match(line, /^Semi · White · 1\.\.\.e5 · \d+m · \d+ traps$/);
+    assert.match(line, /^Gambit · White · 1\.\.\.e5 · \d+m · \d+ lines$/);
     assert.ok(openingHouses(scotch).length > 0);
-    assert.ok(!openingHouses(scotch).includes("Semi"));
   });
 
   it("keeps Learn on the existing drill route", () => {
@@ -21,19 +20,19 @@ describe("openingDossier", () => {
     assert.equal(studyHref("london", "progress"), "/drill/london");
   });
 
-  it("labels system openings", () => {
+  it("labels system openings and gambits", () => {
     const london = openings.find((o) => o.id === "london");
     assert.ok(london);
     assert.match(openingDossier(london), /^System · White/);
-    const italian = openings.find((o) => o.id === "italian-attack");
-    assert.ok(italian);
-    assert.match(openingDossier(italian), /^System · White/);
     const alapin = openings.find((o) => o.id === "alapin");
     assert.ok(alapin);
     assert.match(openingDossier(alapin), /^System · White/);
     const prix = openings.find((o) => o.id === "grand-prix");
     assert.ok(prix);
-    assert.match(openingDossier(prix), /^Semi · White/);
+    assert.match(openingDossier(prix), /^System · White/);
+    const benko = openings.find((o) => o.id === "benko");
+    assert.ok(benko);
+    assert.match(openingDossier(benko), /^Gambit · Black/);
   });
 });
 

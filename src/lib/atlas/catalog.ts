@@ -48,7 +48,7 @@ export const ATLAS: AtlasEntry[] = [
     ],
     "Aim at f7 with the bishop. Castle fast, then push d4.",
     "Don't rush Ng5 unless they leave f7 loose. Develop, then break.",
-    "italian-attack",
+    "scotch-gambit",
   ),
   e(
     "giuoco-piano",
@@ -94,7 +94,7 @@ export const ATLAS: AtlasEntry[] = [
     ],
     "Sacrifice on f7 only if the queen check comes next.",
     "If they decline the knight, just take on d5 and stay developed.",
-    "italian-attack",
+    "scotch-gambit",
   ),
   e(
     "traxler",
@@ -110,7 +110,7 @@ export const ATLAS: AtlasEntry[] = [
     ],
     "Give a check on f2 and hunt their king before yours falls.",
     "Only play this if you know the first five checks. Else castle.",
-    "italian-attack",
+    "scotch-gambit",
   ),
   e(
     "evans-gambit",
@@ -354,7 +354,6 @@ export const ATLAS: AtlasEntry[] = [
     ],
     "Open the f-file and point the bishop at f7.",
     "Knight to f3 first — never let …Qh4+ wreck the king.",
-    "kings-gambit",
   ),
   e(
     "kga",
@@ -370,7 +369,6 @@ export const ATLAS: AtlasEntry[] = [
     ],
     "Get the f-file and a bishop on c4. Their king is the prize.",
     "Don't grab every pawn. Castle (even by walking) and use the file.",
-    "kings-gambit",
   ),
   e(
     "kgd",

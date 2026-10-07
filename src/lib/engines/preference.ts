@@ -13,7 +13,7 @@ type Store = Pick<Storage, "getItem" | "setItem">;
 
 export function readEngineChoice(storage: Store | null | undefined): AnalysisEngineId {
   const raw = storage?.getItem(ENGINE_STORAGE_KEY);
-  if (raw === "stockfish" || raw === "fairy" || raw === "lc0") return raw;
+  if (raw === "stockfish") return raw;
   return "stockfish";
 }
 
@@ -26,9 +26,7 @@ export function writeEngineChoice(
 }
 
 export function readEngineDepth(storage: Store | null | undefined): EngineDepth {
-  const raw = Number(storage?.getItem(ENGINE_DEPTH_KEY));
-  if (raw === 8 || raw === 12 || raw === 16) return raw;
-  return 12;
+  return storage?.getItem(ENGINE_DEPTH_KEY) === "20" ? 20 : 20;
 }
 
 export function writeEngineDepth(storage: Store | null | undefined, depth: EngineDepth): void {

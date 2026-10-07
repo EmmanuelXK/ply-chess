@@ -1,5 +1,6 @@
 import {
-  LC0_WEIGHTS,
+  LIVE_DEPTH,
+  LIVE_MOVETIME_MS,
   engineById,
   type AnalysisEngineId,
   type EngineDepth,
@@ -119,18 +120,21 @@ class EngineSession {
       this.emit("info string engine failed to start");
     };
 
-    if (id === "lc0") this.post(`load ${LC0_WEIGHTS}`);
-    else this.post("uci");
+    this.post("uci");
   }
 
-  private onEngineLine(id: AnalysisEngineId, line: string): void {
+  private onEngineLine(_id: AnalysisEngineId, line: string): void {
     this.emit(line);
     if (line === "uciok" || line.startsWith("uciok ")) {
       this.phase = "idle";
-      if (id !== "lc0") {
-        this.post("setoption name Hash value 16");
-        if (id === "fairy") this.post("setoption name Threads value 1");
-      }
+      const cores =
+        typeof navigator !== "undefined" && navigator.hardwareConcurrency
+          ? navigator.hardwareConcurrency
+          : 2;
+      const isolated = typeof crossOriginIsolated !== "undefined" && crossOriginIsolated;
+      const threads = isolated ? Math.max(2, Math.min(4, cores)) : 1;
+      this.post(`setoption name Threads value ${threads}`);
+      this.post("setoption name Hash value 32");
       this.flush();
       return;
     }
@@ -169,9 +173,9 @@ class EngineSession {
     this.phase = "searching";
     this.searchingKey = key;
     this.setUi("searching");
-    if (req.id !== "lc0") this.post(`setoption name MultiPV value ${req.multipv}`);
+    this.post(`setoption name MultiPV value ${req.multipv}`);
     this.post(`position fen ${req.fen}`);
-    this.post(`go depth ${req.depth}`);
+    this.post(`go depth ${LIVE_DEPTH} movetime ${LIVE_MOVETIME_MS}`);
   }
 
   private disposeWorker(): void {

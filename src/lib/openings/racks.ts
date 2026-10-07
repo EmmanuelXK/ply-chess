@@ -2,25 +2,19 @@ import type { Family, Opening, Side } from "./types";
 
 /**
  * Home information architecture — four racks on one page.
- * This file is the only source of truth for rack membership and tile order.
- * Playable systems themselves live in specs.ts (ids must match).
- *
- *   alapin, english, queens-gambit  → White · Systems
- *   caro-kann                       → Black · vs 1.e4
- *   slav                            → Black · vs 1.d4
- *   grand-prix                      → White · Gambits (semi-sharp)
+ * Membership follows the prepared repertoire: gambits and systems, both colors.
  */
 export type RackId =
   | "white-gambits"
   | "white-systems"
-  | "black-e4"
-  | "black-d4";
+  | "black-gambits"
+  | "black-systems";
 
 export const RACK_ORDER: readonly RackId[] = [
   "white-gambits",
   "white-systems",
-  "black-e4",
-  "black-d4",
+  "black-gambits",
+  "black-systems",
 ] as const;
 
 export const RACK_META: Record<
@@ -28,28 +22,28 @@ export const RACK_META: Record<
   { title: string; kicker: string; label: string; blurb: string }
 > = {
   "white-gambits": {
-    title: "White · Gambits",
+    title: "White Gambits",
     kicker: "White",
     label: "Gambits",
-    blurb: "Open files. Semi-sharp sits here too.",
+    blurb: "Open files. Give a pawn for time.",
   },
   "white-systems": {
-    title: "White · Systems",
+    title: "White Systems",
     kicker: "White",
     label: "Systems",
     blurb: "Same setups, every game.",
   },
-  "black-e4": {
-    title: "Black · vs 1.e4",
+  "black-gambits": {
+    title: "Black Gambits",
     kicker: "Black",
-    label: "vs 1.e4",
-    blurb: "They open the king file.",
+    label: "Gambits",
+    blurb: "Give a pawn. Take the file.",
   },
-  "black-d4": {
-    title: "Black · vs 1.d4",
+  "black-systems": {
+    title: "Black Systems",
     kicker: "Black",
-    label: "vs 1.d4",
-    blurb: "They want the queen file.",
+    label: "Systems",
+    blurb: "A setup against their center.",
   },
 };
 
@@ -83,38 +77,28 @@ export function canonicalOpeningId(id: string): string {
 
 /** Display order per rack. Home tiles follow this sequence when the spec exists. */
 export const RACK_SEQUENCE: Record<RackId, readonly string[]> = {
-  "white-gambits": [
-    "scotch-gambit",
-    "evans-gambit",
-    "vienna-gambit",
-    "kings-gambit",
-    "smith-morra",
-    "grand-prix",
-  ],
+  "white-gambits": ["evans-gambit", "scotch-gambit", "vienna-gambit", "smith-morra"],
   "white-systems": [
     "london",
     "jobava-london",
-    "italian-attack",
     "french-kia",
     "caro-fantasy",
+    "grand-prix",
     "alapin",
     "english",
     "queens-gambit",
   ],
-  "black-e4": [
+  "black-gambits": ["benko", "budapest"],
+  "black-systems": [
+    "caro-kann",
     "black-lion",
     "pirc",
     "dragon",
     "scandinavian",
     "alekhine",
-    "caro-kann",
-  ],
-  "black-d4": [
     "kings-indian",
     "modern-benoni",
-    "benko",
     "dutch-leningrad",
-    "budapest",
     "slav",
   ],
 };
@@ -142,9 +126,9 @@ export function rackForOpeningId(
 ): RackId {
   const mapped = rackById.get(id) ?? rackById.get(canonicalOpeningId(id));
   if (mapped) return mapped;
-  if (hint?.family === "black-e4") return "black-e4";
-  if (hint?.family === "black-d4") return "black-d4";
-  if (hint?.side === "black") return "black-e4";
+  if (hint?.family === "black-e4" || hint?.family === "black-d4" || hint?.side === "black") {
+    return "black-systems";
+  }
   return "white-systems";
 }
 

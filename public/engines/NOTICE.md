@@ -1,27 +1,16 @@
-# Browser engines
+# Browser engine
 
-All three engines are GPL-3.0. The license text is `licenses/COPYING.txt`. Corresponding source is the upstream projects below. Opening Edge does not add Chessable or Chess.com branding to the UI.
+Stockfish is GPL-3.0. The license text is `licenses/COPYING.txt`. Opening Edge does not add Chessable or Chess.com branding to the UI.
 
-## Stockfish lite (default)
+## Stockfish 17.1 lite (multithreaded)
 
-- Build: Stockfish.js 19.0.0 lite, single thread (`stockfish-19-lite-single.js` + `.wasm`)
+- Build: Stockfish.js 17.1 lite, multithreaded (`stockfish-17.1-lite.js` + `stockfish.wasm`)
+- The loader requests `stockfish.wasm` beside the worker script. That file is the lite multithreaded 17.1 wasm.
 - License: GPL-3.0
 - Upstream: https://github.com/nmrugg/stockfish.js and https://github.com/official-stockfish/Stockfish
-- Size: about 1.8 MB wasm + 21 KB loader
-- Loads with Analyze. No shared-memory headers required.
+- Network: `nn-9067e33176e` (the lite net published with Stockfish.js 17.1)
+- Size: about 6.8 MB wasm + 32 KB loader
+- Needs cross-origin isolation (`Cross-Origin-Opener-Policy: same-origin` and `Cross-Origin-Embedder-Policy: require-corp`) so the WASM build can use shared memory. Learn and Analyze set `Threads` from the device when `crossOriginIsolated` is true.
+- The full Stockfish 17.1 net is about 75 MB. This phone-first notebook ships the lite multithreaded build instead, which is the mobile build stockfish.js recommends when isolation is available. Book evaluations are the stored Stockfish 17.1 depth-22 scores and do not depend on this net.
 
-## Fairy-Stockfish NNUE
-
-- Build: `fairy-stockfish-nnue.wasm` 1.1.12 (`fairy/stockfish.js`, `fairy/stockfish.wasm`, `fairy/stockfish.worker.js`, `fairy/bridge.js`)
-- License: GPL-3.0
-- Upstream: https://github.com/fairy-stockfish/fairy-stockfish.wasm
-- Size: about 1.6 MB wasm
-- Needs cross-origin isolation (`Cross-Origin-Opener-Policy: same-origin` and `Cross-Origin-Embedder-Policy: require-corp`) because the WASM build uses shared memory. Threads are pinned to 1.
-
-## Lc0 (opt-in)
-
-- Build: lc0-js release js-v0.1.0 (`lc0/lc0.js` + `lc0/lc0.wasm`) with network id 9155 (6×64), `weights_9155.txt.gz`
-- License: GPL-3.0 (Leela Chess Zero)
-- Upstream: https://github.com/frpays/lc0-js and https://github.com/LeelaChessZero/lc0
-- Engine: about 0.6 MB wasm. Network: about 22 MB, fetched only after Lc0 is chosen.
-- Worker dependencies (TensorFlow.js 0.14.1, pako 1.0.3, protobuf.js 6.8.8) are vendored under `lc0/vendor/` so the phone does not call a third-party CDN. The loader URLs inside `lc0.js` point at those files.
+Lc0 and Fairy-Stockfish are not shipped. No network file is downloaded.

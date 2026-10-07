@@ -4,7 +4,7 @@ import { openingKind, studyHref, type Opening } from "@/lib/openings";
 
 export function OpeningTile({ opening }: { opening: Opening }) {
   const href = studyHref(opening.id, "learn");
-  const kind = openingKind(opening.id) === "system" ? "System" : "Semi";
+  const kind = openingKind(opening.id) === "system" ? "System" : "Gambit";
 
   return (
     <Link
