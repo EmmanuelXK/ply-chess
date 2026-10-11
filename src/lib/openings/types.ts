@@ -200,6 +200,60 @@ export interface HistoryMilestone {
   trapId?: string;
 }
 
+export interface BookEval {
+  /** Centipawns from White's point of view. */
+  cp: number | null;
+  /** Mate distance from White's point of view. */
+  mate: number | null;
+  depth: number;
+  /** Stockfish best SAN in this position. */
+  best: string;
+}
+
+export interface BookNote {
+  /** 0-based index of the move this note belongs to. */
+  ply: number;
+  san: string;
+  text: string;
+}
+
+/** A stored exception for a user move that loses at least 0.8 pawns. */
+export interface GambitMark {
+  ply?: number;
+  san?: string;
+  gambit?: boolean;
+  sacrifice?: boolean;
+  gambitSacrifice?: boolean;
+  reason?: string;
+  label?: string;
+  kind?: string;
+  /** Accepted offbeat choice, exempt from the 0.8-pawn drop rule. */
+  acceptedOffbeat?: boolean;
+}
+
+export interface BookLine {
+  id: string;
+  /** Move-order label kept from the book. */
+  label: string;
+  /** "Weapon vs opponent setup", shown beside the nickname. */
+  matchup: string;
+  /** Short name of the line, shown prominently. */
+  nickname: string;
+  /** ECO code plus official name, shown as secondary text. */
+  ecoName: string;
+  /** True on lines added after the first book cut. */
+  new?: boolean;
+  main: boolean;
+  /** First ply where this line leaves the mainline. Null on the mainline. */
+  forkPly: number | null;
+  moves: string[];
+  eco: { eco: string; name: string };
+  ecoPly: number;
+  evals: BookEval[];
+  notes: BookNote[];
+  flaggedDrops: GambitMark[];
+}
+
 export interface Opening {
   id: string;
   name: string;
@@ -210,6 +264,12 @@ export interface Opening {
   blurb: string;
   story: Story;
   moves: string[];
+  /** Stored eval after each ply, including the start. Index k is the position after k plies. */
+  evals: BookEval[];
+  /** Coach notes whose SAN matches the move. Shared prefix notes are included on branches. */
+  notes: BookNote[];
+  /** Mainline first, then opponent branches. */
+  lines: BookLine[];
   modelFromPly: number;
   chunks: Chunk[];
   pins: Pin[];

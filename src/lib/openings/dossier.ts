@@ -4,10 +4,10 @@ import { parseStudyMode } from "@/lib/reps/schedule";
 
 /** Facts that used to crowd home tiles — shown when the player enters Learn. */
 export function openingDossier(opening: Opening): string {
-  const kind = openingKind(opening.id) === "system" ? "System" : "Semi";
+  const kind = openingKind(opening.id) === "system" ? "System" : "Gambit";
   const side = opening.side === "white" ? "White" : "Black";
   const vs = opening.versus ? ` · ${opening.versus}` : "";
-  return `${kind} · ${side}${vs} · ${fullMoveCount(opening)}m · ${opening.traps.length} traps`;
+  return `${kind} · ${side}${vs} · ${fullMoveCount(opening)}m · ${opening.lines.length} lines`;
 }
 
 export function openingHouses(opening: Opening): string {

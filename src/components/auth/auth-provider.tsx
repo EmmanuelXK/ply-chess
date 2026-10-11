@@ -77,13 +77,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!configured) {
       setProgressUser(null);
-      setReady(true);
       return;
     }
     const supabase = createBrowserSupabase();
     if (!supabase) {
-      setReady(true);
-      return;
+      const timer = window.setTimeout(() => setReady(true), 0);
+      return () => window.clearTimeout(timer);
     }
     let cancelled = false;
     let readyOnce = false;

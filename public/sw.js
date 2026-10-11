@@ -1,6 +1,6 @@
 /* EDGES shell.
    Documents are network-first so a Vercel deploy shows up on the next open.
-   /engines/ is never intercepted. Fairy-Stockfish needs the document to stay
+   /engines/ is never intercepted. Stockfish threads need the document to stay
    cross-origin isolated (COOP + COEP / SharedArrayBuffer). Cached documents
    get those headers reapplied so a stored shell cannot drop them. */
 

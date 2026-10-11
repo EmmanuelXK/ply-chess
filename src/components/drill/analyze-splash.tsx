@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { X } from "lucide-react";
 
 import { EvalBar } from "@/components/board/eval-bar";
@@ -8,33 +8,12 @@ import { useAnalysis } from "@/components/drill/use-analysis";
 import { PlyNav } from "@/components/drill/ply-nav";
 import { SplashBoard } from "@/components/drill/splash-board";
 import { playLine } from "@/lib/chess/line";
-import {
-  ENGINE_CHOICES,
-  ENGINE_DEPTHS,
-  type AnalysisEngineId,
-  type EngineDepth,
-} from "@/lib/engines/catalog";
-import {
-  ENGINE_PREF_EVENT,
-  readEngineChoice,
-  readEngineDepth,
-  writeEngineChoice,
-  writeEngineDepth,
-} from "@/lib/engines/preference";
+import { LIVE_DEPTH } from "@/lib/engines/catalog";
 import type { EvalTick } from "@/lib/engines/types";
 import { formatNodes, formatScore } from "@/lib/engines/uci";
 
-function subscribePrefs(onStoreChange: () => void): () => void {
-  window.addEventListener(ENGINE_PREF_EVENT, onStoreChange);
-  window.addEventListener("storage", onStoreChange);
-  return () => {
-    window.removeEventListener(ENGINE_PREF_EVENT, onStoreChange);
-    window.removeEventListener("storage", onStoreChange);
-  };
-}
-
-function phaseCopy(phase: string, engineId: AnalysisEngineId): string {
-  if (phase === "loading") return engineId === "lc0" ? "Loading network" : "Loading";
+function phaseCopy(phase: string): string {
+  if (phase === "loading") return "Loading";
   if (phase === "searching") return "Searching";
   if (phase === "ready") return "Ready";
   if (phase === "error") return "Did not start";
@@ -54,24 +33,14 @@ export function AnalyzeSplash({
 }) {
   const [ply, setPly] = useState(() => Math.max(0, Math.min(startPly, line.length)));
   const [playing, setPlaying] = useState(false);
-  const engineId = useSyncExternalStore(
-    subscribePrefs,
-    () => readEngineChoice(window.localStorage),
-    () => "stockfish" as const,
-  );
-  const depth = useSyncExternalStore(
-    subscribePrefs,
-    () => readEngineDepth(window.localStorage),
-    () => 12 as const,
-  );
   const [run, setRun] = useState(true);
   const [nonce, setNonce] = useState(0);
 
   const pos = useMemo(() => playLine(line, ply), [line, ply]);
   const { view, phase } = useAnalysis({
     fen: pos.fen,
-    engineId,
-    depth,
+    engineId: "stockfish",
+    depth: LIVE_DEPTH,
     run,
     nonce,
     enabled: true,
@@ -114,17 +83,8 @@ export function AnalyzeSplash({
     best: view.lines[0]?.uci[0],
   };
 
-  const chooseEngine = (id: AnalysisEngineId) => {
-    writeEngineChoice(window.localStorage, id);
-    setRun(true);
-    setNonce((current) => current + 1);
-  };
-
-  const chooseDepth = (next: EngineDepth) => {
-    writeEngineDepth(window.localStorage, next);
-    setRun(true);
-    setNonce((current) => current + 1);
-  };
+  const pending = !view.lines.length;
+  const depthLabel = pending ? "…" : `d${view.depth}`;
 
   return (
     <div className="splash-root" role="dialog" aria-modal="true" aria-label="Analyze">
@@ -143,27 +103,15 @@ export function AnalyzeSplash({
           </button>
         </header>
 
-        <div className="engine-picker" role="radiogroup" aria-label="Engine" data-testid="engine-picker">
-          {ENGINE_CHOICES.map((engine) => (
-            <button
-              key={engine.id}
-              type="button"
-              role="radio"
-              aria-checked={engineId === engine.id}
-              className={engineId === engine.id ? "engine-choice engine-choice-on" : "engine-choice"}
-              onClick={() => chooseEngine(engine.id)}
-            >
-              <strong>{engine.label}</strong>
-              <em>{engine.blurb}</em>
-            </button>
-          ))}
-        </div>
-        {engineId === "lc0" ? (
-          <p className="engine-warn">Lc0 loads a 22 MB network only after you choose it.</p>
-        ) : null}
+        <p className="engine-warn">Stockfish 17.1. Live search, about 2.5s or depth 20.</p>
 
         <div className="analyze-stage" data-testid="eval-bar">
-          <EvalBar tick={tick} orientation={orientation} layout="vertical" />
+          <div className="analyze-eval-col">
+            <EvalBar tick={tick} orientation={orientation} layout="vertical" pending={pending} />
+            <span className="engine-eval-depth" data-testid="eval-depth-beside">
+              {depthLabel}
+            </span>
+          </div>
           <div className="analyze-board">
             <SplashBoard
               fen={pos.fen}
@@ -176,26 +124,14 @@ export function AnalyzeSplash({
           </div>
         </div>
         <div className="analyze-eval-h">
-          <EvalBar tick={tick} orientation={orientation} layout="horizontal" />
+          <EvalBar tick={tick} orientation={orientation} layout="horizontal" pending={pending} />
+          <span className="engine-eval-depth">{depthLabel}</span>
         </div>
 
         <div className="engine-meta">
-          <span data-testid="engine-phase">{phaseCopy(phase, engineId)}</span>
-          <span data-testid="engine-depth">d{view.depth || "–"}</span>
+          <span data-testid="engine-phase">{phaseCopy(phase)}</span>
+          <span data-testid="engine-depth">{depthLabel}</span>
           <span data-testid="engine-nodes">{formatNodes(view.nodes)} nodes</span>
-          <div className="engine-depths" role="group" aria-label="Depth">
-            {ENGINE_DEPTHS.map((stop) => (
-              <button
-                key={stop}
-                type="button"
-                className={depth === stop ? "engine-depth engine-depth-on" : "engine-depth"}
-                onClick={() => chooseDepth(stop)}
-                aria-pressed={depth === stop}
-              >
-                {stop}
-              </button>
-            ))}
-          </div>
           <button
             type="button"
             className="engine-go"

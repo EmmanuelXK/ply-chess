@@ -21,11 +21,6 @@ export function moveMarkAt(opening: Opening, afterPly: number): MoveMark | null 
   if (afterPly < 0 || afterPly >= opening.moves.length) return null;
   if (!isKeyPly(opening, afterPly)) return null;
   if (!isUserPly(opening.side, afterPly)) return null;
-  const reasons = keyPlyReasons(opening, afterPly);
-  const signature =
-    reasons.includes("pin") &&
-    (reasons.includes("story") || reasons.includes("hook"));
-  if (signature) return "gem";
-  if (reasons.includes("pin") || reasons.includes("story")) return "true";
+  if (!keyPlyReasons(opening, afterPly).includes("note")) return null;
   return "clean";
 }

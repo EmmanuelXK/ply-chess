@@ -1,11 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import {
-  readEngineChoice,
-  readEngineDepth,
-  writeEngineChoice,
-  writeEngineDepth,
-} from "./preference";
+import { readEngineChoice, readEngineDepth, writeEngineChoice, writeEngineDepth } from "./preference";
 
 function memory() {
   const data = new Map<string, string>();
@@ -17,25 +12,23 @@ function memory() {
   };
 }
 
-test("engine choice defaults to Stockfish and ignores unknown names", () => {
+test("engine choice is Stockfish and ignores retired engine names", () => {
   const store = memory();
   assert.equal(readEngineChoice(null), "stockfish");
   assert.equal(readEngineChoice(store), "stockfish");
-  store.setItem("oe.engine", "maia");
+  store.setItem("oe.engine", "lc0");
   assert.equal(readEngineChoice(store), "stockfish");
-  writeEngineChoice(store, "fairy");
-  assert.equal(readEngineChoice(store), "fairy");
-  writeEngineChoice(store, "lc0");
-  assert.equal(readEngineChoice(store), "lc0");
+  store.setItem("oe.engine", "fairy");
+  assert.equal(readEngineChoice(store), "stockfish");
+  writeEngineChoice(store, "stockfish");
+  assert.equal(readEngineChoice(store), "stockfish");
 });
 
-test("depth persists only the offered stops", () => {
+test("live search depth stays at 20", () => {
   const store = memory();
-  assert.equal(readEngineDepth(store), 12);
-  writeEngineDepth(store, 8);
-  assert.equal(readEngineDepth(store), 8);
-  store.setItem("oe.engine.depth", "99");
-  assert.equal(readEngineDepth(store), 12);
-  writeEngineDepth(store, 16);
-  assert.equal(readEngineDepth(store), 16);
+  assert.equal(readEngineDepth(store), 20);
+  writeEngineDepth(store, 20);
+  assert.equal(readEngineDepth(store), 20);
+  store.setItem("oe.engine.depth", "8");
+  assert.equal(readEngineDepth(store), 20);
 });
