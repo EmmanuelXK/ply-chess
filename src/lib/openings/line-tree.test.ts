@@ -9,7 +9,9 @@ describe("repertoireLineTree", () => {
     assert.ok(london);
     const tree = repertoireLineTree(london);
     assert.equal(tree[0]?.id, null);
-    assert.equal(tree[0]?.title, london.shortName);
+    assert.equal(tree[0]?.nickname, london.lines[0]?.nickname);
+    assert.equal(tree[0]?.matchup, london.lines[0]?.matchup);
+    assert.equal(tree[0]?.ecoName, london.lines[0]?.ecoName);
     assert.ok((tree[0]?.leaves.length ?? 0) >= 2);
     assert.equal(tree.length, london.lines.length);
     assert.equal(tree[1]?.id, london.lines[1]?.id);
@@ -22,12 +24,13 @@ describe("repertoireLineTree", () => {
     assert.ok(evans);
     assert.ok(scotch);
     const tree = repertoireLineTree(evans);
-    assert.equal(tree.length, 5);
-    assert.ok(tree.every((branch) => branch.title.trim().length > 0));
+    assert.equal(tree.length, 7);
+    assert.ok(tree.every((branch) => branch.nickname.trim().length > 0));
+    assert.ok(tree.every((branch) => branch.matchup.trim().length > 0));
     assert.ok(tree.every((branch) => branch.leaves.length >= 1));
     assert.match(
       repertoireLineTree(scotch)
-        .map((branch) => branch.title)
+        .map((branch) => branch.matchup)
         .join(" "),
       /Max Lange/,
     );

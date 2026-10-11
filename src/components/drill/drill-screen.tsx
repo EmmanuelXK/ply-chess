@@ -555,17 +555,27 @@ export function DrillScreen({
           </Button>
           <div className="min-w-0 flex-1">
             <div className="flex items-baseline justify-between gap-2">
-              <h1 className="drill-title">{activeRoot.shortName}</h1>
+              <h1 className="drill-title" data-testid="line-nickname">
+                {line?.nickname ?? activeRoot.shortName}
+              </h1>
               <p className="drill-count">
                 {shownMove}/{fullMoves}
               </p>
             </div>
+            {line ? (
+              <p className="drill-matchup" data-testid="line-matchup">
+                {line.matchup}
+              </p>
+            ) : null}
+            {line ? (
+              <p className="drill-eco" data-testid="line-eco">
+                {line.ecoName}
+              </p>
+            ) : null}
             {bookEnded ? (
               <p className="truncate text-[11px] text-[var(--mist)]">Book ends.</p>
             ) : mode === "plan" ? (
               <p className="truncate text-[11px] text-[var(--mist)]">Off book. Analyze from here.</p>
-            ) : line && !line.main ? (
-              <p className="drill-branch">{line.label}</p>
             ) : null}
           </div>
           <Button
@@ -645,7 +655,10 @@ export function DrillScreen({
                   className={choice.selected ? "branch-chip branch-chip-on" : "branch-chip"}
                   onClick={() => switchLine(choice.lineId)}
                 >
-                  {choice.chip}
+                  <span className="branch-chip-move">{choice.chip}</span>
+                  {choice.nickname ? (
+                    <span className="branch-chip-nick">{choice.nickname}</span>
+                  ) : null}
                 </button>
               ))}
             </div>

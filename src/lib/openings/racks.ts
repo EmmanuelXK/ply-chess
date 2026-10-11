@@ -100,6 +100,7 @@ export const RACK_SEQUENCE: Record<RackId, readonly string[]> = {
     "modern-benoni",
     "dutch-leningrad",
     "slav",
+    "carr-defence",
   ],
 };
 

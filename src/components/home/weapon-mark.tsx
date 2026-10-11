@@ -228,6 +228,20 @@ const GLYPHS: Record<WeaponMarkId, ReactNode> = {
       <rect x="22" y="28" width="16" height="42" rx="7" fill={AMBER} />
     </>
   ),
+  "carr-defence": (
+    <>
+      <circle cx="72" cy="26" r="6.5" fill={CREAM} />
+      <path d="M65 34 h14 l5 16 h-24 z" fill={CREAM} />
+      <path
+        d="M54 58 v12 h28 v-12"
+        fill="none"
+        stroke={AMBER}
+        strokeWidth="2.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </>
+  ),
 };
 
 const FALLBACK = (

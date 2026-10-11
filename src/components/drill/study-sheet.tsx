@@ -61,8 +61,11 @@ export function StudySheet({
               className={on ? "trap-chip trap-chip-on" : "trap-chip"}
               onClick={() => (id ? onLine(id) : onSpine())}
             >
-              {index === 0 ? opening.shortName : line.label}
-              <span className="trap-blurb">{line.eco.name}</span>
+              <span className="line-name-row">
+                <strong>{line.nickname}</strong>
+                <span className="line-matchup">{line.matchup}</span>
+              </span>
+              <span className="trap-blurb">{line.ecoName}</span>
             </button>
           );
         })}

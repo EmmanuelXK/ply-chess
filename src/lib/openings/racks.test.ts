@@ -15,9 +15,9 @@ import {
 } from "./racks";
 
 describe("weapon racks", () => {
-  it("uses RACK_SEQUENCE as the only membership list — 24 weapons, no duplicate tiles", () => {
+  it("uses RACK_SEQUENCE as the only membership list — 25 weapons, no duplicate tiles", () => {
     const specIds = openings.map((o) => o.id);
-    assert.equal(openings.length, 24);
+    assert.equal(openings.length, 25);
 
     const sequence = RACK_ORDER.flatMap((rack) => [...RACK_SEQUENCE[rack]]);
     assert.equal(new Set(sequence).size, sequence.length, "duplicate id in RACK_SEQUENCE");
@@ -74,6 +74,7 @@ describe("weapon racks", () => {
           "modern-benoni",
           "dutch-leningrad",
           "slav",
+          "carr-defence",
         ],
       ],
     );

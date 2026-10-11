@@ -24,6 +24,7 @@ export const WEAPON_MARK_IDS = [
   "dutch-leningrad",
   "budapest",
   "slav",
+  "carr-defence",
 ] as const;
 
 export type WeaponMarkId = (typeof WEAPON_MARK_IDS)[number];

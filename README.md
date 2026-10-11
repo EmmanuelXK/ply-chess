@@ -1,6 +1,6 @@
 # Opening Edge
 
-iPhone-first PWA dashboard (`100dvh`, no page scroll). **24 weapons** on one **Your Weapons** home in **four racks** (White Gambits, White Systems, Black Gambits, Black Systems). Square widget tiles; full details live in Learn. Each weapon is a short book line plus opponent branches. Under the board, the note is the written coach comment for that move. The board opens with no sign-in. Analyze runs Stockfish 17.1 on the device.
+iPhone-first PWA dashboard (`100dvh`, no page scroll). **25 weapons** on one **Your Weapons** home in **four racks** (White Gambits, White Systems, Black Gambits, Black Systems). Square widget tiles; full details live in Learn. Each weapon is a short book line plus opponent branches. Under the board, the note is the written coach comment for that move. The board opens with no sign-in. Analyze runs Stockfish 17.1 on the device.
 
 Production: [https://blitzbar.app](https://blitzbar.app) (Vercel project `ply-chess`, GitHub `EmmanuelXK/ply-chess`).
 
@@ -14,7 +14,7 @@ Home is four racks on one page. Rack membership lives in `src/lib/openings/racks
 
 **Black Gambits:** Benko, Budapest.
 
-**Black Systems:** Caro-Kann, Black Lion, Pirc, Sicilian Dragon, Scandinavian, Alekhine, King's Indian, Modern Benoni, Dutch Leningrad, Slav.
+**Black Systems:** Caro-Kann, Black Lion, Pirc, Sicilian Dragon, Scandinavian, Alekhine, King's Indian, Modern Benoni, Dutch Leningrad, Slav, Carr Defence.
 
 King's Gambit is not on the grid. The Max Lange Attack is a Scotch Gambit branch, not its own tile.
 
@@ -63,7 +63,7 @@ npm run dev
 App: [http://127.0.0.1:43173](http://127.0.0.1:43173)
 
 ```bash
-npm run validate   # 24 weapons, legal lines, ECO names, stored evals, coach notes
+npm run validate   # 25 weapons, legal lines, ECO names, stored evals, coach notes
 npm run build
 ```
 

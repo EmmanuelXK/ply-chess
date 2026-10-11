@@ -64,7 +64,7 @@ export function LineTreeMenu({
             Close
           </button>
         </div>
-        <ul className="line-tree" role="tree">
+        <ul className="line-tree" role="tree" data-testid="line-list">
           {tree.map((branch, i) => {
             const key = branch.id ?? "spine";
             const expanded = open.has(key) || key === (trapId ?? "spine");
@@ -96,8 +96,11 @@ export function LineTreeMenu({
                     onClick={() => onPickBranch(branch.id)}
                   >
                     <span className="line-branch-copy">
-                      <strong>{branch.title}</strong>
-                      <em>{branch.hint}</em>
+                      <span className="line-name-row">
+                        <strong data-testid="line-nickname">{branch.nickname}</strong>
+                        <span className="line-matchup">{branch.matchup}</span>
+                      </span>
+                      <em>{branch.ecoName}</em>
                     </span>
                     {current ? <span className="line-now">Now</span> : null}
                   </button>

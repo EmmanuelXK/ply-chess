@@ -1,7 +1,7 @@
 {
- "version": 2,
+ "version": 3,
  "source": "Stockfish 17.1 (x86-64-avx2), depth 22 (8 s cap), 7 threads, hash 1 GB; ECO names: lichess-org/chess-openings TSV",
- "generated": "2026-10-07T23:42",
+ "generated": "2026-10-11T16:04",
  "weapons": [
   {
    "id": "evans-gambit",
@@ -291,7 +291,10 @@
        "text": "Book ends. -1 pawn, compensation: lead in development, big center, Black's king still in the middle. Plan: Rad1 and Rfe1, then d5 or e5 to open lines."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Evans vs Normal Defence (7...d6)",
+     "nickname": "The Open Road",
+     "ecoName": "C51 Italian Game: Evans Gambit, Göring Attack"
     },
     {
      "id": "evans-gambit--1",
@@ -492,7 +495,10 @@
        "text": "Book ends. Material level. Pin on c6, Black's king stuck in the center. Plan: Re1, Nbd2, Qa4."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Evans vs 7...Nge7",
+     "nickname": "The Bishop Gate",
+     "ecoName": "C52 Italian Game: Evans Gambit, Mieses Defense"
     },
     {
      "id": "evans-gambit--2",
@@ -693,7 +699,10 @@
        "text": "Book ends. -2 pawns, compensation: Black can't castle easily and is far behind in development. Plan: Rad1, Rfe1, then Ne4 or Nd5."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Evans vs Compromised Defence",
+     "nickname": "The Two-Pawn Rush",
+     "ecoName": "C52 Italian Game: Evans Gambit, Compromised Defense, Main Line"
     },
     {
      "id": "evans-gambit--3",
@@ -866,7 +875,10 @@
        "text": "Book ends. Roughly equal: you have open lines, Black must untangle. Plan: Bb2 or a4, Nc4."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Evans vs Lasker Defence",
+     "nickname": "The f7 Squeeze",
+     "ecoName": "C52 Italian Game: Evans Gambit, Tartakower Attack"
     },
     {
      "id": "evans-gambit--4",
@@ -1058,7 +1070,407 @@
        "text": "Book ends. Break open the center. You have space and quicker development."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Evans vs Declined (4...Bb6)",
+     "nickname": "The a-Pawn Lasso",
+     "ecoName": "C51 Italian Game: Evans Gambit Declined, Showalter Variation"
+    },
+    {
+     "id": "evans-gambit--5",
+     "label": "3...Nf6: 4.d4 exd4 5.O-O Nxe4 6.Re1",
+     "main": false,
+     "forkPly": 5,
+     "moves": [
+      "e4",
+      "e5",
+      "Nf3",
+      "Nc6",
+      "Bc4",
+      "Nf6",
+      "d4",
+      "exd4",
+      "O-O",
+      "Nxe4",
+      "Re1",
+      "d5",
+      "Bxd5",
+      "Qxd5",
+      "Nc3",
+      "Qa5",
+      "Nxe4",
+      "Be6",
+      "Neg5",
+      "O-O-O",
+      "Nxe6",
+      "fxe6",
+      "Rxe6"
+     ],
+     "eco": {
+      "eco": "C56",
+      "name": "Italian Game: Scotch Gambit, Anderssen Attack"
+     },
+     "ecoPly": 14,
+     "evals": [
+      {
+       "cp": 37,
+       "mate": null,
+       "depth": 22,
+       "best": "e4"
+      },
+      {
+       "cp": 31,
+       "mate": null,
+       "depth": 22,
+       "best": "c5"
+      },
+      {
+       "cp": 26,
+       "mate": null,
+       "depth": 22,
+       "best": "Nf3"
+      },
+      {
+       "cp": 28,
+       "mate": null,
+       "depth": 22,
+       "best": "Nc6"
+      },
+      {
+       "cp": 28,
+       "mate": null,
+       "depth": 22,
+       "best": "Bb5"
+      },
+      {
+       "cp": 15,
+       "mate": null,
+       "depth": 22,
+       "best": "Bc5"
+      },
+      {
+       "cp": 19,
+       "mate": null,
+       "depth": 22,
+       "best": "d3"
+      },
+      {
+       "cp": 12,
+       "mate": null,
+       "depth": 22,
+       "best": "exd4"
+      },
+      {
+       "cp": 1,
+       "mate": null,
+       "depth": 22,
+       "best": "e5"
+      },
+      {
+       "cp": -9,
+       "mate": null,
+       "depth": 22,
+       "best": "Nxe4"
+      },
+      {
+       "cp": -9,
+       "mate": null,
+       "depth": 22,
+       "best": "Re1"
+      },
+      {
+       "cp": -11,
+       "mate": null,
+       "depth": 22,
+       "best": "d5"
+      },
+      {
+       "cp": -15,
+       "mate": null,
+       "depth": 22,
+       "best": "Bxd5"
+      },
+      {
+       "cp": -10,
+       "mate": null,
+       "depth": 22,
+       "best": "Qxd5"
+      },
+      {
+       "cp": -14,
+       "mate": null,
+       "depth": 22,
+       "best": "Nc3"
+      },
+      {
+       "cp": -12,
+       "mate": null,
+       "depth": 22,
+       "best": "Qd7"
+      },
+      {
+       "cp": 11,
+       "mate": null,
+       "depth": 22,
+       "best": "Nxe4"
+      },
+      {
+       "cp": 11,
+       "mate": null,
+       "depth": 22,
+       "best": "Be7"
+      },
+      {
+       "cp": 19,
+       "mate": null,
+       "depth": 22,
+       "best": "Neg5"
+      },
+      {
+       "cp": 23,
+       "mate": null,
+       "depth": 22,
+       "best": "O-O-O"
+      },
+      {
+       "cp": 18,
+       "mate": null,
+       "depth": 22,
+       "best": "Nxe6"
+      },
+      {
+       "cp": 27,
+       "mate": null,
+       "depth": 22,
+       "best": "fxe6"
+      },
+      {
+       "cp": 20,
+       "mate": null,
+       "depth": 22,
+       "best": "Rxe6"
+      },
+      {
+       "cp": 15,
+       "mate": null,
+       "depth": 22,
+       "best": "Be7"
+      }
+     ],
+     "notes": [
+      {
+       "ply": 5,
+       "san": "Nf6",
+       "text": "Two Knights: Black skips ...Bc5, so no Evans. Answer with the same attacking idea: open the center fast."
+      },
+      {
+       "ply": 6,
+       "san": "d4",
+       "text": "Strike the center at once."
+      },
+      {
+       "ply": 8,
+       "san": "O-O",
+       "text": "Castle and leave d4: speed over the pawn."
+      },
+      {
+       "ply": 10,
+       "san": "Re1",
+       "text": "Pin the knight on e4 against the king's file."
+      },
+      {
+       "ply": 12,
+       "san": "Bxd5",
+       "text": "Give the bishop back to drag the queen out."
+      },
+      {
+       "ply": 14,
+       "san": "Nc3",
+       "text": "Develop with tempo on the queen."
+      },
+      {
+       "ply": 16,
+       "san": "Nxe4",
+       "text": "Win the piece back."
+      },
+      {
+       "ply": 18,
+       "san": "Neg5",
+       "text": "Knight jumps at e6 and f7."
+      },
+      {
+       "ply": 22,
+       "san": "Rxe6",
+       "text": "Book ends. Material is level, White's pieces are active and Black's e-pawns are loose. Plan: Bd2, Qe2, pressure on the e-file. Material: level."
+      }
+     ],
+     "flaggedDrops": [],
+     "new": true,
+     "matchup": "Evans vs Two Knights (3...Nf6)",
+     "nickname": "The f7 Strike",
+     "ecoName": "C56 Italian Game: Scotch Gambit, Anderssen Attack"
+    },
+    {
+     "id": "evans-gambit--6",
+     "label": "3...Be7: 4.d4 exd4 5.Nxd4",
+     "main": false,
+     "forkPly": 5,
+     "moves": [
+      "e4",
+      "e5",
+      "Nf3",
+      "Nc6",
+      "Bc4",
+      "Be7",
+      "d4",
+      "exd4",
+      "Nxd4",
+      "d6",
+      "O-O",
+      "Nf6",
+      "Nc3",
+      "O-O",
+      "h3"
+     ],
+     "eco": {
+      "eco": "C44",
+      "name": "Scotch Game: Benima Defense"
+     },
+     "ecoPly": 7,
+     "evals": [
+      {
+       "cp": 37,
+       "mate": null,
+       "depth": 22,
+       "best": "e4"
+      },
+      {
+       "cp": 31,
+       "mate": null,
+       "depth": 22,
+       "best": "c5"
+      },
+      {
+       "cp": 26,
+       "mate": null,
+       "depth": 22,
+       "best": "Nf3"
+      },
+      {
+       "cp": 28,
+       "mate": null,
+       "depth": 22,
+       "best": "Nc6"
+      },
+      {
+       "cp": 28,
+       "mate": null,
+       "depth": 22,
+       "best": "Bb5"
+      },
+      {
+       "cp": 15,
+       "mate": null,
+       "depth": 22,
+       "best": "Bc5"
+      },
+      {
+       "cp": 47,
+       "mate": null,
+       "depth": 22,
+       "best": "d4"
+      },
+      {
+       "cp": 41,
+       "mate": null,
+       "depth": 22,
+       "best": "exd4"
+      },
+      {
+       "cp": 43,
+       "mate": null,
+       "depth": 22,
+       "best": "Nxd4"
+      },
+      {
+       "cp": 41,
+       "mate": null,
+       "depth": 22,
+       "best": "d6"
+      },
+      {
+       "cp": 40,
+       "mate": null,
+       "depth": 22,
+       "best": "Nxc6"
+      },
+      {
+       "cp": 47,
+       "mate": null,
+       "depth": 22,
+       "best": "Nf6"
+      },
+      {
+       "cp": 48,
+       "mate": null,
+       "depth": 22,
+       "best": "Nc3"
+      },
+      {
+       "cp": 49,
+       "mate": null,
+       "depth": 22,
+       "best": "O-O"
+      },
+      {
+       "cp": 45,
+       "mate": null,
+       "depth": 22,
+       "best": "Bf4"
+      },
+      {
+       "cp": 45,
+       "mate": null,
+       "depth": 22,
+       "best": "Nxd4"
+      }
+     ],
+     "notes": [
+      {
+       "ply": 5,
+       "san": "Be7",
+       "text": "Hungarian Defence: a quiet bishop, no Evans possible. Take the center instead."
+      },
+      {
+       "ply": 6,
+       "san": "d4",
+       "text": "Hit e5 while Black is passive."
+      },
+      {
+       "ply": 8,
+       "san": "Nxd4",
+       "text": "Recapture: White has a free center."
+      },
+      {
+       "ply": 10,
+       "san": "O-O",
+       "text": "King safe, rook toward e1."
+      },
+      {
+       "ply": 12,
+       "san": "Nc3",
+       "text": "Develop and guard e4."
+      },
+      {
+       "ply": 14,
+       "san": "h3",
+       "text": "Book ends. White is a bit better: more space and easy play. Plan: Re1, Bf4, Qd2, f4 later; stop ...Ng4. Material: level."
+      }
+     ],
+     "flaggedDrops": [],
+     "new": true,
+     "matchup": "Evans vs Hungarian (3...Be7)",
+     "nickname": "The Space Grab",
+     "ecoName": "C44 Scotch Game: Benima Defense"
     }
    ]
   },
@@ -1318,7 +1730,10 @@
        "text": "Book ends. Plan: Nd2 to trade the e4 knight, then c3, Rae1 and a kingside push. Black's c-pawns are weak."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Scotch Gambit vs Two Knights (5.e5)",
+     "nickname": "The Wedge",
+     "ecoName": "C56 Italian Game: Scotch Gambit, Max Lange Attack"
     },
     {
      "id": "scotch-gambit--1",
@@ -1524,7 +1939,10 @@
        "text": "Book ends. -1 pawn, compensation: Black can't castle and the d4 pawn is hard to keep. Plan: Nd2-e4, Bf4."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Scotch Gambit vs 5...Ng4",
+     "nickname": "The Open File",
+     "ecoName": "C44 Scotch Game: Scotch Gambit, Kingside Variation"
     },
     {
      "id": "scotch-gambit--2",
@@ -1678,7 +2096,10 @@
        "text": "Book ends. Plan: Re1 and Nxd4 to win the pawn back with active pieces."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Scotch Gambit vs 5...Ne4",
+     "nickname": "The Lone Knight",
+     "ecoName": "C44 Scotch Game: Scotch Gambit, Advance Variation"
     },
     {
      "id": "scotch-gambit--3",
@@ -2032,7 +2453,10 @@
        "text": "Book ends. White is better: the g7 pawn and pressure on c5 matter more than Black's d-pawns."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Scotch Gambit vs Max Lange",
+     "nickname": "The g7 Thorn",
+     "ecoName": "C56 Italian Game: Scotch Gambit, Max Lange Attack, Long Variation"
     },
     {
      "id": "scotch-gambit--4",
@@ -2186,7 +2610,365 @@
        "text": "Book ends. Pin the knight. Plan: Qb3 or Nd5, then Rad1."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Scotch Gambit vs 5...d6",
+     "nickname": "The Second Pawn",
+     "ecoName": "C44 Scotch Game: Haxo Gambit"
+    },
+    {
+     "id": "scotch-gambit--5",
+     "label": "2...Nf6: 3.d4 Nxe4 4.Bd3",
+     "main": false,
+     "forkPly": 3,
+     "moves": [
+      "e4",
+      "e5",
+      "Nf3",
+      "Nf6",
+      "d4",
+      "Nxe4",
+      "Bd3",
+      "d5",
+      "Nxe5",
+      "Nd7",
+      "Nxd7",
+      "Bxd7",
+      "O-O",
+      "Bd6",
+      "c4",
+      "c6",
+      "cxd5",
+      "cxd5",
+      "Qh5"
+     ],
+     "eco": {
+      "eco": "C43",
+      "name": "Petrov's Defense: Modern Attack, Center Variation"
+     },
+     "ecoPly": 6,
+     "evals": [
+      {
+       "cp": 37,
+       "mate": null,
+       "depth": 22,
+       "best": "e4"
+      },
+      {
+       "cp": 31,
+       "mate": null,
+       "depth": 22,
+       "best": "c5"
+      },
+      {
+       "cp": 26,
+       "mate": null,
+       "depth": 22,
+       "best": "Nf3"
+      },
+      {
+       "cp": 28,
+       "mate": null,
+       "depth": 22,
+       "best": "Nc6"
+      },
+      {
+       "cp": 33,
+       "mate": null,
+       "depth": 22,
+       "best": "Nxe5"
+      },
+      {
+       "cp": 24,
+       "mate": null,
+       "depth": 22,
+       "best": "Nxe4"
+      },
+      {
+       "cp": 21,
+       "mate": null,
+       "depth": 22,
+       "best": "Nxe5"
+      },
+      {
+       "cp": 33,
+       "mate": null,
+       "depth": 22,
+       "best": "d5"
+      },
+      {
+       "cp": 30,
+       "mate": null,
+       "depth": 22,
+       "best": "Nxe5"
+      },
+      {
+       "cp": 32,
+       "mate": null,
+       "depth": 22,
+       "best": "Nd7"
+      },
+      {
+       "cp": 36,
+       "mate": null,
+       "depth": 22,
+       "best": "Nxd7"
+      },
+      {
+       "cp": 39,
+       "mate": null,
+       "depth": 22,
+       "best": "Bxd7"
+      },
+      {
+       "cp": 38,
+       "mate": null,
+       "depth": 22,
+       "best": "O-O"
+      },
+      {
+       "cp": 32,
+       "mate": null,
+       "depth": 22,
+       "best": "Be7"
+      },
+      {
+       "cp": 42,
+       "mate": null,
+       "depth": 22,
+       "best": "Nc3"
+      },
+      {
+       "cp": 10,
+       "mate": null,
+       "depth": 22,
+       "best": "O-O"
+      },
+      {
+       "cp": 40,
+       "mate": null,
+       "depth": 22,
+       "best": "Nc3"
+      },
+      {
+       "cp": 41,
+       "mate": null,
+       "depth": 22,
+       "best": "cxd5"
+      },
+      {
+       "cp": 31,
+       "mate": null,
+       "depth": 22,
+       "best": "Nc3"
+      },
+      {
+       "cp": 0,
+       "mate": null,
+       "depth": 22,
+       "best": "O-O"
+      }
+     ],
+     "notes": [
+      {
+       "ply": 3,
+       "san": "Nf6",
+       "text": "Petroff: Black counterattacks e4. Keep the d4 idea."
+      },
+      {
+       "ply": 4,
+       "san": "d4",
+       "text": "Steinitz Attack: open lines in the center."
+      },
+      {
+       "ply": 6,
+       "san": "Bd3",
+       "text": "Hit the e4 knight."
+      },
+      {
+       "ply": 8,
+       "san": "Nxe5",
+       "text": "Take the pawn back."
+      },
+      {
+       "ply": 10,
+       "san": "Nxd7",
+       "text": "Trade the knight that wanted to challenge e5."
+      },
+      {
+       "ply": 12,
+       "san": "O-O",
+       "text": "Castle first."
+      },
+      {
+       "ply": 14,
+       "san": "c4",
+       "text": "Break at d5."
+      },
+      {
+       "ply": 16,
+       "san": "cxd5",
+       "text": "Open the c-file."
+      },
+      {
+       "ply": 18,
+       "san": "Qh5",
+       "text": "Book ends. Level material, about equal; White's pieces point at the king. Plan: Nc3, attack d5, Bg5 to pin. Material: level."
+      }
+     ],
+     "flaggedDrops": [],
+     "new": true,
+     "matchup": "Scotch Gambit vs Petroff",
+     "nickname": "The Center Pawn",
+     "ecoName": "C43 Petrov's Defense: Modern Attack, Center Variation"
+    },
+    {
+     "id": "scotch-gambit--6",
+     "label": "2...d6: 3.d4 exd4 4.Nxd4",
+     "main": false,
+     "forkPly": 3,
+     "moves": [
+      "e4",
+      "e5",
+      "Nf3",
+      "d6",
+      "d4",
+      "exd4",
+      "Nxd4",
+      "Nf6",
+      "Nc3",
+      "Be7",
+      "Bf4",
+      "O-O",
+      "Qd2"
+     ],
+     "eco": {
+      "eco": "C41",
+      "name": "Philidor Defense: Exchange Variation"
+     },
+     "ecoPly": 7,
+     "evals": [
+      {
+       "cp": 37,
+       "mate": null,
+       "depth": 22,
+       "best": "e4"
+      },
+      {
+       "cp": 31,
+       "mate": null,
+       "depth": 22,
+       "best": "c5"
+      },
+      {
+       "cp": 26,
+       "mate": null,
+       "depth": 22,
+       "best": "Nf3"
+      },
+      {
+       "cp": 28,
+       "mate": null,
+       "depth": 22,
+       "best": "Nc6"
+      },
+      {
+       "cp": 64,
+       "mate": null,
+       "depth": 22,
+       "best": "d4"
+      },
+      {
+       "cp": 61,
+       "mate": null,
+       "depth": 22,
+       "best": "exd4"
+      },
+      {
+       "cp": 59,
+       "mate": null,
+       "depth": 22,
+       "best": "Nxd4"
+      },
+      {
+       "cp": 67,
+       "mate": null,
+       "depth": 22,
+       "best": "Be7"
+      },
+      {
+       "cp": 57,
+       "mate": null,
+       "depth": 22,
+       "best": "Nc3"
+      },
+      {
+       "cp": 72,
+       "mate": null,
+       "depth": 22,
+       "best": "Be7"
+      },
+      {
+       "cp": 61,
+       "mate": null,
+       "depth": 22,
+       "best": "Bf4"
+      },
+      {
+       "cp": 61,
+       "mate": null,
+       "depth": 22,
+       "best": "Nc6"
+      },
+      {
+       "cp": 57,
+       "mate": null,
+       "depth": 22,
+       "best": "Qd2"
+      },
+      {
+       "cp": 55,
+       "mate": null,
+       "depth": 22,
+       "best": "Nc6"
+      }
+     ],
+     "notes": [
+      {
+       "ply": 3,
+       "san": "d6",
+       "text": "Philidor: solid but passive. Take the center."
+      },
+      {
+       "ply": 4,
+       "san": "d4",
+       "text": "Hit e5 at once."
+      },
+      {
+       "ply": 6,
+       "san": "Nxd4",
+       "text": "Recapture: White owns the center."
+      },
+      {
+       "ply": 8,
+       "san": "Nc3",
+       "text": "Guard e4."
+      },
+      {
+       "ply": 10,
+       "san": "Bf4",
+       "text": "Bishop on the active diagonal."
+      },
+      {
+       "ply": 12,
+       "san": "Qd2",
+       "text": "Book ends. White is a bit better (about +0.5). Plan: O-O-O and push g4-g5 at Black's king. Material: level."
+      }
+     ],
+     "flaggedDrops": [],
+     "new": true,
+     "matchup": "Scotch Gambit vs Philidor",
+     "nickname": "The Space Squeeze",
+     "ecoName": "C41 Philidor Defense: Exchange Variation"
     }
    ]
   },
@@ -2387,7 +3169,10 @@
        "text": "Book ends. Long castle. Plan: h4, g4 and a kingside attack using the e5 pawn. Sharp, roughly equal."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Vienna vs 3...d5 (Be7)",
+     "nickname": "The Long Castle",
+     "ecoName": "C29 Vienna Game: Vienna Gambit, Breyer Variation"
     },
     {
      "id": "vienna-gambit--1",
@@ -2536,7 +3321,10 @@
        "text": "Book ends. You are a pawn up. Plan: d4, Bd3 or Be2, then castle."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Vienna vs 5...Bg4",
+     "nickname": "The Broken Pin",
+     "ecoName": "C29 Vienna Game: Vienna Gambit, Kaufmann Variation"
     },
     {
      "id": "vienna-gambit--2",
@@ -2695,7 +3483,10 @@
        "text": "Book ends. Material level next with Bxf4. Black's knight is still on g8."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Vienna vs 3...exf4",
+     "nickname": "The Knight Sent Home",
+     "ecoName": "C29 Vienna Game: Vienna Gambit"
     },
     {
      "id": "vienna-gambit--3",
@@ -2816,7 +3607,10 @@
        "text": "Book ends. Plan: O-O, then fxe5 to open the f-file and Qe1-h4."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Vienna vs 3...d6",
+     "nickname": "The f-File Opener",
+     "ecoName": "C29 Vienna Game: Vienna Gambit"
     }
    ]
   },
@@ -3036,7 +3830,10 @@
        "text": "Book ends. Stop ...Bg4. -1 pawn, compensation: pressure on d5 and the c-file. Plan: Be3, Rac1, Nd5."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Morra vs Classical Setup",
+     "nickname": "The Open Files",
+     "ecoName": "B21 Sicilian Defense: Smith-Morra Gambit Accepted, Scheveningen Formation"
     },
     {
      "id": "smith-morra--1",
@@ -3171,7 +3968,10 @@
        "text": "Book ends. Pressure on d5. Plan: O-O, Qe2, Rd1."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Morra vs 3...Nf6",
+     "nickname": "The Kicked Knight",
+     "ecoName": "B22 Sicilian Defense: Alapin Variation, Smith-Morra Declined"
     },
     {
      "id": "smith-morra--2",
@@ -3301,7 +4101,10 @@
        "text": "Book ends. A bind with c4 and e4. Plan: Nc3, h3, Be3."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Morra vs 3...d3",
+     "nickname": "The Free Center",
+     "ecoName": "B21 Sicilian Defense: Smith-Morra Gambit Declined, Push Variation"
     },
     {
      "id": "smith-morra--3",
@@ -3488,7 +4291,10 @@
        "text": "Book ends. Nb5 hits c7 and d4. You win the pawn back with more active pieces."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Morra vs 3...d5",
+     "nickname": "The Queen Hunt",
+     "ecoName": "B22 Sicilian Defense: Alapin Variation, Barmen Defense, Endgame Variation"
     }
    ]
   },
@@ -3703,7 +4509,10 @@
        "text": "Book ends. Stonewall-London. Plan: Qf3, O-O, then Qh3 or g4 against the king."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "London vs Queen's Gambit Setup",
+     "nickname": "The Stonewall",
+     "ecoName": "D02 Queen's Pawn Game: London System"
     },
     {
      "id": "london--1",
@@ -3874,7 +4683,10 @@
        "text": "Book ends. Black covers b7. Plan: Nh4 to chase the f5 bishop, Be2, O-O."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "London vs 2...c5",
+     "nickname": "The b7 Poke",
+     "ecoName": "D02 Queen's Pawn Game: London System"
     },
     {
      "id": "london--2",
@@ -4028,7 +4840,10 @@
        "text": "Book ends. Plan: O-O, Ne5, play in the center."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "London vs Mirror London",
+     "nickname": "The Bishop Swap",
+     "ecoName": "D00 Queen's Pawn Game: Accelerated London System"
     },
     {
      "id": "london--3",
@@ -4168,7 +4983,10 @@
        "text": "Book ends. Plan: O-O, Nbd2, keep d4 solid. Black aims for ...e5."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "London vs KID",
+     "nickname": "The Quiet Triangle",
+     "ecoName": "A48 London System, with Be2"
     }
    ]
   },
@@ -4357,7 +5175,10 @@
        "text": "Book ends. Black's bishop is buried on h7. Plan: Bd3 to trade it, Nge2, O-O-O and a pawn storm."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Jobava vs Mirror Bishop (3...Bf5)",
+     "nickname": "The Buried Bishop",
+     "ecoName": "D01 Rapport-Jobava System"
     },
     {
      "id": "jobava-london--1",
@@ -4492,7 +5313,10 @@
        "text": "Book ends. The knight returns and Black's a6 knight is offside. Plan: Bd3, Ne5, O-O."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Jobava vs 3...e6",
+     "nickname": "The c7 Raid",
+     "ecoName": "D01 Rapport-Jobava System"
     },
     {
      "id": "jobava-london--2",
@@ -4627,7 +5451,10 @@
        "text": "Book ends. Strong knight on e5. Plan: Bd3, Qf3."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Jobava vs 3...c5",
+     "nickname": "The e5 Outpost",
+     "ecoName": "D01 Rapport-Jobava System"
     },
     {
      "id": "jobava-london--3",
@@ -4738,7 +5565,10 @@
        "text": "Book ends. Knight to e5. Plan: Bd3, Qf3, g4."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Jobava vs 3...a6",
+     "nickname": "The e5 Jump",
+     "ecoName": "D01 Rapport-Jobava System"
     }
    ]
   },
@@ -4988,7 +5818,10 @@
        "text": "Book ends. Plan: N1h2, Ng4, h5 and a kingside attack. It's a race against Black's queenside pawns."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "KIA vs French Main (…c5)",
+     "nickname": "The Pawn Storm",
+     "ecoName": "A08 King's Indian Attack: Sicilian Variation"
     },
     {
      "id": "french-kia--1",
@@ -5127,7 +5960,10 @@
        "text": "Book ends. Same KIA setup. Plan: e5, Nf1, h4."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "KIA vs 2...c5",
+     "nickname": "The Same Plan",
+     "ecoName": "A08 King's Indian Attack: Sicilian Variation"
     },
     {
      "id": "french-kia--2",
@@ -5271,7 +6107,10 @@
        "text": "Book ends. Plan: f4 to push on the kingside."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "KIA vs …Bd6/…Nge7",
+     "nickname": "The f4 Lever",
+     "ecoName": "C00 French Defense: King's Indian Attack"
     }
    ]
   },
@@ -5415,7 +6254,10 @@
        "text": "Book ends. -1 pawn for now, compensation: open f-file, Bc4 against f7, quick castling. Plan: O-O, Ng5 or e5."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Fantasy vs 3...dxe4",
+     "nickname": "The f-File Fire",
+     "ecoName": "B12 Caro-Kann Defense: Maróczy Variation, Maróczy Gambit"
     },
     {
      "id": "caro-fantasy--1",
@@ -5522,7 +6364,10 @@
        "text": "Book ends. Develop actively. Plan: Qd2, a3, O-O-O, then e5 for space."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Fantasy vs 3...e6",
+     "nickname": "The Space Grab",
+     "ecoName": "B12 Caro-Kann Defense: Maróczy Variation"
     },
     {
      "id": "caro-fantasy--2",
@@ -5624,7 +6469,10 @@
        "text": "Book ends. Solid center. Plan: Nd2, Bd3, Ne2."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Fantasy vs 3...g6",
+     "nickname": "The Solid Base",
+     "ecoName": "B12 Caro-Kann Defense: Maróczy Variation"
     },
     {
      "id": "caro-fantasy--3",
@@ -5745,7 +6593,10 @@
        "text": "Book ends. Plan: Bc4, O-O, pressure on f7."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Fantasy vs 3...Qb6",
+     "nickname": "The f7 Target",
+     "ecoName": "B12 Caro-Kann Defense: Maróczy Variation"
     }
    ]
   },
@@ -5917,7 +6768,10 @@
        "text": "Book ends. Plan: Qe1-h4, f5 and Bh6 for a kingside attack; c3 keeps Black out of d4."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Grand Prix vs 2...Nc6",
+     "nickname": "The Kingside Charge",
+     "ecoName": "B23 Sicilian Defense: Grand Prix Attack"
     },
     {
      "id": "grand-prix--1",
@@ -6052,7 +6906,10 @@
        "text": "Book ends. Plan: Qe1-h4, f5, and Bxc6 if it damages Black's pawns."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Grand Prix vs 2...d6",
+     "nickname": "The Queen Lift",
+     "ecoName": "B23 Sicilian Defense: Closed"
     },
     {
      "id": "grand-prix--2",
@@ -6192,7 +7049,10 @@
        "text": "Book ends. Kick the knight and take kingside space. Plan: d4, O-O, Ne2."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Grand Prix vs 2...e6",
+     "nickname": "The Space Wedge",
+     "ecoName": "B23 Sicilian Defense: Closed"
     }
    ]
   },
@@ -6466,7 +7326,10 @@
        "text": "Book ends. Isolated pawn position. Plan: Rc1, Bd3, Ne5 and a kingside attack."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Alapin vs 2...d5",
+     "nickname": "The Isolated Spearhead",
+     "ecoName": "B22 Sicilian Defense: Delayed Alapin Variation"
     },
     {
      "id": "alapin--1",
@@ -6651,7 +7514,10 @@
        "text": "Book ends. Active pieces. Plan: O-O, Nc3, Qb3."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Alapin vs 2...Nf6",
+     "nickname": "The Chased Knight",
+     "ecoName": "B22 Sicilian Defense: Alapin Variation, Smith-Morra Declined"
     },
     {
      "id": "alapin--2",
@@ -6767,7 +7633,10 @@
        "text": "Book ends. Stop ...Bb4 and ...Nb4. Plan: b4, Bd3, O-O."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Alapin vs 2...e6",
+     "nickname": "The Advance Chain",
+     "ecoName": "C02 French Defense: Advance Variation, Main Line"
     },
     {
      "id": "alapin--3",
@@ -6945,7 +7814,10 @@
        "text": "Book ends. Plan: Be3, a3, Qb3."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Alapin vs 2...Nc6",
+     "nickname": "The Early Center",
+     "ecoName": "B22 Sicilian Defense: Alapin Variation, Barmen Defense"
     }
    ]
   },
@@ -7181,7 +8053,10 @@
        "text": "Book ends. Plan: Rac1, f3, then b4-b5 on the queenside."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "English vs 1...e5",
+     "nickname": "The d5 Anchor",
+     "ecoName": "A25 English Opening: King's English Variation, Taimanov Variation"
     },
     {
      "id": "english--1",
@@ -7347,7 +8222,10 @@
        "text": "Book ends. A Dragon with an extra tempo. Plan: a3, b4, Be3, Rc1."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "English vs 1...Nf6 (Reversed Sicilian)",
+     "nickname": "The Extra Tempo",
+     "ecoName": "A29 English Opening: King's English Variation, Four Knights Variation, Fianchetto Line, with Nb6"
     },
     {
      "id": "english--2",
@@ -7498,7 +8376,10 @@
        "text": "Book ends. Plan: d3, Be3, then f4 or a3-b4."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "English vs Symmetrical",
+     "nickname": "The Mirror Bind",
+     "ecoName": "A36 English Opening: Symmetrical Variation, Botvinnik System"
     },
     {
      "id": "english--3",
@@ -7605,7 +8486,10 @@
        "text": "Book ends. Same plans as your Queen's Gambit Exchange."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "English vs 1...e6",
+     "nickname": "The Carlsbad Switch",
+     "ecoName": "D35 Queen's Gambit Declined: Exchange Variation, Positional Variation"
     }
    ]
   },
@@ -7871,7 +8755,10 @@
        "text": "Book ends. Plan: b5 to leave Black a weak c-pawn."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Queen's Gambit vs QGD (Exchange)",
+     "nickname": "The Minority Attack",
+     "ecoName": "D36 Queen's Gambit Declined: Exchange Variation, Reshevsky Variation"
     },
     {
      "id": "queens-gambit--1",
@@ -8041,7 +8928,10 @@
        "text": "Book ends. Black's pawns are doubled. Plan: Nge2, Nf4, minority attack."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Queen's Gambit vs 6...Bf5",
+     "nickname": "The Doubled Pawns",
+     "ecoName": "D35 Queen's Gambit Declined: Exchange Variation, Positional Variation"
     },
     {
      "id": "queens-gambit--2",
@@ -8214,7 +9104,10 @@
        "text": "Book ends. Plan: e4 and Rd1 to build a center."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Queen's Gambit vs Slav",
+     "nickname": "The Big Center",
+     "ecoName": "D19 Slav Defense: Czech Variation, Dutch Variation"
     },
     {
      "id": "queens-gambit--3",
@@ -8418,7 +9311,10 @@
        "text": "Book ends. Material level. Black's d4 pawn is weak. Plan: Nbd2-b3 and Rd1 to win it."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Queen's Gambit vs Accepted",
+     "nickname": "The b7 Grab",
+     "ecoName": "D20 Queen's Gambit Accepted: Central Variation, McDonnell Defense"
     }
    ]
   },
@@ -8677,7 +9573,10 @@
        "text": "Book ends. Plan: ...Ne8-c7-b5, pressure on a2 and b2. The pressure lasts into the endgame."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Benko vs Full Acceptance",
+     "nickname": "The Open Files",
+     "ecoName": "A58 Benko Gambit Accepted: Fully Accepted Variation"
     },
     {
      "id": "benko--1",
@@ -8819,7 +9718,10 @@
        "text": "Book ends. White won the pawn back. Material level. Plan: ...O-O, ...Nbd7, ...Rb8, ...e6."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Benko vs 4.Nf3",
+     "nickname": "The Quick Return",
+     "ecoName": "A57 Benko Gambit Declined: Main Line"
     },
     {
      "id": "benko--2",
@@ -8970,7 +9872,10 @@
        "text": "Book ends. Material level. Plan: ...O-O, ...Nbd7, ...a5 or ...Ba6."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Benko vs 5.b6",
+     "nickname": "The Pawn Handback",
+     "ecoName": "A57 Benko Gambit Accepted: Pawn Return Variation"
     },
     {
      "id": "benko--3",
@@ -9107,7 +10012,259 @@
        "text": "Book ends. Plan: ...axb5, ...e6 and quick development."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Benko vs 5.e3",
+     "nickname": "The Delayed Grab",
+     "ecoName": "A57 Benko Gambit Accepted: Modern Variation"
+    },
+    {
+     "id": "benko--4",
+     "label": "2.Bf4 c5 3.d5 b5",
+     "main": false,
+     "forkPly": 2,
+     "moves": [
+      "d4",
+      "Nf6",
+      "Bf4",
+      "c5",
+      "d5",
+      "b5",
+      "Nf3",
+      "a6"
+     ],
+     "eco": {
+      "eco": "A45",
+      "name": "Indian Defense: Accelerated London System"
+     },
+     "ecoPly": 2,
+     "evals": [
+      {
+       "cp": 37,
+       "mate": null,
+       "depth": 22,
+       "best": "e4"
+      },
+      {
+       "cp": 18,
+       "mate": null,
+       "depth": 22,
+       "best": "Nf6"
+      },
+      {
+       "cp": 25,
+       "mate": null,
+       "depth": 22,
+       "best": "c4"
+      },
+      {
+       "cp": 0,
+       "mate": null,
+       "depth": 22,
+       "best": "e6"
+      },
+      {
+       "cp": 38,
+       "mate": null,
+       "depth": 22,
+       "best": "d5"
+      },
+      {
+       "cp": 30,
+       "mate": null,
+       "depth": 22,
+       "best": "d6"
+      },
+      {
+       "cp": 33,
+       "mate": null,
+       "depth": 22,
+       "best": "e4"
+      },
+      {
+       "cp": 28,
+       "mate": null,
+       "depth": 22,
+       "best": "Bb7"
+      },
+      {
+       "cp": 41,
+       "mate": null,
+       "depth": 22,
+       "best": "a4"
+      }
+     ],
+     "notes": [
+      {
+       "ply": 2,
+       "san": "Bf4",
+       "text": "London: no c4, so no Benko. Same spirit: hit the center with ...c5."
+      },
+      {
+       "ply": 3,
+       "san": "c5",
+       "text": "Challenge d4 at once."
+      },
+      {
+       "ply": 4,
+       "san": "d5",
+       "text": "White grabs space."
+      },
+      {
+       "ply": 5,
+       "san": "b5",
+       "text": "Benko-style: queenside space and an open a/b-file later."
+      },
+      {
+       "ply": 7,
+       "san": "a6",
+       "text": "Book ends. About +0.4, normal. Plan: ...Bb7, ...g6, ...d6, ...Bg7 and play on the queenside. Material: level."
+      }
+     ],
+     "flaggedDrops": [],
+     "new": true,
+     "matchup": "Benko vs London (no c4)",
+     "nickname": "The Early …c5",
+     "ecoName": "A45 Indian Defense: Accelerated London System"
+    },
+    {
+     "id": "benko--5",
+     "label": "2.Nf3 c5 3.d5 b5 4.Bg5",
+     "main": false,
+     "forkPly": 2,
+     "moves": [
+      "d4",
+      "Nf6",
+      "Nf3",
+      "c5",
+      "d5",
+      "b5",
+      "Bg5",
+      "Ne4",
+      "Bf4",
+      "Bb7",
+      "e3"
+     ],
+     "eco": {
+      "eco": "A43",
+      "name": "Indian Defense: Pseudo-Benko"
+     },
+     "ecoPly": 5,
+     "evals": [
+      {
+       "cp": 37,
+       "mate": null,
+       "depth": 22,
+       "best": "e4"
+      },
+      {
+       "cp": 18,
+       "mate": null,
+       "depth": 22,
+       "best": "Nf6"
+      },
+      {
+       "cp": 25,
+       "mate": null,
+       "depth": 22,
+       "best": "c4"
+      },
+      {
+       "cp": 30,
+       "mate": null,
+       "depth": 22,
+       "best": "d5"
+      },
+      {
+       "cp": 57,
+       "mate": null,
+       "depth": 22,
+       "best": "d5"
+      },
+      {
+       "cp": 62,
+       "mate": null,
+       "depth": 22,
+       "best": "e6"
+      },
+      {
+       "cp": 61,
+       "mate": null,
+       "depth": 22,
+       "best": "e4"
+      },
+      {
+       "cp": 39,
+       "mate": null,
+       "depth": 22,
+       "best": "g6"
+      },
+      {
+       "cp": 64,
+       "mate": null,
+       "depth": 22,
+       "best": "Bh4"
+      },
+      {
+       "cp": 58,
+       "mate": null,
+       "depth": 22,
+       "best": "Bb7"
+      },
+      {
+       "cp": 66,
+       "mate": null,
+       "depth": 22,
+       "best": "a4"
+      },
+      {
+       "cp": 38,
+       "mate": null,
+       "depth": 22,
+       "best": "Qa5+"
+      }
+     ],
+     "notes": [
+      {
+       "ply": 2,
+       "san": "Nf3",
+       "text": "No c4 yet."
+      },
+      {
+       "ply": 3,
+       "san": "c5",
+       "text": "Hit d4 anyway."
+      },
+      {
+       "ply": 5,
+       "san": "b5",
+       "text": "Benko idea against d5."
+      },
+      {
+       "ply": 6,
+       "san": "Bg5",
+       "text": "White pins and threatens to win the center."
+      },
+      {
+       "ply": 7,
+       "san": "Ne4",
+       "text": "Jump out of the pin and hit g5."
+      },
+      {
+       "ply": 9,
+       "san": "Bb7",
+       "text": "Pressure on d5."
+      },
+      {
+       "ply": 10,
+       "san": "e3",
+       "text": "Book ends. About +0.35. Plan: ...e6 to break d5, ...Qa5+ ideas, ...g6. Material: level."
+      }
+     ],
+     "flaggedDrops": [],
+     "new": true,
+     "matchup": "Benko vs 2.Nf3 / 4.Bg5",
+     "nickname": "The Knight Hop-Out",
+     "ecoName": "A43 Indian Defense: Pseudo-Benko"
     }
    ]
   },
@@ -9314,7 +10471,10 @@
        "text": "Book ends. Plan: ...a5 to keep the bishop, ...Ng6 or ...Bf5. Black is active."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Budapest vs Rubinstein (4.Bf4)",
+     "nickname": "The e5 Siege",
+     "ecoName": "A52 Indian Defense: Budapest Gambit Accepted, Main Line, Rubinstein Variation"
     },
     {
      "id": "budapest--1",
@@ -9470,7 +10630,10 @@
        "text": "Book ends. Material level, easy development."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Budapest vs 4.Nf3",
+     "nickname": "The f2 Aim",
+     "ecoName": "A52 Indian Defense: Budapest Gambit Accepted, Main Line, Adler Variation"
     },
     {
      "id": "budapest--2",
@@ -9655,7 +10818,330 @@
        "text": "Book ends. Plan: ...Nc5 against White's weak c-pawns."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Budapest vs 4.e4",
+     "nickname": "The Broken Pawns",
+     "ecoName": "A52 Indian Defense: Budapest Gambit Accepted, Main Line, Alekhine Variation, Abonyi Variation"
+    },
+    {
+     "id": "budapest--3",
+     "label": "2.Bf4 c5 3.e3 Qb6",
+     "main": false,
+     "forkPly": 2,
+     "moves": [
+      "d4",
+      "Nf6",
+      "Bf4",
+      "c5",
+      "e3",
+      "Qb6",
+      "Nc3",
+      "d6",
+      "Rb1",
+      "e6",
+      "Nf3",
+      "Be7",
+      "Be2",
+      "O-O",
+      "O-O"
+     ],
+     "eco": {
+      "eco": "A45",
+      "name": "Indian Defense: Accelerated London System"
+     },
+     "ecoPly": 2,
+     "evals": [
+      {
+       "cp": 37,
+       "mate": null,
+       "depth": 22,
+       "best": "e4"
+      },
+      {
+       "cp": 18,
+       "mate": null,
+       "depth": 22,
+       "best": "Nf6"
+      },
+      {
+       "cp": 25,
+       "mate": null,
+       "depth": 22,
+       "best": "c4"
+      },
+      {
+       "cp": 0,
+       "mate": null,
+       "depth": 22,
+       "best": "e6"
+      },
+      {
+       "cp": 38,
+       "mate": null,
+       "depth": 22,
+       "best": "d5"
+      },
+      {
+       "cp": 8,
+       "mate": null,
+       "depth": 22,
+       "best": "d5"
+      },
+      {
+       "cp": 14,
+       "mate": null,
+       "depth": 22,
+       "best": "Nc3"
+      },
+      {
+       "cp": 17,
+       "mate": null,
+       "depth": 22,
+       "best": "e6"
+      },
+      {
+       "cp": 16,
+       "mate": null,
+       "depth": 22,
+       "best": "Qd2"
+      },
+      {
+       "cp": 0,
+       "mate": null,
+       "depth": 22,
+       "best": "e6"
+      },
+      {
+       "cp": 4,
+       "mate": null,
+       "depth": 22,
+       "best": "Nf3"
+      },
+      {
+       "cp": 4,
+       "mate": null,
+       "depth": 22,
+       "best": "Be7"
+      },
+      {
+       "cp": 3,
+       "mate": null,
+       "depth": 22,
+       "best": "Nb5"
+      },
+      {
+       "cp": -5,
+       "mate": null,
+       "depth": 22,
+       "best": "O-O"
+      },
+      {
+       "cp": 5,
+       "mate": null,
+       "depth": 22,
+       "best": "O-O"
+      },
+      {
+       "cp": 11,
+       "mate": null,
+       "depth": 22,
+       "best": "a6"
+      }
+     ],
+     "notes": [
+      {
+       "ply": 2,
+       "san": "Bf4",
+       "text": "London: no c4, so no Budapest. Hit d4 with ...c5."
+      },
+      {
+       "ply": 4,
+       "san": "e3",
+       "text": "White keeps d4 solid."
+      },
+      {
+       "ply": 5,
+       "san": "Qb6",
+       "text": "Hit b2: the London bishop left the queenside."
+      },
+      {
+       "ply": 7,
+       "san": "d6",
+       "text": "Quiet: don't grab b2 yet (…Qxb2 gets messy)."
+      },
+      {
+       "ply": 8,
+       "san": "Rb1",
+       "text": "White guards b2."
+      },
+      {
+       "ply": 9,
+       "san": "e6",
+       "text": "Solid setup."
+      },
+      {
+       "ply": 13,
+       "san": "O-O",
+       "text": "Castle."
+      },
+      {
+       "ply": 14,
+       "san": "O-O",
+       "text": "Book ends. About equal. Plan: ...Nc6, ...cxd4, ...e5 to gain space with tempo on the f4 bishop. Material: level."
+      }
+     ],
+     "flaggedDrops": [],
+     "new": true,
+     "matchup": "Budapest vs London (no c4)",
+     "nickname": "The Plan B",
+     "ecoName": "A45 Indian Defense: Accelerated London System"
+    },
+    {
+     "id": "budapest--4",
+     "label": "2.Bg5 Ne4 3.Bf4 c5",
+     "main": false,
+     "forkPly": 2,
+     "moves": [
+      "d4",
+      "Nf6",
+      "Bg5",
+      "Ne4",
+      "Bf4",
+      "c5",
+      "f3",
+      "Qa5+",
+      "c3",
+      "Nf6",
+      "d5",
+      "Qb6"
+     ],
+     "eco": {
+      "eco": "A45",
+      "name": "Trompowsky Attack"
+     },
+     "ecoPly": 2,
+     "evals": [
+      {
+       "cp": 37,
+       "mate": null,
+       "depth": 22,
+       "best": "e4"
+      },
+      {
+       "cp": 18,
+       "mate": null,
+       "depth": 22,
+       "best": "Nf6"
+      },
+      {
+       "cp": 25,
+       "mate": null,
+       "depth": 22,
+       "best": "c4"
+      },
+      {
+       "cp": 7,
+       "mate": null,
+       "depth": 22,
+       "best": "d5"
+      },
+      {
+       "cp": 19,
+       "mate": null,
+       "depth": 22,
+       "best": "Bf4"
+      },
+      {
+       "cp": 23,
+       "mate": null,
+       "depth": 22,
+       "best": "d5"
+      },
+      {
+       "cp": 53,
+       "mate": null,
+       "depth": 22,
+       "best": "f3"
+      },
+      {
+       "cp": 54,
+       "mate": null,
+       "depth": 22,
+       "best": "Qa5+"
+      },
+      {
+       "cp": 52,
+       "mate": null,
+       "depth": 22,
+       "best": "c3"
+      },
+      {
+       "cp": 52,
+       "mate": null,
+       "depth": 22,
+       "best": "Nf6"
+      },
+      {
+       "cp": 45,
+       "mate": null,
+       "depth": 22,
+       "best": "d5"
+      },
+      {
+       "cp": 56,
+       "mate": null,
+       "depth": 22,
+       "best": "Qb6"
+      },
+      {
+       "cp": 50,
+       "mate": null,
+       "depth": 22,
+       "best": "Bc1"
+      }
+     ],
+     "notes": [
+      {
+       "ply": 2,
+       "san": "Bg5",
+       "text": "Trompowsky: no c4, so no Budapest."
+      },
+      {
+       "ply": 3,
+       "san": "Ne4",
+       "text": "Hit the bishop at once."
+      },
+      {
+       "ply": 5,
+       "san": "c5",
+       "text": "Attack d4."
+      },
+      {
+       "ply": 6,
+       "san": "f3",
+       "text": "Kick the knight."
+      },
+      {
+       "ply": 7,
+       "san": "Qa5+",
+       "text": "Check first: it disturbs White's pawns."
+      },
+      {
+       "ply": 9,
+       "san": "Nf6",
+       "text": "Retreat; the knight did its job."
+      },
+      {
+       "ply": 11,
+       "san": "Qb6",
+       "text": "Book ends. About +0.5. Plan: hit b2, ...d6, ...e6 to break d5. Material: level."
+      }
+     ],
+     "flaggedDrops": [],
+     "new": true,
+     "matchup": "Budapest vs Trompowsky",
+     "nickname": "The Pin Dodge",
+     "ecoName": "A45 Trompowsky Attack"
     }
    ]
   },
@@ -9924,7 +11410,10 @@
        "text": "Book ends. Plan: ...Qb6, ...f6 to break the chain, keep pressing d4."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Caro-Kann vs Advance",
+     "nickname": "The Chain Breaker",
+     "ecoName": "B12 Caro-Kann Defense: Advance Variation, Short Variation"
     },
     {
      "id": "caro-kann--1",
@@ -10151,7 +11640,10 @@
        "text": "Book ends. Plan: ...O-O or ...Qc7 and ...O-O-O, then ...c5."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Caro-Kann vs Classical (3.Nc3)",
+     "nickname": "The Bishop Trade",
+     "ecoName": "B19 Caro-Kann Defense: Classical Variation, Lobron System"
     },
     {
      "id": "caro-kann--2",
@@ -10321,7 +11813,10 @@
        "text": "Book ends. Plan: ...Bd6 to trade dark bishops, then ...b5-b4."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Caro-Kann vs Exchange",
+     "nickname": "The Minority Mirror",
+     "ecoName": "B13 Caro-Kann Defense: Exchange Variation, Rubinstein Variation"
     },
     {
      "id": "caro-kann--3",
@@ -10500,7 +11995,10 @@
        "text": "Book ends. White has an isolated pawn. Blockade d5 and trade pieces."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Caro-Kann vs Panov",
+     "nickname": "The Blockade",
+     "ecoName": "B14 Caro-Kann Defense: Panov Attack"
     },
     {
      "id": "caro-kann--4",
@@ -10665,7 +12163,10 @@
        "text": "Book ends. Plan: ...Nf6, ...Bd6, ...O-O. White has the bishop pair but nothing to attack."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Caro-Kann vs Two Knights",
+     "nickname": "The Solid Wall",
+     "ecoName": "B11 Caro-Kann Defense: Two Knights Attack, Mindeno Variation, Exchange Line"
     }
    ]
   },
@@ -10891,7 +12392,10 @@
        "text": "Book ends. The knight goes to g6 or e6. Plan: ...Ng6, ...Bf8, then ...d5 or ...b5."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Lion vs Bc4 Main",
+     "nickname": "The Coiled Lion",
+     "ecoName": "C41 Philidor Defense: Lion Variation"
     },
     {
      "id": "black-lion--1",
@@ -11042,7 +12546,10 @@
        "text": "Book ends. Solid. Plan: ...Qc7, ...Nc5, ...b5."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Lion vs 5.dxe5",
+     "nickname": "The Quiet Den",
+     "ecoName": "C41 Philidor Defense: Lion Variation"
     },
     {
      "id": "black-lion--2",
@@ -11215,7 +12722,10 @@
        "text": "Book ends. Plan: ...Bc5 to trade White's good bishop, ...Qb6."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Lion vs 4.f4",
+     "nickname": "The Counterstrike",
+     "ecoName": "B07 Lion Defense: Anti-Philidor, Lion's Cave"
     }
    ]
   },
@@ -11441,7 +12951,10 @@
        "text": "Book ends. Hit e4. Plan: ...a5, ...Qb6, pressure on e4 and b2."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Pirc vs Classical",
+     "nickname": "The e4 Pressure",
+     "ecoName": "B08 Pirc Defense: Classical Variation, Quiet System, Czech Defense"
     },
     {
      "id": "pirc--1",
@@ -11597,7 +13110,10 @@
        "text": "Book ends. Pin the f3 knight. Plan: ...Nc7, ...Rb8, ...b5."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Pirc vs Austrian",
+     "nickname": "The Pin and Strike",
+     "ecoName": "B09 Pirc Defense: Austrian Attack, Weiss Variation"
     },
     {
      "id": "pirc--2",
@@ -11734,7 +13250,10 @@
        "text": "Book ends. Plan: ...Be7 or ...Bg7, ...Qc7, queenside space."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Pirc vs 150 Attack",
+     "nickname": "The Queenside Spring",
+     "ecoName": "B07 Pirc Defense: 150 Attack"
     },
     {
      "id": "pirc--3",
@@ -11871,7 +13390,10 @@
        "text": "Book ends. Plan: ...e5 next, then ...Bb7 and ...Be7 or ...Bg7."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Pirc vs Byrne (4.Bg5)",
+     "nickname": "The b5 Spring",
+     "ecoName": "B07 Pirc Defense: Byrne Variation"
     }
    ]
   },
@@ -12134,7 +13656,10 @@
        "text": "Book ends. Plan: ...Nc4, ...b5, and the exchange sacrifice ...Rxc3 when it works."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Dragon vs Yugoslav 9.Bc4",
+     "nickname": "The Soltis Wall",
+     "ecoName": "B78 Sicilian Defense: Dragon Variation, Yugoslav Attack, Old Line"
     },
     {
      "id": "dragon--1",
@@ -12374,7 +13899,10 @@
        "text": "Book ends. Active pieces. Plan: ...Qc7, ...Rab8, ...f5."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Dragon vs Yugoslav 9.O-O-O",
+     "nickname": "The Center Strike",
+     "ecoName": "B76 Sicilian Defense: Dragon Variation, Yugoslav Attack, Modern Line"
     },
     {
      "id": "dragon--2",
@@ -12600,7 +14128,10 @@
        "text": "Book ends. Plan: ...b5-b4 to open White's king."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Dragon vs Yugoslav 9.g4",
+     "nickname": "The b-Pawn Charge",
+     "ecoName": "B76 Sicilian Defense: Dragon Variation, Yugoslav Attack, Panov Variation"
     },
     {
      "id": "dragon--3",
@@ -12779,7 +14310,751 @@
        "text": "Book ends. Plan: ...Rd8, ...d5 or ...Bg4."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Dragon vs Classical",
+     "nickname": "The Calm Dragon",
+     "ecoName": "B74 Sicilian Defense: Dragon Variation, Classical Variation, Tartakower Line"
+    },
+    {
+     "id": "dragon--4",
+     "label": "2.c3 Nf6 (Alapin)",
+     "main": false,
+     "forkPly": 2,
+     "moves": [
+      "e4",
+      "c5",
+      "c3",
+      "Nf6",
+      "e5",
+      "Nd5",
+      "d4",
+      "cxd4",
+      "Nf3",
+      "Nc6",
+      "cxd4",
+      "d6",
+      "Bc4",
+      "Nb6",
+      "Bb5",
+      "dxe5",
+      "Nxe5",
+      "Bd7"
+     ],
+     "eco": {
+      "eco": "B22",
+      "name": "Sicilian Defense: Alapin Variation, Smith-Morra Declined"
+     },
+     "ecoPly": 7,
+     "evals": [
+      {
+       "cp": 37,
+       "mate": null,
+       "depth": 22,
+       "best": "e4"
+      },
+      {
+       "cp": 31,
+       "mate": null,
+       "depth": 22,
+       "best": "c5"
+      },
+      {
+       "cp": 32,
+       "mate": null,
+       "depth": 22,
+       "best": "Nc3"
+      },
+      {
+       "cp": 12,
+       "mate": null,
+       "depth": 22,
+       "best": "Nf6"
+      },
+      {
+       "cp": 10,
+       "mate": null,
+       "depth": 22,
+       "best": "e5"
+      },
+      {
+       "cp": 8,
+       "mate": null,
+       "depth": 22,
+       "best": "Nd5"
+      },
+      {
+       "cp": 12,
+       "mate": null,
+       "depth": 22,
+       "best": "d4"
+      },
+      {
+       "cp": 5,
+       "mate": null,
+       "depth": 22,
+       "best": "d6"
+      },
+      {
+       "cp": 25,
+       "mate": null,
+       "depth": 22,
+       "best": "Nf3"
+      },
+      {
+       "cp": 2,
+       "mate": null,
+       "depth": 22,
+       "best": "d6"
+      },
+      {
+       "cp": 0,
+       "mate": null,
+       "depth": 22,
+       "best": "cxd4"
+      },
+      {
+       "cp": 3,
+       "mate": null,
+       "depth": 22,
+       "best": "d6"
+      },
+      {
+       "cp": 18,
+       "mate": null,
+       "depth": 22,
+       "best": "Bc4"
+      },
+      {
+       "cp": 16,
+       "mate": null,
+       "depth": 22,
+       "best": "Nb6"
+      },
+      {
+       "cp": 10,
+       "mate": null,
+       "depth": 22,
+       "best": "Bb5"
+      },
+      {
+       "cp": 8,
+       "mate": null,
+       "depth": 22,
+       "best": "dxe5"
+      },
+      {
+       "cp": 7,
+       "mate": null,
+       "depth": 22,
+       "best": "Nxe5"
+      },
+      {
+       "cp": 7,
+       "mate": null,
+       "depth": 22,
+       "best": "Bd7"
+      },
+      {
+       "cp": 6,
+       "mate": null,
+       "depth": 22,
+       "best": "Nxd7"
+      }
+     ],
+     "notes": [
+      {
+       "ply": 2,
+       "san": "c3",
+       "text": "Alapin: no open Sicilian, no Dragon."
+      },
+      {
+       "ply": 3,
+       "san": "Nf6",
+       "text": "Hit e4."
+      },
+      {
+       "ply": 5,
+       "san": "Nd5",
+       "text": "Knight to the center."
+      },
+      {
+       "ply": 7,
+       "san": "cxd4",
+       "text": "Trade center pawns."
+      },
+      {
+       "ply": 9,
+       "san": "Nc6",
+       "text": "Hit d4."
+      },
+      {
+       "ply": 11,
+       "san": "d6",
+       "text": "Challenge e5."
+      },
+      {
+       "ply": 13,
+       "san": "Nb6",
+       "text": "Hit c4."
+      },
+      {
+       "ply": 15,
+       "san": "dxe5",
+       "text": "Open the center."
+      },
+      {
+       "ply": 17,
+       "san": "Bd7",
+       "text": "Book ends. About equal. Plan: ...e6, ...Bd6 and castle. Material: level."
+      }
+     ],
+     "flaggedDrops": [],
+     "new": true,
+     "matchup": "Dragon vs Alapin (2.c3)",
+     "nickname": "The Center Knight",
+     "ecoName": "B22 Sicilian Defense: Alapin Variation, Smith-Morra Declined"
+    },
+    {
+     "id": "dragon--5",
+     "label": "2.Nf3 d6 3.Bb5+ (Moscow)",
+     "main": false,
+     "forkPly": 4,
+     "moves": [
+      "e4",
+      "c5",
+      "Nf3",
+      "d6",
+      "Bb5+",
+      "Bd7",
+      "Bxd7+",
+      "Qxd7",
+      "O-O",
+      "Nc6",
+      "c3",
+      "Nf6",
+      "Re1",
+      "e6",
+      "d4",
+      "cxd4",
+      "cxd4",
+      "d5",
+      "e5",
+      "Ne4"
+     ],
+     "eco": {
+      "eco": "B52",
+      "name": "Sicilian Defense: Moscow Variation, Main Line"
+     },
+     "ecoPly": 5,
+     "evals": [
+      {
+       "cp": 37,
+       "mate": null,
+       "depth": 22,
+       "best": "e4"
+      },
+      {
+       "cp": 31,
+       "mate": null,
+       "depth": 22,
+       "best": "c5"
+      },
+      {
+       "cp": 32,
+       "mate": null,
+       "depth": 22,
+       "best": "Nc3"
+      },
+      {
+       "cp": 27,
+       "mate": null,
+       "depth": 22,
+       "best": "Nc6"
+      },
+      {
+       "cp": 35,
+       "mate": null,
+       "depth": 22,
+       "best": "d4"
+      },
+      {
+       "cp": 18,
+       "mate": null,
+       "depth": 22,
+       "best": "Nd7"
+      },
+      {
+       "cp": 23,
+       "mate": null,
+       "depth": 22,
+       "best": "Bxd7+"
+      },
+      {
+       "cp": 19,
+       "mate": null,
+       "depth": 22,
+       "best": "Qxd7"
+      },
+      {
+       "cp": 22,
+       "mate": null,
+       "depth": 22,
+       "best": "O-O"
+      },
+      {
+       "cp": 14,
+       "mate": null,
+       "depth": 22,
+       "best": "Nf6"
+      },
+      {
+       "cp": 10,
+       "mate": null,
+       "depth": 22,
+       "best": "c3"
+      },
+      {
+       "cp": 2,
+       "mate": null,
+       "depth": 22,
+       "best": "d5"
+      },
+      {
+       "cp": 23,
+       "mate": null,
+       "depth": 22,
+       "best": "d4"
+      },
+      {
+       "cp": 7,
+       "mate": null,
+       "depth": 22,
+       "best": "e6"
+      },
+      {
+       "cp": 12,
+       "mate": null,
+       "depth": 22,
+       "best": "d4"
+      },
+      {
+       "cp": 11,
+       "mate": null,
+       "depth": 22,
+       "best": "cxd4"
+      },
+      {
+       "cp": 9,
+       "mate": null,
+       "depth": 22,
+       "best": "cxd4"
+      },
+      {
+       "cp": 7,
+       "mate": null,
+       "depth": 22,
+       "best": "d5"
+      },
+      {
+       "cp": 10,
+       "mate": null,
+       "depth": 22,
+       "best": "e5"
+      },
+      {
+       "cp": 10,
+       "mate": null,
+       "depth": 22,
+       "best": "Ne4"
+      },
+      {
+       "cp": 9,
+       "mate": null,
+       "depth": 22,
+       "best": "Nbd2"
+      }
+     ],
+     "notes": [
+      {
+       "ply": 4,
+       "san": "Bb5+",
+       "text": "Moscow: White avoids the Dragon with a check."
+      },
+      {
+       "ply": 5,
+       "san": "Bd7",
+       "text": "Block and offer a trade."
+      },
+      {
+       "ply": 7,
+       "san": "Qxd7",
+       "text": "Queen recaptures."
+      },
+      {
+       "ply": 9,
+       "san": "Nc6",
+       "text": "Develop."
+      },
+      {
+       "ply": 11,
+       "san": "Nf6",
+       "text": "Hit e4."
+      },
+      {
+       "ply": 13,
+       "san": "e6",
+       "text": "Solid center."
+      },
+      {
+       "ply": 15,
+       "san": "cxd4",
+       "text": "Trade."
+      },
+      {
+       "ply": 17,
+       "san": "d5",
+       "text": "Strike back."
+      },
+      {
+       "ply": 19,
+       "san": "Ne4",
+       "text": "Book ends. About equal. Plan: ...Be7, ...O-O, ...f6 or ...Rc8. Material: level."
+      }
+     ],
+     "flaggedDrops": [],
+     "new": true,
+     "matchup": "Dragon vs Moscow (3.Bb5+)",
+     "nickname": "The Bishop Swap",
+     "ecoName": "B52 Sicilian Defense: Moscow Variation, Main Line"
+    },
+    {
+     "id": "dragon--6",
+     "label": "2.Nc3 Nc6 3.f4 (Grand Prix)",
+     "main": false,
+     "forkPly": 2,
+     "moves": [
+      "e4",
+      "c5",
+      "Nc3",
+      "Nc6",
+      "f4",
+      "g6",
+      "Nf3",
+      "Bg7",
+      "Bb5",
+      "Nd4",
+      "O-O",
+      "Nxb5",
+      "Nxb5",
+      "d6",
+      "d3"
+     ],
+     "eco": {
+      "eco": "B23",
+      "name": "Sicilian Defense: Grand Prix Attack"
+     },
+     "ecoPly": 4,
+     "evals": [
+      {
+       "cp": 37,
+       "mate": null,
+       "depth": 22,
+       "best": "e4"
+      },
+      {
+       "cp": 31,
+       "mate": null,
+       "depth": 22,
+       "best": "c5"
+      },
+      {
+       "cp": 32,
+       "mate": null,
+       "depth": 22,
+       "best": "Nc3"
+      },
+      {
+       "cp": 27,
+       "mate": null,
+       "depth": 22,
+       "best": "Nc6"
+      },
+      {
+       "cp": 27,
+       "mate": null,
+       "depth": 22,
+       "best": "Nf3"
+      },
+      {
+       "cp": -19,
+       "mate": null,
+       "depth": 22,
+       "best": "g6"
+      },
+      {
+       "cp": -18,
+       "mate": null,
+       "depth": 22,
+       "best": "Nf3"
+      },
+      {
+       "cp": -29,
+       "mate": null,
+       "depth": 22,
+       "best": "Bg7"
+      },
+      {
+       "cp": -27,
+       "mate": null,
+       "depth": 22,
+       "best": "d3"
+      },
+      {
+       "cp": -30,
+       "mate": null,
+       "depth": 22,
+       "best": "Nd4"
+      },
+      {
+       "cp": -29,
+       "mate": null,
+       "depth": 22,
+       "best": "O-O"
+      },
+      {
+       "cp": -30,
+       "mate": null,
+       "depth": 22,
+       "best": "a6"
+      },
+      {
+       "cp": -27,
+       "mate": null,
+       "depth": 22,
+       "best": "Nxb5"
+      },
+      {
+       "cp": -29,
+       "mate": null,
+       "depth": 22,
+       "best": "a6"
+      },
+      {
+       "cp": 18,
+       "mate": null,
+       "depth": 22,
+       "best": "a4"
+      },
+      {
+       "cp": -3,
+       "mate": null,
+       "depth": 22,
+       "best": "a6"
+      }
+     ],
+     "notes": [
+      {
+       "ply": 4,
+       "san": "f4",
+       "text": "Grand Prix: White aims for a kingside attack."
+      },
+      {
+       "ply": 5,
+       "san": "g6",
+       "text": "Dragon setup anyway."
+      },
+      {
+       "ply": 7,
+       "san": "Bg7",
+       "text": "Long diagonal."
+      },
+      {
+       "ply": 8,
+       "san": "Bb5",
+       "text": "Pin c6."
+      },
+      {
+       "ply": 9,
+       "san": "Nd4",
+       "text": "Jump to d4 and win the bishop pair."
+      },
+      {
+       "ply": 11,
+       "san": "Nxb5",
+       "text": "Take the bishop."
+      },
+      {
+       "ply": 13,
+       "san": "d6",
+       "text": "Solid."
+      },
+      {
+       "ply": 14,
+       "san": "d3",
+       "text": "Book ends. About equal; Black has two bishops. Plan: ...a6, ...Nf6, ...O-O, ...b5. Material: level."
+      }
+     ],
+     "flaggedDrops": [],
+     "new": true,
+     "matchup": "Dragon vs Grand Prix",
+     "nickname": "The Bishop Pair",
+     "ecoName": "B23 Sicilian Defense: Grand Prix Attack"
+    },
+    {
+     "id": "dragon--7",
+     "label": "2.Nc3 Nc6 3.g3 (Closed)",
+     "main": false,
+     "forkPly": 2,
+     "moves": [
+      "e4",
+      "c5",
+      "Nc3",
+      "Nc6",
+      "g3",
+      "g6",
+      "Bg2",
+      "Bg7",
+      "d3",
+      "d6",
+      "Be3",
+      "e5",
+      "Qd2",
+      "Nge7"
+     ],
+     "eco": {
+      "eco": "B26",
+      "name": "Sicilian Defense: Closed"
+     },
+     "ecoPly": 10,
+     "evals": [
+      {
+       "cp": 37,
+       "mate": null,
+       "depth": 22,
+       "best": "e4"
+      },
+      {
+       "cp": 31,
+       "mate": null,
+       "depth": 22,
+       "best": "c5"
+      },
+      {
+       "cp": 32,
+       "mate": null,
+       "depth": 22,
+       "best": "Nc3"
+      },
+      {
+       "cp": 27,
+       "mate": null,
+       "depth": 22,
+       "best": "Nc6"
+      },
+      {
+       "cp": 27,
+       "mate": null,
+       "depth": 22,
+       "best": "Nf3"
+      },
+      {
+       "cp": -9,
+       "mate": null,
+       "depth": 22,
+       "best": "g6"
+      },
+      {
+       "cp": -7,
+       "mate": null,
+       "depth": 22,
+       "best": "Bg2"
+      },
+      {
+       "cp": -16,
+       "mate": null,
+       "depth": 22,
+       "best": "Bg7"
+      },
+      {
+       "cp": -10,
+       "mate": null,
+       "depth": 22,
+       "best": "d3"
+      },
+      {
+       "cp": -16,
+       "mate": null,
+       "depth": 22,
+       "best": "d6"
+      },
+      {
+       "cp": -9,
+       "mate": null,
+       "depth": 22,
+       "best": "Nge2"
+      },
+      {
+       "cp": -26,
+       "mate": null,
+       "depth": 22,
+       "best": "Rb8"
+      },
+      {
+       "cp": -10,
+       "mate": null,
+       "depth": 22,
+       "best": "h4"
+      },
+      {
+       "cp": -22,
+       "mate": null,
+       "depth": 22,
+       "best": "Nge7"
+      },
+      {
+       "cp": -20,
+       "mate": null,
+       "depth": 22,
+       "best": "h4"
+      }
+     ],
+     "notes": [
+      {
+       "ply": 4,
+       "san": "g3",
+       "text": "Closed Sicilian: slow fianchetto."
+      },
+      {
+       "ply": 5,
+       "san": "g6",
+       "text": "Mirror fianchetto."
+      },
+      {
+       "ply": 7,
+       "san": "Bg7",
+       "text": "Long diagonal."
+      },
+      {
+       "ply": 9,
+       "san": "d6",
+       "text": "Solid."
+      },
+      {
+       "ply": 11,
+       "san": "e5",
+       "text": "Botvinnik grip on d4."
+      },
+      {
+       "ply": 13,
+       "san": "Nge7",
+       "text": "Book ends. About equal. Plan: ...O-O, ...Nd4, ...Rb8 and ...b5. Material: level."
+      }
+     ],
+     "flaggedDrops": [],
+     "new": true,
+     "matchup": "Dragon vs Closed Sicilian",
+     "nickname": "The Botvinnik Grip",
+     "ecoName": "B26 Sicilian Defense: Closed"
     }
    ]
   },
@@ -13005,7 +15280,10 @@
        "text": "Book ends. Solid. Plan: ...O-O or ...O-O-O and ...Nd5."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Scandinavian vs 3.Nc3",
+     "nickname": "The Safe Queen",
+     "ecoName": "B01 Scandinavian Defense: Classical Variation"
     },
     {
      "id": "scandinavian--1",
@@ -13142,7 +15420,10 @@
        "text": "Book ends. Plan: ...O-O-O and pressure on d4."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Scandinavian vs 3.Nf3",
+     "nickname": "The Long Castle",
+     "ecoName": "B01 Scandinavian Defense: Mieses-Kotroc Variation"
     },
     {
      "id": "scandinavian--2",
@@ -13263,7 +15544,10 @@
        "text": "Book ends. Plan: ...Qb6, ...Nge7."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Scandinavian vs 2.e5",
+     "nickname": "The Free Bishop",
+     "ecoName": "B01 Scandinavian Defense"
     },
     {
      "id": "scandinavian--3",
@@ -13372,7 +15656,10 @@
        "text": "Book ends. Space in the center. Plan: ...Ngf6, ...Bd6."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Scandinavian vs 2.Nc3",
+     "nickname": "The Space Push",
+     "ecoName": "B01 Scandinavian Defense"
     }
    ]
   },
@@ -13607,7 +15894,10 @@
        "text": "Book ends. Plan: pressure on d4 with ...Qe7, ...Rad8, ...e5."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Alekhine vs Four Pawns",
+     "nickname": "The Center Crack",
+     "ecoName": "B03 Alekhine Defense: Four Pawns Attack, Main Line"
     },
     {
      "id": "alekhine--1",
@@ -13786,7 +16076,10 @@
        "text": "Book ends. A French-like structure. Plan: ...dxc4 or ...Nc6."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Alekhine vs Modern (4.Nf3)",
+     "nickname": "The Pin",
+     "ecoName": "B05 Alekhine Defense: Modern Variation, Main Line"
     },
     {
      "id": "alekhine--2",
@@ -13944,7 +16237,10 @@
        "text": "Book ends. Plan: ...e5 or ...Nc6, ...Bf5."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Alekhine vs Exchange",
+     "nickname": "The Balanced Structure",
+     "ecoName": "B03 Alekhine Defense: Exchange Variation, Voronezh Variation"
     },
     {
      "id": "alekhine--3",
@@ -14039,7 +16335,10 @@
        "text": "Book ends. French structure. Plan: ...c5."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Alekhine vs 2.Nc3",
+     "nickname": "The French Turn",
+     "ecoName": "B02 Alekhine Defense: Scandinavian Variation"
     }
    ]
   },
@@ -14293,7 +16592,10 @@
        "text": "Book ends. Plan: ...Ng6, ...Rf7, ...h5 and ...g4."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "KID vs Classical",
+     "nickname": "The Pawn Storm",
+     "ecoName": "E98 King's Indian Defense: Orthodox Variation, Classical System"
     },
     {
      "id": "kings-indian--1",
@@ -14501,7 +16803,10 @@
        "text": "Book ends. Plan: ...f5 and ...Nc5."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "KID vs Petrosian",
+     "nickname": "The c5 Knight",
+     "ecoName": "E92 King's Indian Defense: Petrosian Variation, Stein Defense"
     },
     {
      "id": "kings-indian--2",
@@ -14671,7 +16976,10 @@
        "text": "Book ends. Plan: ...Ndf6 and ...f4, or ...a6 and ...b5."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "KID vs Sämisch",
+     "nickname": "The f5 Break",
+     "ecoName": "E87 King's Indian Defense: Sämisch Variation, Closed Variation"
     },
     {
      "id": "kings-indian--3",
@@ -14808,7 +17116,306 @@
        "text": "Book ends. Prepare ...Rb8 and ...b5."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "KID vs Fianchetto",
+     "nickname": "The b5 Lever",
+     "ecoName": "E63 King's Indian Defense: Fianchetto Variation, Panno Variation"
+    },
+    {
+     "id": "kings-indian--4",
+     "label": "2.Bf4 g6 (London)",
+     "main": false,
+     "forkPly": 2,
+     "moves": [
+      "d4",
+      "Nf6",
+      "Bf4",
+      "g6",
+      "e3",
+      "Bg7",
+      "Nf3",
+      "O-O",
+      "Be2",
+      "d6",
+      "h3",
+      "c5",
+      "c3"
+     ],
+     "eco": {
+      "eco": "A48",
+      "name": "London System, with Be2"
+     },
+     "ecoPly": 9,
+     "evals": [
+      {
+       "cp": 37,
+       "mate": null,
+       "depth": 22,
+       "best": "e4"
+      },
+      {
+       "cp": 18,
+       "mate": null,
+       "depth": 22,
+       "best": "Nf6"
+      },
+      {
+       "cp": 25,
+       "mate": null,
+       "depth": 22,
+       "best": "c4"
+      },
+      {
+       "cp": 0,
+       "mate": null,
+       "depth": 22,
+       "best": "e6"
+      },
+      {
+       "cp": 5,
+       "mate": null,
+       "depth": 22,
+       "best": "Nc3"
+      },
+      {
+       "cp": 8,
+       "mate": null,
+       "depth": 22,
+       "best": "d6"
+      },
+      {
+       "cp": 9,
+       "mate": null,
+       "depth": 22,
+       "best": "h3"
+      },
+      {
+       "cp": 9,
+       "mate": null,
+       "depth": 22,
+       "best": "d6"
+      },
+      {
+       "cp": 9,
+       "mate": null,
+       "depth": 22,
+       "best": "h3"
+      },
+      {
+       "cp": 12,
+       "mate": null,
+       "depth": 22,
+       "best": "d6"
+      },
+      {
+       "cp": 9,
+       "mate": null,
+       "depth": 22,
+       "best": "h3"
+      },
+      {
+       "cp": 8,
+       "mate": null,
+       "depth": 22,
+       "best": "b6"
+      },
+      {
+       "cp": 22,
+       "mate": null,
+       "depth": 22,
+       "best": "O-O"
+      },
+      {
+       "cp": -17,
+       "mate": null,
+       "depth": 22,
+       "best": "Qb6"
+      }
+     ],
+     "notes": [
+      {
+       "ply": 2,
+       "san": "Bf4",
+       "text": "London: no c4. Play the KID setup anyway."
+      },
+      {
+       "ply": 3,
+       "san": "g6",
+       "text": "Fianchetto."
+      },
+      {
+       "ply": 5,
+       "san": "Bg7",
+       "text": "Long diagonal at d4."
+      },
+      {
+       "ply": 7,
+       "san": "O-O",
+       "text": "King safe first."
+      },
+      {
+       "ply": 9,
+       "san": "d6",
+       "text": "Prepare ...e5 or ...c5."
+      },
+      {
+       "ply": 11,
+       "san": "c5",
+       "text": "Hit d4."
+      },
+      {
+       "ply": 12,
+       "san": "c3",
+       "text": "Book ends. About equal. Plan: ...Qb6 at b2, ...Nc6, or ...cxd4 and ...Nc6-e5 ideas. Material: level."
+      }
+     ],
+     "flaggedDrops": [],
+     "new": true,
+     "matchup": "KID vs London",
+     "nickname": "The …c5 Answer",
+     "ecoName": "A48 London System, with Be2"
+    },
+    {
+     "id": "kings-indian--5",
+     "label": "2.Bg5 Ne4 (Trompowsky)",
+     "main": false,
+     "forkPly": 2,
+     "moves": [
+      "d4",
+      "Nf6",
+      "Bg5",
+      "Ne4",
+      "Bf4",
+      "c5",
+      "f3",
+      "Qa5+",
+      "c3",
+      "Nf6",
+      "d5",
+      "Qb6"
+     ],
+     "eco": {
+      "eco": "A45",
+      "name": "Trompowsky Attack"
+     },
+     "ecoPly": 2,
+     "evals": [
+      {
+       "cp": 37,
+       "mate": null,
+       "depth": 22,
+       "best": "e4"
+      },
+      {
+       "cp": 18,
+       "mate": null,
+       "depth": 22,
+       "best": "Nf6"
+      },
+      {
+       "cp": 25,
+       "mate": null,
+       "depth": 22,
+       "best": "c4"
+      },
+      {
+       "cp": 7,
+       "mate": null,
+       "depth": 22,
+       "best": "d5"
+      },
+      {
+       "cp": 19,
+       "mate": null,
+       "depth": 22,
+       "best": "Bf4"
+      },
+      {
+       "cp": 23,
+       "mate": null,
+       "depth": 22,
+       "best": "d5"
+      },
+      {
+       "cp": 53,
+       "mate": null,
+       "depth": 22,
+       "best": "f3"
+      },
+      {
+       "cp": 54,
+       "mate": null,
+       "depth": 22,
+       "best": "Qa5+"
+      },
+      {
+       "cp": 52,
+       "mate": null,
+       "depth": 22,
+       "best": "c3"
+      },
+      {
+       "cp": 52,
+       "mate": null,
+       "depth": 22,
+       "best": "Nf6"
+      },
+      {
+       "cp": 45,
+       "mate": null,
+       "depth": 22,
+       "best": "d5"
+      },
+      {
+       "cp": 56,
+       "mate": null,
+       "depth": 22,
+       "best": "Qb6"
+      },
+      {
+       "cp": 50,
+       "mate": null,
+       "depth": 22,
+       "best": "Bc1"
+      }
+     ],
+     "notes": [
+      {
+       "ply": 2,
+       "san": "Bg5",
+       "text": "Trompowsky: the bishop wants to double your pawns."
+      },
+      {
+       "ply": 3,
+       "san": "Ne4",
+       "text": "Dodge the trade and hit g5."
+      },
+      {
+       "ply": 5,
+       "san": "c5",
+       "text": "Attack d4."
+      },
+      {
+       "ply": 7,
+       "san": "Qa5+",
+       "text": "Check first."
+      },
+      {
+       "ply": 9,
+       "san": "Nf6",
+       "text": "Back, ready for ...g6/...Bg7."
+      },
+      {
+       "ply": 11,
+       "san": "Qb6",
+       "text": "Book ends. About +0.5. Plan: pressure b2, then ...g6, ...Bg7, ...d6: Benoni-style. Material: level."
+      }
+     ],
+     "flaggedDrops": [],
+     "new": true,
+     "matchup": "KID vs Trompowsky",
+     "nickname": "The Knight Hop",
+     "ecoName": "A45 Trompowsky Attack"
     }
    ]
   },
@@ -15060,7 +17667,10 @@
        "text": "Book ends. Active pieces. Plan: ...Nd7, ...Rb8 and pressure on the b-file."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Benoni vs Classical (h3/Bd3)",
+     "nickname": "The b5 Strike",
+     "ecoName": "A70 Benoni Defense: Classical Variation, New York Variation"
     },
     {
      "id": "modern-benoni--1",
@@ -15258,7 +17868,10 @@
        "text": "Book ends. Plan: ...a6, ...Rb8, ...b5. Watch White's e5 push."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Benoni vs Flick-Knife",
+     "nickname": "The Knight Tour",
+     "ecoName": "A67 Benoni Defense: Taimanov Variation"
     },
     {
      "id": "modern-benoni--2",
@@ -15418,7 +18031,10 @@
        "text": "Book ends. Plan: ...a6, ...Nbd7, ...b5."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Benoni vs Fianchetto",
+     "nickname": "The b5 Lever",
+     "ecoName": "A62 Benoni Defense: Fianchetto Variation"
     },
     {
      "id": "modern-benoni--3",
@@ -15539,7 +18155,318 @@
        "text": "Book ends. English-style play. Plan: ...O-O, ...d5."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Benoni vs 3.Nf3",
+     "nickname": "The Pin",
+     "ecoName": "A32 English Opening: Symmetrical Variation, Anti-Benoni Variation, Spielmann Defense"
+    },
+    {
+     "id": "modern-benoni--4",
+     "label": "2.Nf3 c5 3.d5 e6",
+     "main": false,
+     "forkPly": 2,
+     "moves": [
+      "d4",
+      "Nf6",
+      "Nf3",
+      "c5",
+      "d5",
+      "e6",
+      "Nc3",
+      "exd5",
+      "Nxd5",
+      "Nxd5",
+      "Qxd5",
+      "Be7",
+      "e4",
+      "O-O"
+     ],
+     "eco": {
+      "eco": "A43",
+      "name": "Benoni Defense: Benoni-Indian Defense, Kingside Move Order"
+     },
+     "ecoPly": 4,
+     "evals": [
+      {
+       "cp": 37,
+       "mate": null,
+       "depth": 22,
+       "best": "e4"
+      },
+      {
+       "cp": 18,
+       "mate": null,
+       "depth": 22,
+       "best": "Nf6"
+      },
+      {
+       "cp": 25,
+       "mate": null,
+       "depth": 22,
+       "best": "c4"
+      },
+      {
+       "cp": 30,
+       "mate": null,
+       "depth": 22,
+       "best": "d5"
+      },
+      {
+       "cp": 57,
+       "mate": null,
+       "depth": 22,
+       "best": "d5"
+      },
+      {
+       "cp": 62,
+       "mate": null,
+       "depth": 22,
+       "best": "e6"
+      },
+      {
+       "cp": 62,
+       "mate": null,
+       "depth": 22,
+       "best": "c4"
+      },
+      {
+       "cp": 47,
+       "mate": null,
+       "depth": 22,
+       "best": "Nxd5"
+      },
+      {
+       "cp": 41,
+       "mate": null,
+       "depth": 22,
+       "best": "Nxd5"
+      },
+      {
+       "cp": 42,
+       "mate": null,
+       "depth": 22,
+       "best": "Nxd5"
+      },
+      {
+       "cp": 55,
+       "mate": null,
+       "depth": 22,
+       "best": "Qxd5"
+      },
+      {
+       "cp": 49,
+       "mate": null,
+       "depth": 22,
+       "best": "Nc6"
+      },
+      {
+       "cp": 82,
+       "mate": null,
+       "depth": 22,
+       "best": "Bf4"
+      },
+      {
+       "cp": 49,
+       "mate": null,
+       "depth": 22,
+       "best": "O-O"
+      },
+      {
+       "cp": 44,
+       "mate": null,
+       "depth": 22,
+       "best": "Bf4"
+      }
+     ],
+     "notes": [
+      {
+       "ply": 2,
+       "san": "Nf3",
+       "text": "No c4 yet."
+      },
+      {
+       "ply": 3,
+       "san": "c5",
+       "text": "Benoni push on d4."
+      },
+      {
+       "ply": 5,
+       "san": "e6",
+       "text": "Break d5 at once."
+      },
+      {
+       "ply": 7,
+       "san": "exd5",
+       "text": "Trade the pawn."
+      },
+      {
+       "ply": 9,
+       "san": "Nxd5",
+       "text": "Trade knights."
+      },
+      {
+       "ply": 11,
+       "san": "Be7",
+       "text": "Develop, ...O-O next."
+      },
+      {
+       "ply": 13,
+       "san": "O-O",
+       "text": "Book ends. About +0.5. Plan: ...Nc6, ...d6, ...Be6 with tempo on the queen. Material: level."
+      }
+     ],
+     "flaggedDrops": [],
+     "new": true,
+     "matchup": "Benoni vs 2.Nf3 (no c4)",
+     "nickname": "The Early Break",
+     "ecoName": "A43 Benoni Defense: Benoni-Indian Defense, Kingside Move Order"
+    },
+    {
+     "id": "modern-benoni--5",
+     "label": "2.Bf4 c5 3.d5 d6",
+     "main": false,
+     "forkPly": 2,
+     "moves": [
+      "d4",
+      "Nf6",
+      "Bf4",
+      "c5",
+      "d5",
+      "d6",
+      "Nc3",
+      "g6",
+      "e4",
+      "Bg7",
+      "Nf3",
+      "O-O"
+     ],
+     "eco": {
+      "eco": "A45",
+      "name": "Indian Defense: Accelerated London System"
+     },
+     "ecoPly": 2,
+     "evals": [
+      {
+       "cp": 37,
+       "mate": null,
+       "depth": 22,
+       "best": "e4"
+      },
+      {
+       "cp": 18,
+       "mate": null,
+       "depth": 22,
+       "best": "Nf6"
+      },
+      {
+       "cp": 25,
+       "mate": null,
+       "depth": 22,
+       "best": "c4"
+      },
+      {
+       "cp": 0,
+       "mate": null,
+       "depth": 22,
+       "best": "e6"
+      },
+      {
+       "cp": 38,
+       "mate": null,
+       "depth": 22,
+       "best": "d5"
+      },
+      {
+       "cp": 30,
+       "mate": null,
+       "depth": 22,
+       "best": "d6"
+      },
+      {
+       "cp": 31,
+       "mate": null,
+       "depth": 22,
+       "best": "Nc3"
+      },
+      {
+       "cp": 28,
+       "mate": null,
+       "depth": 22,
+       "best": "e5"
+      },
+      {
+       "cp": 54,
+       "mate": null,
+       "depth": 22,
+       "best": "e4"
+      },
+      {
+       "cp": 57,
+       "mate": null,
+       "depth": 22,
+       "best": "Bg7"
+      },
+      {
+       "cp": 60,
+       "mate": null,
+       "depth": 22,
+       "best": "Nf3"
+      },
+      {
+       "cp": 60,
+       "mate": null,
+       "depth": 22,
+       "best": "O-O"
+      },
+      {
+       "cp": 62,
+       "mate": null,
+       "depth": 22,
+       "best": "a4"
+      }
+     ],
+     "notes": [
+      {
+       "ply": 2,
+       "san": "Bf4",
+       "text": "London: no c4."
+      },
+      {
+       "ply": 3,
+       "san": "c5",
+       "text": "Benoni idea: hit d4."
+      },
+      {
+       "ply": 4,
+       "san": "d5",
+       "text": "White grabs space."
+      },
+      {
+       "ply": 5,
+       "san": "d6",
+       "text": "Benoni chain."
+      },
+      {
+       "ply": 7,
+       "san": "g6",
+       "text": "Fianchetto."
+      },
+      {
+       "ply": 9,
+       "san": "Bg7",
+       "text": "Bishop on the long diagonal."
+      },
+      {
+       "ply": 11,
+       "san": "O-O",
+       "text": "Book ends. About +0.6, a normal Benoni-type game. Plan: ...a6, ...b5, ...Nbd7, ...Qa5. Material: level."
+      }
+     ],
+     "flaggedDrops": [],
+     "new": true,
+     "matchup": "Benoni vs London (no c4)",
+     "nickname": "The …c5 Strike",
+     "ecoName": "A45 Indian Defense: Accelerated London System"
     }
    ]
   },
@@ -15708,7 +18635,10 @@
        "text": "Book ends. Secure c5 for the knight. Plan: ...Na6-c5, ...Bd7, ...e5."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Dutch vs Main (c4/Nc3)",
+     "nickname": "The c5 Outpost",
+     "ecoName": "A81 Dutch Defense: Semi-Leningrad Variation"
     },
     {
      "id": "dutch-leningrad--1",
@@ -15815,7 +18745,10 @@
        "text": "Book ends. White wants h5. Plan: ...c6, ...Nd7, ...Qd6, and ...Nf6 when it's safe."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Dutch vs 2.Bg5",
+     "nickname": "The h-Pawn Watch",
+     "ecoName": "A80 Dutch Defense: Hopton Attack"
     },
     {
      "id": "dutch-leningrad--2",
@@ -15979,7 +18912,10 @@
        "text": "Book ends. Material level. Plan: ...Bb4+ or ...Be7, then ...O-O."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Dutch vs Staunton Gambit",
+     "nickname": "The Returned Pawn",
+     "ecoName": "A83 Dutch Defense: Staunton Gambit"
     },
     {
      "id": "dutch-leningrad--3",
@@ -16107,7 +19043,10 @@
        "text": "Book ends. Plan: ...Bd6, ...O-O, ...Nd7."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Dutch vs 2.Nc3",
+     "nickname": "The Bishop Pair",
+     "ecoName": "A80 Dutch Defense: Raphael Variation"
     }
    ]
   },
@@ -16356,7 +19295,10 @@
        "text": "Book ends. Plan: ...Rc8, ...Bg6, ...Nb6 or ...Qb6."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Slav vs Main (Czech)",
+     "nickname": "The Outside Bishop",
+     "ecoName": "D19 Slav Defense: Czech Variation, Dutch Variation"
     },
     {
      "id": "slav--1",
@@ -16512,7 +19454,10 @@
        "text": "Book ends. Pin the knight. Plan: ...O-O, ...Qa5 or ...Qe7."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Slav vs Exchange",
+     "nickname": "The Pin",
+     "ecoName": "D14 Slav Defense: Exchange Variation, Trifunovic Variation"
     },
     {
      "id": "slav--2",
@@ -16673,9 +19618,1845 @@
        "text": "Book ends. Plan: ...Bd6, ...Qe7, then ...dxc4 and ...e5."
       }
      ],
-     "flaggedDrops": []
+     "flaggedDrops": [],
+     "matchup": "Slav vs 4.e3",
+     "nickname": "The h-File",
+     "ecoName": "D12 Slav Defense: Quiet Variation, Schallopp Defense"
+    },
+    {
+     "id": "slav--3",
+     "label": "1.d4 d5 2.Bf4 c6 (London)",
+     "main": false,
+     "forkPly": 2,
+     "moves": [
+      "d4",
+      "d5",
+      "Bf4",
+      "c6",
+      "e3",
+      "Bf5",
+      "Nf3",
+      "e6",
+      "Bd3",
+      "Bxd3",
+      "Qxd3",
+      "Nf6",
+      "Nbd2",
+      "Nbd7"
+     ],
+     "eco": {
+      "eco": "D00",
+      "name": "Queen's Pawn Game: Accelerated London System"
+     },
+     "ecoPly": 2,
+     "evals": [
+      {
+       "cp": 37,
+       "mate": null,
+       "depth": 22,
+       "best": "e4"
+      },
+      {
+       "cp": 18,
+       "mate": null,
+       "depth": 22,
+       "best": "Nf6"
+      },
+      {
+       "cp": 29,
+       "mate": null,
+       "depth": 22,
+       "best": "c4"
+      },
+      {
+       "cp": 6,
+       "mate": null,
+       "depth": 22,
+       "best": "c5"
+      },
+      {
+       "cp": 40,
+       "mate": null,
+       "depth": 22,
+       "best": "e3"
+      },
+      {
+       "cp": 31,
+       "mate": null,
+       "depth": 22,
+       "best": "Bf5"
+      },
+      {
+       "cp": 31,
+       "mate": null,
+       "depth": 22,
+       "best": "c4"
+      },
+      {
+       "cp": 21,
+       "mate": null,
+       "depth": 22,
+       "best": "e6"
+      },
+      {
+       "cp": 16,
+       "mate": null,
+       "depth": 22,
+       "best": "c4"
+      },
+      {
+       "cp": 14,
+       "mate": null,
+       "depth": 22,
+       "best": "Bxd3"
+      },
+      {
+       "cp": 14,
+       "mate": null,
+       "depth": 22,
+       "best": "Qxd3"
+      },
+      {
+       "cp": 13,
+       "mate": null,
+       "depth": 22,
+       "best": "Nf6"
+      },
+      {
+       "cp": 13,
+       "mate": null,
+       "depth": 22,
+       "best": "c4"
+      },
+      {
+       "cp": 13,
+       "mate": null,
+       "depth": 22,
+       "best": "Be7"
+      },
+      {
+       "cp": 22,
+       "mate": null,
+       "depth": 22,
+       "best": "O-O"
+      }
+     ],
+     "notes": [
+      {
+       "ply": 2,
+       "san": "Bf4",
+       "text": "London: no c4. Slav setup anyway."
+      },
+      {
+       "ply": 3,
+       "san": "c6",
+       "text": "Solid d5."
+      },
+      {
+       "ply": 5,
+       "san": "Bf5",
+       "text": "Bishop out before ...e6."
+      },
+      {
+       "ply": 7,
+       "san": "e6",
+       "text": "Pawn triangle."
+      },
+      {
+       "ply": 9,
+       "san": "Bxd3",
+       "text": "Trade the good White bishop."
+      },
+      {
+       "ply": 11,
+       "san": "Nf6",
+       "text": "Develop."
+      },
+      {
+       "ply": 13,
+       "san": "Nbd7",
+       "text": "Book ends. About equal. Plan: ...Be7, ...O-O, ...c5 break. Material: level."
+      }
+     ],
+     "flaggedDrops": [],
+     "new": true,
+     "matchup": "Slav vs London",
+     "nickname": "The Solid Square",
+     "ecoName": "D00 Queen's Pawn Game: Accelerated London System"
+    },
+    {
+     "id": "slav--4",
+     "label": "1.d4 d5 2.Nf3 Nf6 3.e3 (Colle)",
+     "main": false,
+     "forkPly": 2,
+     "moves": [
+      "d4",
+      "d5",
+      "Nf3",
+      "Nf6",
+      "e3",
+      "Bf5",
+      "Bd3",
+      "e6",
+      "Bxf5",
+      "exf5",
+      "Qd3",
+      "Qc8"
+     ],
+     "eco": {
+      "eco": "D04",
+      "name": "Queen's Pawn Game: Colle System, Anti-Colle"
+     },
+     "ecoPly": 5,
+     "evals": [
+      {
+       "cp": 37,
+       "mate": null,
+       "depth": 22,
+       "best": "e4"
+      },
+      {
+       "cp": 18,
+       "mate": null,
+       "depth": 22,
+       "best": "Nf6"
+      },
+      {
+       "cp": 29,
+       "mate": null,
+       "depth": 22,
+       "best": "c4"
+      },
+      {
+       "cp": 23,
+       "mate": null,
+       "depth": 22,
+       "best": "e6"
+      },
+      {
+       "cp": 26,
+       "mate": null,
+       "depth": 22,
+       "best": "c4"
+      },
+      {
+       "cp": 9,
+       "mate": null,
+       "depth": 22,
+       "best": "e6"
+      },
+      {
+       "cp": 22,
+       "mate": null,
+       "depth": 22,
+       "best": "c4"
+      },
+      {
+       "cp": -5,
+       "mate": null,
+       "depth": 22,
+       "best": "e6"
+      },
+      {
+       "cp": 2,
+       "mate": null,
+       "depth": 22,
+       "best": "O-O"
+      },
+      {
+       "cp": 0,
+       "mate": null,
+       "depth": 22,
+       "best": "exf5"
+      },
+      {
+       "cp": 12,
+       "mate": null,
+       "depth": 22,
+       "best": "Qd3"
+      },
+      {
+       "cp": 11,
+       "mate": null,
+       "depth": 22,
+       "best": "Qc8"
+      },
+      {
+       "cp": 9,
+       "mate": null,
+       "depth": 22,
+       "best": "O-O"
+      }
+     ],
+     "notes": [
+      {
+       "ply": 4,
+       "san": "e3",
+       "text": "Colle: White locks the c1 bishop."
+      },
+      {
+       "ply": 5,
+       "san": "Bf5",
+       "text": "Bishop out first."
+      },
+      {
+       "ply": 7,
+       "san": "e6",
+       "text": "Solid."
+      },
+      {
+       "ply": 9,
+       "san": "exf5",
+       "text": "Pawn back to the f-file: it controls e4."
+      },
+      {
+       "ply": 10,
+       "san": "Qd3",
+       "text": "Hit f5."
+      },
+      {
+       "ply": 11,
+       "san": "Qc8",
+       "text": "Book ends. About equal. Plan: ...Bd6, ...O-O, ...Ne4 outpost. Material: level."
+      }
+     ],
+     "flaggedDrops": [],
+     "new": true,
+     "matchup": "Slav vs Colle",
+     "nickname": "The f-File Shield",
+     "ecoName": "D04 Queen's Pawn Game: Colle System, Anti-Colle"
     }
    ]
+  },
+  {
+   "id": "carr-defence",
+   "name": "Carr Defence",
+   "category": "black-systems",
+   "side": "black",
+   "lines": [
+    {
+     "id": "carr-defence--0",
+     "label": "2.d4 e6 3.Nf3 d5 4.e5 (French style)",
+     "main": true,
+     "forkPly": null,
+     "moves": [
+      "e4",
+      "h6",
+      "d4",
+      "e6",
+      "Nf3",
+      "d5",
+      "e5",
+      "c5",
+      "c3",
+      "Nc6",
+      "Bd3",
+      "Qb6",
+      "O-O",
+      "cxd4",
+      "cxd4",
+      "Bd7"
+     ],
+     "eco": {
+      "eco": "B00",
+      "name": "Carr Defense"
+     },
+     "ecoPly": 1,
+     "evals": [
+      {
+       "cp": 37,
+       "mate": null,
+       "depth": 22,
+       "best": "e4"
+      },
+      {
+       "cp": 31,
+       "mate": null,
+       "depth": 22,
+       "best": "c5"
+      },
+      {
+       "cp": 71,
+       "mate": null,
+       "depth": 22,
+       "best": "d4"
+      },
+      {
+       "cp": 72,
+       "mate": null,
+       "depth": 22,
+       "best": "e6"
+      },
+      {
+       "cp": 75,
+       "mate": null,
+       "depth": 22,
+       "best": "Nc3"
+      },
+      {
+       "cp": 70,
+       "mate": null,
+       "depth": 22,
+       "best": "d5"
+      },
+      {
+       "cp": 63,
+       "mate": null,
+       "depth": 22,
+       "best": "Nbd2"
+      },
+      {
+       "cp": 64,
+       "mate": null,
+       "depth": 22,
+       "best": "c5"
+      },
+      {
+       "cp": 58,
+       "mate": null,
+       "depth": 22,
+       "best": "c3"
+      },
+      {
+       "cp": 63,
+       "mate": null,
+       "depth": 22,
+       "best": "Nc6"
+      },
+      {
+       "cp": 64,
+       "mate": null,
+       "depth": 22,
+       "best": "Bd3"
+      },
+      {
+       "cp": 68,
+       "mate": null,
+       "depth": 22,
+       "best": "Nge7"
+      },
+      {
+       "cp": 126,
+       "mate": null,
+       "depth": 22,
+       "best": "O-O"
+      },
+      {
+       "cp": 121,
+       "mate": null,
+       "depth": 22,
+       "best": "cxd4"
+      },
+      {
+       "cp": 113,
+       "mate": null,
+       "depth": 22,
+       "best": "cxd4"
+      },
+      {
+       "cp": 124,
+       "mate": null,
+       "depth": 22,
+       "best": "Nge7"
+      },
+      {
+       "cp": 125,
+       "mate": null,
+       "depth": 22,
+       "best": "Nc3"
+      }
+     ],
+     "notes": [
+      {
+       "ply": 1,
+       "san": "h6",
+       "text": "The Carr Defence. An offbeat move: it controls g5 but doesn't develop. White is objectively better (about +0.4); the point is to get a game White hasn't prepared for."
+      },
+      {
+       "ply": 3,
+       "san": "e6",
+       "text": "Plan: ...d5 next, a French-style center. The h6 pawn already stops Bg5 and Ng5."
+      },
+      {
+       "ply": 5,
+       "san": "d5",
+       "text": "Hit e4."
+      },
+      {
+       "ply": 6,
+       "san": "e5",
+       "text": "White grabs space. Hit the chain with ...c5."
+      },
+      {
+       "ply": 7,
+       "san": "c5",
+       "text": "Attack d4, the base of White's chain."
+      },
+      {
+       "ply": 9,
+       "san": "Nc6",
+       "text": "More pressure on d4."
+      },
+      {
+       "ply": 11,
+       "san": "Qb6",
+       "text": "Third attacker on d4 and an eye on b2."
+      },
+      {
+       "ply": 13,
+       "san": "cxd4",
+       "text": "Open the c-file."
+      },
+      {
+       "ply": 15,
+       "san": "Bd7",
+       "text": "Book ends. White has more space (about +1.3). Plan: ...Nge7-f5 against d4, ...Rc8, and ...g5 later if White's king feels safe."
+      }
+     ],
+     "flaggedDrops": [],
+     "matchup": "Carr vs 2.d4",
+     "nickname": "The French Chain",
+     "ecoName": "B00 Carr Defense"
+    },
+    {
+     "id": "carr-defence--1",
+     "label": "3.Nc3 d5 4.exd5",
+     "main": false,
+     "forkPly": 4,
+     "moves": [
+      "e4",
+      "h6",
+      "d4",
+      "e6",
+      "Nc3",
+      "d5",
+      "exd5",
+      "exd5",
+      "Bd3",
+      "Nf6",
+      "Nf3",
+      "Bd6",
+      "O-O",
+      "O-O"
+     ],
+     "eco": {
+      "eco": "B00",
+      "name": "Carr Defense"
+     },
+     "ecoPly": 1,
+     "evals": [
+      {
+       "cp": 37,
+       "mate": null,
+       "depth": 22,
+       "best": "e4"
+      },
+      {
+       "cp": 31,
+       "mate": null,
+       "depth": 22,
+       "best": "c5"
+      },
+      {
+       "cp": 71,
+       "mate": null,
+       "depth": 22,
+       "best": "d4"
+      },
+      {
+       "cp": 72,
+       "mate": null,
+       "depth": 22,
+       "best": "e6"
+      },
+      {
+       "cp": 75,
+       "mate": null,
+       "depth": 22,
+       "best": "Nc3"
+      },
+      {
+       "cp": 75,
+       "mate": null,
+       "depth": 22,
+       "best": "d5"
+      },
+      {
+       "cp": 77,
+       "mate": null,
+       "depth": 22,
+       "best": "Bd3"
+      },
+      {
+       "cp": 20,
+       "mate": null,
+       "depth": 22,
+       "best": "exd5"
+      },
+      {
+       "cp": 18,
+       "mate": null,
+       "depth": 22,
+       "best": "Nf3"
+      },
+      {
+       "cp": 17,
+       "mate": null,
+       "depth": 22,
+       "best": "Nf6"
+      },
+      {
+       "cp": 18,
+       "mate": null,
+       "depth": 22,
+       "best": "Nf3"
+      },
+      {
+       "cp": 15,
+       "mate": null,
+       "depth": 22,
+       "best": "Bd6"
+      },
+      {
+       "cp": 12,
+       "mate": null,
+       "depth": 22,
+       "best": "O-O"
+      },
+      {
+       "cp": 18,
+       "mate": null,
+       "depth": 22,
+       "best": "O-O"
+      },
+      {
+       "cp": 16,
+       "mate": null,
+       "depth": 22,
+       "best": "Nb5"
+      }
+     ],
+     "notes": [
+      {
+       "ply": 4,
+       "san": "Nc3",
+       "text": "White protects e4 with the knight."
+      },
+      {
+       "ply": 5,
+       "san": "d5",
+       "text": "Hit e4 anyway."
+      },
+      {
+       "ply": 6,
+       "san": "exd5",
+       "text": "White exchanges."
+      },
+      {
+       "ply": 7,
+       "san": "exd5",
+       "text": "Recapture. Symmetrical and solid."
+      },
+      {
+       "ply": 9,
+       "san": "Nf6",
+       "text": "Develop."
+      },
+      {
+       "ply": 11,
+       "san": "Bd6",
+       "text": "Develop."
+      },
+      {
+       "ply": 13,
+       "san": "O-O",
+       "text": "Book ends. Level and quiet (about +0.2). h6 is useful: no Bg5 pin."
+      }
+     ],
+     "flaggedDrops": [],
+     "matchup": "Carr vs 2.d4 e6 3.Nc3",
+     "nickname": "The Mirror",
+     "ecoName": "B00 Carr Defense"
+    },
+    {
+     "id": "carr-defence--2",
+     "label": "Owner's plan: 2...a6 3.Bd3 c5 4.dxc5",
+     "main": false,
+     "forkPly": 3,
+     "moves": [
+      "e4",
+      "h6",
+      "d4",
+      "a6",
+      "Bd3",
+      "c5",
+      "dxc5",
+      "e6",
+      "Be3",
+      "Qc7",
+      "b4",
+      "Nc6",
+      "c3",
+      "d6",
+      "cxd6",
+      "Bxd6",
+      "Nf3",
+      "Nf6",
+      "h3",
+      "g5",
+      "a3",
+      "g4",
+      "Nd4",
+      "Ne5"
+     ],
+     "eco": {
+      "eco": "B00",
+      "name": "Carr Defense"
+     },
+     "ecoPly": 1,
+     "evals": [
+      {
+       "cp": 37,
+       "mate": null,
+       "depth": 22,
+       "best": "e4"
+      },
+      {
+       "cp": 31,
+       "mate": null,
+       "depth": 22,
+       "best": "c5"
+      },
+      {
+       "cp": 71,
+       "mate": null,
+       "depth": 22,
+       "best": "d4"
+      },
+      {
+       "cp": 72,
+       "mate": null,
+       "depth": 22,
+       "best": "e6"
+      },
+      {
+       "cp": 106,
+       "mate": null,
+       "depth": 22,
+       "best": "Nf3"
+      },
+      {
+       "cp": 90,
+       "mate": null,
+       "depth": 22,
+       "best": "d6"
+      },
+      {
+       "cp": 130,
+       "mate": null,
+       "depth": 22,
+       "best": "d5"
+      },
+      {
+       "cp": 102,
+       "mate": null,
+       "depth": 22,
+       "best": "e6"
+      },
+      {
+       "cp": 94,
+       "mate": null,
+       "depth": 22,
+       "best": "Be3"
+      },
+      {
+       "cp": 100,
+       "mate": null,
+       "depth": 22,
+       "best": "Qc7"
+      },
+      {
+       "cp": 100,
+       "mate": null,
+       "depth": 22,
+       "best": "Nc3"
+      },
+      {
+       "cp": 101,
+       "mate": null,
+       "depth": 22,
+       "best": "d6"
+      },
+      {
+       "cp": 113,
+       "mate": null,
+       "depth": 22,
+       "best": "a3"
+      },
+      {
+       "cp": 104,
+       "mate": null,
+       "depth": 22,
+       "best": "d6"
+      },
+      {
+       "cp": 112,
+       "mate": null,
+       "depth": 22,
+       "best": "cxd6"
+      },
+      {
+       "cp": 112,
+       "mate": null,
+       "depth": 22,
+       "best": "Bxd6"
+      },
+      {
+       "cp": 103,
+       "mate": null,
+       "depth": 22,
+       "best": "Nf3"
+      },
+      {
+       "cp": 113,
+       "mate": null,
+       "depth": 22,
+       "best": "Nf6"
+      },
+      {
+       "cp": 113,
+       "mate": null,
+       "depth": 22,
+       "best": "h3"
+      },
+      {
+       "cp": 112,
+       "mate": null,
+       "depth": 22,
+       "best": "O-O"
+      },
+      {
+       "cp": 153,
+       "mate": null,
+       "depth": 22,
+       "best": "a4"
+      },
+      {
+       "cp": 45,
+       "mate": null,
+       "depth": 22,
+       "best": "g4"
+      },
+      {
+       "cp": 43,
+       "mate": null,
+       "depth": 22,
+       "best": "Nfd2"
+      },
+      {
+       "cp": 30,
+       "mate": null,
+       "depth": 22,
+       "best": "gxh3"
+      },
+      {
+       "cp": 47,
+       "mate": null,
+       "depth": 22,
+       "best": "Be2"
+      }
+     ],
+     "notes": [
+      {
+       "ply": 3,
+       "san": "a6",
+       "text": "Your sample game: ...a6 keeps Bb5 out and prepares ...b5 or ...c5."
+      },
+      {
+       "ply": 5,
+       "san": "c5",
+       "text": "Hit d4. White's best is 4.d5, see the other branch."
+      },
+      {
+       "ply": 6,
+       "san": "dxc5",
+       "text": "White takes."
+      },
+      {
+       "ply": 7,
+       "san": "e6",
+       "text": "Open the bishop to take back on c5."
+      },
+      {
+       "ply": 9,
+       "san": "Qc7",
+       "text": "The queen eyes c5 and the h2-b8 diagonal."
+      },
+      {
+       "ply": 10,
+       "san": "b4",
+       "text": "White holds the extra pawn."
+      },
+      {
+       "ply": 11,
+       "san": "Nc6",
+       "text": "Develop and hit b4."
+      },
+      {
+       "ply": 13,
+       "san": "d6",
+       "text": "Strike at c5 again."
+      },
+      {
+       "ply": 15,
+       "san": "Bxd6",
+       "text": "Material level."
+      },
+      {
+       "ply": 17,
+       "san": "Nf6",
+       "text": "Develop."
+      },
+      {
+       "ply": 19,
+       "san": "g5",
+       "text": "Kingside space: ...g4 kicks the f3 knight."
+      },
+      {
+       "ply": 20,
+       "san": "a3",
+       "text": "Inaccurate: 11.a4 was better."
+      },
+      {
+       "ply": 21,
+       "san": "g4",
+       "text": "Kick the knight."
+      },
+      {
+       "ply": 23,
+       "san": "Ne5",
+       "text": "Book ends. Black is fine (about +0.5 for White only). Plan: ...gxh3 or ...Rg8 down the g-file, ...Bd7 and long castle."
+      }
+     ],
+     "flaggedDrops": [],
+     "matchup": "Carr vs 2.d4 (…a6 …c5)",
+     "nickname": "The g-Pawn Hook",
+     "ecoName": "B00 Carr Defense"
+    },
+    {
+     "id": "carr-defence--3",
+     "label": "2...a6 3.Bd3 c5 4.d5",
+     "main": false,
+     "forkPly": 3,
+     "moves": [
+      "e4",
+      "h6",
+      "d4",
+      "a6",
+      "Bd3",
+      "c5",
+      "d5",
+      "d6",
+      "c4",
+      "g6",
+      "Nc3",
+      "Bg7",
+      "Nge2",
+      "e6"
+     ],
+     "eco": {
+      "eco": "B00",
+      "name": "Carr Defense"
+     },
+     "ecoPly": 1,
+     "evals": [
+      {
+       "cp": 37,
+       "mate": null,
+       "depth": 22,
+       "best": "e4"
+      },
+      {
+       "cp": 31,
+       "mate": null,
+       "depth": 22,
+       "best": "c5"
+      },
+      {
+       "cp": 71,
+       "mate": null,
+       "depth": 22,
+       "best": "d4"
+      },
+      {
+       "cp": 72,
+       "mate": null,
+       "depth": 22,
+       "best": "e6"
+      },
+      {
+       "cp": 106,
+       "mate": null,
+       "depth": 22,
+       "best": "Nf3"
+      },
+      {
+       "cp": 90,
+       "mate": null,
+       "depth": 22,
+       "best": "d6"
+      },
+      {
+       "cp": 130,
+       "mate": null,
+       "depth": 22,
+       "best": "d5"
+      },
+      {
+       "cp": 136,
+       "mate": null,
+       "depth": 22,
+       "best": "d6"
+      },
+      {
+       "cp": 142,
+       "mate": null,
+       "depth": 22,
+       "best": "f4"
+      },
+      {
+       "cp": 118,
+       "mate": null,
+       "depth": 22,
+       "best": "e5"
+      },
+      {
+       "cp": 139,
+       "mate": null,
+       "depth": 22,
+       "best": "f4"
+      },
+      {
+       "cp": 118,
+       "mate": null,
+       "depth": 22,
+       "best": "e5"
+      },
+      {
+       "cp": 125,
+       "mate": null,
+       "depth": 22,
+       "best": "f4"
+      },
+      {
+       "cp": 111,
+       "mate": null,
+       "depth": 22,
+       "best": "e6"
+      },
+      {
+       "cp": 96,
+       "mate": null,
+       "depth": 22,
+       "best": "a4"
+      }
+     ],
+     "notes": [
+      {
+       "ply": 6,
+       "san": "d5",
+       "text": "White's best: grab space."
+      },
+      {
+       "ply": 7,
+       "san": "d6",
+       "text": "Lock the center."
+      },
+      {
+       "ply": 9,
+       "san": "g6",
+       "text": "Fianchetto: the bishop on g7 hits the long diagonal."
+      },
+      {
+       "ply": 11,
+       "san": "Bg7",
+       "text": "Develop."
+      },
+      {
+       "ply": 13,
+       "san": "e6",
+       "text": "Book ends. White is better (about +1). Benoni-style plan: ...exd5, ...Ne7, ...O-O and ...b5."
+      }
+     ],
+     "flaggedDrops": [],
+     "matchup": "Carr vs 4.d5",
+     "nickname": "The Locked Center",
+     "ecoName": "B00 Carr Defense"
+    },
+    {
+     "id": "carr-defence--4",
+     "label": "2...a6 3.c4",
+     "main": false,
+     "forkPly": 3,
+     "moves": [
+      "e4",
+      "h6",
+      "d4",
+      "a6",
+      "c4",
+      "e6",
+      "Nc3",
+      "c5",
+      "d5",
+      "d6",
+      "Nf3",
+      "Nf6"
+     ],
+     "eco": {
+      "eco": "B00",
+      "name": "Carr Defense"
+     },
+     "ecoPly": 1,
+     "evals": [
+      {
+       "cp": 37,
+       "mate": null,
+       "depth": 22,
+       "best": "e4"
+      },
+      {
+       "cp": 31,
+       "mate": null,
+       "depth": 22,
+       "best": "c5"
+      },
+      {
+       "cp": 71,
+       "mate": null,
+       "depth": 22,
+       "best": "d4"
+      },
+      {
+       "cp": 72,
+       "mate": null,
+       "depth": 22,
+       "best": "e6"
+      },
+      {
+       "cp": 106,
+       "mate": null,
+       "depth": 22,
+       "best": "Nf3"
+      },
+      {
+       "cp": 108,
+       "mate": null,
+       "depth": 22,
+       "best": "d6"
+      },
+      {
+       "cp": 117,
+       "mate": null,
+       "depth": 22,
+       "best": "Nc3"
+      },
+      {
+       "cp": 119,
+       "mate": null,
+       "depth": 22,
+       "best": "Bb4"
+      },
+      {
+       "cp": 122,
+       "mate": null,
+       "depth": 22,
+       "best": "d5"
+      },
+      {
+       "cp": 131,
+       "mate": null,
+       "depth": 22,
+       "best": "d6"
+      },
+      {
+       "cp": 125,
+       "mate": null,
+       "depth": 22,
+       "best": "Bd3"
+      },
+      {
+       "cp": 113,
+       "mate": null,
+       "depth": 22,
+       "best": "Ne7"
+      },
+      {
+       "cp": 129,
+       "mate": null,
+       "depth": 22,
+       "best": "Bd3"
+      }
+     ],
+     "notes": [
+      {
+       "ply": 4,
+       "san": "c4",
+       "text": "White takes more space."
+      },
+      {
+       "ply": 5,
+       "san": "e6",
+       "text": "Prepare ...c5 or ...d5."
+      },
+      {
+       "ply": 7,
+       "san": "c5",
+       "text": "Hit d4."
+      },
+      {
+       "ply": 9,
+       "san": "d6",
+       "text": "A Benoni setup."
+      },
+      {
+       "ply": 11,
+       "san": "Nf6",
+       "text": "Book ends. White is clearly better (about +1.4). Plan: ...exd5, ...Be7, ...O-O and ...b5; keep it compact."
+      }
+     ],
+     "flaggedDrops": [],
+     "matchup": "Carr vs 2.d4 a6 3.c4",
+     "nickname": "The Compact Coil",
+     "ecoName": "B00 Carr Defense"
+    },
+    {
+     "id": "carr-defence--5",
+     "label": "2.Nf3",
+     "main": false,
+     "forkPly": 2,
+     "moves": [
+      "e4",
+      "h6",
+      "Nf3",
+      "e6",
+      "d4",
+      "d5",
+      "Bd3",
+      "dxe4",
+      "Bxe4",
+      "Nf6",
+      "Bd3",
+      "c5"
+     ],
+     "eco": {
+      "eco": "B00",
+      "name": "Carr Defense"
+     },
+     "ecoPly": 1,
+     "evals": [
+      {
+       "cp": 37,
+       "mate": null,
+       "depth": 22,
+       "best": "e4"
+      },
+      {
+       "cp": 31,
+       "mate": null,
+       "depth": 22,
+       "best": "c5"
+      },
+      {
+       "cp": 71,
+       "mate": null,
+       "depth": 22,
+       "best": "d4"
+      },
+      {
+       "cp": 61,
+       "mate": null,
+       "depth": 22,
+       "best": "e6"
+      },
+      {
+       "cp": 69,
+       "mate": null,
+       "depth": 22,
+       "best": "c3"
+      },
+      {
+       "cp": 70,
+       "mate": null,
+       "depth": 22,
+       "best": "d5"
+      },
+      {
+       "cp": 63,
+       "mate": null,
+       "depth": 22,
+       "best": "Nbd2"
+      },
+      {
+       "cp": 17,
+       "mate": null,
+       "depth": 22,
+       "best": "dxe4"
+      },
+      {
+       "cp": 7,
+       "mate": null,
+       "depth": 22,
+       "best": "Bxe4"
+      },
+      {
+       "cp": 2,
+       "mate": null,
+       "depth": 22,
+       "best": "Nf6"
+      },
+      {
+       "cp": 4,
+       "mate": null,
+       "depth": 22,
+       "best": "Nc3"
+      },
+      {
+       "cp": 0,
+       "mate": null,
+       "depth": 22,
+       "best": "c5"
+      },
+      {
+       "cp": 0,
+       "mate": null,
+       "depth": 22,
+       "best": "Nc3"
+      }
+     ],
+     "notes": [
+      {
+       "ply": 2,
+       "san": "Nf3",
+       "text": "White develops first."
+      },
+      {
+       "ply": 3,
+       "san": "e6",
+       "text": "Same French plan."
+      },
+      {
+       "ply": 5,
+       "san": "d5",
+       "text": "Hit e4."
+      },
+      {
+       "ply": 6,
+       "san": "Bd3",
+       "text": "White keeps the center flexible."
+      },
+      {
+       "ply": 7,
+       "san": "dxe4",
+       "text": "Take."
+      },
+      {
+       "ply": 9,
+       "san": "Nf6",
+       "text": "Develop with tempo on the bishop."
+      },
+      {
+       "ply": 11,
+       "san": "c5",
+       "text": "Book ends. Level (about 0.0). Plan: ...Nc6, ...cxd4, ...Be7 and ...O-O."
+      }
+     ],
+     "flaggedDrops": [],
+     "matchup": "Carr vs 2.Nf3",
+     "nickname": "The French Turn",
+     "ecoName": "B00 Carr Defense"
+    },
+    {
+     "id": "carr-defence--6",
+     "label": "2.Nc3",
+     "main": false,
+     "forkPly": 2,
+     "moves": [
+      "e4",
+      "h6",
+      "Nc3",
+      "e6",
+      "d4",
+      "d5",
+      "e5",
+      "c5",
+      "Nf3",
+      "Nc6",
+      "dxc5",
+      "Bxc5",
+      "Bd3",
+      "Nge7",
+      "O-O",
+      "a6"
+     ],
+     "eco": {
+      "eco": "B00",
+      "name": "Carr Defense"
+     },
+     "ecoPly": 1,
+     "evals": [
+      {
+       "cp": 37,
+       "mate": null,
+       "depth": 22,
+       "best": "e4"
+      },
+      {
+       "cp": 31,
+       "mate": null,
+       "depth": 22,
+       "best": "c5"
+      },
+      {
+       "cp": 71,
+       "mate": null,
+       "depth": 22,
+       "best": "d4"
+      },
+      {
+       "cp": 67,
+       "mate": null,
+       "depth": 22,
+       "best": "c5"
+      },
+      {
+       "cp": 70,
+       "mate": null,
+       "depth": 22,
+       "best": "d4"
+      },
+      {
+       "cp": 75,
+       "mate": null,
+       "depth": 22,
+       "best": "d5"
+      },
+      {
+       "cp": 77,
+       "mate": null,
+       "depth": 22,
+       "best": "Bd3"
+      },
+      {
+       "cp": 12,
+       "mate": null,
+       "depth": 22,
+       "best": "c5"
+      },
+      {
+       "cp": 15,
+       "mate": null,
+       "depth": 22,
+       "best": "Nce2"
+      },
+      {
+       "cp": 19,
+       "mate": null,
+       "depth": 22,
+       "best": "Nc6"
+      },
+      {
+       "cp": 21,
+       "mate": null,
+       "depth": 22,
+       "best": "Ne2"
+      },
+      {
+       "cp": -12,
+       "mate": null,
+       "depth": 22,
+       "best": "Bxc5"
+      },
+      {
+       "cp": -3,
+       "mate": null,
+       "depth": 22,
+       "best": "Bd3"
+      },
+      {
+       "cp": -4,
+       "mate": null,
+       "depth": 22,
+       "best": "a6"
+      },
+      {
+       "cp": 6,
+       "mate": null,
+       "depth": 22,
+       "best": "Na4"
+      },
+      {
+       "cp": -36,
+       "mate": null,
+       "depth": 22,
+       "best": "Ng6"
+      },
+      {
+       "cp": 0,
+       "mate": null,
+       "depth": 22,
+       "best": "Ne2"
+      }
+     ],
+     "notes": [
+      {
+       "ply": 2,
+       "san": "Nc3",
+       "text": "White develops."
+      },
+      {
+       "ply": 3,
+       "san": "e6",
+       "text": "French plan again."
+      },
+      {
+       "ply": 6,
+       "san": "e5",
+       "text": "White grabs space."
+      },
+      {
+       "ply": 7,
+       "san": "c5",
+       "text": "Hit d4."
+      },
+      {
+       "ply": 9,
+       "san": "Nc6",
+       "text": "Pressure on d4."
+      },
+      {
+       "ply": 11,
+       "san": "Bxc5",
+       "text": "Win the pawn back."
+      },
+      {
+       "ply": 13,
+       "san": "Nge7",
+       "text": "The knight heads to g6 to hit e5."
+      },
+      {
+       "ply": 15,
+       "san": "a6",
+       "text": "Book ends. Level (about 0.0). Plan: ...Ng6, ...Qc7 against e5, ...b5."
+      }
+     ],
+     "flaggedDrops": [],
+     "matchup": "Carr vs 2.Nc3",
+     "nickname": "The Knight to g6",
+     "ecoName": "B00 Carr Defense"
+    },
+    {
+     "id": "carr-defence--7",
+     "label": "2.Bc4",
+     "main": false,
+     "forkPly": 2,
+     "moves": [
+      "e4",
+      "h6",
+      "Bc4",
+      "e6",
+      "d4",
+      "d5",
+      "exd5",
+      "exd5",
+      "Bb3",
+      "Nf6",
+      "Nf3",
+      "Bd6",
+      "O-O",
+      "O-O"
+     ],
+     "eco": {
+      "eco": "B00",
+      "name": "Carr Defense"
+     },
+     "ecoPly": 1,
+     "evals": [
+      {
+       "cp": 37,
+       "mate": null,
+       "depth": 22,
+       "best": "e4"
+      },
+      {
+       "cp": 31,
+       "mate": null,
+       "depth": 22,
+       "best": "c5"
+      },
+      {
+       "cp": 71,
+       "mate": null,
+       "depth": 22,
+       "best": "d4"
+      },
+      {
+       "cp": 4,
+       "mate": null,
+       "depth": 22,
+       "best": "e6"
+      },
+      {
+       "cp": 1,
+       "mate": null,
+       "depth": 22,
+       "best": "Qe2"
+      },
+      {
+       "cp": -20,
+       "mate": null,
+       "depth": 22,
+       "best": "d5"
+      },
+      {
+       "cp": -18,
+       "mate": null,
+       "depth": 22,
+       "best": "exd5"
+      },
+      {
+       "cp": -20,
+       "mate": null,
+       "depth": 22,
+       "best": "exd5"
+      },
+      {
+       "cp": -20,
+       "mate": null,
+       "depth": 22,
+       "best": "Bd3"
+      },
+      {
+       "cp": -24,
+       "mate": null,
+       "depth": 22,
+       "best": "Bd6"
+      },
+      {
+       "cp": -23,
+       "mate": null,
+       "depth": 22,
+       "best": "Ne2"
+      },
+      {
+       "cp": -33,
+       "mate": null,
+       "depth": 22,
+       "best": "Bd6"
+      },
+      {
+       "cp": -31,
+       "mate": null,
+       "depth": 22,
+       "best": "O-O"
+      },
+      {
+       "cp": -29,
+       "mate": null,
+       "depth": 22,
+       "best": "O-O"
+      },
+      {
+       "cp": -30,
+       "mate": null,
+       "depth": 22,
+       "best": "Nc3"
+      }
+     ],
+     "notes": [
+      {
+       "ply": 2,
+       "san": "Bc4",
+       "text": "White aims at f7."
+      },
+      {
+       "ply": 3,
+       "san": "e6",
+       "text": "Block the bishop and prepare ...d5."
+      },
+      {
+       "ply": 5,
+       "san": "d5",
+       "text": "Hit the bishop."
+      },
+      {
+       "ply": 7,
+       "san": "exd5",
+       "text": "Recapture. The open e-file is level."
+      },
+      {
+       "ply": 9,
+       "san": "Nf6",
+       "text": "Develop."
+      },
+      {
+       "ply": 11,
+       "san": "Bd6",
+       "text": "Develop."
+      },
+      {
+       "ply": 13,
+       "san": "O-O",
+       "text": "Book ends. Level (about -0.3). Plan: ...c6, ...Re8, ...Bf5."
+      }
+     ],
+     "flaggedDrops": [],
+     "matchup": "Carr vs 2.Bc4",
+     "nickname": "The Blunted Bishop",
+     "ecoName": "B00 Carr Defense"
+    },
+    {
+     "id": "carr-defence--8",
+     "label": "2.c4",
+     "main": false,
+     "forkPly": 2,
+     "moves": [
+      "e4",
+      "h6",
+      "c4",
+      "e5",
+      "Nf3",
+      "Nc6",
+      "Nc3",
+      "Nf6",
+      "d4",
+      "exd4",
+      "Nxd4",
+      "Bb4"
+     ],
+     "eco": {
+      "eco": "B00",
+      "name": "Carr Defense"
+     },
+     "ecoPly": 1,
+     "evals": [
+      {
+       "cp": 37,
+       "mate": null,
+       "depth": 22,
+       "best": "e4"
+      },
+      {
+       "cp": 31,
+       "mate": null,
+       "depth": 22,
+       "best": "c5"
+      },
+      {
+       "cp": 71,
+       "mate": null,
+       "depth": 22,
+       "best": "d4"
+      },
+      {
+       "cp": 32,
+       "mate": null,
+       "depth": 22,
+       "best": "e5"
+      },
+      {
+       "cp": 28,
+       "mate": null,
+       "depth": 22,
+       "best": "Nf3"
+      },
+      {
+       "cp": 23,
+       "mate": null,
+       "depth": 22,
+       "best": "Nc6"
+      },
+      {
+       "cp": 28,
+       "mate": null,
+       "depth": 22,
+       "best": "d4"
+      },
+      {
+       "cp": 23,
+       "mate": null,
+       "depth": 22,
+       "best": "Nf6"
+      },
+      {
+       "cp": 24,
+       "mate": null,
+       "depth": 22,
+       "best": "a3"
+      },
+      {
+       "cp": 4,
+       "mate": null,
+       "depth": 22,
+       "best": "Bb4"
+      },
+      {
+       "cp": 30,
+       "mate": null,
+       "depth": 22,
+       "best": "Nxd4"
+      },
+      {
+       "cp": 31,
+       "mate": null,
+       "depth": 22,
+       "best": "Bb4"
+      },
+      {
+       "cp": 32,
+       "mate": null,
+       "depth": 22,
+       "best": "f3"
+      }
+     ],
+     "notes": [
+      {
+       "ply": 2,
+       "san": "c4",
+       "text": "White goes for a bind."
+      },
+      {
+       "ply": 3,
+       "san": "e5",
+       "text": "Take the center."
+      },
+      {
+       "ply": 5,
+       "san": "Nc6",
+       "text": "Protect e5."
+      },
+      {
+       "ply": 7,
+       "san": "Nf6",
+       "text": "Develop."
+      },
+      {
+       "ply": 9,
+       "san": "exd4",
+       "text": "Take."
+      },
+      {
+       "ply": 11,
+       "san": "Bb4",
+       "text": "Book ends. Pin the knight (about +0.3). Plan: ...O-O, ...Re8, ...d6."
+      }
+     ],
+     "flaggedDrops": [],
+     "matchup": "Carr vs 2.c4",
+     "nickname": "The Pin",
+     "ecoName": "B00 Carr Defense"
+    }
+   ],
+   "iconSuggestion": "Symbol mark: a single pawn glyph standing one step forward on the h-file edge (a short vertical stem with a small notch at the top-right corner of the tile), with a thin bracket below it suggesting a 'guard' over the g5 square. Same stroke weight, monochrome, no letters, matching the existing weapon marks."
   }
  ]
 }

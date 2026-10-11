@@ -43,6 +43,26 @@ export function isGambitSacrifice(mark: GambitMark): boolean {
   return /gambit sacrifice/i.test(text);
 }
 
+export function isAcceptedOffbeat(mark: GambitMark): boolean {
+  if (mark.acceptedOffbeat === true) return true;
+  const text = `${mark.reason ?? ""} ${mark.label ?? ""} ${mark.kind ?? ""}`;
+  return /accepted offbeat|offbeat choice/i.test(text);
+}
+
+/** Carr 1...h6 is marked in the coach note. A flaggedDrops entry can say the same. */
+export function moveIsAcceptedOffbeat(line: BookLine, ply: number): boolean {
+  const san = line.moves[ply];
+  const flagged = line.flaggedDrops.some(
+    (mark) =>
+      (mark.ply == null || mark.ply === ply) &&
+      (mark.san == null || mark.san === san) &&
+      isAcceptedOffbeat(mark),
+  );
+  if (flagged) return true;
+  const note = line.notes.find((row) => row.ply === ply && row.san === san);
+  return !!note && /\boffbeat\b/i.test(note.text);
+}
+
 /** Notes for a line. Shared plies are stored on the mainline only. */
 export function notesForLine(line: BookLine, main: BookLine): BookNote[] {
   const own = line.notes.filter(
@@ -69,6 +89,8 @@ export interface BranchChoice {
   lineId: string;
   san: string;
   chip: string;
+  /** Line nickname, shown on the chip when it fits. */
+  nickname: string;
   selected: boolean;
 }
 
@@ -99,6 +121,7 @@ export function branchChoices(opening: Opening, ply: number): BranchChoice[] {
       lineId: owner.id,
       san,
       chip: moveChip(ply, san),
+      nickname: owner.nickname,
       selected,
     });
   }

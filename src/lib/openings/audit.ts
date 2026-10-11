@@ -1,6 +1,6 @@
 import { Chess } from "chess.js";
 import ecoRaw from "./data/eco-subset.json";
-import { isGambitSacrifice } from "./book";
+import { isGambitSacrifice, moveIsAcceptedOffbeat } from "./book";
 import type { BookLine, Side } from "./types";
 
 export const DROP_CP = 80;
@@ -62,8 +62,15 @@ export function auditLine(id: string, side: Side, line: BookLine): string[] {
     }
   }
 
+  if (!line.label?.trim()) problems.push(`${label}: missing label`);
+  if (!line.matchup?.trim()) problems.push(`${label}: missing matchup`);
+  if (!line.nickname?.trim()) problems.push(`${label}: missing nickname`);
+  if (!line.ecoName?.trim()) problems.push(`${label}: missing ecoName`);
+
   if (!line.eco?.eco || !line.eco.name?.trim()) {
     problems.push(`${label}: missing ECO name`);
+  } else if (line.ecoName && line.ecoName !== `${line.eco.eco} ${line.eco.name}`) {
+    problems.push(`${label}: ecoName ${line.ecoName} does not match ${line.eco.eco} ${line.eco.name}`);
   } else {
     const deepest = deepestEco(line.moves);
     if (!deepest) {
@@ -109,12 +116,14 @@ export function auditLine(id: string, side: Side, line: BookLine): string[] {
       if (!userMove) continue;
       const drop = userDrop(line.evals[ply], line.evals[ply + 1], side);
       if (drop < DROP_CP) continue;
-      const marked = line.flaggedDrops.some(
-        (mark) =>
-          mark.ply === ply &&
-          (mark.san == null || mark.san === line.moves[ply]) &&
-          isGambitSacrifice(mark),
-      );
+      const marked =
+        moveIsAcceptedOffbeat(line, ply) ||
+        line.flaggedDrops.some(
+          (mark) =>
+            mark.ply === ply &&
+            (mark.san == null || mark.san === line.moves[ply]) &&
+            isGambitSacrifice(mark),
+        );
       if (!marked) {
         problems.push(
           `${label}: user move ${line.moves[ply]} at ply ${ply} drops ${(drop / 100).toFixed(2)} pawns`,

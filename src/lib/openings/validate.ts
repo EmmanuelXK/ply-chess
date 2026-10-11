@@ -60,8 +60,8 @@ export function validateAll(openings: Opening[]): void {
     ids.add(opening.id);
     validateOpening(opening);
   }
-  if (openings.length !== 24) {
-    throw new Error(`expected 24 weapons, got ${openings.length}`);
+  if (openings.length !== 25) {
+    throw new Error(`expected 25 weapons, got ${openings.length}`);
   }
   if (openings.some((opening) => opening.id === "kings-gambit" || opening.id === "italian-attack")) {
     throw new Error("kings-gambit and italian-attack are not weapons");

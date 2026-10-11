@@ -21,4 +21,4 @@ for (const opening of openings) {
 validateAtlas();
 console.log(`\n${openings.length} openings legal from the start position.`);
 console.log(`✓ Theory atlas: ${ATLAS.length} mainstream openings, legal routes.`);
-console.log("✓ Book lines, ECO names, stored evals, and coach notes on all 24 weapons.");
+console.log("✓ Book lines, ECO names, stored evals, and coach notes on all 25 weapons.");

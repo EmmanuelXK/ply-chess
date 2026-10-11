@@ -227,11 +227,22 @@ export interface GambitMark {
   reason?: string;
   label?: string;
   kind?: string;
+  /** Accepted offbeat choice, exempt from the 0.8-pawn drop rule. */
+  acceptedOffbeat?: boolean;
 }
 
 export interface BookLine {
   id: string;
+  /** Move-order label kept from the book. */
   label: string;
+  /** "Weapon vs opponent setup", shown beside the nickname. */
+  matchup: string;
+  /** Short name of the line, shown prominently. */
+  nickname: string;
+  /** ECO code plus official name, shown as secondary text. */
+  ecoName: string;
+  /** True on lines added after the first book cut. */
+  new?: boolean;
   main: boolean;
   /** First ply where this line leaves the mainline. Null on the mainline. */
   forkPly: number | null;

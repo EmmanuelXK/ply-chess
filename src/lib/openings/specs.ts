@@ -3985,5 +3985,38 @@ export const openingSpecs = [
     },
     depthNote: "21 moves. Classical Slav (…dxc4, 5.a4 Bf5, bishop out before …e6). Semi-Slav …e6 is a different tile later — not mixed into this spine. Exchange Qb3 and Geller e4 live in the trap pack.",
   },
+  {
+    id: "carr-defence",
+    name: "Carr Defence",
+    shortName: "Carr",
+    side: "black",
+    family: "black-e4",
+    versus: "1.e4",
+    blurb: "1...h6. An offbeat move that controls g5. White is better; you get a game they have not prepared.",
+    story: {
+      cast: "You answer 1.e4 with ...h6.",
+      conflict: "White is objectively better and wants a normal center.",
+      plan: "Against 2.d4, play ...e6 and ...d5, then ...c5 on the chain.",
+    },
+    modelFromPly: 15,
+    bookChunks: [[16, "Carr", "Follow the book line."]],
+    pins: [],
+    storyBeats: [],
+    coach: [],
+    traps: [],
+    pillars: {
+      pawnStructure: "1...h6 controls g5 and does not develop. Against 2.d4 the book continues ...e6, ...d5, and ...c5.",
+      pieceCoordination: "Knight to c6, queen to b6, bishop to d7. Against 2.Nc3 the knight can sit on g6.",
+      kingSafety: "The king waits while the center is decided. White keeps more space.",
+      breaksAndStorms: "...c5 against the e5 chain. ...g5 only later, if their king feels the hook.",
+      tacticsBank: "No forced trick. 1...h6 is an accepted offbeat choice.",
+      attackingPlan: "French-style center. The book ends with ...Nge7-f5 against d4 and a rook on the c-file.",
+    },
+    plans: {
+      steady: "Play the French-style chain and sit on d4.",
+      creative: "Use ...a6 and ...c5 when the g-pawn hook is the idea.",
+      aggressive: "Open the c-file and put the knight on f5.",
+    },
+  },
 ] as OpeningSpec[];
 
