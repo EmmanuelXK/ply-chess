@@ -63,16 +63,32 @@
   will-change: auto;
 }
 
-.board-frame[data-mark="gem"] cg-board square.last-move {
-  background-color: rgb(228 177 90 / 78%);
+.board-frame[data-mark="brilliant"] cg-board square.last-move {
+  background-color: rgb(45 212 191 / 55%);
 }
 
-.board-frame[data-mark="true"] cg-board square.last-move {
-  background-color: rgb(64 150 96 / 55%);
+.board-frame[data-mark="best"] cg-board square.last-move {
+  background-color: rgb(245 193 108 / 62%);
 }
 
-.board-frame[data-mark="clean"] cg-board square.last-move {
-  background-color: rgb(90 150 196 / 50%);
+.board-frame[data-mark="good"] cg-board square.last-move {
+  background-color: rgb(74 222 128 / 48%);
+}
+
+.board-frame[data-mark="positional"] cg-board square.last-move {
+  background-color: rgb(165 180 252 / 42%);
+}
+
+.board-frame[data-mark="inaccuracy"] cg-board square.last-move {
+  background-color: rgb(251 191 36 / 48%);
+}
+
+.board-frame[data-mark="mistake"] cg-board square.last-move {
+  background-color: rgb(249 115 22 / 48%);
+}
+
+.board-frame[data-mark="blunder"] cg-board square.last-move {
+  background-color: rgb(239 68 68 / 50%);
 }
 
 .board-cg cg-board square.move-dest {

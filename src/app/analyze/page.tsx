@@ -39,7 +39,7 @@ export default async function AnalyzePage({
       side={line?.side ?? "white"}
       moves={moves}
       startPly={startPly}
-      scores={(line?.evals ?? []).map((row) => ({ cp: row.cp, mate: row.mate }))}
+      scores={(line?.evals ?? []).map((row) => ({ cp: row.cp, mate: row.mate, best: row.best }))}
     />
   );
 }

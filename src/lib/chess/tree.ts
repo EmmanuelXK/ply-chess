@@ -12,12 +12,16 @@ export interface MoveNode {
   /** White's point of view, when known. */
   cp: number | null;
   mate: number | null;
+  /** Stockfish's best move from the position after this move. */
+  bestFrom: string | null;
 }
 
 export interface AnalysisTree {
   startFen: string;
   rootCp: number | null;
   rootMate: number | null;
+  /** Stockfish's best move from the starting position. */
+  rootBest: string | null;
   children: MoveNode[];
   /** Child indexes from the root to the cursor. Empty is the start position. */
   path: number[];
@@ -26,6 +30,8 @@ export interface AnalysisTree {
 export interface ScoreMark {
   cp: number | null;
   mate: number | null;
+  /** Best move from this position, when the book or a search stored one. */
+  best?: string | null;
 }
 
 export interface SanBranch {
@@ -54,6 +60,7 @@ export function emptyTree(startFen = START_FEN): AnalysisTree {
     startFen,
     rootCp: null,
     rootMate: null,
+    rootBest: null,
     children: [],
     path: [],
   };
@@ -71,6 +78,7 @@ export function treeFromSans(
   if (root) {
     tree.rootCp = root.cp;
     tree.rootMate = root.mate;
+    tree.rootBest = root.best ?? null;
   }
   let parent: MoveNode | null = null;
   const path: number[] = [];
@@ -82,6 +90,7 @@ export function treeFromSans(
     if (score) {
       node.cp = score.cp;
       node.mate = score.mate;
+      node.bestFrom = score.best ?? null;
     }
     if (parent) parent.children.push(node);
     else tree.children.push(node);
@@ -222,16 +231,19 @@ export function recordScore(
   tree: AnalysisTree,
   cp: number | null,
   mate: number | null,
+  best?: string | null,
 ): AnalysisTree {
   if (!tree.path.length) {
-    if (tree.rootCp === cp && tree.rootMate === mate) return tree;
-    return { ...tree, rootCp: cp, rootMate: mate };
+    const rootBest = best === undefined ? tree.rootBest : best;
+    if (tree.rootCp === cp && tree.rootMate === mate && tree.rootBest === rootBest) return tree;
+    return { ...tree, rootCp: cp, rootMate: mate, rootBest };
   }
   let changed = false;
   const children = mapNode(tree.children, tree.path, (node) => {
-    if (node.cp === cp && node.mate === mate) return node;
+    const bestFrom = best === undefined ? node.bestFrom : best;
+    if (node.cp === cp && node.mate === mate && node.bestFrom === bestFrom) return node;
     changed = true;
-    return { ...node, cp, mate };
+    return { ...node, cp, mate, bestFrom };
   });
   if (!changed) return tree;
   return { ...tree, children };
@@ -314,6 +326,7 @@ function makeNode(move: Move, parentId: string): MoveNode {
     children: [],
     cp: null,
     mate: null,
+    bestFrom: null,
   };
 }
 

@@ -6,8 +6,11 @@ import "@/app/chessground.css";
 import type { Api } from "@lichess-org/chessground/api";
 import type { Key } from "@lichess-org/chessground/types";
 import type { DrawBrushes, DrawShape } from "@lichess-org/chessground/draw";
-import type { MoveMark } from "@/lib/openings/move-mark";
-import { MOVE_MARK_LABEL } from "@/lib/openings/move-mark";
+import {
+  QUALITY_NAME,
+  QUALITY_SYMBOL,
+  type MoveQuality,
+} from "@/lib/chess/move-quality";
 import type { ArrowBrush, MoveGlyph } from "@/lib/openings/types";
 import {
   clearChessgroundTransients,
@@ -27,7 +30,7 @@ export interface BoardGlyph {
 
 export interface BoardMark {
   square: Key;
-  kind: MoveMark;
+  kind: MoveQuality;
 }
 
 interface ChessBoardProps {
@@ -359,9 +362,11 @@ export function ChessBoard({
         <span
           className={`move-mark move-mark-${mark.kind}`}
           style={glyphStyle(mark.square, orientation)}
-          title={markTitle(mark.kind)}
+          title={QUALITY_NAME[mark.kind]}
+          aria-label={QUALITY_NAME[mark.kind]}
+          data-testid="quality-badge"
         >
-          {MOVE_MARK_LABEL[mark.kind]}
+          {QUALITY_SYMBOL[mark.kind]}
         </span>
       ) : null}
       {glyphs.map((g) => (
@@ -376,12 +381,6 @@ export function ChessBoard({
       ))}
     </div>
   );
-}
-
-function markTitle(kind: BoardMark["kind"]): string {
-  if (kind === "gem") return "Signature idea";
-  if (kind === "true") return "The house move";
-  return "Clean theory";
 }
 
 function glyphClass(g: MoveGlyph): string {
