@@ -39,7 +39,7 @@ Notices and the GPL text live in `public/engines/NOTICE.md`. Lc0 and Fairy-Stock
 Large **Back** and **Forward** under the board (thumb zone). Instant ply-by-ply through the spine — hurry the repertoire. Same control set inside Analyze. Chessground animations ~90ms (no teleports).
 
 ### Analyze
-**Analyze** on the dock, or **long-press the board**, from Learn. The sheet keeps the board, a vertical eval bar, the top lines, depth, node count, and Stop / Go. Back and Forward still walk the line.
+**Analyze** on the dock, or **long-press the board**, from Learn opens a full-screen board at `/analyze`. The book line is the mainline and the cursor starts on the current Learn move. Stockfish 17.1 searches until you stop it, or to a chosen depth and time, with three lines, a best-move arrow, and a slim eval bar. Free moves branch the move tree (jump, delete, promote). The ECO name follows the position. PGN and FEN paste and copy live on that page. Learn still uses only the short on-device Stockfish search.
 
 ### History Gig Pack
 The old history marks were written for the 21-move spines. They are not attached to the new book lines, so nothing mismatched appears on the move strip. The pack file is still in the repo.

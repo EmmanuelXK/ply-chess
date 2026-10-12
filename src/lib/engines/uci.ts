@@ -6,6 +6,7 @@ export interface PvLine {
   cp: number | null;
   /** Mate distance from White's point of view. Positive means White is mating. */
   mate: number | null;
+  depth: number;
   san: string[];
   uci: string[];
 }
@@ -98,6 +99,7 @@ export function reduceInfo(prev: AnalysisView, raw: string, fen: string): Analys
     multipv,
     cp: cpRaw == null ? null : whitePov(cpRaw, fen),
     mate: mateRaw == null ? null : whitePov(mateRaw, fen),
+    depth: depth ?? 0,
     uci,
     san: pvToSan(fen, uci),
   };

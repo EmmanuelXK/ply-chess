@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Chess, type Square } from "chess.js";
 import type { Key } from "@lichess-org/chessground/types";
 import {
@@ -15,7 +16,6 @@ import {
 
 import { ChessBoard, type BoardArrow, type BoardMark } from "@/components/board/chess-board";
 import { Button } from "@/components/ui/button";
-import { AnalyzeSplash } from "@/components/drill/analyze-splash";
 import { HistoryMark } from "@/components/drill/history-mark";
 import { LineTreeMenu } from "@/components/drill/line-tree-menu";
 import { HistorySplash } from "@/components/drill/history-splash";
@@ -99,7 +99,7 @@ export function DrillScreen({
   const [bookOpen, setBookOpen] = useState(false);
   const [lineMenuOpen, setLineMenuOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
-  const [analyzeOpen, setAnalyzeOpen] = useState(false);
+  const router = useRouter();
   const reps: StudyMode = "learn";
   const [boardEpoch, setBoardEpoch] = useState(0);
   const [holdBook, setHoldBook] = useState(false);
@@ -251,7 +251,6 @@ export function DrillScreen({
     modeRef.current = pos.appliedPly >= opening.moves.length ? "plan" : "drill";
     lockRef.current = false;
     holdRef.current = false;
-    setAnalyzeOpen(false);
     setFen(pos.fen);
     setPly(pos.appliedPly);
     setPlayed(pos.chess.history());
@@ -481,7 +480,7 @@ export function DrillScreen({
   }, [applyPly, cancelTimer, finishBook, opening.id, opening.moves.length, setHold]);
 
   useEffect(() => {
-    const sheetOpen = bookOpen || lineMenuOpen || historyOpen || analyzeOpen;
+    const sheetOpen = bookOpen || lineMenuOpen || historyOpen;
     const onKey = (event: KeyboardEvent) => {
       if (sheetOpen) return;
       const target = event.target as HTMLElement | null;
@@ -502,7 +501,7 @@ export function DrillScreen({
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [analyzeOpen, bookOpen, historyOpen, lineMenuOpen, stepBack, stepForward]);
+  }, [bookOpen, historyOpen, lineMenuOpen, stepBack, stepForward]);
 
   const switchLine = (nextId: string | null, jumpPly?: number) => {
     const mainId = activeRoot.lines[0]?.id ?? null;
@@ -528,10 +527,13 @@ export function DrillScreen({
     setSession((n) => n + 1);
   };
 
-  const analyzeLine = useMemo(
-    () => [...played, ...opening.moves.slice(ply)],
-    [played, opening.moves, ply],
-  );
+  const openAnalyze = useCallback(() => {
+    const params = new URLSearchParams();
+    params.set("opening", activeRoot.id);
+    if (lineId) params.set("line", lineId);
+    params.set("ply", String(plyRef.current));
+    router.push(`/analyze?${params.toString()}`);
+  }, [activeRoot.id, lineId, router]);
 
   const canForward = ply < opening.moves.length || holdBook;
   const canBack = ply > 0;
@@ -621,7 +623,7 @@ export function DrillScreen({
               animationMs={MOVE_MS}
               resyncKey={boardEpoch}
               onMove={onMove}
-              onLongPress={() => setAnalyzeOpen(true)}
+              onLongPress={openAnalyze}
             />
           </div>
         </div>
@@ -676,7 +678,7 @@ export function DrillScreen({
           <BoardEngines
             fen={fen}
             orientation={orientation}
-            enabled={!analyzeOpen}
+            enabled
             book={
               bookEval
                 ? { cp: bookEval.cp, mate: bookEval.mate, depth: bookEval.depth, best: bookEval.best }
@@ -700,7 +702,7 @@ export function DrillScreen({
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => setAnalyzeOpen(true)}
+          onClick={openAnalyze}
           className="dock-btn"
           data-testid="open-analyze"
         >
@@ -746,14 +748,6 @@ export function DrillScreen({
         />
       ) : null}
 
-      {analyzeOpen ? (
-        <AnalyzeSplash
-          line={analyzeLine}
-          startPly={played.length}
-          orientation={orientation}
-          onClose={() => setAnalyzeOpen(false)}
-        />
-      ) : null}
     </div>
   );
 }
