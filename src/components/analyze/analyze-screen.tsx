@@ -6,7 +6,9 @@ import type { Key } from "@lichess-org/chessground/types";
 import { Clipboard, Cpu, FlipVertical2 } from "lucide-react";
 
 import { BoardShell } from "@/components/board/board-shell";
-import { ChessBoard, type BoardArrow } from "@/components/board/chess-board";
+import { ChessBoard, type BoardArrow, type BoardMark } from "@/components/board/chess-board";
+import { CoachBubble } from "@/components/coach/coach-bubble";
+import { analyzedMoveSquare, gradeAnalyzedMove } from "@/lib/chess/move-quality";
 import { EvalBar } from "@/components/board/eval-bar";
 import { HeaderBar } from "@/components/board/header-bar";
 import { NavControls } from "@/components/board/nav-controls";
@@ -20,6 +22,7 @@ import { needsPromotion, toDests } from "@/lib/chess/dests";
 import { openingName } from "@/lib/chess/opening-name";
 import {
   START_FEN,
+  applyLiveScore,
   canDelete,
   canPromote,
   canStepBack,
@@ -31,7 +34,6 @@ import {
   playUci,
   playUcis,
   promoteNode,
-  recordScore,
   sansAlong,
   stepBack,
   stepForward,
@@ -88,7 +90,7 @@ export function AnalyzeScreen({
     if (line.cp == null && (line.mate == null || line.mate === 0)) return;
     setTree((current) => {
       if (fenAt(current) !== fen) return current;
-      return recordScore(current, line.cp, line.mate);
+      return applyLiveScore(current, line.cp, line.mate, line.san[0] ?? null);
     });
   }, []);
   const { view, phase } = useAnalysis({
@@ -161,6 +163,10 @@ export function AnalyzeScreen({
       },
     ];
   }, [showArrow, top]);
+  const quality = gradeAnalyzedMove(tree);
+  const qualitySquare = analyzedMoveSquare(tree);
+  const mark: BoardMark | null =
+    quality && qualitySquare ? { kind: quality, square: qualitySquare as Key } : null;
   const busy = phase === "searching" || phase === "loading";
   const backHref = openingId
     ? `/drill/${openingId}${lineId ? `?trap=${encodeURIComponent(lineId)}` : ""}`
@@ -234,6 +240,7 @@ export function AnalyzeScreen({
             dests={dests}
             lastMove={pos.lastMove as Key[] | null}
             arrows={arrows}
+            mark={mark}
             orientation={orientation}
             turnColor={turnColor}
             movableColor={turnColor}
@@ -394,6 +401,20 @@ export function AnalyzeScreen({
           onClose={() => setMenu(null)}
         />
       ) : null}
+      <CoachBubble
+        position={{
+          fen: pos.fen,
+          line: heading,
+          matchup: kicker,
+          moves: sansAlong(tree),
+          side,
+          evalCp: top?.cp ?? null,
+          evalMate: top?.mate ?? null,
+          evalDepth: view.depth || null,
+          best: top?.san[0] ?? null,
+          note: null,
+        }}
+      />
         </>
       }
     />

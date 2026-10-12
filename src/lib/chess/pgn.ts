@@ -51,6 +51,7 @@ export function importNotation(text: string): AnalysisTree | null {
     startFen,
     rootCp: null,
     rootMate: null,
+    rootBest: null,
     children,
     path: mainlineEnd(children),
   };
@@ -167,5 +168,6 @@ function nodeFrom(move: Move, parentId: string): MoveNode {
     children: [],
     cp: null,
     mate: null,
+    bestFrom: null,
   };
 }

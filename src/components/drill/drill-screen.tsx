@@ -17,15 +17,19 @@ import { ChessBoard, type BoardArrow, type BoardMark } from "@/components/board/
 import { HeaderBar } from "@/components/board/header-bar";
 import { NavControls } from "@/components/board/nav-controls";
 import { Button } from "@/components/ui/button";
+import { CoachBubble } from "@/components/coach/coach-bubble";
 import { HistoryMark } from "@/components/drill/history-mark";
 import { LineTreeMenu } from "@/components/drill/line-tree-menu";
 import { HistorySplash } from "@/components/drill/history-splash";
+import { ModeToggle } from "@/components/drill/mode-toggle";
+import { PracticeMiss } from "@/components/drill/practice-miss";
 import { StudySheet } from "@/components/drill/study-sheet";
 import { lastMoveFrom, needsPromotion, toDests } from "@/lib/chess/dests";
 import { playLine } from "@/lib/chess/line";
 import { BoardEngines, BoardEvalBar, BoardEvalReadout } from "@/components/drill/board-engines";
+import { gradeBookPly } from "@/lib/chess/move-quality";
 import { moveNoteAt } from "@/lib/openings/move-note";
-import { moveMarkAt } from "@/lib/openings/move-mark";
+import { judgeUserMove, pickReply, storedReplies } from "@/lib/openings/practice";
 import {
   DAILY_QUEUE_CAP,
   introduceMove,
@@ -40,6 +44,7 @@ import {
   branchChoices,
   getOpening,
   historyAt,
+  isUserPly,
   openingOnLine,
   sharedPrefixLength,
   type Opening,
@@ -103,6 +108,14 @@ export function DrillScreen({
   const reps: StudyMode = "learn";
   const [boardEpoch, setBoardEpoch] = useState(0);
   const [holdBook, setHoldBook] = useState(false);
+  const [trainer, setTrainer] = useState<"learn" | "practice">("learn");
+  const [miss, setMiss] = useState<{ played: string; book: string; reason: string } | null>(null);
+  const [awaitReply, setAwaitReply] = useState(false);
+  const trainerRef = useRef(trainer);
+  const lineIdRef = useRef(lineId);
+  const missRef = useRef(miss);
+  const playReplyRef = useRef<() => void>(() => {});
+  const switchLineRef = useRef<(nextId: string | null, jumpPly?: number) => void>(() => {});
   const [, setReviewEmpty] = useState(false);
   const [, setReviewDone] = useState(false);
   const [, setQueuePos] = useState(0);
@@ -122,6 +135,15 @@ export function DrillScreen({
   useEffect(() => {
     activeIdRef.current = activeId;
   }, [activeId]);
+  useEffect(() => {
+    trainerRef.current = trainer;
+  }, [trainer]);
+  useEffect(() => {
+    lineIdRef.current = lineId;
+  }, [lineId]);
+  useEffect(() => {
+    missRef.current = miss;
+  }, [miss]);
 
   const sync = useCallback(() => {
     const g = gameRef.current;
@@ -271,16 +293,28 @@ export function DrillScreen({
     return clear;
   }, [collectQueue, opening, session]);
 
+  const userToMove = isUserPly(opening.side, ply);
+  const inPracticeBook = trainer === "practice" && mode === "drill" && ply < opening.moves.length;
   const dests = useMemo(() => {
     if (busy || holdBook) {
       return new Map<Key, Key[]>();
     }
+    if (inPracticeBook && !userToMove) return new Map<Key, Key[]>();
     if (mode === "drill" && ply >= opening.moves.length) return new Map<Key, Key[]>();
     return toDests(new Chess(fen));
-  }, [busy, fen, holdBook, mode, opening.moves.length, ply]);
+  }, [busy, fen, holdBook, inPracticeBook, mode, opening.moves.length, ply, userToMove]);
 
   const turnColor = fen.includes(" w ") ? "white" : "black";
-  const movableColor = busy || holdBook ? undefined : mode === "plan" ? "both" : turnColor;
+  const movableColor =
+    busy || holdBook
+      ? undefined
+      : inPracticeBook
+        ? userToMove
+          ? opening.side
+          : undefined
+        : mode === "plan"
+          ? "both"
+          : turnColor;
 
   const historyNow = historyAt(opening, ply);
   const note = useMemo(() => moveNoteAt(opening, ply), [opening, ply]);
@@ -298,30 +332,22 @@ export function DrillScreen({
   );
 
   const mark = useMemo<BoardMark | null>(() => {
-    if (ply <= 0 || !lastMove || lastMove.length < 2) return null;
-    const kind = moveMarkAt(opening, ply - 1);
+    if (ply <= 0 || !lastMove || lastMove.length < 2 || !onBook) return null;
+    const kind = gradeBookPly(opening, ply - 1);
     if (!kind) return null;
     return { kind, square: lastMove[1] };
-  }, [opening, ply, lastMove]);
+  }, [opening, ply, lastMove, onBook]);
 
   const arrows = useMemo<BoardArrow[]>(() => {
     const next: BoardArrow[] = [];
     if (lastMove && lastMove.length === 2) {
-      const brush =
-        mark?.kind === "gem"
-          ? "yellow"
-          : mark?.kind === "true"
-            ? "green"
-            : mark?.kind === "clean"
-              ? "blue"
-              : "last";
-      next.push({ orig: lastMove[0], dest: lastMove[1], brush });
+      next.push({ orig: lastMove[0], dest: lastMove[1], brush: "last" });
     }
     if (hintKeys && hintKeys.length === 2) {
       next.push({ orig: hintKeys[0], dest: hintKeys[1], brush: "hint" });
     }
     return next;
-  }, [lastMove, hintKeys, mark]);
+  }, [lastMove, hintKeys]);
 
   const onMove = useCallback(
     (from: Key, to: Key) => {
@@ -364,6 +390,37 @@ export function DrillScreen({
       const move = g.move({ from, to, promotion });
       if (!move) {
         snapBoard();
+        return;
+      }
+
+      if (trainerRef.current === "practice") {
+        const prefix = g.history().slice(0, -1);
+        const currentId = activeLine(opening)?.id ?? null;
+        const verdict = judgeUserMove(activeRoot, opening.side, prefix, move.san, currentId);
+        if (!verdict.ok) {
+          g.undo();
+          setMiss({ played: move.san, book: verdict.bookSan, reason: verdict.reason });
+          snapBoard();
+          return;
+        }
+        setMiss(null);
+        const mainId = activeRoot.lines[0]?.id ?? null;
+        const normalized = !verdict.lineId || verdict.lineId === mainId ? null : verdict.lineId;
+        if (normalized !== lineIdRef.current) {
+          setAwaitReply(true);
+          switchLineRef.current(verdict.lineId, plyNow + 1);
+          return;
+        }
+        plyRef.current += 1;
+        setHintKeys(null);
+        setHintUsed(false);
+        if (plyRef.current >= opening.moves.length) {
+          setAwaitReply(false);
+          finishBook();
+        } else {
+          setAwaitReply(true);
+          sync();
+        }
         return;
       }
 
@@ -420,7 +477,7 @@ export function DrillScreen({
       }
       if (plyRef.current >= opening.moves.length) finishBook();
     },
-    [finishBook, opening.id, opening.moves, setHold, snapBoard, sync],
+    [activeRoot, finishBook, opening, setHold, snapBoard, sync],
   );
 
   const hint = () => {
@@ -447,6 +504,8 @@ export function DrillScreen({
   const stepBack = useCallback(() => {
     cancelTimer();
     setHold(false);
+    setMiss(null);
+    setAwaitReply(false);
     if (repsRef.current === "review") {
       if (queueIndexRef.current > 0) goToQueueIndex(queueIndexRef.current - 1);
       return;
@@ -470,12 +529,19 @@ export function DrillScreen({
       if (plyRef.current >= opening.moves.length) finishBook();
       return;
     }
+    if (trainerRef.current === "practice") {
+      if (missRef.current) return;
+      if (isUserPly(opening.side, plyRef.current)) return;
+      if (plyRef.current >= opening.moves.length) return;
+      applyPly(plyRef.current + 1);
+      return;
+    }
     if (repsRef.current !== "learn") return;
     if (plyRef.current >= opening.moves.length) return;
     const index = plyRef.current;
     applyPly(index + 1);
     introduceMove(opening.id, index);
-  }, [applyPly, cancelTimer, finishBook, opening.id, opening.moves.length, setHold]);
+  }, [applyPly, cancelTimer, finishBook, opening.id, opening.moves.length, opening.side, setHold]);
 
   useEffect(() => {
     const sheetOpen = bookOpen || lineMenuOpen || historyOpen;
@@ -501,29 +567,57 @@ export function DrillScreen({
     return () => window.removeEventListener("keydown", onKey);
   }, [bookOpen, historyOpen, lineMenuOpen, stepBack, stepForward]);
 
-  const switchLine = (nextId: string | null, jumpPly?: number) => {
-    const mainId = activeRoot.lines[0]?.id ?? null;
-    const normalized = !nextId || nextId === mainId ? null : nextId;
-    const same = normalized === lineId;
-    setLineMenuOpen(false);
-    setBookOpen(false);
-    if (same) {
-      if (jumpPly != null) {
-        cancelTimer();
-        applyPly(jumpPly);
+  const switchLine = useCallback(
+    (nextId: string | null, jumpPly?: number) => {
+      const mainId = activeRoot.lines[0]?.id ?? null;
+      const normalized = !nextId || nextId === mainId ? null : nextId;
+      const same = normalized === lineId;
+      setLineMenuOpen(false);
+      setBookOpen(false);
+      if (same) {
+        if (jumpPly != null) {
+          cancelTimer();
+          applyPly(jumpPly);
+        }
+        return;
       }
+      const nextMoves =
+        activeRoot.lines.find((item) => item.id === (normalized ?? mainId))?.moves ??
+        activeRoot.lines[0]?.moves ??
+        opening.moves;
+      const shared = sharedPrefixLength(opening.moves, nextMoves);
+      resumePlyRef.current =
+        jumpPly != null ? Math.min(jumpPly, nextMoves.length) : Math.min(plyRef.current, shared);
+      setLineId(normalized);
+      setSession((n) => n + 1);
+    },
+    [activeRoot.lines, applyPly, cancelTimer, lineId, opening.moves],
+  );
+  const playStoredReply = useCallback(() => {
+    const currentPly = plyRef.current;
+    const prefix = gameRef.current.history();
+    const pick = pickReply(storedReplies(activeRoot, prefix));
+    if (!pick) return;
+    if (opening.moves[currentPly] === pick.san) {
+      applyPly(currentPly + 1);
       return;
     }
-    const nextMoves =
-      activeRoot.lines.find((item) => item.id === (normalized ?? mainId))?.moves ??
-      activeRoot.lines[0]?.moves ??
-      opening.moves;
-    const shared = sharedPrefixLength(opening.moves, nextMoves);
-    resumePlyRef.current =
-      jumpPly != null ? Math.min(jumpPly, nextMoves.length) : Math.min(plyRef.current, shared);
-    setLineId(normalized);
-    setSession((n) => n + 1);
-  };
+    switchLine(pick.lineId, currentPly + 1);
+  }, [activeRoot, applyPly, opening.moves, switchLine]);
+  useEffect(() => {
+    switchLineRef.current = switchLine;
+    playReplyRef.current = playStoredReply;
+  }, [playStoredReply, switchLine]);
+
+  useEffect(() => {
+    if (trainer !== "practice" || !awaitReply || miss) return;
+    if (isUserPly(opening.side, ply) || ply >= opening.moves.length || mode === "plan") return;
+    const timer = window.setTimeout(() => {
+      setAwaitReply(false);
+      playReplyRef.current();
+    }, 420);
+    return () => window.clearTimeout(timer);
+  }, [awaitReply, miss, mode, opening.moves.length, opening.side, ply, trainer]);
 
   const openAnalyze = useCallback(() => {
     const params = new URLSearchParams();
@@ -533,7 +627,10 @@ export function DrillScreen({
     router.push(`/analyze?${params.toString()}`);
   }, [activeRoot.id, lineId, router]);
 
-  const canForward = ply < opening.moves.length || holdBook;
+  const canForward =
+    trainer === "practice"
+      ? !userToMove && ply < opening.moves.length && !miss && mode === "drill"
+      : ply < opening.moves.length || holdBook;
   const canBack = ply > 0;
   const status = [
     bookEnded ? "Book ends." : "",
@@ -571,6 +668,23 @@ export function DrillScreen({
             }
             actions={
               <>
+                <ModeToggle
+                  mode={trainer}
+                  onChange={(next) => {
+                    setTrainer(next);
+                    setMiss(null);
+                    if (
+                      next === "practice" &&
+                      !isUserPly(opening.side, plyRef.current) &&
+                      plyRef.current < opening.moves.length &&
+                      modeRef.current === "drill"
+                    ) {
+                      setAwaitReply(true);
+                    } else {
+                      setAwaitReply(false);
+                    }
+                  }}
+                />
                 <Button
                   variant="ghost"
                   size="icon-sm"
@@ -619,6 +733,9 @@ export function DrillScreen({
               {status}
             </p>
             <div className="learn-readout" data-testid="move-note" data-book={holdBook ? "true" : undefined}>
+              {trainer === "practice" && miss ? (
+                <PracticeMiss played={miss.played} book={miss.book} reason={miss.reason} />
+              ) : null}
               <div className="learn-readout-head">
                 <p className="move-note-san">{note.san}</p>
                 {holdBook ? <span className="move-note-timer">Book</span> : null}
@@ -630,7 +747,7 @@ export function DrillScreen({
                   />
                 ) : null}
               </div>
-              {choices.length > 1 ? (
+              {trainer === "learn" && choices.length > 1 ? (
                 <div
                   className="branch-chooser"
                   role="listbox"
@@ -675,7 +792,14 @@ export function DrillScreen({
                 variant="ghost"
                 size="sm"
                 onClick={hint}
-                disabled={reps !== "learn" || hintUsed || busy || holdBook || ply >= opening.moves.length}
+                disabled={
+                  trainer === "practice" ||
+                  reps !== "learn" ||
+                  hintUsed ||
+                  busy ||
+                  holdBook ||
+                  ply >= opening.moves.length
+                }
                 className="dock-btn"
               >
                 <Lightbulb />
@@ -731,6 +855,20 @@ export function DrillScreen({
                 onClose={() => setHistoryOpen(false)}
               />
             ) : null}
+            <CoachBubble
+              position={{
+                fen,
+                line: line?.nickname ?? activeRoot.shortName,
+                matchup: line?.matchup ?? activeRoot.name,
+                moves: played,
+                side: opening.side,
+                evalCp: bookEval?.cp ?? null,
+                evalMate: bookEval?.mate ?? null,
+                evalDepth: bookEval?.depth ?? null,
+                best: bookEval?.best ?? null,
+                note: note.comment ?? null,
+              }}
+            />
           </>
         }
       />

@@ -1,4 +1,4 @@
-/** Ply marks used by Gem / True / Clean. Not rendered as coach prose. */
+/** Ply marks used by older Gem / True stamps. Not rendered as coach prose. */
 export interface AuthoredFact {
   ply: number;
   concept?: string;
