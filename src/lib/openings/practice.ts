@@ -78,10 +78,11 @@ export function passesPawnRule(line: BookLine, ply: number, side: Side): boolean
 function noteReason(opening: Opening, line: BookLine, ply: number, san: string): string {
   const main = opening.lines[0] ?? line;
   const notes = notesForLine(line, main);
-  const text = notes.find((note) => note.ply === ply && note.san === san)?.text?.trim();
+  const text = notes.find((note) => note.ply === ply && note.san === san)?.text?.replace(/\s+/g, " ").trim();
   if (!text) return "Book move.";
+  if (text.length <= 140) return text;
   const sentence = firstSentence(text);
-  return sentence.length > 160 ? `${sentence.slice(0, 157).trim()}…` : sentence;
+  return sentence.length > 140 ? `${sentence.slice(0, 137).trim()}…` : sentence;
 }
 
 /** Distinct stored replies at this position, mainline first. */

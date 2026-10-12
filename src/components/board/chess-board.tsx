@@ -83,6 +83,7 @@ export function ChessBoard({
   onLongPress,
 }: ChessBoardProps) {
   const hostRef = useRef<HTMLDivElement>(null);
+  const cgRef = useRef<HTMLDivElement>(null);
   const apiRef = useRef<Api | null>(null);
   const onMoveRef = useRef(onMove);
   const latestRef = useRef({
@@ -156,15 +157,8 @@ export function ChessBoard({
 
   useEffect(() => {
     if (!ready) return;
-    const host = hostRef.current;
-    if (!host) return;
-
-    const el = document.createElement("div");
-    el.className = "cg-wrap board-cg";
-    const px = Math.max(sideRef.current, 32);
-    el.style.width = `${px}px`;
-    el.style.height = `${px}px`;
-    host.replaceChildren(el);
+    const el = cgRef.current;
+    if (!el) return;
 
     const latest = latestRef.current;
     const scrub = () => clearChessgroundTransients(el);
@@ -222,13 +216,12 @@ export function ChessBoard({
     return () => {
       api.destroy();
       if (apiRef.current === api) apiRef.current = null;
-      el.remove();
     };
   }, [ready]);
 
   useEffect(() => {
     if (!apiRef.current || side < 32) return;
-    const wrap = hostRef.current?.querySelector(".cg-wrap") as HTMLElement | null;
+    const wrap = cgRef.current;
     if (!wrap) return;
     wrap.style.width = `${side}px`;
     wrap.style.height = `${side}px`;
@@ -358,6 +351,11 @@ export function ChessBoard({
         side > 0 ? { width: side, height: side, maxWidth: "none" } : undefined
       }
     >
+      <div
+        ref={cgRef}
+        className="cg-wrap board-cg"
+        style={side > 0 ? { width: side, height: side } : undefined}
+      />
       {mark ? (
         <span
           className={`move-mark move-mark-${mark.kind}`}

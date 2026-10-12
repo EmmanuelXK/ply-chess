@@ -21,7 +21,7 @@ function deviceId(): string {
 
 export function CoachBubble({ position }: { position: CoachPosition }) {
   const [open, setOpen] = useState(false);
-  const [spot, setSpot] = useState({ right: 10, bottom: 92 });
+  const [spot, setSpot] = useState({ right: 12, bottom: 118 });
   const [connected, setConnected] = useState<boolean | null>(null);
   const [remaining, setRemaining] = useState<number | null>(null);
   const [draft, setDraft] = useState("");
@@ -85,6 +85,40 @@ export function CoachBubble({ position }: { position: CoachPosition }) {
 
   const resting = remaining === 0;
   const disconnected = connected === false;
+  const [panelBox, setPanelBox] = useState<{
+    left: number;
+    width: number;
+    maxHeight: number;
+    top?: number;
+    bottom?: number;
+  } | null>(null);
+
+  useEffect(() => {
+    if (!open || !host.current) return;
+    const place = () => {
+      const rect = host.current?.getBoundingClientRect();
+      if (!rect) return;
+      const width = Math.min(280, window.innerWidth - 16);
+      let left = rect.right - width;
+      if (left < 8) left = 8;
+      if (left + width > window.innerWidth - 8) left = window.innerWidth - width - 8;
+      if (rect.top > 240) {
+        const maxHeight = Math.min(320, rect.top - 16);
+        setPanelBox({
+          left,
+          width,
+          maxHeight,
+          bottom: window.innerHeight - rect.top + 8,
+        });
+        return;
+      }
+      const maxHeight = Math.min(320, window.innerHeight - rect.bottom - 16);
+      setPanelBox({ left, width, maxHeight, top: rect.bottom + 8 });
+    };
+    place();
+    window.addEventListener("resize", place);
+    return () => window.removeEventListener("resize", place);
+  }, [open, spot]);
 
   const send = async (event: FormEvent) => {
     event.preventDefault();
@@ -126,9 +160,6 @@ export function CoachBubble({ position }: { position: CoachPosition }) {
     }
   };
 
-  const panelAbove = spot.bottom > 180;
-  const panelRight = spot.right < 160;
-
   return (
     <div
       ref={host}
@@ -136,17 +167,20 @@ export function CoachBubble({ position }: { position: CoachPosition }) {
       style={{ right: spot.right, bottom: spot.bottom }}
       data-testid="coach-bubble"
     >
-      {open ? (
+      {open && panelBox ? (
         <div
           className="coach-panel"
           role="dialog"
           aria-label="Coach"
           data-testid="coach-panel"
-          style={
-            panelAbove
-              ? { bottom: "3.2rem", [panelRight ? "right" : "left"]: 0 }
-              : { top: "3.2rem", [panelRight ? "right" : "left"]: 0 }
-          }
+          style={{
+            position: "fixed",
+            left: panelBox.left,
+            width: panelBox.width,
+            maxHeight: panelBox.maxHeight,
+            top: panelBox.top,
+            bottom: panelBox.bottom,
+          }}
         >
           <header>
             <strong>Coach</strong>
