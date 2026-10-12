@@ -227,6 +227,27 @@ export function promoteNode(tree: AnalysisTree, path: readonly number[]): Analys
   };
 }
 
+/**
+ * Write a live search onto the cursor only when that position has no stored
+ * score yet. Book evals stay put so a shallow search cannot regrade them.
+ */
+export function applyLiveScore(
+  tree: AnalysisTree,
+  cp: number | null,
+  mate: number | null,
+  best?: string | null,
+): AnalysisTree {
+  const known = (scoreCp: number | null, scoreMate: number | null) =>
+    scoreCp != null || (scoreMate != null && scoreMate !== 0);
+  if (!tree.path.length) {
+    if (known(tree.rootCp, tree.rootMate)) return tree;
+    return recordScore(tree, cp, mate, best);
+  }
+  const node = nodeAt(tree);
+  if (!node || known(node.cp, node.mate)) return tree;
+  return recordScore(tree, cp, mate, best);
+}
+
 export function recordScore(
   tree: AnalysisTree,
   cp: number | null,

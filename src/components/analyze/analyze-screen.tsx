@@ -22,6 +22,7 @@ import { needsPromotion, toDests } from "@/lib/chess/dests";
 import { openingName } from "@/lib/chess/opening-name";
 import {
   START_FEN,
+  applyLiveScore,
   canDelete,
   canPromote,
   canStepBack,
@@ -33,7 +34,6 @@ import {
   playUci,
   playUcis,
   promoteNode,
-  recordScore,
   sansAlong,
   stepBack,
   stepForward,
@@ -90,7 +90,7 @@ export function AnalyzeScreen({
     if (line.cp == null && (line.mate == null || line.mate === 0)) return;
     setTree((current) => {
       if (fenAt(current) !== fen) return current;
-      return recordScore(current, line.cp, line.mate, line.san[0] ?? null);
+      return applyLiveScore(current, line.cp, line.mate, line.san[0] ?? null);
     });
   }, []);
   const { view, phase } = useAnalysis({

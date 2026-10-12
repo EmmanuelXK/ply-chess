@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+  applyLiveScore,
   canDelete,
   canPromote,
   canStepForward,
@@ -66,6 +67,19 @@ test("promote lifts a variation to the mainline and delete removes it", () => {
   assert.deepEqual(sansAlong(tree), ["e4"]);
   assert.equal(tree.children[0]?.children[0]?.san, "e5");
   assert.equal(fenAt(tree).split(" ")[1], "b");
+});
+
+test("applyLiveScore fills a blank position and leaves a stored book eval", () => {
+  const booked = treeFromSans(START, ["e4"], 1, [
+    { cp: 20, mate: null, best: "e4" },
+    { cp: 30, mate: null, best: "e5" },
+  ]);
+  assert.equal(applyLiveScore(booked, -80, null, "d4"), booked);
+  const blank = treeFromSans(START, ["e4"]);
+  const live = applyLiveScore(blank, 14, null, "c5");
+  assert.equal(live.children[0]?.cp, 14);
+  assert.equal(live.children[0]?.bestFrom, "c5");
+  assert.equal(applyLiveScore(live, -40, null, "d5"), live);
 });
 
 test("recordScore keeps the same tree when the eval does not change", () => {
