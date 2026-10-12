@@ -1,21 +1,22 @@
 export default function DrillLoading() {
   return (
-    <div className="drill-shell">
-      <div className="drill-top">
+    <div className="board-shell">
+      <header className="board-header">
         <div className="shell-skel" />
-      </div>
-      <div className="learn-main">
-        <div className="board-stage">
-          <div className="board-with-history">
-            <div className="board-frame animate-pulse" />
-          </div>
+      </header>
+      <div className="board-row">
+        <div className="board-rail" />
+        <div className="board-well">
+          <div className="board-frame animate-pulse" />
         </div>
-        <div className="ply-nav" aria-hidden>
+      </div>
+      <div className="board-panel">
+        <p className="shell-wait">Loading the book…</p>
+      </div>
+      <div className="board-dock" aria-hidden>
+        <div className="ply-nav">
           <span className="ply-btn" />
           <span className="ply-btn ply-btn-fwd" />
-        </div>
-        <div className="move-note">
-          <p className="shell-wait">Loading the book…</p>
         </div>
       </div>
     </div>
