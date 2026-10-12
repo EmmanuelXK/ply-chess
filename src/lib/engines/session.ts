@@ -1,10 +1,5 @@
-import {
-  LIVE_DEPTH,
-  LIVE_MOVETIME_MS,
-  engineById,
-  type AnalysisEngineId,
-  type EngineDepth,
-} from "./catalog";
+import { engineById, type AnalysisEngineId } from "./catalog";
+import { analysisKey, uciGo, type AnalysisLimit } from "./search";
 
 export type AnalysisPhase = "loading" | "searching" | "ready" | "stopped" | "error";
 
@@ -15,10 +10,12 @@ interface SearchRequest {
   id: AnalysisEngineId;
   fen: string;
   run: boolean;
-  depth: EngineDepth;
+  depth: number;
   /** Bumps when the user presses Go again on the same position. */
   nonce: number;
   multipv: number;
+  /** Learn uses the live cap. Analyze can run until stopped or to a depth and time. */
+  limit: AnalysisLimit;
 }
 
 function normalizeLine(data: unknown): string[] {
@@ -88,7 +85,7 @@ class EngineSession {
   }
 
   private keyOf(req: SearchRequest): string {
-    return `${req.id}|${req.depth}|${req.multipv}|${req.nonce}|${req.fen}`;
+    return analysisKey(req);
   }
 
   private post(line: string): void {
@@ -188,7 +185,7 @@ class EngineSession {
     this.setUi("searching");
     this.post(`setoption name MultiPV value ${req.multipv}`);
     this.post(`position fen ${req.fen}`);
-    this.post(`go depth ${LIVE_DEPTH} movetime ${LIVE_MOVETIME_MS}`);
+    this.post(uciGo(req.limit));
   }
 
   private disposeWorker(): void {
