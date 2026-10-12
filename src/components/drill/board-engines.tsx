@@ -1,56 +1,50 @@
 "use client";
 
+import { createContext, useContext, type ReactNode } from "react";
+
 import { EvalBar } from "@/components/board/eval-bar";
 import { useAnalysis } from "@/components/drill/use-analysis";
 import { LIVE_DEPTH } from "@/lib/engines/catalog";
 import type { EvalTick } from "@/lib/engines/types";
 import { formatScore } from "@/lib/engines/uci";
 
-function ScoreRow({
-  name,
-  phase,
-  tick,
-  pending,
-  testId,
-  orientation,
-}: {
-  name: string;
-  phase: string;
+interface BoardScores {
   tick: EvalTick | null;
   pending: boolean;
-  testId: string;
-  orientation: "white" | "black";
-}) {
-  const score = pending || !tick ? "—" : formatScore(tick);
-  const depth = !pending && tick && tick.depth > 0 ? `d${tick.depth}` : "";
-  return (
-    <div className="engine-eval-row" data-testid={testId} data-phase={phase}>
-      <span className="engine-eval-name">
-        {name}
-        <span className="engine-eval-phase">{phase}</span>
-      </span>
-      <EvalBar tick={tick} orientation={orientation} layout="horizontal" showLabel={false} pending={pending} />
-      <span className="engine-eval-cp" aria-label={`${name} evaluation ${score}`}>
-        {score}
-      </span>
-      <span className="engine-eval-depth" data-testid={`${testId}-depth`}>
-        {depth}
-      </span>
-    </div>
-  );
+  bookText: string;
+  bookDepth: string;
+  sfText: string;
+  sfDepth: string;
+  sfPhase: string;
+}
+
+const BoardScoreContext = createContext<BoardScores | null>(null);
+
+function known(tick: EvalTick | null): boolean {
+  return !!tick && (tick.cp != null || (tick.mate != null && tick.mate !== 0));
+}
+
+function scoreText(tick: EvalTick | null): string {
+  if (!known(tick) || !tick) return "—";
+  return formatScore(tick);
+}
+
+function depthText(tick: EvalTick | null): string {
+  if (!known(tick) || !tick || tick.depth <= 0) return "";
+  return `d${tick.depth}`;
 }
 
 export function BoardEngines({
   fen,
-  orientation,
   enabled,
   book,
+  children,
 }: {
   fen: string;
-  orientation: "white" | "black";
   enabled: boolean;
   /** Stored book eval for this position, when the board is still on a book line. */
   book: EvalTick | null;
+  children: ReactNode;
 }) {
   const { view, phase } = useAnalysis({
     fen,
@@ -71,29 +65,71 @@ export function BoardEngines({
         best: line.uci[0],
       }
     : null;
-  const livePending = !line;
-  const livePhase = line ? (phase === "searching" ? "Searching" : "Live") : phase === "error" ? "Unavailable" : "Loading";
+  const shown = known(live) ? live : book;
+  const scores: BoardScores = {
+    tick: shown,
+    pending: !known(shown),
+    bookText: scoreText(book),
+    bookDepth: depthText(book),
+    sfText: scoreText(live),
+    sfDepth: depthText(live),
+    sfPhase: known(live)
+      ? phase === "searching"
+        ? "Searching"
+        : "Live"
+      : phase === "error"
+        ? "Unavailable"
+        : "Loading",
+  };
 
+  return <BoardScoreContext.Provider value={scores}>{children}</BoardScoreContext.Provider>;
+}
+
+function useBoardScores(): BoardScores {
+  const scores = useContext(BoardScoreContext);
+  if (!scores) {
+    return {
+      tick: null,
+      pending: true,
+      bookText: "—",
+      bookDepth: "",
+      sfText: "—",
+      sfDepth: "",
+      sfPhase: "Loading",
+    };
+  }
+  return scores;
+}
+
+/** Vertical bar: the book score shows at once, then the live search replaces it. */
+export function BoardEvalBar({ orientation }: { orientation: "white" | "black" }) {
+  const { tick, pending } = useBoardScores();
   return (
-    <div className="engine-strip" data-testid="board-engines" aria-label="Engine evaluations">
-      {book ? (
-        <ScoreRow
-          name="Book"
-          phase="book eval"
-          tick={book}
-          pending={false}
-          testId="engine-eval-book"
-          orientation={orientation}
-        />
-      ) : null}
-      <ScoreRow
-        name="Stockfish"
-        phase={livePhase}
-        tick={live}
-        pending={livePending}
-        testId="engine-eval-stockfish"
-        orientation={orientation}
-      />
-    </div>
+    <EvalBar
+      tick={tick}
+      orientation={orientation}
+      layout="vertical"
+      showLabel={false}
+      pending={pending}
+    />
+  );
+}
+
+export function BoardEvalReadout() {
+  const scores = useBoardScores();
+  return (
+    <p className="eval-readout" data-testid="board-engines" aria-label="Engine evaluations">
+      <span data-testid="engine-eval-book" data-phase="book eval">
+        Book {scores.bookText}
+        {scores.bookDepth ? " " : ""}
+        <span data-testid="engine-eval-book-depth">{scores.bookDepth}</span>
+      </span>
+      <span aria-hidden> · </span>
+      <span data-testid="engine-eval-stockfish" data-phase={scores.sfPhase}>
+        SF {scores.sfText}
+        {scores.sfDepth ? " " : ""}
+        <span data-testid="engine-eval-stockfish-depth">{scores.sfDepth}</span>
+      </span>
+    </p>
   );
 }

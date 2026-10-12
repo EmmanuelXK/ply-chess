@@ -127,6 +127,7 @@ export function ChessBoard({
     if (!host || !parent) return;
 
     const well =
+      parent.closest(".board-well") ??
       parent.closest(".board-with-history") ??
       parent.closest(".splash-board") ??
       parent.closest(".analyze-board") ??

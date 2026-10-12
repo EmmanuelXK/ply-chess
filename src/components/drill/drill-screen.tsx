@@ -1,12 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Chess, type Square } from "chess.js";
 import type { Key } from "@lichess-org/chessground/types";
 import {
-  ChevronLeft,
   FlipVertical2,
   Lightbulb,
   Menu,
@@ -14,16 +12,18 @@ import {
   ScanSearch,
 } from "lucide-react";
 
+import { BoardShell } from "@/components/board/board-shell";
 import { ChessBoard, type BoardArrow, type BoardMark } from "@/components/board/chess-board";
+import { HeaderBar } from "@/components/board/header-bar";
+import { NavControls } from "@/components/board/nav-controls";
 import { Button } from "@/components/ui/button";
 import { HistoryMark } from "@/components/drill/history-mark";
 import { LineTreeMenu } from "@/components/drill/line-tree-menu";
 import { HistorySplash } from "@/components/drill/history-splash";
-import { PlyNav } from "@/components/drill/ply-nav";
 import { StudySheet } from "@/components/drill/study-sheet";
 import { lastMoveFrom, needsPromotion, toDests } from "@/lib/chess/dests";
 import { playLine } from "@/lib/chess/line";
-import { BoardEngines } from "@/components/drill/board-engines";
+import { BoardEngines, BoardEvalBar, BoardEvalReadout } from "@/components/drill/board-engines";
 import { moveNoteAt } from "@/lib/openings/move-note";
 import { moveMarkAt } from "@/lib/openings/move-mark";
 import {
@@ -282,8 +282,6 @@ export function DrillScreen({
   const turnColor = fen.includes(" w ") ? "white" : "black";
   const movableColor = busy || holdBook ? undefined : mode === "plan" ? "both" : turnColor;
 
-  const fullMoves = Math.ceil(opening.moves.length / 2);
-  const shownMove = Math.min(Math.ceil(ply / 2), fullMoves);
   const historyNow = historyAt(opening, ply);
   const note = useMemo(() => moveNoteAt(opening, ply), [opening, ply]);
   const line = activeLine(opening);
@@ -546,208 +544,196 @@ export function DrillScreen({
     .filter(Boolean)
     .join(" ");
 
+  const bookTick = bookEval
+    ? { cp: bookEval.cp, mate: bookEval.mate, depth: bookEval.depth, best: bookEval.best }
+    : null;
+
   return (
-    <div className="drill-shell" data-mode={reps} data-testid="train-screen">
-      <header className="drill-top">
-        <div className="drill-nav">
-          <Button asChild variant="ghost" size="icon-sm">
-            <Link href="/" aria-label="Back to repertoire">
-              <ChevronLeft />
-            </Link>
-          </Button>
-          <div className="min-w-0 flex-1">
-            <div className="flex items-baseline justify-between gap-2">
-              <h1 className="drill-title" data-testid="line-nickname">
-                {line?.nickname ?? activeRoot.shortName}
-              </h1>
-              <p className="drill-count">
-                {shownMove}/{fullMoves}
-              </p>
-            </div>
-            {line ? (
-              <p className="drill-matchup" data-testid="line-matchup">
-                {line.matchup}
-              </p>
-            ) : null}
-            {line ? (
-              <p className="drill-eco" data-testid="line-eco">
-                {line.ecoName}
-              </p>
-            ) : null}
-            {bookEnded ? (
-              <p className="truncate text-[11px] text-[var(--mist)]">Book ends.</p>
-            ) : mode === "plan" ? (
-              <p className="truncate text-[11px] text-[var(--mist)]">Off book. Analyze from here.</p>
-            ) : null}
-          </div>
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            onClick={() => setOrientation((side) => (side === "white" ? "black" : "white"))}
-            aria-label="Flip board"
-            title="Flip board"
-          >
-            <FlipVertical2 />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            onClick={() => setLineMenuOpen(true)}
-            aria-label="Repertoire branches"
-            aria-expanded={lineMenuOpen}
-            aria-haspopup="dialog"
-          >
-            <Menu />
-          </Button>
-        </div>
-
-        <p className="sr-only" role="status" aria-live="polite">
-          {status}
-        </p>
-      </header>
-
-      <div className="learn-main">
-        <div className="board-stage">
-          <div className="board-with-history">
-            <ChessBoard
-              fen={fen}
-              dests={dests}
-              lastMove={lastMove}
-              arrows={arrows}
-              mark={mark}
-              orientation={orientation}
-              turnColor={turnColor}
-              viewOnly={(busy && mode === "drill") || holdBook}
-              movableColor={movableColor}
-              check={check}
-              animationMs={MOVE_MS}
-              resyncKey={boardEpoch}
-              onMove={onMove}
-              onLongPress={openAnalyze}
-            />
-          </div>
-        </div>
-        <PlyNav
-          onBack={stepBack}
-          onForward={stepForward}
-          canBack={canBack}
-          canForward={canForward}
-          lastSan={played.at(-1) ?? "Start"}
-        />
-        <div className="learn-readout" data-testid="move-note" data-book={holdBook ? "true" : undefined}>
-          <div className="learn-readout-head">
-            <p className="move-note-san">{note.san}</p>
-            {holdBook ? <span className="move-note-timer">Book</span> : null}
-            {historyNow.length ? (
-              <HistoryMark
-                glyph={historyNow[0].glyph}
-                label={`${historyNow[0].title} (${historyNow[0].year})`}
-                onClick={() => setHistoryOpen(true)}
-              />
-            ) : null}
-          </div>
-          {choices.length > 1 ? (
-            <div className="branch-chooser" role="listbox" aria-label="Opponent alternatives" data-testid="branch-chooser">
-              {choices.map((choice) => (
-                <button
-                  key={choice.san}
-                  type="button"
-                  role="option"
-                  aria-selected={choice.selected}
-                  className={choice.selected ? "branch-chip branch-chip-on" : "branch-chip"}
-                  onClick={() => switchLine(choice.lineId)}
+    <BoardEngines fen={fen} enabled book={bookTick}>
+      <BoardShell
+        testId="train-screen"
+        mode={reps}
+        header={
+          <HeaderBar
+            backHref="/"
+            backLabel="Back to repertoire"
+            kicker={activeRoot.shortName}
+            title={line?.nickname ?? activeRoot.shortName}
+            titleTestId="line-nickname"
+            subtitle={
+              line ? (
+                <>
+                  <span data-testid="line-matchup">{line.matchup}</span>
+                  <span aria-hidden> · </span>
+                  <span data-testid="line-eco">{line.ecoName}</span>
+                </>
+              ) : null
+            }
+            actions={
+              <>
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  onClick={() => setOrientation((side) => (side === "white" ? "black" : "white"))}
+                  aria-label="Flip board"
+                  title="Flip board"
                 >
-                  <span className="branch-chip-move">{choice.chip}</span>
-                  {choice.nickname ? (
-                    <span className="branch-chip-nick">{choice.nickname}</span>
-                  ) : null}
-                </button>
-              ))}
-            </div>
-          ) : null}
-          {bookEnded ? (
-            <p className="explain-done" data-testid="book-ends">
-              Book ends{line?.eco.name ? ` · ${line.eco.name}` : ""}
-            </p>
-          ) : null}
-          {note.comment ? (
-            <p className="explain-copy" data-testid="explain">
-              {note.comment}
-            </p>
-          ) : null}
-          <BoardEngines
-            fen={fen}
-            orientation={orientation}
-            enabled
-            book={
-              bookEval
-                ? { cp: bookEval.cp, mate: bookEval.mate, depth: bookEval.depth, best: bookEval.best }
-                : null
+                  <FlipVertical2 />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  onClick={() => setLineMenuOpen(true)}
+                  aria-label="Repertoire branches"
+                  aria-expanded={lineMenuOpen}
+                  aria-haspopup="dialog"
+                >
+                  <Menu />
+                </Button>
+              </>
             }
           />
-        </div>
-      </div>
-
-      <footer className="drill-dock">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={hint}
-          disabled={reps !== "learn" || hintUsed || busy || holdBook || ply >= opening.moves.length}
-          className="dock-btn"
-        >
-          <Lightbulb />
-          Hint
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={openAnalyze}
-          className="dock-btn"
-          data-testid="open-analyze"
-        >
-          <ScanSearch />
-          Analyze
-        </Button>
-        <Button variant="ghost" size="sm" onClick={restart} className="dock-btn">
-          <RotateCcw />
-          Restart
-        </Button>
-      </footer>
-
-      {lineMenuOpen ? (
-        <LineTreeMenu
-          opening={activeRoot}
-          trapId={lineId}
-          ply={ply}
-          onClose={() => setLineMenuOpen(false)}
-          onPickBranch={switchLine}
-          onOpenBook={() => {
-            setLineMenuOpen(false);
-            setBookOpen(true);
-          }}
-        />
-      ) : null}
-
-      {bookOpen ? (
-        <StudySheet
-          opening={activeRoot}
-          trapId={lineId}
-          onClose={() => setBookOpen(false)}
-          onSpine={() => switchLine(null)}
-          onLine={(id) => switchLine(id)}
-        />
-      ) : null}
-
-      {historyOpen && historyNow.length ? (
-        <HistorySplash
-          opening={opening}
-          milestones={historyNow}
-          orientation={orientation}
-          onClose={() => setHistoryOpen(false)}
-        />
-      ) : null}
-
-    </div>
+        }
+        evalBar={<BoardEvalBar orientation={orientation} />}
+        board={
+          <ChessBoard
+            fen={fen}
+            dests={dests}
+            lastMove={lastMove}
+            arrows={arrows}
+            mark={mark}
+            orientation={orientation}
+            turnColor={turnColor}
+            viewOnly={(busy && mode === "drill") || holdBook}
+            movableColor={movableColor}
+            check={check}
+            animationMs={MOVE_MS}
+            resyncKey={boardEpoch}
+            onMove={onMove}
+            onLongPress={openAnalyze}
+          />
+        }
+        panel={
+          <>
+            <p className="sr-only" role="status" aria-live="polite">
+              {status}
+            </p>
+            <div className="learn-readout" data-testid="move-note" data-book={holdBook ? "true" : undefined}>
+              <div className="learn-readout-head">
+                <p className="move-note-san">{note.san}</p>
+                {holdBook ? <span className="move-note-timer">Book</span> : null}
+                {historyNow.length ? (
+                  <HistoryMark
+                    glyph={historyNow[0].glyph}
+                    label={`${historyNow[0].title} (${historyNow[0].year})`}
+                    onClick={() => setHistoryOpen(true)}
+                  />
+                ) : null}
+              </div>
+              {choices.length > 1 ? (
+                <div
+                  className="branch-chooser"
+                  role="listbox"
+                  aria-label="Opponent alternatives"
+                  data-testid="branch-chooser"
+                >
+                  {choices.map((choice) => (
+                    <button
+                      key={choice.san}
+                      type="button"
+                      role="option"
+                      aria-selected={choice.selected}
+                      className={choice.selected ? "branch-chip branch-chip-on" : "branch-chip"}
+                      onClick={() => switchLine(choice.lineId)}
+                    >
+                      <span className="branch-chip-move">{choice.chip}</span>
+                      {choice.nickname ? <span className="branch-chip-nick">{choice.nickname}</span> : null}
+                    </button>
+                  ))}
+                </div>
+              ) : null}
+              {bookEnded ? (
+                <p className="explain-done" data-testid="book-ends">
+                  Book ends{line?.eco.name ? ` · ${line.eco.name}` : ""}
+                </p>
+              ) : mode === "plan" ? (
+                <p className="explain-done">Off book. Analyze from here.</p>
+              ) : null}
+              {note.comment ? (
+                <p className="explain-copy" data-testid="explain">
+                  {note.comment}
+                </p>
+              ) : null}
+              <BoardEvalReadout />
+            </div>
+          </>
+        }
+        dock={
+          <>
+            <div className="learn-actions">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={hint}
+                disabled={reps !== "learn" || hintUsed || busy || holdBook || ply >= opening.moves.length}
+                className="dock-btn"
+              >
+                <Lightbulb />
+                Hint
+              </Button>
+              <Button variant="ghost" size="sm" onClick={openAnalyze} className="dock-btn" data-testid="open-analyze">
+                <ScanSearch />
+                Analyze
+              </Button>
+              <Button variant="ghost" size="sm" onClick={restart} className="dock-btn">
+                <RotateCcw />
+                Restart
+              </Button>
+            </div>
+            <NavControls
+              onBack={stepBack}
+              onForward={stepForward}
+              canBack={canBack}
+              canForward={canForward}
+              lastSan={played.at(-1) ?? "Start"}
+            />
+          </>
+        }
+        overlays={
+          <>
+            {lineMenuOpen ? (
+              <LineTreeMenu
+                opening={activeRoot}
+                trapId={lineId}
+                ply={ply}
+                onClose={() => setLineMenuOpen(false)}
+                onPickBranch={switchLine}
+                onOpenBook={() => {
+                  setLineMenuOpen(false);
+                  setBookOpen(true);
+                }}
+              />
+            ) : null}
+            {bookOpen ? (
+              <StudySheet
+                opening={activeRoot}
+                trapId={lineId}
+                onClose={() => setBookOpen(false)}
+                onSpine={() => switchLine(null)}
+                onLine={(id) => switchLine(id)}
+              />
+            ) : null}
+            {historyOpen && historyNow.length ? (
+              <HistorySplash
+                opening={opening}
+                milestones={historyNow}
+                orientation={orientation}
+                onClose={() => setHistoryOpen(false)}
+              />
+            ) : null}
+          </>
+        }
+      />
+    </BoardEngines>
   );
 }

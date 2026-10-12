@@ -1,18 +1,19 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import Link from "next/link";
 import { Chess, type Square } from "chess.js";
 import type { Key } from "@lichess-org/chessground/types";
-import { ChevronLeft, Clipboard, Cpu, FlipVertical2 } from "lucide-react";
+import { Clipboard, Cpu, FlipVertical2 } from "lucide-react";
 
+import { BoardShell } from "@/components/board/board-shell";
 import { ChessBoard, type BoardArrow } from "@/components/board/chess-board";
 import { EvalBar } from "@/components/board/eval-bar";
+import { HeaderBar } from "@/components/board/header-bar";
+import { NavControls } from "@/components/board/nav-controls";
 import { EngineMenu } from "@/components/analyze/engine-menu";
 import { EvalGraph } from "@/components/analyze/eval-graph";
 import { MoveTreeView } from "@/components/analyze/move-tree-view";
 import { NotationSheet } from "@/components/analyze/notation-sheet";
-import { PlyNav } from "@/components/drill/ply-nav";
 import { useAnalysis } from "@/components/drill/use-analysis";
 import { Button } from "@/components/ui/button";
 import { needsPromotion, toDests } from "@/lib/chess/dests";
@@ -180,54 +181,54 @@ export function AnalyzeScreen({
   );
 
   return (
-    <div className="analyze-page" data-testid="analyze-screen" data-fen={pos.fen}>
-      <header className="analyze-top">
-        <Button asChild variant="ghost" size="icon-sm">
-          <Link href={backHref} aria-label="Back to Learn">
-            <ChevronLeft />
-          </Link>
-        </Button>
-        <div className="analyze-heading">
-          <p className="analyze-kicker">{kicker}</p>
-          <h1>{heading}</h1>
-        </div>
-        <Button
-          variant="ghost"
-          size="icon-sm"
-          aria-label="Engine"
-          aria-expanded={menu === "engine"}
-          onClick={() => setMenu("engine")}
-        >
-          <Cpu />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon-sm"
-          aria-label="PGN and FEN"
-          aria-expanded={menu === "notation"}
-          onClick={() => setMenu("notation")}
-        >
-          <Clipboard />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon-sm"
-          aria-label="Flip board"
-          onClick={() => setOrientation((current) => (current === "white" ? "black" : "white"))}
-        >
-          <FlipVertical2 />
-        </Button>
-      </header>
-
-      <div className="analyze-board-row">
-        <div className="analyze-rail" data-testid="eval-bar">
-          <EvalBar tick={tick} orientation={orientation} layout="vertical" pending={pending} showLabel={false} />
-        </div>
-        <div
-          className="analyze-board"
-          data-arrow={arrows[0] ? `${arrows[0].orig}${arrows[0].dest}` : ""}
-          data-testid="best-move-arrow"
-        >
+    <BoardShell
+      testId="analyze-screen"
+      fen={pos.fen}
+      header={
+        <HeaderBar
+          backHref={backHref}
+          backLabel="Back to Learn"
+          kicker={kicker}
+          title={heading}
+          actions={
+            <>
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                aria-label="Engine"
+                aria-expanded={menu === "engine"}
+                onClick={() => setMenu("engine")}
+              >
+                <Cpu />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                aria-label="PGN and FEN"
+                aria-expanded={menu === "notation"}
+                onClick={() => setMenu("notation")}
+              >
+                <Clipboard />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                aria-label="Flip board"
+                onClick={() => setOrientation((current) => (current === "white" ? "black" : "white"))}
+              >
+                <FlipVertical2 />
+              </Button>
+            </>
+          }
+        />
+      }
+      evalBar={
+        <EvalBar tick={tick} orientation={orientation} layout="vertical" pending={pending} showLabel={false} />
+      }
+      wellTestId="best-move-arrow"
+      wellArrow={arrows[0] ? `${arrows[0].orig}${arrows[0].dest}` : ""}
+      board={
+        <>
           <ChessBoard
             fen={pos.fen}
             dests={dests}
@@ -258,10 +259,10 @@ export function AnalyzeScreen({
               ))}
             </div>
           ) : null}
-        </div>
-      </div>
-
-      <div className="analyze-scroll">
+        </>
+      }
+      panel={
+        <>
         <div className="analyze-status">
           <span data-testid="engine-phase">{phaseLabel(phase)}</span>
           <strong data-testid="engine-depth">{pending ? "d…" : `d${view.depth}`}</strong>
@@ -350,10 +351,10 @@ export function AnalyzeScreen({
             setTree((current) => jumpTo(current, path));
           }}
         />
-      </div>
-
-      <div className="analyze-dock">
-        <PlyNav
+        </>
+      }
+      dock={
+        <NavControls
           canBack={canStepBack(tree)}
           canForward={canStepForward(tree)}
           lastSan={pos.san ?? "Start"}
@@ -366,8 +367,9 @@ export function AnalyzeScreen({
             setTree((current) => stepForward(current));
           }}
         />
-      </div>
-
+      }
+      overlays={
+        <>
       {menu === "engine" ? (
         <EngineMenu
           infinite={infinite}
@@ -392,7 +394,9 @@ export function AnalyzeScreen({
           onClose={() => setMenu(null)}
         />
       ) : null}
-    </div>
+        </>
+      }
+    />
   );
 }
 
