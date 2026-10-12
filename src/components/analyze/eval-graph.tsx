@@ -1,11 +1,39 @@
 "use client";
 
-import { graphPoints, type AnalysisTree } from "@/lib/chess/tree";
+import { useRef, type PointerEvent } from "react";
+import { chartAreas, evalUnit, gridMarks, plyIndexAt, unitToY } from "@/lib/chess/eval-chart";
+import { graphPoints, type AnalysisTree, type GraphPoint } from "@/lib/chess/tree";
 
-function tilt(cp: number | null, mate: number | null): number | null {
-  if (mate != null && mate !== 0) return mate > 0 ? 0.96 : -0.96;
-  if (cp == null) return null;
-  return Math.tanh(cp / 380);
+const VB = 1000;
+
+function place(point: { x: number; y: number }): string {
+  return `${(point.x * VB).toFixed(2)} ${(point.y * 100).toFixed(2)}`;
+}
+
+function areaPath(curve: { x: number; y: number }[]): string {
+  const first = curve[0];
+  const last = curve[curve.length - 1];
+  if (!first || !last) return "";
+  const edge = curve.map((point) => `L${place(point)}`).join(" ");
+  return `M${(first.x * VB).toFixed(2)} 50 ${edge} L${(last.x * VB).toFixed(2)} 50 Z`;
+}
+
+function curvePath(curve: { x: number; y: number }[]): string {
+  return curve
+    .map((point, index) => `${index === 0 ? "M" : "L"}${place(point)}`)
+    .join(" ");
+}
+
+function describe(point: GraphPoint | undefined): string {
+  if (!point) return "Evaluation chart";
+  const where = point.san ?? "start";
+  if (point.mate != null && point.mate !== 0) {
+    const mate = point.mate > 0 ? `M${point.mate}` : `-M${Math.abs(point.mate)}`;
+    return `${where}, ${mate}`;
+  }
+  if (point.cp == null) return `${where}, no eval`;
+  const pawns = (point.cp / 100).toFixed(1);
+  return `${where}, ${point.cp > 0 ? `+${pawns}` : pawns}`;
 }
 
 export function EvalGraph({
@@ -16,65 +44,87 @@ export function EvalGraph({
   onJump: (path: number[]) => void;
 }) {
   const points = graphPoints(tree);
-  const width = 100;
-  const height = 36;
-  const top = 4;
-  const bottom = 32;
-  const mid = (top + bottom) / 2;
-  const span = Math.max(points.length - 1, 1);
-  const xAt = (index: number) => (points.length === 1 ? width / 2 : (index / span) * width);
-  const yAt = (value: number) => mid - value * (mid - top);
+  const units = points.map((point) => evalUnit(point.cp, point.mate));
+  const areas = chartAreas(units);
+  const cursor = Math.min(tree.path.length, Math.max(points.length - 1, 0));
+  const cursorUnit = units[cursor] ?? null;
+  const cursorX = points.length <= 1 ? 0.5 : cursor / Math.max(points.length - 1, 1);
+  const lastIndex = useRef<number | null>(null);
 
-  const segments: string[] = [];
-  let current = "";
-  points.forEach((point, index) => {
-    const value = tilt(point.cp, point.mate);
-    if (value == null) {
-      if (current) segments.push(current);
-      current = "";
-      return;
-    }
-    const command = `${current ? "L" : "M"}${xAt(index).toFixed(2)} ${yAt(value).toFixed(2)}`;
-    current = current ? `${current} ${command}` : command;
-  });
-  if (current) segments.push(current);
-
-  const cursor = Math.min(tree.path.length, points.length - 1);
-  const cursorPoint = points[cursor];
-  const cursorValue = cursorPoint ? tilt(cursorPoint.cp, cursorPoint.mate) : null;
+  const seek = (event: PointerEvent<HTMLDivElement>) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    if (rect.width <= 0 || points.length === 0) return;
+    const index = plyIndexAt((event.clientX - rect.left) / rect.width, points.length);
+    if (lastIndex.current === index) return;
+    lastIndex.current = index;
+    const point = points[index];
+    if (point) onJump(point.path);
+  };
 
   return (
-    <button
-      type="button"
+    <div
       className="analyze-graph"
       data-testid="eval-graph"
-      aria-label="Evaluation graph. Tap to jump to a move."
-      onClick={(event) => {
-        const rect = event.currentTarget.getBoundingClientRect();
-        if (!rect.width || points.length === 0) return;
-        const ratio = Math.min(1, Math.max(0, (event.clientX - rect.left) / rect.width));
-        const index = Math.round(ratio * span);
-        const point = points[index];
-        if (point) onJump(point.path);
+      data-areas={areas.length}
+      role="slider"
+      tabIndex={0}
+      aria-label="Evaluation chart. Drag to jump to a move."
+      aria-valuemin={0}
+      aria-valuemax={Math.max(points.length - 1, 0)}
+      aria-valuenow={cursor}
+      aria-valuetext={describe(points[cursor])}
+      onPointerDown={(event) => {
+        if (event.button !== 0) return;
+        event.currentTarget.setPointerCapture(event.pointerId);
+        lastIndex.current = null;
+        seek(event);
+      }}
+      onPointerMove={(event) => {
+        if (!event.currentTarget.hasPointerCapture(event.pointerId)) return;
+        seek(event);
+      }}
+      onPointerUp={() => {
+        lastIndex.current = null;
+      }}
+      onPointerCancel={() => {
+        lastIndex.current = null;
       }}
     >
-      <svg viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" aria-hidden>
-        <line x1="0" x2={width} y1={mid} y2={mid} className="analyze-graph-zero" />
-        {segments.map((d) => (
-          <path key={d} d={d} className="analyze-graph-line" />
-        ))}
-        {cursorValue != null ? (
-          <circle cx={xAt(cursor)} cy={yAt(cursorValue)} r="1.7" className="analyze-graph-mark" />
-        ) : (
-          <line
-            x1={xAt(cursor)}
-            x2={xAt(cursor)}
-            y1={top}
-            y2={bottom}
-            className="analyze-graph-cursor"
+      <svg viewBox={`0 0 ${VB} 100`} preserveAspectRatio="none" aria-hidden>
+        {areas.map((area, index) => (
+          <path
+            key={`${area.side}-${index}-${area.curve[0]?.x}`}
+            d={areaPath(area.curve)}
+            className={area.side === "white" ? "analyze-graph-fill-w" : "analyze-graph-fill-b"}
           />
-        )}
+        ))}
+        {areas.map((area, index) => (
+          <path
+            key={`edge-${area.side}-${index}-${area.curve[0]?.x}`}
+            d={curvePath(area.curve)}
+            className={area.side === "white" ? "analyze-graph-edge-w" : "analyze-graph-edge-b"}
+            vectorEffect="non-scaling-stroke"
+          />
+        ))}
+        {gridMarks().map((mark) => (
+          <line
+            key={`${mark.pawns}`}
+            x1="0"
+            x2={VB}
+            y1={mark.y * 100}
+            y2={mark.y * 100}
+            className={mark.axis ? "analyze-graph-zero" : "analyze-graph-grid"}
+            vectorEffect="non-scaling-stroke"
+          />
+        ))}
       </svg>
-    </button>
+      <span className="analyze-graph-cursor" style={{ left: `${cursorX * 100}%` }} />
+      {cursorUnit != null ? (
+        <span
+          className={`analyze-graph-dot ${cursorUnit < 0 ? "is-black" : "is-white"}`}
+          style={{ left: `${cursorX * 100}%`, top: `${unitToY(cursorUnit) * 100}%` }}
+        />
+      ) : null}
+    </div>
   );
 }
