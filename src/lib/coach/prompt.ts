@@ -19,6 +19,8 @@ export const COACH_SYSTEM = [
   "Keep the answer to at most four short sentences.",
   "Reply in the language the user writes in. English and Sinhala both work. If the question is in Sinhala, answer in Sinhala. If it is in English, answer in English.",
   "No accounts, no quizzes, no streaks.",
+  "Return one JSON object and nothing else: {\"text\":\"...\",\"arrows\":[\"f1c4\"],\"squares\":[\"f7\"]}.",
+  "text is the spoken answer. arrows are UCI moves that are each legal from the given FEN. squares are board squares the answer mentions. Use empty arrays when you are not pointing at a move. Do not send a multi-move line, and do not invent an illegal move.",
 ].join(" ");
 
 function formatEval(cp: number | null, mate: number | null): string {

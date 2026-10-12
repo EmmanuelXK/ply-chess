@@ -22,6 +22,7 @@ import { HistoryMark } from "@/components/drill/history-mark";
 import { LineTreeMenu } from "@/components/drill/line-tree-menu";
 import { HistorySplash } from "@/components/drill/history-splash";
 import { ModeToggle } from "@/components/drill/mode-toggle";
+import { PlanCard } from "@/components/drill/plan-card";
 import { PracticeMiss } from "@/components/drill/practice-miss";
 import { StudySheet } from "@/components/drill/study-sheet";
 import { lastMoveFrom, needsPromotion, toDests } from "@/lib/chess/dests";
@@ -29,7 +30,10 @@ import { playLine } from "@/lib/chess/line";
 import { BoardEngines, BoardEvalBar, BoardEvalReadout } from "@/components/drill/board-engines";
 import { gradeBookPly } from "@/lib/chess/move-quality";
 import { moveNoteAt } from "@/lib/openings/move-note";
-import { judgeUserMove, pickReply, storedReplies } from "@/lib/openings/practice";
+import { fetchCrowd } from "@/lib/explorer/client";
+import { pickWeighted } from "@/lib/explorer/crowd";
+import { planForLine } from "@/lib/openings/line-plan";
+import { judgeUserMove, storedReplies } from "@/lib/openings/practice";
 import {
   DAILY_QUEUE_CAP,
   introduceMove,
@@ -111,6 +115,10 @@ export function DrillScreen({
   const [trainer, setTrainer] = useState<"learn" | "practice">("learn");
   const [miss, setMiss] = useState<{ played: string; book: string; reason: string } | null>(null);
   const [awaitReply, setAwaitReply] = useState(false);
+  const [crowd, setCrowd] = useState<{ ply: number; san: string; percent: number } | null>(null);
+  const [planPick, setPlanPick] = useState(0);
+  const [shown, setShown] = useState<{ fen: string; arrows: string[]; squares: string[] } | null>(null);
+  const replyGen = useRef(0);
   const trainerRef = useRef(trainer);
   const lineIdRef = useRef(lineId);
   const missRef = useRef(miss);
@@ -338,6 +346,8 @@ export function DrillScreen({
     return { kind, square: lastMove[1] };
   }, [opening, ply, lastMove, onBook]);
 
+  const linePlan = bookEnded ? planForLine(line?.id) : null;
+  const planStep = linePlan?.steps[Math.min(planPick, Math.max(0, linePlan.steps.length - 1))] ?? null;
   const arrows = useMemo<BoardArrow[]>(() => {
     const next: BoardArrow[] = [];
     if (lastMove && lastMove.length === 2) {
@@ -346,8 +356,33 @@ export function DrillScreen({
     if (hintKeys && hintKeys.length === 2) {
       next.push({ orig: hintKeys[0], dest: hintKeys[1], brush: "hint" });
     }
+    if (planStep?.uci && planStep.uci.length >= 4) {
+      next.push({
+        orig: planStep.uci.slice(0, 2) as Key,
+        dest: planStep.uci.slice(2, 4) as Key,
+        brush: "blue",
+      });
+    }
+    if (shown && shown.fen === fen) {
+      for (const uci of shown.arrows) {
+        if (uci.length < 4) continue;
+        next.push({
+          orig: uci.slice(0, 2) as Key,
+          dest: uci.slice(2, 4) as Key,
+          brush: "green",
+        });
+      }
+    }
     return next;
-  }, [lastMove, hintKeys]);
+  }, [fen, hintKeys, lastMove, planStep, shown]);
+  const circles = useMemo<Key[]>(() => {
+    const marks: Key[] = [];
+    if (planStep?.square && !planStep.uci) marks.push(planStep.square as Key);
+    if (shown && shown.fen === fen) {
+      for (const square of shown.squares) marks.push(square as Key);
+    }
+    return marks;
+  }, [fen, planStep, shown]);
 
   const onMove = useCallback(
     (from: Key, to: Key) => {
@@ -503,6 +538,7 @@ export function DrillScreen({
 
   const stepBack = useCallback(() => {
     cancelTimer();
+    replyGen.current += 1;
     setHold(false);
     setMiss(null);
     setAwaitReply(false);
@@ -594,15 +630,29 @@ export function DrillScreen({
     [activeRoot.lines, applyPly, cancelTimer, lineId, opening.moves],
   );
   const playStoredReply = useCallback(() => {
+    const generation = ++replyGen.current;
     const currentPly = plyRef.current;
+    const fenNow = gameRef.current.fen();
     const prefix = gameRef.current.history();
-    const pick = pickReply(storedReplies(activeRoot, prefix));
-    if (!pick) return;
-    if (opening.moves[currentPly] === pick.san) {
-      applyPly(currentPly + 1);
-      return;
-    }
-    switchLine(pick.lineId, currentPly + 1);
+    const replies = storedReplies(activeRoot, prefix);
+    void (async () => {
+      const table = await fetchCrowd(fenNow);
+      if (generation !== replyGen.current) return;
+      if (trainerRef.current !== "practice" || missRef.current) return;
+      if (plyRef.current !== currentPly) return;
+      const picked = pickWeighted(replies, table, fenNow);
+      if (!picked) return;
+      if (picked.percent != null) {
+        setCrowd({ ply: currentPly + 1, san: picked.reply.san, percent: picked.percent });
+      } else {
+        setCrowd(null);
+      }
+      if (opening.moves[currentPly] === picked.reply.san) {
+        applyPly(currentPly + 1);
+        return;
+      }
+      switchLine(picked.reply.lineId, currentPly + 1);
+    })();
   }, [activeRoot, applyPly, opening.moves, switchLine]);
   useEffect(() => {
     switchLineRef.current = switchLine;
@@ -673,6 +723,7 @@ export function DrillScreen({
                   onChange={(next) => {
                     setTrainer(next);
                     setMiss(null);
+                    replyGen.current += 1;
                     if (
                       next === "practice" &&
                       !isUserPly(opening.side, plyRef.current) &&
@@ -715,6 +766,7 @@ export function DrillScreen({
             dests={dests}
             lastMove={lastMove}
             arrows={arrows}
+            circles={circles}
             mark={mark}
             orientation={orientation}
             turnColor={turnColor}
@@ -769,12 +821,19 @@ export function DrillScreen({
                   ))}
                 </div>
               ) : null}
-              {bookEnded ? (
+              {linePlan ? (
+                <PlanCard plan={linePlan} selected={planPick} onSelect={setPlanPick} />
+              ) : bookEnded ? (
                 <p className="explain-done" data-testid="book-ends">
                   Book ends{line?.eco.name ? ` · ${line.eco.name}` : ""}
                 </p>
               ) : mode === "plan" ? (
                 <p className="explain-done">Off book. Analyze from here.</p>
+              ) : null}
+              {trainer === "practice" && crowd && crowd.ply === ply && !miss ? (
+                <p className="crowd-hint" data-testid="crowd-hint">
+                  played by {crowd.percent}% of players
+                </p>
               ) : null}
               {note.comment ? (
                 <p className="explain-copy" data-testid="explain">
@@ -868,6 +927,7 @@ export function DrillScreen({
                 best: bookEval?.best ?? null,
                 note: note.comment ?? null,
               }}
+              onShow={(mark) => setShown({ fen, arrows: mark.arrows, squares: mark.squares })}
             />
           </>
         }

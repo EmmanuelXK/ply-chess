@@ -1,0 +1,2563 @@
+[
+  {
+    "lineId": "alapin--0",
+    "steps": [
+      {
+        "text": "Put a rook on c1 and work that file. Stockfish ranks this first.",
+        "uci": "a1c1",
+        "square": "c1"
+      },
+      {
+        "text": "Plant the knight on d5.",
+        "uci": "c3d5",
+        "square": "d5"
+      },
+      {
+        "text": "Aim the bishop at a6.",
+        "uci": "e2a6",
+        "square": "a6"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "alapin--1",
+    "steps": [
+      {
+        "text": "Bring the knight to d7. Stockfish ranks this first.",
+        "uci": "e5d7",
+        "square": "d7"
+      },
+      {
+        "text": "Push d5.",
+        "uci": "d4d5",
+        "square": "d5"
+      },
+      {
+        "text": "Push f3.",
+        "uci": "f2f3",
+        "square": "f3"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "alapin--2",
+    "steps": [
+      {
+        "text": "Break with dxc5.",
+        "uci": "d4c5",
+        "square": "c5"
+      },
+      {
+        "text": "Aim the bishop at a6.",
+        "uci": "f1a6",
+        "square": "a6"
+      },
+      {
+        "text": "Aim the bishop at b5.",
+        "uci": "f1b5",
+        "square": "b5"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "alapin--3",
+    "steps": [
+      {
+        "text": "Plant the knight on d5.",
+        "uci": "c3d5",
+        "square": "d5"
+      },
+      {
+        "text": "Push d5.",
+        "uci": "d4d5",
+        "square": "d5"
+      },
+      {
+        "text": "Aim the bishop at a6.",
+        "uci": "e2a6",
+        "square": "a6"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "alekhine--0",
+    "steps": [
+      {
+        "text": "Plant the knight on c4.",
+        "uci": "b6c4",
+        "square": "c4"
+      },
+      {
+        "text": "Push e5.",
+        "uci": "e6e5",
+        "square": "e5"
+      },
+      {
+        "text": "Aim the bishop at d4.",
+        "uci": "f6d4",
+        "square": "d4"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "alekhine--1",
+    "steps": [
+      {
+        "text": "Plant the knight on c4.",
+        "uci": "b6c4",
+        "square": "c4"
+      },
+      {
+        "text": "Push c5.",
+        "uci": "c7c5",
+        "square": "c5"
+      },
+      {
+        "text": "Push c6.",
+        "uci": "c7c6",
+        "square": "c6"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "alekhine--2",
+    "steps": [
+      {
+        "text": "Push e5. Stockfish ranks this first.",
+        "uci": "e7e5",
+        "square": "e5"
+      },
+      {
+        "text": "Plant the knight on c4.",
+        "uci": "b6c4",
+        "square": "c4"
+      },
+      {
+        "text": "Push d5.",
+        "uci": "d6d5",
+        "square": "d5"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "alekhine--3",
+    "steps": [
+      {
+        "text": "Plant the knight on e5.",
+        "uci": "d7e5",
+        "square": "e5"
+      },
+      {
+        "text": "Push c5.",
+        "uci": "c7c5",
+        "square": "c5"
+      },
+      {
+        "text": "Push c6.",
+        "uci": "c7c6",
+        "square": "c6"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "benko--0",
+    "steps": [
+      {
+        "text": "Plant the knight on d5.",
+        "uci": "f6d5",
+        "square": "d5"
+      },
+      {
+        "text": "Push c4.",
+        "uci": "c5c4",
+        "square": "c4"
+      },
+      {
+        "text": "Push e5.",
+        "uci": "e7e5",
+        "square": "e5"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "benko--1",
+    "steps": [
+      {
+        "text": "Castle kingside and connect the rooks.",
+        "uci": "e8g8",
+        "square": "g8"
+      },
+      {
+        "text": "Plant the knight on d5.",
+        "uci": "f6d5",
+        "square": "d5"
+      },
+      {
+        "text": "Plant the knight on e4.",
+        "uci": "f6e4",
+        "square": "e4"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "benko--2",
+    "steps": [
+      {
+        "text": "Castle kingside and connect the rooks.",
+        "uci": "e8g8",
+        "square": "g8"
+      },
+      {
+        "text": "Plant the knight on d5.",
+        "uci": "f6d5",
+        "square": "d5"
+      },
+      {
+        "text": "Plant the knight on e4.",
+        "uci": "f6e4",
+        "square": "e4"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "benko--3",
+    "steps": [
+      {
+        "text": "Plant the knight on d5.",
+        "uci": "f6d5",
+        "square": "d5"
+      },
+      {
+        "text": "Push c4.",
+        "uci": "c5c4",
+        "square": "c4"
+      },
+      {
+        "text": "Push d6.",
+        "uci": "d7d6",
+        "square": "d6"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "benko--4",
+    "steps": [
+      {
+        "text": "Plant the knight on d5.",
+        "uci": "f6d5",
+        "square": "d5"
+      },
+      {
+        "text": "Push c4.",
+        "uci": "c5c4",
+        "square": "c4"
+      },
+      {
+        "text": "Push d6.",
+        "uci": "d7d6",
+        "square": "d6"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "benko--5",
+    "steps": [
+      {
+        "text": "Bring the queen to a5 behind the pieces. Stockfish ranks this first.",
+        "uci": "d8a5",
+        "square": "a5"
+      },
+      {
+        "text": "Push c4.",
+        "uci": "c5c4",
+        "square": "c4"
+      },
+      {
+        "text": "Push d6.",
+        "uci": "d7d6",
+        "square": "d6"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "black-lion--0",
+    "steps": [
+      {
+        "text": "Plant the knight on e4.",
+        "uci": "f6e4",
+        "square": "e4"
+      },
+      {
+        "text": "Push c5.",
+        "uci": "c6c5",
+        "square": "c5"
+      },
+      {
+        "text": "Push d5.",
+        "uci": "d6d5",
+        "square": "d5"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "black-lion--1",
+    "steps": [
+      {
+        "text": "Plant the knight on e4.",
+        "uci": "f6e4",
+        "square": "e4"
+      },
+      {
+        "text": "Push c5.",
+        "uci": "c6c5",
+        "square": "c5"
+      },
+      {
+        "text": "Plant the knight on c5.",
+        "uci": "d7c5",
+        "square": "c5"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "black-lion--2",
+    "steps": [
+      {
+        "text": "Bring the queen to b6 behind the pieces. Stockfish ranks this first.",
+        "uci": "d8b6",
+        "square": "b6"
+      },
+      {
+        "text": "Plant the knight on e5.",
+        "uci": "d7e5",
+        "square": "e5"
+      },
+      {
+        "text": "Push c5.",
+        "uci": "c6c5",
+        "square": "c5"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "budapest--0",
+    "steps": [
+      {
+        "text": "Plant the knight on c4.",
+        "uci": "e5c4",
+        "square": "c4"
+      },
+      {
+        "text": "Push c5.",
+        "uci": "c7c5",
+        "square": "c5"
+      },
+      {
+        "text": "Push c6.",
+        "uci": "c7c6",
+        "square": "c6"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "budapest--1",
+    "steps": [
+      {
+        "text": "Plant the knight on c4.",
+        "uci": "e5c4",
+        "square": "c4"
+      },
+      {
+        "text": "Push c6.",
+        "uci": "c7c6",
+        "square": "c6"
+      },
+      {
+        "text": "Push d5.",
+        "uci": "d7d5",
+        "square": "d5"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "budapest--2",
+    "steps": [
+      {
+        "text": "Push d5.",
+        "uci": "d7d5",
+        "square": "d5"
+      },
+      {
+        "text": "Plant the knight on c5.",
+        "uci": "a6c5",
+        "square": "c5"
+      },
+      {
+        "text": "Plant the knight on d4.",
+        "uci": "c6d4",
+        "square": "d4"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "budapest--3",
+    "steps": [
+      {
+        "text": "Push a6. Stockfish ranks this first.",
+        "uci": "a7a6",
+        "square": "a6"
+      },
+      {
+        "text": "Plant the knight on c6.",
+        "uci": "b8c6",
+        "square": "c6"
+      },
+      {
+        "text": "Plant the knight on d5.",
+        "uci": "f6d5",
+        "square": "d5"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "budapest--4",
+    "steps": [
+      {
+        "text": "Plant the knight on d5.",
+        "uci": "f6d5",
+        "square": "d5"
+      },
+      {
+        "text": "Push c4.",
+        "uci": "c5c4",
+        "square": "c4"
+      },
+      {
+        "text": "Push d6.",
+        "uci": "d7d6",
+        "square": "d6"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "caro-fantasy--0",
+    "steps": [
+      {
+        "text": "Plant the knight on d4.",
+        "uci": "f3d4",
+        "square": "d4"
+      },
+      {
+        "text": "Push c3.",
+        "uci": "c2c3",
+        "square": "c3"
+      },
+      {
+        "text": "Push e5.",
+        "uci": "e4e5",
+        "square": "e5"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "caro-fantasy--1",
+    "steps": [
+      {
+        "text": "Break with exd5.",
+        "uci": "e4d5",
+        "square": "d5"
+      },
+      {
+        "text": "Aim the bishop at b8.",
+        "uci": "f4b8",
+        "square": "b8"
+      },
+      {
+        "text": "Aim the bishop at a6.",
+        "uci": "f1a6",
+        "square": "a6"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "caro-fantasy--2",
+    "steps": [
+      {
+        "text": "Break with exd5.",
+        "uci": "e4d5",
+        "square": "d5"
+      },
+      {
+        "text": "Aim the bishop at a6.",
+        "uci": "f1a6",
+        "square": "a6"
+      },
+      {
+        "text": "Aim the bishop at b5.",
+        "uci": "f1b5",
+        "square": "b5"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "caro-fantasy--3",
+    "steps": [
+      {
+        "text": "Break with dxe5.",
+        "uci": "d4e5",
+        "square": "e5"
+      },
+      {
+        "text": "Plant the knight on e5.",
+        "uci": "f3e5",
+        "square": "e5"
+      },
+      {
+        "text": "Push d5.",
+        "uci": "d4d5",
+        "square": "d5"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "caro-kann--0",
+    "steps": [
+      {
+        "text": "Plant the knight on d4.",
+        "uci": "c6d4",
+        "square": "d4"
+      },
+      {
+        "text": "Push f6.",
+        "uci": "f7f6",
+        "square": "f6"
+      },
+      {
+        "text": "Plant the knight on d6.",
+        "uci": "f5d6",
+        "square": "d6"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "caro-kann--1",
+    "steps": [
+      {
+        "text": "Push c5.",
+        "uci": "c6c5",
+        "square": "c5"
+      },
+      {
+        "text": "Plant the knight on c5.",
+        "uci": "d7c5",
+        "square": "c5"
+      },
+      {
+        "text": "Plant the knight on d5.",
+        "uci": "f6d5",
+        "square": "d5"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "caro-kann--2",
+    "steps": [
+      {
+        "text": "Castle queenside and take the open file.",
+        "uci": "e8c8",
+        "square": "c8"
+      },
+      {
+        "text": "Plant the knight on d4.",
+        "uci": "c6d4",
+        "square": "d4"
+      },
+      {
+        "text": "Push e5.",
+        "uci": "e6e5",
+        "square": "e5"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "caro-kann--3",
+    "steps": [
+      {
+        "text": "Plant the knight on d4.",
+        "uci": "c6d4",
+        "square": "d4"
+      },
+      {
+        "text": "Push e5.",
+        "uci": "e6e5",
+        "square": "e5"
+      },
+      {
+        "text": "Aim the bishop at d4.",
+        "uci": "f6d4",
+        "square": "d4"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "caro-kann--4",
+    "steps": [
+      {
+        "text": "Push c5.",
+        "uci": "c6c5",
+        "square": "c5"
+      },
+      {
+        "text": "Plant the knight on c5.",
+        "uci": "d7c5",
+        "square": "c5"
+      },
+      {
+        "text": "Plant the knight on e5.",
+        "uci": "d7e5",
+        "square": "e5"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "carr-defence--0",
+    "steps": [
+      {
+        "text": "Castle queenside and take the open file.",
+        "uci": "e8c8",
+        "square": "c8"
+      },
+      {
+        "text": "Plant the knight on d4.",
+        "uci": "c6d4",
+        "square": "d4"
+      },
+      {
+        "text": "Plant the knight on e5.",
+        "uci": "c6e5",
+        "square": "e5"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "carr-defence--1",
+    "steps": [
+      {
+        "text": "Push c5.",
+        "uci": "c7c5",
+        "square": "c5"
+      },
+      {
+        "text": "Aim the bishop at h2.",
+        "uci": "d6h2",
+        "square": "h2"
+      },
+      {
+        "text": "Plant the knight on c6.",
+        "uci": "b8c6",
+        "square": "c6"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "carr-defence--2",
+    "steps": [
+      {
+        "text": "Castle kingside and connect the rooks.",
+        "uci": "e8g8",
+        "square": "g8"
+      },
+      {
+        "text": "Plant the knight on e4.",
+        "uci": "f6e4",
+        "square": "e4"
+      },
+      {
+        "text": "Aim the bishop at b4.",
+        "uci": "d6b4",
+        "square": "b4"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "carr-defence--3",
+    "steps": [
+      {
+        "text": "Push e5.",
+        "uci": "e6e5",
+        "square": "e5"
+      },
+      {
+        "text": "Aim the bishop at c3.",
+        "uci": "g7c3",
+        "square": "c3"
+      },
+      {
+        "text": "Plant the knight on c6.",
+        "uci": "b8c6",
+        "square": "c6"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "carr-defence--4",
+    "steps": [
+      {
+        "text": "Plant the knight on d5.",
+        "uci": "f6d5",
+        "square": "d5"
+      },
+      {
+        "text": "Push e5.",
+        "uci": "e6e5",
+        "square": "e5"
+      },
+      {
+        "text": "Plant the knight on c6.",
+        "uci": "b8c6",
+        "square": "c6"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "carr-defence--5",
+    "steps": [
+      {
+        "text": "Break with cxd4.",
+        "uci": "c5d4",
+        "square": "d4"
+      },
+      {
+        "text": "Plant the knight on c6.",
+        "uci": "b8c6",
+        "square": "c6"
+      },
+      {
+        "text": "Plant the knight on d5.",
+        "uci": "f6d5",
+        "square": "d5"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "carr-defence--6",
+    "steps": [
+      {
+        "text": "Plant the knight on e5.",
+        "uci": "c6e5",
+        "square": "e5"
+      },
+      {
+        "text": "Push d4.",
+        "uci": "d5d4",
+        "square": "d4"
+      },
+      {
+        "text": "Push f5.",
+        "uci": "f7f5",
+        "square": "f5"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "carr-defence--7",
+    "steps": [
+      {
+        "text": "Plant the knight on c6.",
+        "uci": "b8c6",
+        "square": "c6"
+      },
+      {
+        "text": "Push c5.",
+        "uci": "c7c5",
+        "square": "c5"
+      },
+      {
+        "text": "Push c6.",
+        "uci": "c7c6",
+        "square": "c6"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "carr-defence--8",
+    "steps": [
+      {
+        "text": "Castle kingside and connect the rooks.",
+        "uci": "e8g8",
+        "square": "g8"
+      },
+      {
+        "text": "Plant the knight on d4.",
+        "uci": "c6d4",
+        "square": "d4"
+      },
+      {
+        "text": "Plant the knight on e4.",
+        "uci": "f6e4",
+        "square": "e4"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "dragon--0",
+    "steps": [
+      {
+        "text": "Plant the knight on e4.",
+        "uci": "f6e4",
+        "square": "e4"
+      },
+      {
+        "text": "Push d5.",
+        "uci": "d6d5",
+        "square": "d5"
+      },
+      {
+        "text": "Push e6.",
+        "uci": "e7e6",
+        "square": "e6"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "dragon--1",
+    "steps": [
+      {
+        "text": "Push f5.",
+        "uci": "f7f5",
+        "square": "f5"
+      },
+      {
+        "text": "Plant the knight on f4.",
+        "uci": "d5f4",
+        "square": "f4"
+      },
+      {
+        "text": "Plant the knight on f6.",
+        "uci": "d5f6",
+        "square": "f6"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "dragon--2",
+    "steps": [
+      {
+        "text": "Plant the knight on e4.",
+        "uci": "f6e4",
+        "square": "e4"
+      },
+      {
+        "text": "Push d5.",
+        "uci": "d6d5",
+        "square": "d5"
+      },
+      {
+        "text": "Aim the bishop at g4.",
+        "uci": "e6g4",
+        "square": "g4"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "dragon--3",
+    "steps": [
+      {
+        "text": "Plant the knight on e4.",
+        "uci": "f6e4",
+        "square": "e4"
+      },
+      {
+        "text": "Push d5.",
+        "uci": "d6d5",
+        "square": "d5"
+      },
+      {
+        "text": "Aim the bishop at b3.",
+        "uci": "e6b3",
+        "square": "b3"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "dragon--4",
+    "steps": [
+      {
+        "text": "Plant the knight on d4.",
+        "uci": "c6d4",
+        "square": "d4"
+      },
+      {
+        "text": "Push e6.",
+        "uci": "e7e6",
+        "square": "e6"
+      },
+      {
+        "text": "Push f5.",
+        "uci": "f7f5",
+        "square": "f5"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "dragon--5",
+    "steps": [
+      {
+        "text": "Plant the knight on d4.",
+        "uci": "c6d4",
+        "square": "d4"
+      },
+      {
+        "text": "Push f5.",
+        "uci": "f7f5",
+        "square": "f5"
+      },
+      {
+        "text": "Push f6.",
+        "uci": "f7f6",
+        "square": "f6"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "dragon--6",
+    "steps": [
+      {
+        "text": "Push a6. Stockfish ranks this first.",
+        "uci": "a7a6",
+        "square": "a6"
+      },
+      {
+        "text": "Aim the bishop at b2.",
+        "uci": "g7b2",
+        "square": "b2"
+      },
+      {
+        "text": "Plant the knight on f6.",
+        "uci": "g8f6",
+        "square": "f6"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "dragon--7",
+    "steps": [
+      {
+        "text": "Push c4.",
+        "uci": "c5c4",
+        "square": "c4"
+      },
+      {
+        "text": "Plant the knight on d4.",
+        "uci": "c6d4",
+        "square": "d4"
+      },
+      {
+        "text": "Plant the knight on d5.",
+        "uci": "e7d5",
+        "square": "d5"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "dutch-leningrad--0",
+    "steps": [
+      {
+        "text": "Plant the knight on d5.",
+        "uci": "f6d5",
+        "square": "d5"
+      },
+      {
+        "text": "Push c5.",
+        "uci": "c7c5",
+        "square": "c5"
+      },
+      {
+        "text": "Push c6.",
+        "uci": "c7c6",
+        "square": "c6"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "dutch-leningrad--1",
+    "steps": [
+      {
+        "text": "Push c6. Stockfish ranks this first.",
+        "uci": "c7c6",
+        "square": "c6"
+      },
+      {
+        "text": "Aim the bishop at d4.",
+        "uci": "g7d4",
+        "square": "d4"
+      },
+      {
+        "text": "Plant the knight on c6.",
+        "uci": "b8c6",
+        "square": "c6"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "dutch-leningrad--2",
+    "steps": [
+      {
+        "text": "Push f5. Stockfish ranks this first.",
+        "uci": "f6f5",
+        "square": "f5"
+      },
+      {
+        "text": "Plant the knight on d6.",
+        "uci": "f7d6",
+        "square": "d6"
+      },
+      {
+        "text": "Plant the knight on e5.",
+        "uci": "f7e5",
+        "square": "e5"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "dutch-leningrad--3",
+    "steps": [
+      {
+        "text": "Push c5.",
+        "uci": "c6c5",
+        "square": "c5"
+      },
+      {
+        "text": "Aim the bishop at a3.",
+        "uci": "f8a3",
+        "square": "a3"
+      },
+      {
+        "text": "Aim the bishop at b4.",
+        "uci": "f8b4",
+        "square": "b4"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "english--0",
+    "steps": [
+      {
+        "text": "Put a rook on e1 and work that file. Stockfish ranks this first.",
+        "uci": "a1e1",
+        "square": "e1"
+      },
+      {
+        "text": "Break with exf5.",
+        "uci": "e4f5",
+        "square": "f5"
+      },
+      {
+        "text": "Plant the knight on d4.",
+        "uci": "e2d4",
+        "square": "d4"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "english--1",
+    "steps": [
+      {
+        "text": "Push a3. Stockfish ranks this first.",
+        "uci": "a2a3",
+        "square": "a3"
+      },
+      {
+        "text": "Plant the knight on e5.",
+        "uci": "f3e5",
+        "square": "e5"
+      },
+      {
+        "text": "Push d4.",
+        "uci": "d3d4",
+        "square": "d4"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "english--2",
+    "steps": [
+      {
+        "text": "Push a3. Stockfish ranks this first.",
+        "uci": "a2a3",
+        "square": "a3"
+      },
+      {
+        "text": "Plant the knight on d4.",
+        "uci": "e2d4",
+        "square": "d4"
+      },
+      {
+        "text": "Plant the knight on d5.",
+        "uci": "c3d5",
+        "square": "d5"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "english--3",
+    "steps": [
+      {
+        "text": "Plant the knight on d5.",
+        "uci": "c3d5",
+        "square": "d5"
+      },
+      {
+        "text": "Push e3.",
+        "uci": "e2e3",
+        "square": "e3"
+      },
+      {
+        "text": "Push e4.",
+        "uci": "e2e4",
+        "square": "e4"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "evans-gambit--0",
+    "steps": [
+      {
+        "text": "Plant the knight on d5.",
+        "uci": "c3d5",
+        "square": "d5"
+      },
+      {
+        "text": "Push d5.",
+        "uci": "d4d5",
+        "square": "d5"
+      },
+      {
+        "text": "Push e5.",
+        "uci": "e4e5",
+        "square": "e5"
+      }
+    ],
+    "game": {
+      "white": "Anderssen",
+      "black": "Dufresne",
+      "event": "Berlin",
+      "year": 1852
+    }
+  },
+  {
+    "lineId": "evans-gambit--1",
+    "steps": [
+      {
+        "text": "Aim the bishop at c6.",
+        "uci": "b5c6",
+        "square": "c6"
+      },
+      {
+        "text": "Plant the knight on e5.",
+        "uci": "f3e5",
+        "square": "e5"
+      },
+      {
+        "text": "Aim the bishop at a4.",
+        "uci": "b5a4",
+        "square": "a4"
+      }
+    ],
+    "game": {
+      "white": "Anderssen",
+      "black": "Dufresne",
+      "event": "Berlin",
+      "year": 1852
+    }
+  },
+  {
+    "lineId": "evans-gambit--2",
+    "steps": [
+      {
+        "text": "Push e6.",
+        "uci": "e5e6",
+        "square": "e6"
+      },
+      {
+        "text": "Aim the bishop at e7.",
+        "uci": "a3e7",
+        "square": "e7"
+      },
+      {
+        "text": "Aim the bishop at f7.",
+        "uci": "c4f7",
+        "square": "f7"
+      }
+    ],
+    "game": {
+      "white": "Anderssen",
+      "black": "Dufresne",
+      "event": "Berlin",
+      "year": 1852
+    }
+  },
+  {
+    "lineId": "evans-gambit--3",
+    "steps": [
+      {
+        "text": "Castle kingside and connect the rooks.",
+        "uci": "e1g1",
+        "square": "g1"
+      },
+      {
+        "text": "Push e6.",
+        "uci": "e5e6",
+        "square": "e6"
+      },
+      {
+        "text": "Aim the bishop at f7.",
+        "uci": "c4f7",
+        "square": "f7"
+      }
+    ],
+    "game": {
+      "white": "Anderssen",
+      "black": "Dufresne",
+      "event": "Berlin",
+      "year": 1852
+    }
+  },
+  {
+    "lineId": "evans-gambit--4",
+    "steps": [
+      {
+        "text": "Plant the knight on d4.",
+        "uci": "f3d4",
+        "square": "d4"
+      },
+      {
+        "text": "Break with dxc7.",
+        "uci": "d6c7",
+        "square": "c7"
+      },
+      {
+        "text": "Push c3.",
+        "uci": "c2c3",
+        "square": "c3"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "evans-gambit--5",
+    "steps": [
+      {
+        "text": "Plant the knight on d4.",
+        "uci": "f3d4",
+        "square": "d4"
+      },
+      {
+        "text": "Push c3.",
+        "uci": "c2c3",
+        "square": "c3"
+      },
+      {
+        "text": "Push c4.",
+        "uci": "c2c4",
+        "square": "c4"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "evans-gambit--6",
+    "steps": [
+      {
+        "text": "Plant the knight on c6.",
+        "uci": "d4c6",
+        "square": "c6"
+      },
+      {
+        "text": "Push e5.",
+        "uci": "e4e5",
+        "square": "e5"
+      },
+      {
+        "text": "Push f3.",
+        "uci": "f2f3",
+        "square": "f3"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "french-kia--0",
+    "steps": [
+      {
+        "text": "Push c4. Stockfish ranks this first.",
+        "uci": "c2c4",
+        "square": "c4"
+      },
+      {
+        "text": "Plant the knight on d4.",
+        "uci": "f3d4",
+        "square": "d4"
+      },
+      {
+        "text": "Aim the bishop at c1.",
+        "uci": "f4c1",
+        "square": "c1"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "french-kia--1",
+    "steps": [
+      {
+        "text": "Break with exd5.",
+        "uci": "e4d5",
+        "square": "d5"
+      },
+      {
+        "text": "Plant the knight on c4.",
+        "uci": "d2c4",
+        "square": "c4"
+      },
+      {
+        "text": "Plant the knight on d4.",
+        "uci": "f3d4",
+        "square": "d4"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "french-kia--2",
+    "steps": [
+      {
+        "text": "Break with exd5.",
+        "uci": "e4d5",
+        "square": "d5"
+      },
+      {
+        "text": "Plant the knight on c4.",
+        "uci": "d2c4",
+        "square": "c4"
+      },
+      {
+        "text": "Plant the knight on f5.",
+        "uci": "h4f5",
+        "square": "f5"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "grand-prix--0",
+    "steps": [
+      {
+        "text": "Plant the knight on d6.",
+        "uci": "b5d6",
+        "square": "d6"
+      },
+      {
+        "text": "Push c3.",
+        "uci": "c2c3",
+        "square": "c3"
+      },
+      {
+        "text": "Push c4.",
+        "uci": "c2c4",
+        "square": "c4"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "grand-prix--1",
+    "steps": [
+      {
+        "text": "Push d4.",
+        "uci": "d3d4",
+        "square": "d4"
+      },
+      {
+        "text": "Aim the bishop at c6.",
+        "uci": "b5c6",
+        "square": "c6"
+      },
+      {
+        "text": "Plant the knight on d4.",
+        "uci": "f3d4",
+        "square": "d4"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "grand-prix--2",
+    "steps": [
+      {
+        "text": "Break with exf6.",
+        "uci": "e5f6",
+        "square": "f6"
+      },
+      {
+        "text": "Plant the knight on d5.",
+        "uci": "c3d5",
+        "square": "d5"
+      },
+      {
+        "text": "Push d3.",
+        "uci": "d2d3",
+        "square": "d3"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "jobava-london--0",
+    "steps": [
+      {
+        "text": "Bring the knight to b5. Stockfish ranks this first.",
+        "uci": "c3b5",
+        "square": "b5"
+      },
+      {
+        "text": "Break with dxc5.",
+        "uci": "d4c5",
+        "square": "c5"
+      },
+      {
+        "text": "Plant the knight on e4.",
+        "uci": "c3e4",
+        "square": "e4"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "jobava-london--1",
+    "steps": [
+      {
+        "text": "Plant the knight on d5.",
+        "uci": "c3d5",
+        "square": "d5"
+      },
+      {
+        "text": "Push e4.",
+        "uci": "e3e4",
+        "square": "e4"
+      },
+      {
+        "text": "Aim the bishop at a6.",
+        "uci": "f1a6",
+        "square": "a6"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "jobava-london--2",
+    "steps": [
+      {
+        "text": "Plant the knight on c6.",
+        "uci": "e5c6",
+        "square": "c6"
+      },
+      {
+        "text": "Push f3.",
+        "uci": "f2f3",
+        "square": "f3"
+      },
+      {
+        "text": "Aim the bishop at a6.",
+        "uci": "f1a6",
+        "square": "a6"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "jobava-london--3",
+    "steps": [
+      {
+        "text": "Break with dxc5.",
+        "uci": "d4c5",
+        "square": "c5"
+      },
+      {
+        "text": "Plant the knight on d5.",
+        "uci": "c3d5",
+        "square": "d5"
+      },
+      {
+        "text": "Push e4.",
+        "uci": "e3e4",
+        "square": "e4"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "kings-indian--0",
+    "steps": [
+      {
+        "text": "Plant the knight on d5.",
+        "uci": "e7d5",
+        "square": "d5"
+      },
+      {
+        "text": "Push c6.",
+        "uci": "c7c6",
+        "square": "c6"
+      },
+      {
+        "text": "Plant the knight on c6.",
+        "uci": "e7c6",
+        "square": "c6"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "kings-indian--1",
+    "steps": [
+      {
+        "text": "Push c5.",
+        "uci": "c7c5",
+        "square": "c5"
+      },
+      {
+        "text": "Plant the knight on c5.",
+        "uci": "a6c5",
+        "square": "c5"
+      },
+      {
+        "text": "Plant the knight on f6.",
+        "uci": "h7f6",
+        "square": "f6"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "kings-indian--2",
+    "steps": [
+      {
+        "text": "Push c5.",
+        "uci": "c7c5",
+        "square": "c5"
+      },
+      {
+        "text": "Plant the knight on c5.",
+        "uci": "d7c5",
+        "square": "c5"
+      },
+      {
+        "text": "Plant the knight on f6.",
+        "uci": "d7f6",
+        "square": "f6"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "kings-indian--3",
+    "steps": [
+      {
+        "text": "Plant the knight on d4.",
+        "uci": "c6d4",
+        "square": "d4"
+      },
+      {
+        "text": "Push d5.",
+        "uci": "d6d5",
+        "square": "d5"
+      },
+      {
+        "text": "Push e5.",
+        "uci": "e7e5",
+        "square": "e5"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "kings-indian--4",
+    "steps": [
+      {
+        "text": "Bring the queen to b6 behind the pieces. Stockfish ranks this first.",
+        "uci": "d8b6",
+        "square": "b6"
+      },
+      {
+        "text": "Break with cxd4.",
+        "uci": "c5d4",
+        "square": "d4"
+      },
+      {
+        "text": "Push c4.",
+        "uci": "c5c4",
+        "square": "c4"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "kings-indian--5",
+    "steps": [
+      {
+        "text": "Plant the knight on d5.",
+        "uci": "f6d5",
+        "square": "d5"
+      },
+      {
+        "text": "Push c4.",
+        "uci": "c5c4",
+        "square": "c4"
+      },
+      {
+        "text": "Push d6.",
+        "uci": "d7d6",
+        "square": "d6"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "london--0",
+    "steps": [
+      {
+        "text": "Break with dxc5.",
+        "uci": "d4c5",
+        "square": "c5"
+      },
+      {
+        "text": "Plant the knight on c6.",
+        "uci": "e5c6",
+        "square": "c6"
+      },
+      {
+        "text": "Push c4.",
+        "uci": "c3c4",
+        "square": "c4"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "london--1",
+    "steps": [
+      {
+        "text": "Aim the bishop at e2. Stockfish ranks this first.",
+        "uci": "f1e2",
+        "square": "e2"
+      },
+      {
+        "text": "Push c4.",
+        "uci": "c3c4",
+        "square": "c4"
+      },
+      {
+        "text": "Plant the knight on c4.",
+        "uci": "d2c4",
+        "square": "c4"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "london--2",
+    "steps": [
+      {
+        "text": "Break with dxc5.",
+        "uci": "d4c5",
+        "square": "c5"
+      },
+      {
+        "text": "Plant the knight on c4.",
+        "uci": "d2c4",
+        "square": "c4"
+      },
+      {
+        "text": "Plant the knight on e4.",
+        "uci": "d2e4",
+        "square": "e4"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "london--3",
+    "steps": [
+      {
+        "text": "Break with dxc5.",
+        "uci": "d4c5",
+        "square": "c5"
+      },
+      {
+        "text": "Aim the bishop at d6.",
+        "uci": "f4d6",
+        "square": "d6"
+      },
+      {
+        "text": "Plant the knight on e5.",
+        "uci": "f3e5",
+        "square": "e5"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "modern-benoni--0",
+    "steps": [
+      {
+        "text": "Plant the knight on f6. Stockfish ranks this first.",
+        "uci": "e4f6",
+        "square": "f6"
+      },
+      {
+        "text": "Push c4.",
+        "uci": "c5c4",
+        "square": "c4"
+      },
+      {
+        "text": "Push f5.",
+        "uci": "f7f5",
+        "square": "f5"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "modern-benoni--1",
+    "steps": [
+      {
+        "text": "Plant the knight on d5.",
+        "uci": "c7d5",
+        "square": "d5"
+      },
+      {
+        "text": "Push c4.",
+        "uci": "c5c4",
+        "square": "c4"
+      },
+      {
+        "text": "Push f5.",
+        "uci": "f7f5",
+        "square": "f5"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "modern-benoni--2",
+    "steps": [
+      {
+        "text": "Plant the knight on d5.",
+        "uci": "f6d5",
+        "square": "d5"
+      },
+      {
+        "text": "Push c4.",
+        "uci": "c5c4",
+        "square": "c4"
+      },
+      {
+        "text": "Plant the knight on c6.",
+        "uci": "b8c6",
+        "square": "c6"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "modern-benoni--3",
+    "steps": [
+      {
+        "text": "Castle kingside and connect the rooks. Stockfish ranks this first.",
+        "uci": "e8g8",
+        "square": "g8"
+      },
+      {
+        "text": "Push d5.",
+        "uci": "d7d5",
+        "square": "d5"
+      },
+      {
+        "text": "Push d6.",
+        "uci": "d7d6",
+        "square": "d6"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "modern-benoni--4",
+    "steps": [
+      {
+        "text": "Push c4.",
+        "uci": "c5c4",
+        "square": "c4"
+      },
+      {
+        "text": "Plant the knight on c6.",
+        "uci": "b8c6",
+        "square": "c6"
+      },
+      {
+        "text": "Aim the bishop at d6.",
+        "uci": "e7d6",
+        "square": "d6"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "modern-benoni--5",
+    "steps": [
+      {
+        "text": "Plant the knight on d5.",
+        "uci": "f6d5",
+        "square": "d5"
+      },
+      {
+        "text": "Push c4.",
+        "uci": "c5c4",
+        "square": "c4"
+      },
+      {
+        "text": "Push e5.",
+        "uci": "e7e5",
+        "square": "e5"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "pirc--0",
+    "steps": [
+      {
+        "text": "Plant the knight on e4.",
+        "uci": "c5e4",
+        "square": "e4"
+      },
+      {
+        "text": "Push d5.",
+        "uci": "d6d5",
+        "square": "d5"
+      },
+      {
+        "text": "Aim the bishop at h3.",
+        "uci": "c8h3",
+        "square": "h3"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "pirc--1",
+    "steps": [
+      {
+        "text": "Plant the knight on d5.",
+        "uci": "f6d5",
+        "square": "d5"
+      },
+      {
+        "text": "Push c4.",
+        "uci": "c5c4",
+        "square": "c4"
+      },
+      {
+        "text": "Push e5.",
+        "uci": "e7e5",
+        "square": "e5"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "pirc--2",
+    "steps": [
+      {
+        "text": "Plant the knight on e4.",
+        "uci": "f6e4",
+        "square": "e4"
+      },
+      {
+        "text": "Push c5.",
+        "uci": "c6c5",
+        "square": "c5"
+      },
+      {
+        "text": "Push d5.",
+        "uci": "d6d5",
+        "square": "d5"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "pirc--3",
+    "steps": [
+      {
+        "text": "Plant the knight on e4.",
+        "uci": "f6e4",
+        "square": "e4"
+      },
+      {
+        "text": "Push c5.",
+        "uci": "c6c5",
+        "square": "c5"
+      },
+      {
+        "text": "Push d5.",
+        "uci": "d6d5",
+        "square": "d5"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "queens-gambit--0",
+    "steps": [
+      {
+        "text": "Plant the knight on d5.",
+        "uci": "c3d5",
+        "square": "d5"
+      },
+      {
+        "text": "Push e4.",
+        "uci": "e3e4",
+        "square": "e4"
+      },
+      {
+        "text": "Aim the bishop at f6.",
+        "uci": "g5f6",
+        "square": "f6"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "queens-gambit--1",
+    "steps": [
+      {
+        "text": "Bring the knight to f3. Stockfish ranks this first.",
+        "uci": "g1f3",
+        "square": "f3"
+      },
+      {
+        "text": "Push e4.",
+        "uci": "e3e4",
+        "square": "e4"
+      },
+      {
+        "text": "Push f3.",
+        "uci": "f2f3",
+        "square": "f3"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "queens-gambit--2",
+    "steps": [
+      {
+        "text": "Plant the knight on d5.",
+        "uci": "c3d5",
+        "square": "d5"
+      },
+      {
+        "text": "Push d5.",
+        "uci": "d4d5",
+        "square": "d5"
+      },
+      {
+        "text": "Push e4.",
+        "uci": "e3e4",
+        "square": "e4"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "queens-gambit--3",
+    "steps": [
+      {
+        "text": "Bring the knight to d2. Stockfish ranks this first.",
+        "uci": "b1d2",
+        "square": "d2"
+      },
+      {
+        "text": "Push e5.",
+        "uci": "e4e5",
+        "square": "e5"
+      },
+      {
+        "text": "Aim the bishop at d2.",
+        "uci": "c1d2",
+        "square": "d2"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "scandinavian--0",
+    "steps": [
+      {
+        "text": "Castle kingside and connect the rooks.",
+        "uci": "e8g8",
+        "square": "g8"
+      },
+      {
+        "text": "Push c5.",
+        "uci": "c6c5",
+        "square": "c5"
+      },
+      {
+        "text": "Push e5.",
+        "uci": "e6e5",
+        "square": "e5"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "scandinavian--1",
+    "steps": [
+      {
+        "text": "Castle queenside and take the open file.",
+        "uci": "e8c8",
+        "square": "c8"
+      },
+      {
+        "text": "Plant the knight on d4.",
+        "uci": "c6d4",
+        "square": "d4"
+      },
+      {
+        "text": "Push e5.",
+        "uci": "e6e5",
+        "square": "e5"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "scandinavian--2",
+    "steps": [
+      {
+        "text": "Break with cxd4. Stockfish ranks this first.",
+        "uci": "c5d4",
+        "square": "d4"
+      },
+      {
+        "text": "Plant the knight on d4.",
+        "uci": "c6d4",
+        "square": "d4"
+      },
+      {
+        "text": "Plant the knight on e5.",
+        "uci": "c6e5",
+        "square": "e5"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "scandinavian--3",
+    "steps": [
+      {
+        "text": "Push c5.",
+        "uci": "c7c5",
+        "square": "c5"
+      },
+      {
+        "text": "Aim the bishop at a2.",
+        "uci": "e6a2",
+        "square": "a2"
+      },
+      {
+        "text": "Plant the knight on c5.",
+        "uci": "d7c5",
+        "square": "c5"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "scotch-gambit--0",
+    "steps": [
+      {
+        "text": "Bring the knight to d2. Stockfish ranks this first.",
+        "uci": "b1d2",
+        "square": "d2"
+      },
+      {
+        "text": "Push c3.",
+        "uci": "c2c3",
+        "square": "c3"
+      },
+      {
+        "text": "Push c4.",
+        "uci": "c2c4",
+        "square": "c4"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "scotch-gambit--1",
+    "steps": [
+      {
+        "text": "Push c3.",
+        "uci": "c2c3",
+        "square": "c3"
+      },
+      {
+        "text": "Aim the bishop at f7.",
+        "uci": "b3f7",
+        "square": "f7"
+      },
+      {
+        "text": "Put a rook on e5 and work that file.",
+        "uci": "e1e5",
+        "square": "e5"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "scotch-gambit--2",
+    "steps": [
+      {
+        "text": "Plant the knight on d4.",
+        "uci": "f3d4",
+        "square": "d4"
+      },
+      {
+        "text": "Push c3.",
+        "uci": "c2c3",
+        "square": "c3"
+      },
+      {
+        "text": "Push c4.",
+        "uci": "c2c4",
+        "square": "c4"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "scotch-gambit--3",
+    "steps": [
+      {
+        "text": "Plant the knight on c5.",
+        "uci": "e4c5",
+        "square": "c5"
+      },
+      {
+        "text": "Aim the bishop at d2.",
+        "uci": "h6d2",
+        "square": "d2"
+      },
+      {
+        "text": "Put a rook on d2 and work that file.",
+        "uci": "e2d2",
+        "square": "d2"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "scotch-gambit--4",
+    "steps": [
+      {
+        "text": "Push e5.",
+        "uci": "e4e5",
+        "square": "e5"
+      },
+      {
+        "text": "Aim the bishop at f6.",
+        "uci": "g5f6",
+        "square": "f6"
+      },
+      {
+        "text": "Aim the bishop at f7.",
+        "uci": "c4f7",
+        "square": "f7"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "scotch-gambit--5",
+    "steps": [
+      {
+        "text": "Push f3.",
+        "uci": "f2f3",
+        "square": "f3"
+      },
+      {
+        "text": "Aim the bishop at e4.",
+        "uci": "d3e4",
+        "square": "e4"
+      },
+      {
+        "text": "Aim the bishop at a6.",
+        "uci": "d3a6",
+        "square": "a6"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "scotch-gambit--6",
+    "steps": [
+      {
+        "text": "Plant the knight on c6.",
+        "uci": "d4c6",
+        "square": "c6"
+      },
+      {
+        "text": "Push e5.",
+        "uci": "e4e5",
+        "square": "e5"
+      },
+      {
+        "text": "Push f3.",
+        "uci": "f2f3",
+        "square": "f3"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "slav--0",
+    "steps": [
+      {
+        "text": "Plant the knight on e5.",
+        "uci": "d7e5",
+        "square": "e5"
+      },
+      {
+        "text": "Push f5.",
+        "uci": "f7f5",
+        "square": "f5"
+      },
+      {
+        "text": "Push f6.",
+        "uci": "f7f6",
+        "square": "f6"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "slav--1",
+    "steps": [
+      {
+        "text": "Plant the knight on d4.",
+        "uci": "c6d4",
+        "square": "d4"
+      },
+      {
+        "text": "Push e5.",
+        "uci": "e6e5",
+        "square": "e5"
+      },
+      {
+        "text": "Aim the bishop at c3.",
+        "uci": "b4c3",
+        "square": "c3"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "slav--2",
+    "steps": [
+      {
+        "text": "Break with dxc4.",
+        "uci": "d5c4",
+        "square": "c4"
+      },
+      {
+        "text": "Plant the knight on c5.",
+        "uci": "d7c5",
+        "square": "c5"
+      },
+      {
+        "text": "Plant the knight on e4.",
+        "uci": "f6e4",
+        "square": "e4"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "slav--3",
+    "steps": [
+      {
+        "text": "Push c5.",
+        "uci": "c6c5",
+        "square": "c5"
+      },
+      {
+        "text": "Plant the knight on c5.",
+        "uci": "d7c5",
+        "square": "c5"
+      },
+      {
+        "text": "Plant the knight on e4.",
+        "uci": "f6e4",
+        "square": "e4"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "slav--4",
+    "steps": [
+      {
+        "text": "Push c5.",
+        "uci": "c7c5",
+        "square": "c5"
+      },
+      {
+        "text": "Plant the knight on c6.",
+        "uci": "b8c6",
+        "square": "c6"
+      },
+      {
+        "text": "Plant the knight on e4.",
+        "uci": "f6e4",
+        "square": "e4"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "smith-morra--0",
+    "steps": [
+      {
+        "text": "Plant the knight on e5.",
+        "uci": "f3e5",
+        "square": "e5"
+      },
+      {
+        "text": "Aim the bishop at f7.",
+        "uci": "c4f7",
+        "square": "f7"
+      },
+      {
+        "text": "Plant the knight on d4.",
+        "uci": "f3d4",
+        "square": "d4"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "smith-morra--1",
+    "steps": [
+      {
+        "text": "Break with exd6.",
+        "uci": "e5d6",
+        "square": "d6"
+      },
+      {
+        "text": "Aim the bishop at d5.",
+        "uci": "c4d5",
+        "square": "d5"
+      },
+      {
+        "text": "Aim the bishop at a6.",
+        "uci": "c4a6",
+        "square": "a6"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "smith-morra--2",
+    "steps": [
+      {
+        "text": "Plant the knight on d4.",
+        "uci": "f3d4",
+        "square": "d4"
+      },
+      {
+        "text": "Push c5.",
+        "uci": "c4c5",
+        "square": "c5"
+      },
+      {
+        "text": "Push e5.",
+        "uci": "e4e5",
+        "square": "e5"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "smith-morra--3",
+    "steps": [
+      {
+        "text": "Plant the knight on d4.",
+        "uci": "b5d4",
+        "square": "d4"
+      },
+      {
+        "text": "Push f4.",
+        "uci": "f3f4",
+        "square": "f4"
+      },
+      {
+        "text": "Bring the knight to a7.",
+        "uci": "b5a7",
+        "square": "a7"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "vienna-gambit--0",
+    "steps": [
+      {
+        "text": "Push c4.",
+        "uci": "c3c4",
+        "square": "c4"
+      },
+      {
+        "text": "Plant the knight on d4.",
+        "uci": "f3d4",
+        "square": "d4"
+      },
+      {
+        "text": "Put a rook on d5 and work that file.",
+        "uci": "d1d5",
+        "square": "d5"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "vienna-gambit--1",
+    "steps": [
+      {
+        "text": "Plant the knight on d4.",
+        "uci": "f3d4",
+        "square": "d4"
+      },
+      {
+        "text": "Push c3.",
+        "uci": "c2c3",
+        "square": "c3"
+      },
+      {
+        "text": "Push c4.",
+        "uci": "c2c4",
+        "square": "c4"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "vienna-gambit--2",
+    "steps": [
+      {
+        "text": "Plant the knight on d5.",
+        "uci": "c3d5",
+        "square": "d5"
+      },
+      {
+        "text": "Push d5.",
+        "uci": "d4d5",
+        "square": "d5"
+      },
+      {
+        "text": "Aim the bishop at f4.",
+        "uci": "c1f4",
+        "square": "f4"
+      }
+    ],
+    "game": null
+  },
+  {
+    "lineId": "vienna-gambit--3",
+    "steps": [
+      {
+        "text": "Plant the knight on e5.",
+        "uci": "f3e5",
+        "square": "e5"
+      },
+      {
+        "text": "Break with fxe5.",
+        "uci": "f4e5",
+        "square": "e5"
+      },
+      {
+        "text": "Plant the knight on d4.",
+        "uci": "f3d4",
+        "square": "d4"
+      }
+    ],
+    "game": null
+  }
+]
