@@ -7,7 +7,6 @@ import {
   listDueCards,
   markReviewed,
   parseStudyMode,
-  setProgressUser,
 } from "./schedule";
 
 describe("study modes", () => {
@@ -52,7 +51,6 @@ describe("saved reps", () => {
         },
       },
     });
-    setProgressUser(null);
   });
 
   it("keeps a miss off the queue until 4 hours, then due at level 1", () => {

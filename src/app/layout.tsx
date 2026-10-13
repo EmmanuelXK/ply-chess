@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Source_Serif_4 } from "next/font/google";
-import { AuthProvider } from "@/components/auth/auth-provider";
 import { RegisterServiceWorker } from "@/components/pwa/register-sw";
 import { APP_NAME, APP_TAGLINE, PWA_ICONS } from "@/lib/version";
 import "./globals.css";
@@ -81,10 +80,8 @@ export default function RootLayout({
         />
       </head>
       <body className="app-body bg-[#040406] text-[#f3ebe0]">
-        <AuthProvider>
-          <RegisterServiceWorker />
-          {children}
-        </AuthProvider>
+        <RegisterServiceWorker />
+        {children}
       </body>
     </html>
   );

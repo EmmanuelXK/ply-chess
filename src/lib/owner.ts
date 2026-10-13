@@ -2,9 +2,9 @@ import {
   draftFromRaw,
   type ProfileDraft,
   type SidePref,
-} from "@/lib/auth/sanitize";
+} from "@/lib/profile-draft";
 
-/** Personal copy of Opening Edge. Shown without a session. */
+/** Personal copy of Opening Edge. Stored on this device. */
 export const OWNER_NAME = "Rajitha Emmanuel";
 
 export const OWNER_KEY = "opening-edge.owner.v1";
@@ -62,10 +62,8 @@ export function writeLocalOwner(draft: ProfileDraft): LocalOwner {
   return stored;
 }
 
-export function ownerLabel(localName?: string | null, sessionName?: string | null): string {
+export function ownerLabel(localName?: string | null): string {
   const local = localName?.trim();
   if (local) return local;
-  const session = sessionName?.trim();
-  if (session) return session;
   return OWNER_NAME;
 }

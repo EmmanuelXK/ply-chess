@@ -1,64 +1,31 @@
-# V1 — Launch with personal Profiles v1.0
+# Opening Edge
 
-Club-ready cut. Signed-in friends get everything. No subscriptions.
+Personal phone trainer. Home, Learn, and Analyze open with no account. The display name, side, and club tag save in this browser. Learn progress saves in this browser too.
 
-## Auth (Google only for V1)
+## Vercel
 
-1. **Google** — Supabase Auth → Providers → Google. Paste the Google client id + secret in the Supabase dashboard (never in this repo). If Google is still off in the dashboard, the app stays on `/login` with a short message (it does not dump raw Supabase JSON).
-
-**Phone OTP is deferred** — no Twilio / SMS work in this cut. Do not treat Phone as a V1 login method.
-
-Redirect URLs in Supabase Auth:
-
-- `https://blitzbar.app/auth/callback`
-- `http://127.0.0.1:43173/auth/callback`
-
-Site URL: `https://blitzbar.app`
-
-Do **not** enable email/password or email magic links for V1.
-
-## Dedicated project
-
-Create an **Opening Edge** Supabase project (do not reuse YUDO or MeeToo). Free-tier orgs are limited to two projects — pause or upgrade one unused project first.
-
-Apply `supabase/migrations/20260913180000_v1_profiles_progress.sql` on that project.
-
-## Vercel env vars (production + preview)
-
-Public only — these are safe in the browser:
+Optional server keys only. The app builds and runs when they are unset.
 
 ```
-NEXT_PUBLIC_SUPABASE_URL=https://YOUR-PROJECT.supabase.co
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_...
+LICHESS_TOKEN=
+AI_GATEWAY_API_KEY=
 ```
 
-Legacy `NEXT_PUBLIC_SUPABASE_ANON_KEY` also works. **Never** add `SERVICE_ROLE`, Twilio, or Google client secrets as `NEXT_PUBLIC_*`.
+`ANTHROPIC_API_KEY` is an alternate coach key. Do not add secrets as `NEXT_PUBLIC_*`.
 
-Voice playback is off in this cut. Do not add TTS keys.
+Voice playback is off. Do not add TTS keys.
 
 Redeploy after saving env vars.
 
 ## iOS Add to Home Screen
 
-After this deploy, delete the old Home Screen icon and Add to Home Screen again. iOS will not replace a saved icon on the next open. The touch icon is the full-bleed fedora (`apple-touch-icon-v2.png`).
+After a deploy that changes the icon, delete the old Home Screen icon and Add to Home Screen again. iOS will not replace a saved icon on the next open. The touch icon is the full-bleed fedora (`apple-touch-icon-v2.png`).
 
 ## Local
 
 ```bash
-cp .env.example .env.local
-# fill public Supabase URL + publishable key
+npm install
 npm run dev
 ```
 
-Personal use opens Home, Learn, and Analyze with no login, including production. Set `OPENING_EDGE_REQUIRE_AUTH=1` only if a later public launch should put the Google wall back.
-
-## Security checklist
-
-- [x] No service-role / JWT / Twilio / Google secrets in the repo or PR
-- [x] `.gitignore` covers `.env*` (`.env.example` placeholders only)
-- [x] Client uses public URL + publishable/anon key
-- [x] RLS on `profiles`, `opening_progress`, `opening_reps` via `auth.uid()`
-- [x] Login UI is Google only (Phone deferred)
-- [x] Git history on this branch: no committed `.env` or private keys found
-
-If a secret was ever pasted into Vercel or a chat, rotate it in the provider dashboard.
+App: http://127.0.0.1:43173
