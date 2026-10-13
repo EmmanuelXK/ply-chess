@@ -1,3 +1,5 @@
+Read [PROJECT_NOTES.md](PROJECT_NOTES.md) before any change. Obey the locked rules in that file. Do not change them unless the owner explicitly says so. Do not build unless the owner says "build". Do not merge unless the owner approves.
+
 <!-- BEGIN:nextjs-agent-rules -->
 
 # This is NOT the Next.js you know
