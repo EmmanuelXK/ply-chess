@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { FormEvent, PointerEvent as ReactPointerEvent } from "react";
 
+import { COACH_OUT_OF_CREDIT } from "@/lib/coach/errors";
 import type { CoachPosition } from "@/lib/coach/prompt";
 
 const DEVICE_KEY = "edges-device";
@@ -40,9 +41,11 @@ export function CoachBubble({
   const [lines, setLines] = useState<
     Array<{ role: "user" | "coach"; text: string; arrows?: string[]; squares?: string[] }>
   >([]);
+  const [outOfCredit, setOutOfCredit] = useState(false);
   const drag = useRef<{ x: number; y: number; right: number; bottom: number; moved: boolean } | null>(
     null,
   );
+  const dragged = useRef(false);
   const host = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -90,14 +93,24 @@ export function CoachBubble({
   };
 
   const onPointerUp = (event: ReactPointerEvent<HTMLButtonElement>) => {
-    const moved = drag.current?.moved ?? false;
+    dragged.current = drag.current?.moved ?? false;
     drag.current = null;
-    event.currentTarget.releasePointerCapture(event.pointerId);
-    if (!moved) setOpen((value) => !value);
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+  };
+
+  const onClick = () => {
+    if (dragged.current) {
+      dragged.current = false;
+      return;
+    }
+    setOpen((value) => !value);
   };
 
   const resting = remaining === 0;
   const disconnected = connected === false;
+  const blocked = disconnected || resting || outOfCredit;
   const [panelBox, setPanelBox] = useState<{
     left: number;
     width: number;
@@ -136,7 +149,7 @@ export function CoachBubble({
   const send = async (event: FormEvent) => {
     event.preventDefault();
     const question = draft.trim();
-    if (!question || pending || resting || disconnected) return;
+    if (!question || pending || resting || disconnected || outOfCredit) return;
     setDraft("");
     setLines((current) => [...current, { role: "user", text: question }]);
     setPending(true);
@@ -164,6 +177,10 @@ export function CoachBubble({
         body.reply ||
         body.error ||
         (body.resting ? "Coach is resting, back tomorrow" : "Coach could not answer. Try again.");
+      if (reply === COACH_OUT_OF_CREDIT || body.error === COACH_OUT_OF_CREDIT) {
+        setOutOfCredit(true);
+        return;
+      }
       const arrows = body.error ? [] : (body.arrows ?? []).filter((item) => typeof item === "string");
       const squares = body.error ? [] : (body.squares ?? []).filter((item) => typeof item === "string");
       setLines((current) => [...current, { role: "coach", text: reply, arrows, squares }]);
@@ -202,7 +219,13 @@ export function CoachBubble({
           <header>
             <strong>Coach</strong>
             <span className="coach-left" data-testid="coach-remaining">
-              {remaining == null ? "…" : resting ? "0 left" : `${remaining} left`}
+              {outOfCredit
+                ? "No credit"
+                : remaining == null
+                  ? "…"
+                  : resting
+                    ? "0 left"
+                    : `${remaining} left`}
             </span>
           </header>
           <div className="coach-log">
@@ -214,6 +237,11 @@ export function CoachBubble({
             {resting ? (
               <p className="coach-note" data-testid="coach-resting">
                 Coach is resting, back tomorrow
+              </p>
+            ) : null}
+            {outOfCredit ? (
+              <p className="coach-note" data-testid="coach-credit">
+                Coach account out of credit
               </p>
             ) : null}
             {lines.map((line, index) => (
@@ -234,7 +262,7 @@ export function CoachBubble({
               </div>
             ))}
           </div>
-          {disconnected || resting ? null : (
+          {blocked ? null : (
             <form className="coach-form" onSubmit={send}>
               <input
                 value={draft}
@@ -259,6 +287,7 @@ export function CoachBubble({
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
+        onClick={onClick}
       >
         <svg viewBox="0 0 16 16" aria-hidden="true">
           <circle cx="8" cy="8" r="2.2" fill="currentColor" />

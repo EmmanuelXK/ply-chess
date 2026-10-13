@@ -16,6 +16,7 @@ import {
   clearChessgroundTransients,
   dropStuckFadingPieces,
 } from "@/lib/chess/clear-transients";
+import { markAnchor } from "@/lib/chess/mark-anchor";
 
 export interface BoardArrow {
   orig: Key;
@@ -359,7 +360,7 @@ export function ChessBoard({
       {mark ? (
         <span
           className={`move-mark move-mark-${mark.kind}`}
-          style={glyphStyle(mark.square, orientation)}
+          style={markAnchor(mark.square, orientation)}
           title={QUALITY_NAME[mark.kind]}
           aria-label={QUALITY_NAME[mark.kind]}
           data-testid="quality-badge"
@@ -371,7 +372,7 @@ export function ChessBoard({
         <span
           key={`${g.square}-${g.glyph}`}
           className={`move-glyph glyph-${glyphClass(g.glyph)}`}
-          style={glyphStyle(g.square, orientation)}
+          style={markAnchor(g.square, orientation)}
           aria-hidden
         >
           {g.glyph}
@@ -388,17 +389,6 @@ function glyphClass(g: MoveGlyph): string {
   if (g === "?!") return "dubious";
   if (g === "?") return "mistake";
   return "blunder";
-}
-
-function glyphStyle(square: Key, orientation: "white" | "black") {
-  const file = square.charCodeAt(0) - 97;
-  const rank = Number(square[1]) - 1;
-  const x = orientation === "white" ? file : 7 - file;
-  const y = orientation === "white" ? 7 - rank : rank;
-  return {
-    left: `${(x + 0.68) * 12.5}%`,
-    top: `${(y + 0.02) * 12.5}%`,
-  };
 }
 
 function toShapes(arrows: BoardArrow[], circles: Key[]): DrawShape[] {

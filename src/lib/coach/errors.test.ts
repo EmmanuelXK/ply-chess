@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { coachFailureMessage, spentCount } from "@/lib/coach/errors";
+import { coachErrorDetail, coachFailureMessage, spentCount } from "@/lib/coach/errors";
 
 describe("coach errors", () => {
   it("names credit and overload without spending a failed answer", () => {
@@ -16,5 +16,17 @@ describe("coach errors", () => {
     assert.equal(coachFailureMessage(500, "boom"), "Coach could not answer. Try again.");
     assert.equal(spentCount(4, true), 3);
     assert.equal(spentCount(4, false), 4);
+  });
+
+  it("reads string and object provider bodies as a clean credit message", () => {
+    assert.equal(
+      coachErrorDetail(403, { error: "You exceeded your current quota" }),
+      "Coach account out of credit",
+    );
+    assert.equal(
+      coachErrorDetail(402, { error: { message: "Insufficient funds" } }),
+      "Coach account out of credit",
+    );
+    assert.equal(coachErrorDetail(500, { message: "boom" }), "Coach could not answer. Try again.");
   });
 });
