@@ -4,6 +4,8 @@ iPhone-first PWA dashboard (`100dvh`, no page scroll). **25 weapons** on one **Y
 
 Production: [https://blitzbar.app](https://blitzbar.app) (Vercel project `ply-chess`, GitHub `EmmanuelXK/ply-chess`).
 
+Handoff for the next person or agent: [PROJECT_NOTES.md](PROJECT_NOTES.md).
+
 ## Repertoire
 
 Home is four racks on one page. Rack membership lives in `src/lib/openings/racks.ts`; tile copy lives in `src/lib/openings/specs.ts`. Tiles are square marks with the name in regular sans underneath and a quiet Gambit or System caption. Phone vs iPad Air uses the auto size arranger.
