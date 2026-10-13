@@ -1,4 +1,4 @@
-import { CoachHttpError } from "@/lib/coach/errors";
+import { CoachHttpError, coachErrorDetail } from "@/lib/coach/errors";
 import { COACH_SYSTEM } from "@/lib/coach/prompt";
 
 /** Visible reply budget. Thinking is turned down so this cap is the answer. */
@@ -55,11 +55,11 @@ export async function askCoach(user: string, signal?: AbortSignal): Promise<stri
 
   const body = (await response.json().catch(() => null)) as {
     content?: MessageBlock[];
-    error?: { message?: string };
+    error?: { message?: string } | string;
+    message?: string;
   } | null;
   if (!response.ok) {
-    const detail = body?.error?.message?.slice(0, 180) || `coach request failed (${response.status})`;
-    throw new CoachHttpError(response.status, detail);
+    throw new CoachHttpError(response.status, coachErrorDetail(response.status, body));
   }
   const text = (body?.content ?? [])
     .filter((block) => block.type === "text" && block.text?.trim())

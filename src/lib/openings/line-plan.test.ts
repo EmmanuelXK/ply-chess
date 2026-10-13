@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
+import { Chess, type Square } from "chess.js";
+
 import { weapons } from "@/lib/openings/book";
 import { buildLinePlan, catalogGamesPlay, planForLine } from "@/lib/openings/line-plan";
 
@@ -21,6 +23,26 @@ describe("line plans", () => {
           assert.ok(step.text.length >= 8);
           assert.equal(step.text.includes("Clean"), false);
           if (step.uci) assert.match(step.uci, /^[a-h][1-8][a-h][1-8][qrbn]?$/);
+        }
+        const end = new Chess();
+        for (const san of line.moves) end.move(san);
+        const user = weapon.side === "white" ? "w" : "b";
+        const parts = end.fen().split(" ");
+        parts[1] = user;
+        parts[3] = "-";
+        const seat = new Chess(parts.join(" "));
+        for (const step of stored.steps) {
+          if (!step.uci) continue;
+          const from = step.uci.slice(0, 2);
+          const piece = end.get(from as Square);
+          assert.equal(piece?.color, user, `${line.id} ${step.uci} piece`);
+          const played = seat.move({
+            from,
+            to: step.uci.slice(2, 4),
+            promotion: step.uci[4],
+          });
+          assert.ok(played, `${line.id} ${step.uci}`);
+          seat.undo();
         }
       }
     }

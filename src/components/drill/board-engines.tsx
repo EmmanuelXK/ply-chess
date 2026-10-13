@@ -65,7 +65,7 @@ export function BoardEngines({
         best: line.uci[0],
       }
     : null;
-  const shown = known(live) ? live : book;
+  const shown = known(book) ? book : live;
   const scores: BoardScores = {
     tick: shown,
     pending: !known(shown),
@@ -101,7 +101,7 @@ function useBoardScores(): BoardScores {
   return scores;
 }
 
-/** Vertical bar: the book score shows at once, then the live search replaces it. */
+/** Vertical bar: the stored book score while the board is on a line. Live search fills in only off book. */
 export function BoardEvalBar({ orientation }: { orientation: "white" | "black" }) {
   const { tick, pending } = useBoardScores();
   return (

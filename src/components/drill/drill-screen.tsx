@@ -532,7 +532,13 @@ export function DrillScreen({
 
   const restart = () => {
     cancelTimer();
+    replyGen.current += 1;
     setHold(false);
+    setMiss(null);
+    setAwaitReply(false);
+    setCrowd(null);
+    setShown(null);
+    setPlanPick(0);
     setSession((n) => n + 1);
   };
 
@@ -569,7 +575,7 @@ export function DrillScreen({
       if (missRef.current) return;
       if (isUserPly(opening.side, plyRef.current)) return;
       if (plyRef.current >= opening.moves.length) return;
-      applyPly(plyRef.current + 1);
+      playReplyRef.current();
       return;
     }
     if (repsRef.current !== "learn") return;

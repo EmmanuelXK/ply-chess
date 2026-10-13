@@ -17,7 +17,7 @@ export function coachFailureMessage(status: number, detail: string): string {
   const text = `${status} ${detail}`.toLowerCase();
   if (
     status === 402 ||
-    /credit|billing|insufficient|too low|payment required/.test(text)
+    /credit|billing|insufficient|too low|payment required|quota|balance|funds/.test(text)
   ) {
     return "Coach account out of credit";
   }
@@ -34,3 +34,18 @@ export function coachFailureMessage(status: number, detail: string): string {
   }
   return "Coach could not answer. Try again.";
 }
+
+/** Read a provider failure whether the body uses a string or `{ error: { message } }`. */
+export function coachErrorDetail(status: number, body: unknown): string {
+  const record = body && typeof body === "object" ? (body as Record<string, unknown>) : null;
+  const error = record?.error;
+  let detail = "";
+  if (typeof error === "string") detail = error;
+  else if (error && typeof error === "object") {
+    const message = (error as { message?: unknown }).message;
+    if (typeof message === "string") detail = message;
+  } else if (typeof record?.message === "string") detail = record.message;
+  return coachFailureMessage(status, detail.slice(0, 180) || `coach request failed (${status})`);
+}
+
+export const COACH_OUT_OF_CREDIT = "Coach account out of credit";

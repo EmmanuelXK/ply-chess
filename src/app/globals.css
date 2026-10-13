@@ -1949,12 +1949,11 @@ body,
 .move-mark {
   position: absolute;
   z-index: 9;
-  padding: 0.08rem 0.34rem 0.1rem;
+  padding: 0.08rem 0.28rem 0.1rem;
   border-radius: 999px;
   font-size: 9px;
   font-weight: 800;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  letter-spacing: 0;
   line-height: 1.15;
   pointer-events: none;
   box-shadow: 0 1px 2px rgb(0 0 0 / 45%);
@@ -3779,6 +3778,8 @@ body,
 
 .auth-phone,
 .set-save {
+  display: block;
+  width: 100%;
   margin-top: 0.45rem;
   color: var(--cream);
   background: var(--charcoal-2);
@@ -3794,6 +3795,7 @@ body,
 }
 
 .auth-label {
+  display: block;
   margin: 0.45rem 0 0.2rem;
   font-size: 10px;
   letter-spacing: 0.12em;
@@ -3802,6 +3804,9 @@ body,
 }
 
 .auth-input {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
   height: 2.6rem;
   border-radius: 0.75rem;
   background: var(--ink-2);
@@ -3888,9 +3893,8 @@ body,
 .board-heading h1,
 .analyze-sheet-head h2 {
   margin: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow: visible;
+  white-space: normal;
   font-family: var(--font-heading);
   font-size: var(--title-size);
   font-weight: 650;
@@ -4199,10 +4203,8 @@ body,
   font-weight: 550;
   line-height: 1.3;
   color: var(--mist);
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+  overflow: visible;
+  white-space: normal;
 }
 
 .board-panel .learn-readout {
