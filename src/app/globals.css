@@ -4514,6 +4514,76 @@ body,
   color: var(--mist);
 }
 
+.crowd-hint {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.3;
+  color: var(--mist);
+}
+
+.plan-card {
+  margin: 0;
+  padding: 0.38rem 0.5rem 0.32rem;
+  border-radius: 0.75rem;
+  background: #12110f;
+  border: 1px solid var(--line);
+}
+
+.plan-card header {
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ember);
+}
+
+.plan-card ol {
+  margin: 0.22rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.08rem;
+}
+
+.plan-card button {
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  color: var(--cream);
+  font-size: 12px;
+  line-height: 1.3;
+  padding: 0.12rem 0.15rem;
+  border-radius: 0.4rem;
+}
+
+.plan-card button[aria-pressed="true"] {
+  background: rgb(245 158 11 / 16%);
+}
+
+.plan-game {
+  margin: 0.28rem 0 0;
+  font-size: 11px;
+  line-height: 1.3;
+  color: var(--mist);
+}
+
+.coach-line p {
+  margin: 0;
+}
+
+.coach-show {
+  margin-top: 0.28rem;
+  padding: 0.12rem 0.45rem;
+  border-radius: 999px;
+  border: 1px solid rgb(245 158 11 / 45%);
+  background: transparent;
+  color: var(--ember);
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 0.04em;
+}
+
 .coach-bubble {
   position: absolute;
   z-index: 30;

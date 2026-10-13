@@ -1,8 +1,10 @@
 import { Chess } from "chess.js";
 import { NextResponse, type NextRequest } from "next/server";
 
+import { CoachHttpError, coachFailureMessage, spentCount } from "@/lib/coach/errors";
 import { askCoach, coachKeyKind } from "@/lib/coach/model";
 import { coachUserPrompt, type CoachPosition } from "@/lib/coach/prompt";
+import { parseCoachShow } from "@/lib/coach/show";
 import {
   COACH_COOKIE,
   COACH_DAILY_LIMIT,
@@ -129,8 +131,8 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const next = used + 1;
-  rememberCount(bucket, parisDay(), next);
+  const reserved = used + 1;
+  rememberCount(bucket, parisDay(), reserved);
   const moves = Array.isArray(body.moves)
     ? body.moves.filter((move): move is string => typeof move === "string").slice(0, 80)
     : [];
@@ -148,27 +150,42 @@ export async function POST(request: NextRequest) {
     note: text(body.note, 400) || null,
   };
 
-  try {
-    const reply = await askCoach(coachUserPrompt(position, question), AbortSignal.timeout(20_000));
-    return NextResponse.json(statusPayload(true, COACH_DAILY_LIMIT - next, { reply }), {
+  const release = (error: unknown) => {
+    const count = spentCount(reserved, true);
+    rememberCount(bucket, parisDay(), count);
+    const message =
+      error instanceof CoachHttpError
+        ? coachFailureMessage(error.status, error.message)
+        : "Coach could not answer. Try again.";
+    const connectedNow = message !== "Coach not connected yet";
+    return NextResponse.json(statusPayload(connectedNow, COACH_DAILY_LIMIT - count, { error: message }), {
+      status: message === "Coach not connected yet" ? 200 : 502,
       headers: {
         "Cache-Control": "private, no-store",
-        "Set-Cookie": cookieHeader(device, next),
+        "Set-Cookie": cookieHeader(device, count),
       },
     });
-  } catch {
-    rememberCount(bucket, parisDay(), used);
+  };
+
+  try {
+    const raw = await askCoach(coachUserPrompt(position, question), AbortSignal.timeout(20_000));
+    const show = parseCoachShow(raw, fen);
+    if (!show) return release(new CoachHttpError(502, "empty reply"));
+    const count = spentCount(reserved, false);
     return NextResponse.json(
-      statusPayload(true, COACH_DAILY_LIMIT - used, {
-        error: "Coach could not answer. Try again.",
+      statusPayload(true, COACH_DAILY_LIMIT - count, {
+        reply: show.text,
+        arrows: show.arrows,
+        squares: show.squares,
       }),
       {
-        status: 502,
         headers: {
           "Cache-Control": "private, no-store",
-          "Set-Cookie": cookieHeader(device, used),
+          "Set-Cookie": cookieHeader(device, count),
         },
       },
     );
+  } catch (error) {
+    return release(error);
   }
 }

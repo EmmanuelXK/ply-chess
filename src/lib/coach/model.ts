@@ -1,3 +1,4 @@
+import { CoachHttpError } from "@/lib/coach/errors";
 import { COACH_SYSTEM } from "@/lib/coach/prompt";
 
 /** Visible reply budget. Thinking is turned down so this cap is the answer. */
@@ -24,10 +25,10 @@ interface MessageBlock {
  */
 export async function askCoach(user: string, signal?: AbortSignal): Promise<string> {
   const kind = coachKeyKind();
-  if (!kind) throw new Error("coach-not-configured");
+  if (!kind) throw new CoachHttpError(0, "coach-not-configured");
   const gateway = kind === "gateway";
   const key = (gateway ? process.env.AI_GATEWAY_API_KEY : process.env.ANTHROPIC_API_KEY)?.trim();
-  if (!key) throw new Error("coach-not-configured");
+  if (!key) throw new CoachHttpError(0, "coach-not-configured");
 
   const response = await fetch(
     gateway ? "https://ai-gateway.vercel.sh/v1/messages" : "https://api.anthropic.com/v1/messages",
@@ -58,13 +59,13 @@ export async function askCoach(user: string, signal?: AbortSignal): Promise<stri
   } | null;
   if (!response.ok) {
     const detail = body?.error?.message?.slice(0, 180) || `coach request failed (${response.status})`;
-    throw new Error(detail);
+    throw new CoachHttpError(response.status, detail);
   }
   const text = (body?.content ?? [])
     .filter((block) => block.type === "text" && block.text?.trim())
     .map((block) => block.text?.trim())
     .join("\n")
     .trim();
-  if (!text) throw new Error("coach returned an empty reply");
+  if (!text) throw new CoachHttpError(502, "coach returned an empty reply");
   return text;
 }

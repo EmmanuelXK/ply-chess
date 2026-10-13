@@ -78,6 +78,9 @@ export function AnalyzeScreen({
   const [menu, setMenu] = useState<"engine" | "notation" | null>(null);
   const [promotion, setPromotion] = useState<{ from: Key; to: Key } | null>(null);
   const [resync, setResync] = useState(0);
+  const [shown, setShown] = useState<{ fen: string; arrows: string[]; squares: string[] } | null>(
+    null,
+  );
 
   const limit = useMemo<AnalysisLimit>(
     () => (infinite ? { kind: "infinite" } : { kind: "bounded", depth, movetimeMs }),
@@ -153,16 +156,31 @@ export function AnalyzeScreen({
   };
   const pending = !top;
   const arrows = useMemo<BoardArrow[]>(() => {
+    const next: BoardArrow[] = [];
     const uci = showArrow ? top?.uci[0] : undefined;
-    if (!uci || uci.length < 4) return [];
-    return [
-      {
+    if (uci && uci.length >= 4) {
+      next.push({
         orig: uci.slice(0, 2) as Key,
         dest: uci.slice(2, 4) as Key,
         brush: "yellow",
-      },
-    ];
-  }, [showArrow, top]);
+      });
+    }
+    if (shown && shown.fen === pos.fen) {
+      for (const move of shown.arrows) {
+        if (move.length < 4) continue;
+        next.push({
+          orig: move.slice(0, 2) as Key,
+          dest: move.slice(2, 4) as Key,
+          brush: "green",
+        });
+      }
+    }
+    return next;
+  }, [pos.fen, showArrow, shown, top]);
+  const circles = useMemo<Key[]>(() => {
+    if (!shown || shown.fen !== pos.fen) return [];
+    return shown.squares.filter((square) => square.length === 2) as Key[];
+  }, [pos.fen, shown]);
   const quality = gradeAnalyzedMove(tree);
   const qualitySquare = analyzedMoveSquare(tree);
   const mark: BoardMark | null =
@@ -240,6 +258,7 @@ export function AnalyzeScreen({
             dests={dests}
             lastMove={pos.lastMove as Key[] | null}
             arrows={arrows}
+            circles={circles}
             mark={mark}
             orientation={orientation}
             turnColor={turnColor}
@@ -414,6 +433,7 @@ export function AnalyzeScreen({
           best: top?.san[0] ?? null,
           note: null,
         }}
+        onShow={(mark) => setShown({ fen: pos.fen, arrows: mark.arrows, squares: mark.squares })}
       />
         </>
       }

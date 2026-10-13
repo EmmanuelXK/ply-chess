@@ -19,14 +19,27 @@ function deviceId(): string {
   }
 }
 
-export function CoachBubble({ position }: { position: CoachPosition }) {
+export interface CoachMark {
+  arrows: string[];
+  squares: string[];
+}
+
+export function CoachBubble({
+  position,
+  onShow,
+}: {
+  position: CoachPosition;
+  onShow?: (mark: CoachMark) => void;
+}) {
   const [open, setOpen] = useState(false);
   const [spot, setSpot] = useState({ right: 12, bottom: 118 });
   const [connected, setConnected] = useState<boolean | null>(null);
   const [remaining, setRemaining] = useState<number | null>(null);
   const [draft, setDraft] = useState("");
   const [pending, setPending] = useState(false);
-  const [lines, setLines] = useState<Array<{ role: "user" | "coach"; text: string }>>([]);
+  const [lines, setLines] = useState<
+    Array<{ role: "user" | "coach"; text: string; arrows?: string[]; squares?: string[] }>
+  >([]);
   const drag = useRef<{ x: number; y: number; right: number; bottom: number; moved: boolean } | null>(
     null,
   );
@@ -142,6 +155,8 @@ export function CoachBubble({ position }: { position: CoachPosition }) {
         remaining?: number;
         connected?: boolean;
         resting?: boolean;
+        arrows?: string[];
+        squares?: string[];
       };
       if (typeof body.remaining === "number") setRemaining(body.remaining);
       if (body.connected === false) setConnected(false);
@@ -149,7 +164,9 @@ export function CoachBubble({ position }: { position: CoachPosition }) {
         body.reply ||
         body.error ||
         (body.resting ? "Coach is resting, back tomorrow" : "Coach could not answer. Try again.");
-      setLines((current) => [...current, { role: "coach", text: reply }]);
+      const arrows = body.error ? [] : (body.arrows ?? []).filter((item) => typeof item === "string");
+      const squares = body.error ? [] : (body.squares ?? []).filter((item) => typeof item === "string");
+      setLines((current) => [...current, { role: "coach", text: reply, arrows, squares }]);
     } catch {
       setLines((current) => [
         ...current,
@@ -200,9 +217,21 @@ export function CoachBubble({ position }: { position: CoachPosition }) {
               </p>
             ) : null}
             {lines.map((line, index) => (
-              <p key={`${line.role}-${index}`} className={`coach-line coach-line-${line.role}`}>
-                {line.text}
-              </p>
+              <div key={`${line.role}-${index}`} className={`coach-line coach-line-${line.role}`}>
+                <p>{line.text}</p>
+                {line.role === "coach" && (line.arrows?.length || line.squares?.length) ? (
+                  <button
+                    type="button"
+                    className="coach-show"
+                    data-testid="coach-show"
+                    onClick={() =>
+                      onShow?.({ arrows: line.arrows ?? [], squares: line.squares ?? [] })
+                    }
+                  >
+                    Show me
+                  </button>
+                ) : null}
+              </div>
             ))}
           </div>
           {disconnected || resting ? null : (
