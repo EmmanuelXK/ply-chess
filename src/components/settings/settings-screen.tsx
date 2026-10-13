@@ -2,19 +2,15 @@
 
 import { useState } from "react";
 import { TabBar } from "@/components/app/tab-bar";
-import { useAuth } from "@/components/auth/auth-provider";
-import type { ProfileDraft } from "@/lib/auth/sanitize";
-import { profileSeed } from "@/lib/auth/profile";
+import type { ProfileDraft } from "@/lib/profile-draft";
 import { defaultOwner, writeLocalOwner } from "@/lib/owner";
 import { useLocalOwner } from "@/lib/use-local-owner";
 import { APP_NAME, APP_TAGLINE, APP_VERSION } from "@/lib/version";
 import { InstallHint } from "@/components/settings/install-hint";
 
 export function SettingsScreen() {
-  const { user, profile, save } = useAuth();
   const stored = useLocalOwner();
-  const session = profile ?? (user ? profileSeed(user) : null);
-  const base = stored ?? session ?? defaultOwner();
+  const base = stored ?? defaultOwner();
   const [edits, setEdits] = useState<ProfileDraft | null>(null);
   const [saved, setSaved] = useState("");
   const draft = edits ?? base;
@@ -94,14 +90,9 @@ export function SettingsScreen() {
             type="button"
             className="set-save"
             onClick={() => {
-              const next = writeLocalOwner(draft);
+              writeLocalOwner(draft);
               setEdits(null);
               setSaved("Saved on this device.");
-              if (user) {
-                void save(next).catch(() => {
-                  /* Local copy already landed. */
-                });
-              }
             }}
           >
             Save profile
